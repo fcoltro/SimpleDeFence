@@ -50,7 +50,8 @@ namespace pylorak.Windows.WFP
                 var subs0 = new Interop.FWPM_FILTER_SUBSCRIPTION0
                 {
                     flags = Interop.FilterSubscriptionFlags.FWPM_SUBSCRIPTION_FLAG_NOTIFY_ON_ADD | Interop.FilterSubscriptionFlags.FWPM_SUBSCRIPTION_FLAG_NOTIFY_ON_DELETE,
-                    enumTemplate = null
+                    enumTemplate = null,
+                    sessionKey = engine.SessionKey
                 };
 
                 if (layerKey.HasValue)
