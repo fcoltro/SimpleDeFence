@@ -77,7 +77,7 @@ namespace pylorak.TinyWall
                     if (sc.Status == ServiceControllerStatus.Stopped)
                     {
                         sc.Start();
-                        sc.WaitForStatus(ServiceControllerStatus.Running, System.TimeSpan.FromSeconds(5));
+                        sc.WaitForStatus(ServiceControllerStatus.Running, System.TimeSpan.FromSeconds(15));
                     }
                 }
                 catch (Exception e)
@@ -155,7 +155,7 @@ namespace pylorak.TinyWall
                     // Stop server
                     twController.RequestServerStop();
                     DateTime startTs = DateTime.Now;
-                    while (!IsServiceStopped() && ((DateTime.Now - startTs) < TimeSpan.FromSeconds(5)))
+                    while (!IsServiceStopped() && ((DateTime.Now - startTs) < TimeSpan.FromSeconds(15)))
                         System.Threading.Thread.Sleep(200);
                     if (!IsServiceStopped())
                     {
