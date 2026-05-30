@@ -6,7 +6,7 @@
 // <remarks/>
 //------------------------------------------------------------------
 
-namespace Microsoft.Samples
+namespace Microsoft.Samples.TaskDialog
 {
     using System;
     using System.Windows.Forms;

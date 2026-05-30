@@ -5,7 +5,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Windows.Forms;
-using Microsoft.Samples;
+using Microsoft.Samples.TaskDialog;
 using pylorak.Windows;
 
 namespace pylorak.TinyWall

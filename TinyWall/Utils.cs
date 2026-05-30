@@ -12,7 +12,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
-using Microsoft.Samples;
+using Microsoft.Samples.TaskDialog;
 using pylorak.Windows;
 
 namespace pylorak.TinyWall

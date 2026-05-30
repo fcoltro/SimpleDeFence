@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Forms;
 using System.Reflection;
+using Microsoft.Samples.TaskDialog;
 using pylorak.Windows;
 
 namespace pylorak.TinyWall
@@ -321,8 +322,8 @@ namespace pylorak.TinyWall
                     Utils.ShowMessageBox(
                         Resources.Messages.PortListInvalid,
                         Resources.Messages.TinyWall,
-                        Microsoft.Samples.TaskDialogCommonButtons.Ok,
-                        Microsoft.Samples.TaskDialogIcon.Warning,
+                        TaskDialogCommonButtons.Ok,
+                        TaskDialogIcon.Warning,
                         this);
 
                     return;
