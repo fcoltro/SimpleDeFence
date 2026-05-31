@@ -91,6 +91,8 @@
             this.btnWeb = new System.Windows.Forms.Button();
             this.sfd = new System.Windows.Forms.SaveFileDialog();
             this.ofd = new System.Windows.Forms.OpenFileDialog();
+            this.label13 = new System.Windows.Forms.Label();
+            this.comboUiTheme = new System.Windows.Forms.ComboBox();
             this.tabPage3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -302,16 +304,18 @@
             // tableLayoutPanel1
             // 
             resources.ApplyResources(this.tableLayoutPanel1, "tableLayoutPanel1");
+            this.tableLayoutPanel1.Controls.Add(this.comboUiTheme, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label13, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.label11, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.chkHostsBlocklist, 4, 3);
-            this.tableLayoutPanel1.Controls.Add(this.chkEnableBlocklists, 3, 1);
-            this.tableLayoutPanel1.Controls.Add(this.chkBlockMalwarePorts, 4, 2);
-            this.tableLayoutPanel1.Controls.Add(this.chkDisplayOffBlock, 0, 4);
-            this.tableLayoutPanel1.Controls.Add(this.chkLockHostsFile, 3, 0);
+            this.tableLayoutPanel1.Controls.Add(this.chkHostsBlocklist, 4, 4);
+            this.tableLayoutPanel1.Controls.Add(this.chkEnableBlocklists, 3, 2);
+            this.tableLayoutPanel1.Controls.Add(this.chkBlockMalwarePorts, 4, 3);
+            this.tableLayoutPanel1.Controls.Add(this.chkDisplayOffBlock, 3, 0);
+            this.tableLayoutPanel1.Controls.Add(this.chkLockHostsFile, 3, 1);
             this.tableLayoutPanel1.Controls.Add(this.comboLanguages, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.chkEnableHotkeys, 0, 3);
-            this.tableLayoutPanel1.Controls.Add(this.chkAutoUpdateCheck, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.chkAskForExceptionDetails, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.chkEnableHotkeys, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.chkAutoUpdateCheck, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.chkAskForExceptionDetails, 0, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             // 
             // label11
@@ -560,6 +564,18 @@
             // 
             this.sfd.DefaultExt = "xml";
             // 
+            // label13
+            // 
+            resources.ApplyResources(this.label13, "label13");
+            this.label13.Name = "label13";
+            // 
+            // comboUiTheme
+            // 
+            resources.ApplyResources(this.comboUiTheme, "comboUiTheme");
+            this.comboUiTheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboUiTheme.FormattingEnabled = true;
+            this.comboUiTheme.Name = "comboUiTheme";
+            // 
             // SettingsForm
             // 
             resources.ApplyResources(this, "$this");
@@ -657,5 +673,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Button btnGithub;
         private System.Windows.Forms.ColumnHeader columnLastModified;
+        private System.Windows.Forms.ComboBox comboUiTheme;
+        private System.Windows.Forms.Label label13;
     }
 }

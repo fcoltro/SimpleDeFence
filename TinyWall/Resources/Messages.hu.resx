@@ -380,4 +380,13 @@ A kiválasztott fájl a következő része lehet: {0}. Ahhoz hogy az alkalmazás
   <data name="SubjectTypeUwpApp" xml:space="preserve">
     <value>UWP app</value>
   </data>
+  <data name="UiThemeLight" xml:space="preserve">
+    <value>Világos</value>
+  </data>
+  <data name="UiThemeDark" xml:space="preserve">
+    <value>Sötét</value>
+  </data>
+  <data name="UiThemeAuto" xml:space="preserve">
+    <value>Rendszerbeállítás</value>
+  </data>
 </root>

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.Samples.TaskDialog;
+using Microsoft.Win32;
+using pylorak.Windows;
+using System;
 using System.Collections.Generic;
-using System.Security;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -8,12 +10,11 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Security.Principal;
 using System.Text;
-using System.Windows.Forms;
 using System.Threading;
-using Microsoft.Samples.TaskDialog;
-using pylorak.Windows;
+using System.Windows.Forms;
 
 namespace pylorak.TinyWall
 {
@@ -224,6 +225,28 @@ namespace pylorak.TinyWall
                 return Environment.GetEnvironmentVariable("ProgramFiles(x86)");
             else
                 return Environment.GetEnvironmentVariable("ProgramFiles");
+        }
+
+        internal static bool AppsUseLightTheme()
+        {
+            try
+            {
+                return 0 != (int)Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme", 1);
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        internal static bool IsDarkModeActive(ControllerSettings settings)
+        {
+            if (string.Equals(settings.UiTheme, "dark", StringComparison.InvariantCultureIgnoreCase))
+                return true;
+            else if (string.Equals(settings.UiTheme, "light", StringComparison.InvariantCultureIgnoreCase))
+                return false;
+            else
+                return !AppsUseLightTheme();
         }
 
         internal static void CompressDeflate(string inputFile, string outputFile)

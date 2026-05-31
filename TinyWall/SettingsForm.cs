@@ -35,7 +35,7 @@ namespace pylorak.TinyWall
         private readonly AsyncIconScanner IconScanner;
         private readonly List<ListViewItem> ExceptionItems = new();
         private readonly List<ListViewItem> FilteredExceptionItems = new();
-        private readonly DarkModeCS DarkMode;
+        private readonly DarkModeCS? DarkMode;
         private bool LoadingSettings;
         private string? m_NewPassword;
         private Size IconSize = new((int)Math.Round(16 * Utils.DpiScalingFactor), (int)Math.Round(16 * Utils.DpiScalingFactor));
@@ -44,7 +44,8 @@ namespace pylorak.TinyWall
         {
             InitializeComponent();
             Utils.SetRightToLeft(this);
-            this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.SystemDefault };
+            if (Utils.IsDarkModeActive(controller))
+                this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.DarkMode };
             this.IconList.ImageSize = IconSize;
             this.Icon = Resources.Icons.firewall;
             this.btnOK.Image = GlobalInstances.ApplyBtnIcon;
@@ -119,12 +120,22 @@ namespace pylorak.TinyWall
                 chkAskForExceptionDetails.Checked = TmpConfig.Controller.AskForExceptionDetails;
                 chkEnableHotkeys.Checked = TmpConfig.Controller.EnableGlobalHotkeys;
                 comboLanguages.SelectedIndex = 0;
-                for(int i = 0; i < comboLanguages.Items.Count; ++i)
+                for (int i = 0; i < comboLanguages.Items.Count; ++i)
                 {
                     IdWithName item = (IdWithName)comboLanguages.Items[i];
                     if (item.Id.Equals(TmpConfig.Controller.Language, StringComparison.OrdinalIgnoreCase))
                     {
                         comboLanguages.SelectedIndex = i;
+                        break;
+                    }
+                }
+                comboUiTheme.SelectedIndex = 0;
+                for (int i = 0; i < comboUiTheme.Items.Count; ++i)
+                {
+                    IdWithName item = (IdWithName)comboUiTheme.Items[i];
+                    if (item.Id.Equals(TmpConfig.Controller.UiTheme, StringComparison.OrdinalIgnoreCase))
+                    {
+                        comboUiTheme.SelectedIndex = i;
                         break;
                     }
                 }
@@ -225,8 +236,8 @@ namespace pylorak.TinyWall
 
         private ListViewItem ListItemFromAppException(FirewallExceptionV3 ex, UwpPackageList packageList)
         {
-            Color deletedRowBackColor = DarkMode.IsDarkMode ? Color.Black : Color.LightGray;
-            Color blockedRowBackColor = DarkMode.IsDarkMode ? Color.IndianRed : Color.LightPink;
+            Color deletedRowBackColor = (DarkMode != null) && DarkMode.IsDarkMode ? Color.Black : Color.LightGray;
+            Color blockedRowBackColor = (DarkMode != null) && DarkMode.IsDarkMode ? Color.IndianRed : Color.LightPink;
 
             var li = new ListViewItem() { Tag = ex };
 
@@ -334,6 +345,7 @@ namespace pylorak.TinyWall
             TmpConfig.Service.ActiveProfile.DisplayOffBlock = chkDisplayOffBlock.Checked;
 
             TmpConfig.Controller.Language = ((IdWithName)comboLanguages.SelectedItem).Id;
+            TmpConfig.Controller.UiTheme = ((IdWithName)comboUiTheme.SelectedItem).Id;
 
             this.DialogResult = DialogResult.OK;
         }
@@ -570,6 +582,10 @@ namespace pylorak.TinyWall
             comboLanguages.Items.Add(new IdWithName("ja", "日本語"));
             comboLanguages.Items.Add(new IdWithName("ko", "한국어"));
             comboLanguages.Items.Add(new IdWithName("zh", "汉语"));
+
+            comboUiTheme.Items.Add(new IdWithName("auto", Resources.Messages.UiThemeAuto));
+            comboUiTheme.Items.Add(new IdWithName("light", Resources.Messages.UiThemeLight));
+            comboUiTheme.Items.Add(new IdWithName("dark", Resources.Messages.UiThemeDark));
 
             lblVersion.Text = string.Format(CultureInfo.CurrentCulture, "{0} {1}", lblVersion.Text, Application.ProductVersion);
 

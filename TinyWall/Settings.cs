@@ -12,9 +12,11 @@ namespace pylorak.TinyWall
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/PKSoft")]
     public sealed class ControllerSettings : ISerializable<ControllerSettings>
     {
-        // UI Localization
+        // UI Customization
         [DataMember(EmitDefaultValue = false)]
         public string Language = "auto";
+        [DataMember(EmitDefaultValue = false)]
+        public string UiTheme = "auto";
 
         // Connections window
         [DataMember(EmitDefaultValue = false)]

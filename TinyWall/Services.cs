@@ -30,7 +30,8 @@ namespace pylorak.TinyWall
         {
             InitializeComponent();
             Utils.SetRightToLeft(this);
-            this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.SystemDefault };
+            if (Utils.IsDarkModeActive(ActiveConfig.Controller))
+                this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.DarkMode };
             this.Icon = Resources.Icons.firewall;
             this.btnOK.Image = GlobalInstances.ApplyBtnIcon;
             this.btnCancel.Image = GlobalInstances.CancelBtnIcon;

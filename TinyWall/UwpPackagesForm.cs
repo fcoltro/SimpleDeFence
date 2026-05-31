@@ -11,13 +11,14 @@ namespace pylorak.TinyWall
     {
         private readonly List<UwpPackageList.Package> SelectedPackages = new ();
         private readonly Size IconSize = new ((int)Math.Round(16 * Utils.DpiScalingFactor), (int)Math.Round(16 * Utils.DpiScalingFactor));
-        private readonly DarkModeCS DarkMode;
+        private readonly DarkModeCS? DarkMode;
 
         public UwpPackagesForm(bool multiSelect)
         {
             InitializeComponent();
             Utils.SetRightToLeft(this);
-            this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.SystemDefault };
+            if (Utils.IsDarkModeActive(ActiveConfig.Controller))
+                this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.DarkMode };
             this.listView.MultiSelect = multiSelect;
             this.Icon = Resources.Icons.firewall;
             this.btnOK.Image = GlobalInstances.ApplyBtnIcon;

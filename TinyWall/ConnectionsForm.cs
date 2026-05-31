@@ -18,14 +18,15 @@ namespace pylorak.TinyWall
         private readonly TinyWallController Controller;
         private readonly AsyncIconScanner IconScanner;
         private readonly Size IconSize = new((int)Math.Round(16 * Utils.DpiScalingFactor), (int)Math.Round(16 * Utils.DpiScalingFactor));
-        private readonly DarkModeCS DarkMode;
+        private readonly DarkModeCS? DarkMode;
         private bool EnableListUpdate = false;
 
         internal ConnectionsForm(TinyWallController ctrl)
         {
             InitializeComponent();
             Utils.SetRightToLeft(this);
-            this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.SystemDefault };
+            if (Utils.IsDarkModeActive(ActiveConfig.Controller))
+                this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.DarkMode };
             this.IconList.ImageSize = IconSize;
             this.Icon = Resources.Icons.firewall;
             this.Controller = ctrl;

@@ -15,7 +15,7 @@ namespace pylorak.TinyWall
 
         private List<FirewallExceptionV3> TmpExceptionSettings = new();
         private readonly bool PreserveSettingsOnSubjectChange = false;
-        private readonly DarkModeCS DarkMode;
+        private readonly DarkModeCS? DarkMode;
 
         internal List<FirewallExceptionV3> ExceptionSettings
         {
@@ -26,7 +26,8 @@ namespace pylorak.TinyWall
         {
             InitializeComponent();
             Utils.SetRightToLeft(this);
-            this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.SystemDefault };
+            if (Utils.IsDarkModeActive(ActiveConfig.Controller))
+                this.DarkMode = new(this) { ColorMode = DarkModeCS.DisplayMode.DarkMode };
 
             try
             {

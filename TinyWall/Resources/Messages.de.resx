@@ -345,4 +345,13 @@ Die ausgewählte Datei kann zu {0} gehören. Um sicherzustellen, dass die Anwend
   <data name="SubjectTypeUwpApp" xml:space="preserve">
     <value>UWP App</value>
   </data>
+  <data name="UiThemeLight" xml:space="preserve">
+    <value>Hell</value>
+  </data>
+  <data name="UiThemeDark" xml:space="preserve">
+    <value>Dunkel</value>
+  </data>
+  <data name="UiThemeAuto" xml:space="preserve">
+    <value>Systemeinstellung</value>
+  </data>
 </root>

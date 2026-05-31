@@ -639,6 +639,33 @@ namespace pylorak.TinyWall.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatic.
+        /// </summary>
+        internal static string UiThemeAuto {
+            get {
+                return ResourceManager.GetString("UiThemeAuto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dark.
+        /// </summary>
+        internal static string UiThemeDark {
+            get {
+                return ResourceManager.GetString("UiThemeDark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Light.
+        /// </summary>
+        internal static string UiThemeLight {
+            get {
+                return ResourceManager.GetString("UiThemeLight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Related files found
         ///The selected executable could be part of {0}. To ensure that this application can be used without limitations, it is recommended to also unblock some other files..
         /// </summary>

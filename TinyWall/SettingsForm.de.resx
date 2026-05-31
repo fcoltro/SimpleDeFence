@@ -165,6 +165,9 @@
   <data name="tabPage2.Text" xml:space="preserve">
     <value>Spezielle Ausnahmen</value>
   </data>
+  <data name="label13.Text" xml:space="preserve">
+    <value>UI Design:</value>
+  </data>
   <data name="label11.Text" xml:space="preserve">
     <value>Sprache:</value>
   </data>

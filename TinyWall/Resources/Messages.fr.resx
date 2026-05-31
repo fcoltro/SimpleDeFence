@@ -361,4 +361,13 @@ L'exécutable trouvé est une partie de {0}. Afin d'être sûr que cette applica
   <data name="SubjectTypeExecutable" xml:space="preserve">
     <value>Exécutable</value>
   </data>
+  <data name="UiThemeLight" xml:space="preserve">
+    <value>Clair</value>
+  </data>
+  <data name="UiThemeDark" xml:space="preserve">
+    <value>Sombre</value>
+  </data>
+  <data name="UiThemeAuto" xml:space="preserve">
+    <value>Système</value>
+  </data>
 </root>

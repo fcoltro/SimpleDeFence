@@ -177,6 +177,9 @@
   <data name="tabPage2.Text" xml:space="preserve">
     <value>Speciális kivételek</value>
   </data>
+  <data name="label13.Text" xml:space="preserve">
+    <value>Megjelenés:</value>
+  </data>
   <data name="label11.Text" xml:space="preserve">
     <value>Nyelv:</value>
   </data>
