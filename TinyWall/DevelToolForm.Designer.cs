@@ -326,7 +326,7 @@
             this.txtUpdateOutput.Name = "txtUpdateOutput";
             this.txtUpdateOutput.Size = new System.Drawing.Size(423, 20);
             this.txtUpdateOutput.TabIndex = 19;
-            this.txtUpdateOutput.Text = "C:\\Users\\Karoly\\Nextcloud\\TinyWall\\TinyWall3\\OnlineUpdate";
+            this.txtUpdateOutput.Text = "C:\\data\\Nextcloud\\TinyWall\\OnlineUpdate";
             // 
             // txtUpdateInstallerProjectDir
             // 
@@ -334,7 +334,7 @@
             this.txtUpdateInstallerProjectDir.Name = "txtUpdateInstallerProjectDir";
             this.txtUpdateInstallerProjectDir.Size = new System.Drawing.Size(423, 20);
             this.txtUpdateInstallerProjectDir.TabIndex = 12;
-            this.txtUpdateInstallerProjectDir.Text = "C:\\Users\\Karoly\\Nextcloud\\TinyWall\\TinyWall3\\MsiSetup";
+            this.txtUpdateInstallerProjectDir.Text = "C:\\data\\Nextcloud\\TinyWall\\TinyWall3\\MsiSetup";
             // 
             // btnUpdateCreate
             // 
@@ -493,7 +493,7 @@
             this.txtSigntool.Name = "txtSigntool";
             this.txtSigntool.Size = new System.Drawing.Size(329, 20);
             this.txtSigntool.TabIndex = 10;
-            this.txtSigntool.Text = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\signtool.exe";
+            this.txtSigntool.Text = "C:\\Program Files (x86)\\Microsoft SDKs\\ClickOnce\\SignTool\\signtool.exe";
             // 
             // label13
             // 

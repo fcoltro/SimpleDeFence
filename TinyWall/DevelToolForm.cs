@@ -357,7 +357,7 @@ namespace pylorak.TinyWall
 
         private void btnSignDir_Click(object sender, EventArgs e)
         {
-            fbd.SelectedPath = Path.GetDirectoryName(txtCert.Text);
+            fbd.SelectedPath = txtSignDir.Text;
             if (fbd.ShowDialog(this) == System.Windows.Forms.DialogResult.Cancel)
                 return;
 
