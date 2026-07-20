@@ -231,9 +231,6 @@
   <data name="lblLinkAttributions.Text" xml:space="preserve">
     <value>Подяки</value>
   </data>
-  <data name="btnDonate.AccessibleName" xml:space="preserve">
-    <value>Пожертва</value>
-  </data>
   <data name="lblLinkLicense.Text" xml:space="preserve">
     <value>Ліцензія</value>
   </data>

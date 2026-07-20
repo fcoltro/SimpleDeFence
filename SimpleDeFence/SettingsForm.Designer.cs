@@ -83,7 +83,6 @@
             this.btnExport = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.lblLinkAttributions = new System.Windows.Forms.LinkLabel();
-            this.btnDonate = new System.Windows.Forms.PictureBox();
             this.lblLinkLicense = new System.Windows.Forms.LinkLabel();
             this.label10 = new System.Windows.Forms.Label();
             this.lblAboutHomepageLink = new System.Windows.Forms.LinkLabel();
@@ -102,7 +101,6 @@
             this.tabControl1.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.btnDonate)).BeginInit();
             this.SuspendLayout();
             // 
             // btnCancel
@@ -502,7 +500,6 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.lblLinkAttributions);
-            this.groupBox2.Controls.Add(this.btnDonate);
             this.groupBox2.Controls.Add(this.lblLinkLicense);
             this.groupBox2.Controls.Add(this.label10);
             this.groupBox2.Controls.Add(this.lblAboutHomepageLink);
@@ -519,18 +516,6 @@
             this.lblLinkAttributions.Name = "lblLinkAttributions";
             this.lblLinkAttributions.TabStop = true;
             this.lblLinkAttributions.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lblLinkAttributions_LinkClicked);
-            // 
-            // btnDonate
-            // 
-            resources.ApplyResources(this.btnDonate, "btnDonate");
-            this.btnDonate.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
-            this.btnDonate.BackColor = System.Drawing.Color.Transparent;
-            this.btnDonate.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnDonate.Name = "btnDonate";
-            this.btnDonate.TabStop = false;
-            this.btnDonate.Click += new System.EventHandler(this.btnDonate_Click);
-            this.btnDonate.MouseEnter += new System.EventHandler(this.btnDonate_MouseEnter);
-            this.btnDonate.MouseLeave += new System.EventHandler(this.btnDonate_MouseLeave);
             // 
             // lblLinkLicense
             // 
@@ -615,7 +600,6 @@
             this.tabPage4.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.btnDonate)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -666,7 +650,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.LinkLabel lblLinkLicense;
-        private System.Windows.Forms.PictureBox btnDonate;
         private System.Windows.Forms.Button btnImport;
         private System.Windows.Forms.Button btnExport;
         private System.Windows.Forms.OpenFileDialog ofd;

@@ -228,9 +228,6 @@
   <data name="lblLinkAttributions.Text" xml:space="preserve">
     <value>属性</value>
   </data>
-  <data name="btnDonate.AccessibleName" xml:space="preserve">
-    <value>寄付</value>
-  </data>
   <data name="lblLinkLicense.Text" xml:space="preserve">
     <value>利用許諾契約</value>
   </data>

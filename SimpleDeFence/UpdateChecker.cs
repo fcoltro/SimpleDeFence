@@ -190,7 +190,7 @@ namespace SimpleDeFence
     internal static class UpdateChecker
     {
         private const int UPDATER_VERSION = 7;
-        private const string URL_UPDATE_DESCRIPTOR = @"https://tinywall.pados.hu/updates/UpdVer{0}/update.json";
+        private const string URL_UPDATE_DESCRIPTOR = @"https://raw.githubusercontent.com/fcoltro/SimpleDeFence/refs/heads/main/updates/UpdVer{0}/update.json";
 
         internal static UpdateDescriptor GetDescriptor()
         {

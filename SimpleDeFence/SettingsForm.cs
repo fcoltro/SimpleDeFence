@@ -65,7 +65,6 @@ namespace SimpleDeFence
             this.btnExport.Image = GlobalInstances.ExportBtnIcon;
             this.btnUpdate.Image = GlobalInstances.UpdateBtnIcon;
             this.btnWeb.Image = GlobalInstances.WebBtnIcon;
-            this.btnDonate.BackgroundImage = Resources.Icons.donate;
 
             const string TEMP_ICON_KEY = "generic-executable";
             IconList.Images.Add(TEMP_ICON_KEY, Utils.GetIconContained(".exe", IconSize.Width, IconSize.Height));
@@ -548,26 +547,6 @@ namespace SimpleDeFence
                 Process.Start(psi)?.Dispose();
             }
             catch { }
-        }
-
-        private void btnDonate_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var psi = new ProcessStartInfo(@"https://tinywall.pados.hu/donate.php") { UseShellExecute = true };
-                Process.Start(psi)?.Dispose();
-            }
-            catch { }
-        }
-
-        private void btnDonate_MouseEnter(object sender, EventArgs e)
-        {
-            btnDonate.BorderStyle = BorderStyle.FixedSingle;
-        }
-
-        private void btnDonate_MouseLeave(object sender, EventArgs e)
-        {
-            btnDonate.BorderStyle = BorderStyle.None;
         }
 
         private void btnImport_Click(object sender, EventArgs e)

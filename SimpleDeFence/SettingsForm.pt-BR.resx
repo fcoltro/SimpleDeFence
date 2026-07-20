@@ -228,9 +228,6 @@
   <data name="lblLinkAttributions.Text" xml:space="preserve">
     <value>Créditos</value>
   </data>
-  <data name="btnDonate.AccessibleName" xml:space="preserve">
-    <value>Doação</value>
-  </data>
   <data name="lblLinkLicense.Text" xml:space="preserve">
     <value>Licença</value>
   </data>

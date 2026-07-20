@@ -1461,42 +1461,6 @@
   <data name="&gt;&gt;lblLinkAttributions.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="btnDonate.AccessibleDescription" xml:space="preserve">
-    <value>Donate</value>
-  </data>
-  <data name="btnDonate.AccessibleName" xml:space="preserve">
-    <value>Donation</value>
-  </data>
-  <data name="btnDonate.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
-  </data>
-  <data name="btnDonate.BackgroundImageLayout" type="System.Windows.Forms.ImageLayout, System.Windows.Forms">
-    <value>Zoom</value>
-  </data>
-  <data name="btnDonate.Location" type="System.Drawing.Point, System.Drawing">
-    <value>375, 79</value>
-  </data>
-  <data name="btnDonate.Size" type="System.Drawing.Size, System.Drawing">
-    <value>92, 26</value>
-  </data>
-  <data name="btnDonate.SizeMode" type="System.Windows.Forms.PictureBoxSizeMode, System.Windows.Forms">
-    <value>Zoom</value>
-  </data>
-  <data name="btnDonate.TabIndex" type="System.Int32, mscorlib">
-    <value>8</value>
-  </data>
-  <data name="&gt;&gt;btnDonate.Name" xml:space="preserve">
-    <value>btnDonate</value>
-  </data>
-  <data name="&gt;&gt;btnDonate.Type" xml:space="preserve">
-    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnDonate.Parent" xml:space="preserve">
-    <value>groupBox2</value>
-  </data>
-  <data name="&gt;&gt;btnDonate.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <data name="lblLinkLicense.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>

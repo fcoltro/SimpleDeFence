@@ -411,7 +411,7 @@ namespace SimpleDeFence
             }
 
             // Assemble signtool command
-            string signParams = string.Format("sign /d SimpleDeFence /du \"https://tinywall.pados.hu\" /n \"{0}\" /tr \"{1}\" /td sha256 /fd sha256 /v {2}",
+            string signParams = string.Format("sign /d SimpleDeFence /du \"https://github.com/fcoltro/SimpleDeFence\" /n \"{0}\" /tr \"{1}\" /td sha256 /fd sha256 /v {2}",
                     txtCert.Text,
                     txtTimestampingServ.Text,
                     string.Join(" ", filesToSign));
