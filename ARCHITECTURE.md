@@ -2,7 +2,7 @@
 
 Structural review of the forked codebase (C#/.NET Framework 4.8), done with the code knowledge
 graph on 2026-07-20 at commit `6795bfa`. Kept as a reference for sequencing the work in
-[ROADMAP.md](ROADMAP.md) — the functional rename and the Rust/Tauri rewrite both benefit from
+[ROADMAP.md](ROADMAP.md) — the functional rename and the WinUI 3 GUI migration both benefit from
 knowing where the seams and risks already are.
 
 ## Structural picture
@@ -25,7 +25,7 @@ Candidates for decomposition before/during the rewrite:
 |---|---|---|
 | `TinyWallServer` (SimpleDeFence/TinyWallService.cs:19) | 1948 | WFP rule construction + IPC message handling + service lifecycle, all in one class |
 | `TinyWallController` (SimpleDeFence/TinyWallController.cs:15) | 1367 | UI orchestration + business logic (talks to the server, drives every form) |
-| `DarkModeCS` (SimpleDeFence/DarkModeCS.cs:21) | 1233 | Vendored third-party theming lib — not worth refactoring, Tailwind replaces it in Phase 2 |
+| `DarkModeCS` (SimpleDeFence/DarkModeCS.cs:21) | 1233 | Vendored third-party theming lib — not worth refactoring, WinUI 3's built-in dark mode replaces it in Phase 2 |
 | `SettingsForm` + Designer (SimpleDeFence/SettingsForm.cs:15, SimpleDeFence/SettingsForm.Designer.cs:3) | 682 + 676 | Typical WinForms code-behind bulk |
 
 Standout hotspots inside `TinyWallServer`:
@@ -45,14 +45,17 @@ safety net that doesn't currently exist.** Before either of those, the highest-l
 adding characterization tests around `ConstructFilter`/`AssembleActiveRules` and IPC message
 handling.
 
-## Architectural seams for the Rust/Tauri split (Phase 2)
+## Architectural seams for the WinUI 3 migration (Phase 2)
 
-From bridge-node/chokepoint analysis, a Rust-core-vs-GUI split lines up naturally with the existing
-structure:
+From bridge-node/chokepoint analysis, a core-vs-GUI split lines up naturally with the existing
+structure — this stays true regardless of GUI framework, since the core (C#, untouched) and the GUI
+(migrating to WinUI 3) were already cleanly separable:
 
-- **Core (Rust candidate):** rule construction/install (`ConstructFilter`, `InstallFirewallRules`),
+- **Core (stays C#, untouched):** rule construction/install (`ConstructFilter`, `InstallFirewallRules`),
   IPC protocol, `ServiceBase` lifecycle, `PathMapper`.
-- **GUI-only (replaced by Tauri):** `TinyWallController`, all `*Form` classes, `DarkModeCS`.
+- **GUI-only (migrates to WinUI 3):** `TinyWallController`, all `*Form` classes, `DarkModeCS` (WinUI 3
+  has first-class dark mode support, so this vendored theming lib goes away entirely rather than
+  needing a replacement).
 
 ## Noise, not signal
 

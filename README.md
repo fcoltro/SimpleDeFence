@@ -5,7 +5,7 @@
   <p align="center">
     A free, lightweight and non-intrusive firewall
     <br />
-    Fork of <a href="https://tinywall.pados.hu">TinyWall</a>, being modernized with a Rust core and a Tauri/Tailwind GUI.
+    Fork of <a href="https://tinywall.pados.hu">TinyWall</a>, being modernized with a WinUI 3 GUI over the existing C# core.
   </p>
 </div>
 
@@ -13,7 +13,7 @@
 
 SimpleDeFence is a free, lightweight, and non-intrusive, secure by default firewall for Windows. Built to just simply sit in your system tray, quietly blocking any application you did not explicitly allow network access. It installs no kernel drivers, so it cannot negatively influence system stability. It also respects your privacy and collects absolutely no data about the user or their computer.
 
-This project is a fork of [TinyWall](https://github.com/pylorak/TinyWall) by Károly Pados, currently a straight rebuild of the original C#/.NET codebase under a new name. See [NOTICE.md](NOTICE.md) for attribution details and [ROADMAP.md](ROADMAP.md) for where the project is headed, including a planned Tauri + Tailwind CSS GUI that talks to the existing C# service.
+This project is a fork of [TinyWall](https://github.com/pylorak/TinyWall) by Károly Pados, currently a straight rebuild of the original C#/.NET codebase under a new name. See [NOTICE.md](NOTICE.md) for attribution details and [ROADMAP.md](ROADMAP.md) for where the project is headed, including a planned WinUI 3 GUI that talks to the existing C# service.
 
 ## How to build
 

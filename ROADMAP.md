@@ -57,27 +57,43 @@ attribution. This document tracks where the project is headed.
 - [ ] Migrate local storage to SQLite.
 - [ ] Windows Action Center integration.
 
-## Phase 2 — GUI modernization: Tauri/Tailwind over the existing C# core
+## Phase 2 — GUI modernization: WinUI 3 (Windows App SDK) over the existing C# core
 
-**Decision (2026-07-20):** not a full Rust rewrite. The core (WFP rule construction, IPC, service
-lifecycle) has zero test coverage today (see [ARCHITECTURE.md](ARCHITECTURE.md)) — rewriting the
-least-tested, highest-consequence part of a firewall into a new language first is the wrong order
-of operations. Instead:
+**Decision (2026-07-20, revised same day):** not Rust/Tauri, not a core rewrite. First cut of this
+phase planned a Tauri + Tailwind CSS GUI talking to the unchanged C# service over IPC. Reconsidered
+because this app is Windows-only — WFP has no cross-platform equivalent, so Tauri's entire value
+proposition (one core, many OS targets) doesn't apply here. Worse, since the plan already kept the
+WFP core in C#, Tauri's Rust side would've done no real work — just a second language/toolchain
+(Rust + Node/npm) reimplementing the existing IPC protocol (`Protocol.cs`) to talk to a webview.
 
-- [ ] Build a Tauri + Tailwind CSS GUI that talks to the **existing, unchanged C# service** over
-      its current named-pipe IPC protocol (`Protocol.cs`, `PipeServerEndpoint`/`PipeClientEndpoint`).
-      The Rust side is just the Tauri backend/IPC shell, not a rewrite of the rule engine.
-- [ ] Port feature-by-feature from the WinForms GUI, validating parity before removing it.
-- [ ] Keep the WinForms GUI buildable and working throughout, until the Tauri app reaches parity —
-      a strangler-fig migration on the GUI only, not a big-bang rewrite.
-- [ ] A full Rust core rewrite stays an explicit, separate, later decision — revisit only once the
-      core has characterization tests to catch regressions.
+WinUI 3 (Windows App SDK) is the better fit: it's Microsoft's committed native flagship for Windows
+desktop apps (recommitted at Build 2026, no competing framework planned, 3-year LTSC support
+available), stays entirely in C#/.NET like the rest of the app (no IPC-language boundary — can share
+the existing DTOs/`PipeClientEndpoint` code directly), and renders genuinely native Fluent 2/Mica UI
+rather than a webview wrapper (the pattern Microsoft is currently steering developers *away* from).
+Microsoft also ships an officially-supported incremental migration path (XAML Islands, hosting WinUI 3
+controls inside an existing WinForms app) plus AI-assisted migration tooling in VS 2026 — a good match
+for the strangler-fig approach this phase already needs.
+
+The core (WFP rule construction, IPC, service lifecycle) still has zero test coverage today (see
+[ARCHITECTURE.md](ARCHITECTURE.md)) — rewriting the least-tested, highest-consequence part of a
+firewall into a new language first is the wrong order of operations regardless of GUI framework, so
+the core stays C#/.NET and untouched throughout this phase either way.
+
+- [ ] Stand up a WinUI 3 shell that talks to the **existing, unchanged C# service** — same process
+      family, same language, can reuse `Protocol.cs`/`PipeServerEndpoint`/`PipeClientEndpoint` as-is.
+- [ ] Use XAML Islands (or equivalent interop) to migrate screen-by-screen, not big-bang — keep
+      WinForms forms working and buildable throughout until each WinUI 3 replacement reaches parity.
+- [ ] Investigate VS 2026's Copilot-assisted "Modernize" tooling for the WinForms → WinUI 3 migration
+      itself, since Microsoft built it for exactly this transition.
+- [ ] Port feature-by-feature from the WinForms GUI, validating parity before removing each old form.
 
 ## Development environment
 
 - [Dockerfile](Dockerfile) provides a containerized build of the current .NET Framework 4.8 app
   (requires Docker Desktop in Windows container mode, since net48 doesn't run on Linux containers).
-- The Tauri GUI in Phase 2 will get its own (cross-platform-friendly) dev setup once that work starts.
+- The WinUI 3 work in Phase 2 stays in the same .NET/Windows toolchain — no new dev environment
+  needed beyond a current Windows App SDK workload in Visual Studio.
 
 ## Backlog inherited from upstream
 
