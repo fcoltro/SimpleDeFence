@@ -41,6 +41,7 @@
             this.btnAppRemove = new System.Windows.Forms.Button();
             this.btnAppModify = new System.Windows.Forms.Button();
             this.btnAppAdd = new System.Windows.Forms.Button();
+            this.btnAppAddFolder = new System.Windows.Forms.Button();
             this.listApplications = new System.Windows.Forms.ListView();
             this.columnApp = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -131,6 +132,7 @@
             this.tabPage3.Controls.Add(this.btnAppRemove);
             this.tabPage3.Controls.Add(this.btnAppModify);
             this.tabPage3.Controls.Add(this.btnAppAdd);
+            this.tabPage3.Controls.Add(this.btnAppAddFolder);
             this.tabPage3.Controls.Add(this.listApplications);
             this.tabPage3.Controls.Add(this.label4);
             resources.ApplyResources(this.tabPage3, "tabPage3");
@@ -195,7 +197,15 @@
             this.btnAppAdd.Name = "btnAppAdd";
             this.btnAppAdd.UseVisualStyleBackColor = true;
             this.btnAppAdd.Click += new System.EventHandler(this.btnAppAdd_Click);
-            // 
+            //
+            // btnAppAddFolder
+            //
+            resources.ApplyResources(this.btnAppAddFolder, "btnAppAddFolder");
+            this.btnAppAddFolder.Image = global::SimpleDeFence.Resources.Icons.add;
+            this.btnAppAddFolder.Name = "btnAppAddFolder";
+            this.btnAppAddFolder.UseVisualStyleBackColor = true;
+            this.btnAppAddFolder.Click += new System.EventHandler(this.btnAppAddFolder_Click);
+            //
             // listApplications
             // 
             resources.ApplyResources(this.listApplications, "listApplications");
@@ -619,6 +629,7 @@
         private System.Windows.Forms.Button btnAppRemove;
         private System.Windows.Forms.Button btnAppModify;
         private System.Windows.Forms.Button btnAppAdd;
+        private System.Windows.Forms.Button btnAppAddFolder;
         private System.Windows.Forms.ListView listApplications;
         private System.Windows.Forms.ColumnHeader columnApp;
         private System.Windows.Forms.ColumnHeader columnDetails;

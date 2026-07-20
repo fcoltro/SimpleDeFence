@@ -434,6 +434,62 @@ namespace SimpleDeFence
             }
         }
 
+        private void btnAppAddFolder_Click(object sender, EventArgs e)
+        {
+            using var fbd = new FolderBrowserDialog();
+            if (fbd.ShowDialog(this) != DialogResult.OK)
+                return;
+
+            var files = new List<string>();
+            CollectExeAndDllFiles(fbd.SelectedPath, files);
+            if (files.Count == 0)
+                return;
+
+            Cursor.Current = Cursors.WaitCursor;
+            var list = new List<FirewallExceptionV3>();
+            try
+            {
+                foreach (string file in files)
+                {
+                    try
+                    {
+                        var subject = new ExecutableSubject(PathMapper.Instance.ConvertPathIgnoreErrors(file, PathFormat.Win32));
+                        // guiPrompt: false - this can match dozens of files at once, so we take
+                        // the database's default recommendation for each instead of popping up a
+                        // TaskDialog per recognized multi-component app.
+                        list.AddRange(GlobalInstances.AppDatabase.GetExceptionsForApp(subject, false, out _));
+                    }
+                    catch { }
+                }
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
+
+            if (list.Count == 0)
+                return;
+
+            TmpConfig.Service.ActiveProfile.AddExceptions(list);
+            RebuildExceptionsList();
+        }
+
+        private static void CollectExeAndDllFiles(string path, List<string> results)
+        {
+            try
+            {
+                results.AddRange(Directory.GetFiles(path, "*.exe", SearchOption.TopDirectoryOnly));
+                results.AddRange(Directory.GetFiles(path, "*.dll", SearchOption.TopDirectoryOnly));
+
+                foreach (string dir in Directory.GetDirectories(path))
+                    CollectExeAndDllFiles(dir, results);
+            }
+            catch
+            {
+                // Inaccessible subfolder - skip it rather than aborting the whole scan.
+            }
+        }
+
         private void chkEnablePassword_CheckedChanged(object sender, EventArgs e)
         {
             txtPassword.Enabled = txtPasswordAgain.Enabled = chkChangePassword.Checked;
@@ -452,7 +508,7 @@ namespace SimpleDeFence
 
         private void btnWeb_Click(object sender, EventArgs e)
         {
-            var psi = new ProcessStartInfo(@"https://tinywall.pados.hu") { UseShellExecute = true };
+            var psi = new ProcessStartInfo(@"https://github.com/fcoltro/SimpleDeFence") { UseShellExecute = true };
             Process.Start(psi)?.Dispose();
         }
 

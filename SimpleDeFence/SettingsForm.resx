@@ -432,6 +432,27 @@
   <data name="btnAppAdd.Text" xml:space="preserve">
     <value>Add application</value>
   </data>
+  <data name="btnAppAddFolder.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="btnAppAddFolder.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="btnAppAddFolder.ImageAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleLeft</value>
+  </data>
+  <data name="btnAppAddFolder.Location" type="System.Drawing.Point, System.Drawing">
+    <value>566, 265</value>
+  </data>
+  <data name="btnAppAddFolder.Size" type="System.Drawing.Size, System.Drawing">
+    <value>127, 36</value>
+  </data>
+  <data name="btnAppAddFolder.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="btnAppAddFolder.Text" xml:space="preserve">
+    <value>Add folder</value>
+  </data>
   <data name="&gt;&gt;btnAppAdd.Name" xml:space="preserve">
     <value>btnAppAdd</value>
   </data>

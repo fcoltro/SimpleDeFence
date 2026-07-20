@@ -21,7 +21,7 @@ attribution. This document tracks where the project is headed.
 ## Phase 1 — Code structure review & incremental features (C#/.NET, current stack)
 
 - [x] Code structure review of the existing C#/.NET codebase — see [ARCHITECTURE.md](ARCHITECTURE.md).
-- [ ] "Add folder" exception: recursively scan a folder for `.exe`/`.dll` and add them all as
+- [x] "Add folder" exception: recursively scan a folder for `.exe`/`.dll` and add them all as
       application exceptions in one action.
 - [ ] Investigate isolating Windows Update traffic as a distinct, controllable exception.
 - [ ] Dark-theme GUI support.
