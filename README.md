@@ -13,7 +13,7 @@
 
 SimpleDeFence is a free, lightweight, and non-intrusive, secure by default firewall for Windows. Built to just simply sit in your system tray, quietly blocking any application you did not explicitly allow network access. It installs no kernel drivers, so it cannot negatively influence system stability. It also respects your privacy and collects absolutely no data about the user or their computer.
 
-This project is a fork of [TinyWall](https://github.com/pylorak/TinyWall) by Károly Pados, currently a straight rebuild of the original C#/.NET codebase under a new name. See [NOTICE.md](NOTICE.md) for attribution details and [ROADMAP.md](ROADMAP.md) for where the project is headed, including a planned rewrite of the core in Rust with a Tauri + Tailwind CSS GUI.
+This project is a fork of [TinyWall](https://github.com/pylorak/TinyWall) by Károly Pados, currently a straight rebuild of the original C#/.NET codebase under a new name. See [NOTICE.md](NOTICE.md) for attribution details and [ROADMAP.md](ROADMAP.md) for where the project is headed, including a planned Tauri + Tailwind CSS GUI that talks to the existing C# service.
 
 ## How to build
 
@@ -27,21 +27,21 @@ Alternatively, see [Dockerfile](Dockerfile) for a containerized build environmen
 
 ### To build the application
 
-1. Open the solution file in Visual Studio and compile the `TinyWall` project. The other projects referenced inside the solution need not be built separately as they will be statically compiled into the application.
+1. Open the solution file in Visual Studio and compile the `SimpleDeFence` project. The other projects referenced inside the solution need not be built separately as they will be statically compiled into the application.
 1. Done.
 
 ### To update/build build the database of known applications
 
-1. Adjust the individual JSON files in the `TinyWall\Database` folder.
+1. Adjust the individual JSON files in the `SimpleDeFence\Database` folder.
 1. Start the application with the `/develtool` flag.
 1. Use the `Database creator` tab to create one combined database file in JSON format. The output file will be called `profiles.json`.
-1. To use the new database in debug builds, copy the output file to the `TinyWall\bin\Debug` folder.
+1. To use the new database in debug builds, copy the output file to the `SimpleDeFence\bin\Debug` folder.
 1. Done.
 
 ### To build the installer
 
-1. Copy the compiled application files and all dependencies into the `MsiSetup\Sources\ProgramFiles\TinyWall` folder.
-1. Update the files as necessary inside the `MsiSetup\Sources\CommonAppData\TinyWall` folder. See instructions above about creating the database.
+1. Copy the compiled application files and all dependencies into the `MsiSetup\Sources\ProgramFiles\SimpleDeFence` folder.
+1. Update the files as necessary inside the `MsiSetup\Sources\CommonAppData\SimpleDeFence` folder. See instructions above about creating the database.
 1. Open the solution file in Visual Studio and compile the `MsiSetup` project.
 1. Done.
 

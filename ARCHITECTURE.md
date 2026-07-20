@@ -13,7 +13,7 @@ Two clean, well-scoped modules and one big blob:
   cleanly separated.
 - `pylorak.Windows.WFP` + `pylorak.Windows` (rule/filter primitives, path/handle utilities, ~590
   nodes combined) — reasonably cohesive native-interop layer.
-- The main app (`TinyWall/`) is one 659-node community with only 0.31 cohesion — nearly everything
+- The main app (`SimpleDeFence/`) is one 659-node community with only 0.31 cohesion — nearly everything
   user-facing (forms, controller, service, dark-mode theming) is tangled together rather than split
   into cohesive subsystems.
 
@@ -23,14 +23,14 @@ Candidates for decomposition before/during the rewrite:
 
 | Class | Lines | Concern mix |
 |---|---|---|
-| `TinyWallServer` (TinyWall/TinyWallService.cs:19) | 1948 | WFP rule construction + IPC message handling + service lifecycle, all in one class |
-| `TinyWallController` (TinyWall/TinyWallController.cs:15) | 1367 | UI orchestration + business logic (talks to the server, drives every form) |
-| `DarkModeCS` (TinyWall/DarkModeCS.cs:21) | 1233 | Vendored third-party theming lib — not worth refactoring, Tailwind replaces it in Phase 2 |
-| `SettingsForm` + Designer (TinyWall/SettingsForm.cs:15, TinyWall/SettingsForm.Designer.cs:3) | 682 + 676 | Typical WinForms code-behind bulk |
+| `TinyWallServer` (SimpleDeFence/TinyWallService.cs:19) | 1948 | WFP rule construction + IPC message handling + service lifecycle, all in one class |
+| `TinyWallController` (SimpleDeFence/TinyWallController.cs:15) | 1367 | UI orchestration + business logic (talks to the server, drives every form) |
+| `DarkModeCS` (SimpleDeFence/DarkModeCS.cs:21) | 1233 | Vendored third-party theming lib — not worth refactoring, Tailwind replaces it in Phase 2 |
+| `SettingsForm` + Designer (SimpleDeFence/SettingsForm.cs:15, SimpleDeFence/SettingsForm.Designer.cs:3) | 682 + 676 | Typical WinForms code-behind bulk |
 
 Standout hotspots inside `TinyWallServer`:
-- `ConstructFilter` (TinyWall/TinyWallService.cs:71) — 86 outgoing edges, touches nearly everything.
-- `AssembleActiveRules` (TinyWall/TinyWallService.cs:71) — 221 lines.
+- `ConstructFilter` (SimpleDeFence/TinyWallService.cs:71) — 86 outgoing edges, touches nearly everything.
+- `AssembleActiveRules` (SimpleDeFence/TinyWallService.cs:71) — 221 lines.
 - `PathMapper.ConvertPath` (pylorak.Windows/PathMapper.cs:335) — 161 lines, 55 outgoing edges; the
   `%VarName%`-style path-variable resolver used throughout rule matching.
 

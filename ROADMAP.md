@@ -7,17 +7,20 @@ attribution. This document tracks where the project is headed.
 
 - [x] Fork TinyWall source into this repository, keeping full upstream history for reference.
 - [x] Public repo at [fcoltro/SimpleDeFence](https://github.com/fcoltro/SimpleDeFence).
-- [x] Cosmetic rebrand (README, docs) — the app itself still identifies internally as TinyWall
-      (service name, data folder, WFP rule grouping, .NET namespaces). That is a functional
-      rename, not a cosmetic one, and is tracked separately below so it doesn't get done half-way.
+- [x] Cosmetic rebrand (README, docs).
+- [x] Full functional rename (service name, `%ProgramData%` folder, WFP rule grouping tag,
+      `DataContract` namespaces, C# namespace, project/solution/exe names, installer/MSI product
+      name + registry key + regenerated GUIDs, named pipe/mutex/self-update identifiers,
+      tray/about strings). Class names (`TinyWallController`, `TinyWallService`, `TinyWallDoctor`,
+      etc.) and resx resource *keys* were deliberately left as-is — internal identifiers only, no
+      user-facing or collision-relevant meaning, renaming them would balloon the diff for no
+      benefit. The bundled installer FAQ (`MsiSetup/Sources/ProgramFiles/SimpleDeFence/doc/faq.html`)
+      still reads as TinyWall prose with real links to the upstream project/site — needs an
+      editorial pass, not a mechanical one, so it's left as a follow-up.
 
 ## Phase 1 — Code structure review & incremental features (C#/.NET, current stack)
 
-- [ ] Code structure review of the existing C#/.NET codebase.
-- [ ] Full functional rename (service name, `%ProgramData%` folder, WFP rule grouping tag,
-      `DataContract` namespaces, installer/MSI product name, tray/about strings). Needs care:
-      the WFP rule grouping and service name are used to identify and clean up the app's own
-      firewall rules — a half-done rename risks orphaned rules or duplicate services.
+- [x] Code structure review of the existing C#/.NET codebase — see [ARCHITECTURE.md](ARCHITECTURE.md).
 - [ ] "Add folder" exception: recursively scan a folder for `.exe`/`.dll` and add them all as
       application exceptions in one action.
 - [ ] Investigate isolating Windows Update traffic as a distinct, controllable exception.
@@ -33,23 +36,27 @@ attribution. This document tracks where the project is headed.
 - [ ] Migrate local storage to SQLite.
 - [ ] Windows Action Center integration.
 
-## Phase 2 — Modernization: Rust core + Tauri/Tailwind GUI
+## Phase 2 — GUI modernization: Tauri/Tailwind over the existing C# core
 
-Full rewrite, targeting eventual replacement of the C#/.NET app:
+**Decision (2026-07-20):** not a full Rust rewrite. The core (WFP rule construction, IPC, service
+lifecycle) has zero test coverage today (see [ARCHITECTURE.md](ARCHITECTURE.md)) — rewriting the
+least-tested, highest-consequence part of a firewall into a new language first is the wrong order
+of operations. Instead:
 
-- [ ] Design the Rust core (service/engine) architecture — WFP bindings, rule engine, config
-      storage — informed by the Phase 1 code structure review.
-- [ ] Stand up a Tauri + Tailwind CSS GUI shell talking to the Rust core.
-- [ ] Port feature-by-feature from the C# app, validating parity before removing the old code path.
-- [ ] Keep the C#/.NET app buildable and working throughout, until the Rust/Tauri app reaches
-      parity — this is a strangler-fig migration, not a big-bang rewrite.
+- [ ] Build a Tauri + Tailwind CSS GUI that talks to the **existing, unchanged C# service** over
+      its current named-pipe IPC protocol (`Protocol.cs`, `PipeServerEndpoint`/`PipeClientEndpoint`).
+      The Rust side is just the Tauri backend/IPC shell, not a rewrite of the rule engine.
+- [ ] Port feature-by-feature from the WinForms GUI, validating parity before removing it.
+- [ ] Keep the WinForms GUI buildable and working throughout, until the Tauri app reaches parity —
+      a strangler-fig migration on the GUI only, not a big-bang rewrite.
+- [ ] A full Rust core rewrite stays an explicit, separate, later decision — revisit only once the
+      core has characterization tests to catch regressions.
 
 ## Development environment
 
 - [Dockerfile](Dockerfile) provides a containerized build of the current .NET Framework 4.8 app
   (requires Docker Desktop in Windows container mode, since net48 doesn't run on Linux containers).
-- The Rust/Tauri stack in Phase 2 will get its own (cross-platform-friendly) Docker setup once that
-  work starts.
+- The Tauri GUI in Phase 2 will get its own (cross-platform-friendly) dev setup once that work starts.
 
 ## Backlog inherited from upstream
 

@@ -11,11 +11,11 @@
 /LocalizationPack/**/*.pdf
 /LocalizationPack/ZetaResourceEditor/
 
-/TinyWall.suo
-/TinyWall.v11.suo
+/SimpleDeFence.suo
+/SimpleDeFence.v11.suo
 
-/TinyWall/obj/
-/TinyWall/bin/
+/SimpleDeFence/obj/
+/SimpleDeFence/bin/
 
 /Microsoft.Samples/obj/
 /Microsoft.Samples/bin/

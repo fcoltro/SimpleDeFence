@@ -4,11 +4,11 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
   <!-- String constants -->
-  <?define ProductName="TinyWall" ?>
-  <?define Manufacturer="Károly Pados" ?>
-  <?define Description="A non-intrusive firewall solution." ?>
-  <?define ProductURL="http://tinywall.pados.hu" ?>
-  <?define ReleaseNotesURL="https://raw.githubusercontent.com/pylorak/TinyWall/refs/heads/master/Changelog.txt" ?>
+  <?define ProductName="SimpleDeFence" ?>
+  <?define Manufacturer="fcoltro" ?>
+  <?define Description="A non-intrusive firewall solution. Fork of TinyWall." ?>
+  <?define ProductURL="https://github.com/fcoltro/SimpleDeFence" ?>
+  <?define ReleaseNotesURL="https://raw.githubusercontent.com/fcoltro/SimpleDeFence/refs/heads/main/Changelog.txt" ?>
   <?define ProductVersion="!(bind.fileVersion.TinyWallEXE)" ?>
   <?define OldestUpgradeableVersion="3.0.0.0" ?>
 
@@ -33,7 +33,7 @@
     <?define System32Dir = "SystemFolder" ?>
   <?endif ?>
 
-  <Product Id="*" Codepage="1250" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="{0D009F71-BB22-4962-AEE0-6D42FA952B84}">
+  <Product Id="*" Codepage="1250" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="{5D6FBFAF-3552-4F7D-9ABF-79F04E73661C}">
     <Package InstallerVersion="301" Compressed="yes" InstallScope="perMachine" SummaryCodepage="1250" Description="$(var.Description)" Manufacturer="$(var.Manufacturer)" />
 
     <!-- Automatic media generation and assignment -->
@@ -85,7 +85,7 @@
     <Property Id="OLDER_UPGRADEABLE_FOUND" Secure="yes" />
     <Property Id="SELF_FOUND" Secure="yes" />
     <Property Id="NEWER_FOUND" Secure="yes" />
-    <Upgrade Id='{0D009F71-BB22-4962-AEE0-6D42FA952B84}'>
+    <Upgrade Id='{5D6FBFAF-3552-4F7D-9ABF-79F04E73661C}'>
       <UpgradeVersion OnlyDetect='yes' Property='OLDER_INCOMPATIBLE_FOUND'
         Maximum="$(var.OldestUpgradeableVersion)" IncludeMaximum='no' />
       <UpgradeVersion Property='OLDER_UPGRADEABLE_FOUND'
@@ -135,8 +135,8 @@
     <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="background.bmp" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value='The default configuration of TinyWall is to block most programs. If an application is unable to access the network, remember to use one of the "Whitelist by..." options from the tray menu.' />
-    <WixVariable Id="WixUILicenseRtf" Value="Sources\ProgramFiles\TinyWall\License.rtf" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value='The default configuration of SimpleDeFence is to block most programs. If an application is unable to access the network, remember to use one of the "Whitelist by..." options from the tray menu.' />
+    <WixVariable Id="WixUILicenseRtf" Value="Sources\ProgramFiles\SimpleDeFence\License.rtf" />
 
   </Product>
 
@@ -146,141 +146,141 @@
 
       <!-- Program Files -->
       <Directory Id="$(var.PlatformProgramFilesFolder)" Name="ProgramFiles">
-        <Directory Id="INSTALLDIR" Name="TinyWall">
-          <Component Id="MainExecutable" Guid="{D0A4DEC7-42C7-48F1-912D-76A4B33AC644}" Win64="$(var.Win64)">
-            <File Id="TinyWallEXE" Source="Sources\ProgramFiles\TinyWall\TinyWall.exe" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+        <Directory Id="INSTALLDIR" Name="SimpleDeFence">
+          <Component Id="MainExecutable" Guid="{422FE697-4CCC-4B6C-B5E6-F4BB54CC1AF3}" Win64="$(var.Win64)">
+            <File Id="TinyWallEXE" Source="Sources\ProgramFiles\SimpleDeFence\SimpleDeFence.exe" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
-          <Component Id="MainExecutableConfig" Guid="{81CD5E43-FAE3-4B3C-AA84-A7A0C660FDB4}" Win64="$(var.Win64)">
-            <File Id="TinyWallCONFIG" Source="Sources\ProgramFiles\TinyWall\TinyWall.exe.config" KeyPath="yes" />
+          <Component Id="MainExecutableConfig" Guid="{D8D025D6-8EAB-4AA7-B77D-83EA96B40DE4}" Win64="$(var.Win64)">
+            <File Id="TinyWallCONFIG" Source="Sources\ProgramFiles\SimpleDeFence\SimpleDeFence.exe.config" KeyPath="yes" />
           </Component>
-          <Component Id="Microsoft_Bcl_AsyncInterfaces_Lib" Guid="{A7FB0F34-9995-43BC-B415-65AAF3AA37A3}" Win64="$(var.Win64)">
-            <File Id="Microsoft_Bcl_AsyncInterfaces_dll" Source="Sources\ProgramFiles\TinyWall\Microsoft.Bcl.AsyncInterfaces.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+          <Component Id="Microsoft_Bcl_AsyncInterfaces_Lib" Guid="{2F512105-6A4B-4383-9A40-083CB0561BE5}" Win64="$(var.Win64)">
+            <File Id="Microsoft_Bcl_AsyncInterfaces_dll" Source="Sources\ProgramFiles\SimpleDeFence\Microsoft.Bcl.AsyncInterfaces.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
-          <Component Id="System_Buffers_Lib" Guid="{A1797893-28F9-4D81-9BAF-E7508B04D119}" Win64="$(var.Win64)">
-            <File Id="System_Buffers_dll" Source="Sources\ProgramFiles\TinyWall\System.Buffers.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+          <Component Id="System_Buffers_Lib" Guid="{C57EA79A-D53D-4C96-8120-C2D030F39D13}" Win64="$(var.Win64)">
+            <File Id="System_Buffers_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Buffers.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
-          <Component Id="System_Memory_Lib" Guid="{0A4C05A5-D37A-419D-B85A-0938F34B43D0}" Win64="$(var.Win64)">
-            <File Id="System_Memory_dll" Source="Sources\ProgramFiles\TinyWall\System.Memory.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+          <Component Id="System_Memory_Lib" Guid="{D1BD8A4C-D66C-4EDF-A414-DD81CC18325A}" Win64="$(var.Win64)">
+            <File Id="System_Memory_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Memory.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
-          <Component Id="System_Numerics_Vectors_Lib" Guid="{8B1979B5-8755-4FF2-8635-9C0CAB71073C}" Win64="$(var.Win64)">
-            <File Id="System_Numerics_Vectors_dll" Source="Sources\ProgramFiles\TinyWall\System.Numerics.Vectors.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+          <Component Id="System_Numerics_Vectors_Lib" Guid="{A4C268C7-2199-4561-86ED-533A5A7CBE45}" Win64="$(var.Win64)">
+            <File Id="System_Numerics_Vectors_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Numerics.Vectors.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
-          <Component Id="System_Runtime_CompilerServices_Unsafe_Lib" Guid="{F3DBEFD2-E80A-40E1-9BEB-79080B47508F}" Win64="$(var.Win64)">
-            <File Id="System_Runtime_CompilerServices_Unsafe_dll" Source="Sources\ProgramFiles\TinyWall\System.Runtime.CompilerServices.Unsafe.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+          <Component Id="System_Runtime_CompilerServices_Unsafe_Lib" Guid="{20D4C69C-DBE1-4DF1-9666-029DCE207E93}" Win64="$(var.Win64)">
+            <File Id="System_Runtime_CompilerServices_Unsafe_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Runtime.CompilerServices.Unsafe.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
           <Component Id="System_Text_Encodings_Web_Lib" Guid="{FA88A627-F2E3-47BF-A245-79B72D91F448}" Win64="$(var.Win64)">
-            <File Id="System_Text_Encodings_Web_dll" Source="Sources\ProgramFiles\TinyWall\System.Text.Encodings.Web.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <File Id="System_Text_Encodings_Web_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Text.Encodings.Web.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
-          <Component Id="System_Text_Json_Lib" Guid="{87A21FAA-7ED7-4383-89B1-720EC6AFF3B8}" Win64="$(var.Win64)">
-            <File Id="System_Text_Json_dll" Source="Sources\ProgramFiles\TinyWall\System.Text.Json.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+          <Component Id="System_Text_Json_Lib" Guid="{A95856BD-5B66-4CAE-8870-1EA5CF3CFAD6}" Win64="$(var.Win64)">
+            <File Id="System_Text_Json_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Text.Json.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
-          <Component Id="System_Threading_Tasks_Extensions_Lib" Guid="{D2B40BC4-0B98-4F07-AA93-E0AFC0405789}" Win64="$(var.Win64)">
-            <File Id="System_Threading_Tasks_Extensions_dll" Source="Sources\ProgramFiles\TinyWall\System.Threading.Tasks.Extensions.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+          <Component Id="System_Threading_Tasks_Extensions_Lib" Guid="{AA5566BE-26F8-483C-8F16-008AE947B1D0}" Win64="$(var.Win64)">
+            <File Id="System_Threading_Tasks_Extensions_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Threading.Tasks.Extensions.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
-          <Component Id="System_ValueTuple_Lib" Guid="{1335CC77-A532-4F69-9811-FF9C83A7A01B}" Win64="$(var.Win64)">
-            <File Id="System_ValueTuple_dll" Source="Sources\ProgramFiles\TinyWall\System.ValueTuple.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+          <Component Id="System_ValueTuple_Lib" Guid="{61BA9FB8-3CF5-462D-8097-0829F724619F}" Win64="$(var.Win64)">
+            <File Id="System_ValueTuple_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.ValueTuple.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
           </Component>
-          <Component Id="License" Guid="{2F2FF77C-8900-406A-AB6E-6DCFF4B53463}" Win64="$(var.Win64)">
-            <File Id="LicenseRTF" Source="Sources\ProgramFiles\TinyWall\License.rtf" KeyPath="yes" />
+          <Component Id="License" Guid="{205DCF42-A705-401A-9868-015BA855B5DB}" Win64="$(var.Win64)">
+            <File Id="LicenseRTF" Source="Sources\ProgramFiles\SimpleDeFence\License.rtf" KeyPath="yes" />
           </Component>
-          <Component Id="Attributions" Guid="{76058250-1331-4D79-B09C-2B6ADEC3E7E2}" Win64="$(var.Win64)">
-            <File Id="AttributionsTXT" Source="Sources\ProgramFiles\TinyWall\Attributions.txt" KeyPath="yes" />
+          <Component Id="Attributions" Guid="{2FE1A628-B97D-4C67-B240-F1A0971310EB}" Win64="$(var.Win64)">
+            <File Id="AttributionsTXT" Source="Sources\ProgramFiles\SimpleDeFence\Attributions.txt" KeyPath="yes" />
           </Component>
           <Directory Id="LOCDIR_bg" Name="bg">
-            <Component Id="LocSatelliteLib_bg" Guid="{ED49577C-871B-4AA4-81D7-E4B879237DBB}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_bg" Source="Sources\ProgramFiles\TinyWall\bg\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_bg" Guid="{3BE9AF16-BF40-4EAA-B49A-89435CC379BD}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_bg" Source="Sources\ProgramFiles\SimpleDeFence\bg\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_es" Name="es">
-            <Component Id="LocSatelliteLib_es" Guid="{164A848E-99AB-4FF3-BFEE-400B0C43E9B0}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_es" Source="Sources\ProgramFiles\TinyWall\es\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_es" Guid="{8EBCFDB2-3734-4496-AC84-7F37B797BCAE}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_es" Source="Sources\ProgramFiles\SimpleDeFence\es\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_cs" Name="cs">
-            <Component Id="LocSatelliteLib_cs" Guid="{9C7D2237-46B9-4D91-AC54-92C9B6545B37}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_cs" Source="Sources\ProgramFiles\TinyWall\cs\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_cs" Guid="{09F0151C-FB6D-4273-BD5D-5A52914117D1}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_cs" Source="Sources\ProgramFiles\SimpleDeFence\cs\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_heIL" Name="he-IL">
-            <Component Id="LocSatelliteLib_heIL" Guid="{8B0B0122-4BEF-45CD-BA18-49F200FB1444}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_heIL" Source="Sources\ProgramFiles\TinyWall\he-IL\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_heIL" Guid="{309054DE-DDD1-4E41-84C7-CF8E8ED375CE}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_heIL" Source="Sources\ProgramFiles\SimpleDeFence\he-IL\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_hu" Name="hu">
-            <Component Id="LocSatelliteLib_hu" Guid="{B976793E-5A50-42A6-8164-DC1337862A0F}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_hu" Source="Sources\ProgramFiles\TinyWall\hu\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_hu" Guid="{6E827904-C113-40AA-9549-E7EF1D740DED}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_hu" Source="Sources\ProgramFiles\SimpleDeFence\hu\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_fr" Name="fr">
-            <Component Id="LocSatelliteLib_fr" Guid="{C5A9E9ED-2298-461B-8EFC-536717B2EC57}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_fr" Source="Sources\ProgramFiles\TinyWall\fr\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_fr" Guid="{F78CB9E7-2CF4-47CD-AB3F-BAB6B86C45DE}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_fr" Source="Sources\ProgramFiles\SimpleDeFence\fr\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_ja" Name="ja">
-            <Component Id="LocSatelliteLib_ja" Guid="{35185D2D-D623-4174-92A9-ECB743C4B712}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_ja" Source="Sources\ProgramFiles\TinyWall\ja\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_ja" Guid="{AB1F4842-62C8-4D6D-8AA7-E689DD466ED9}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_ja" Source="Sources\ProgramFiles\SimpleDeFence\ja\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_de" Name="de">
-            <Component Id="LocSatelliteLib_de" Guid="{F7BC44A5-6433-4CA9-9FD2-C820EE506A1D}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_de" Source="Sources\ProgramFiles\TinyWall\de\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_de" Guid="{AEBFC401-59D1-4238-9E00-479A0EA4E533}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_de" Source="Sources\ProgramFiles\SimpleDeFence\de\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_nl" Name="nl">
-            <Component Id="LocSatelliteLib_nl" Guid="{DE072136-DEC8-4020-8FE8-0F41B04A65ED}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_nl" Source="Sources\ProgramFiles\TinyWall\nl\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_nl" Guid="{50960D7D-9644-4408-BA53-32F87CEF5528}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_nl" Source="Sources\ProgramFiles\SimpleDeFence\nl\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_ko" Name="ko">
-            <Component Id="LocSatelliteLib_ko" Guid="{91FD1C6A-3F94-4926-9C7D-27190A191F13}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_ko" Source="Sources\ProgramFiles\TinyWall\ko\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_ko" Guid="{81C4CEFD-9A1E-4FF2-8A34-5F39E2106D0F}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_ko" Source="Sources\ProgramFiles\SimpleDeFence\ko\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_pl" Name="pl">
-            <Component Id="LocSatelliteLib_pl" Guid="{92858D12-E2A8-4669-AD3C-192DCEFC61F7}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_pl" Source="Sources\ProgramFiles\TinyWall\pl\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_pl" Guid="{1EA37B03-88AE-403F-B325-740B0B0F80B3}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_pl" Source="Sources\ProgramFiles\SimpleDeFence\pl\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_ru" Name="ru">
-            <Component Id="LocSatelliteLib_ru" Guid="{E6ACA74E-3D0E-47D8-BF85-AC4925B89E5B}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_ru" Source="Sources\ProgramFiles\TinyWall\ru\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_ru" Guid="{7ED279CF-98B5-442A-A09A-CC73F6A14978}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_ru" Source="Sources\ProgramFiles\SimpleDeFence\ru\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_ptBR" Name="pt-BR">
-            <Component Id="LocSatelliteLib_ptBR" Guid="{6629C09A-05EE-4767-9DE4-E1B0BB9DA9D2}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_ptBR" Source="Sources\ProgramFiles\TinyWall\pt-BR\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_ptBR" Guid="{6FA8130D-C267-403B-AC1A-73204ED4F579}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_ptBR" Source="Sources\ProgramFiles\SimpleDeFence\pt-BR\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_it" Name="it">
-            <Component Id="LocSatelliteLib_it" Guid="{400AD52C-59F0-48AE-A877-5BA8EF129260}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_it" Source="Sources\ProgramFiles\TinyWall\it\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_it" Guid="{5F552D3B-CF30-48F7-AE48-EC9EF14CD6A4}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_it" Source="Sources\ProgramFiles\SimpleDeFence\it\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_tr" Name="tr">
-            <Component Id="LocSatelliteLib_tr" Guid="{17425844-6683-4F51-A689-79AAF611D207}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_tr" Source="Sources\ProgramFiles\TinyWall\tr\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_tr" Guid="{3B2CF05B-B23C-4CC0-B2F7-98D1AD35E103}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_tr" Source="Sources\ProgramFiles\SimpleDeFence\tr\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_uk" Name="uk">
-            <Component Id="LocSatelliteLib_uk" Guid="{BFAA938B-3840-4A1E-8F4C-C728B7119BB3}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_uk" Source="Sources\ProgramFiles\TinyWall\uk\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_uk" Guid="{81BA36CA-2F0F-49A2-8543-BFECF27ECCB4}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_uk" Source="Sources\ProgramFiles\SimpleDeFence\uk\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="LOCDIR_zh" Name="zh">
-            <Component Id="LocSatelliteLib_zh" Guid="{E6D09715-2015-413F-A78B-2D409B7993D3}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_zh" Source="Sources\ProgramFiles\TinyWall\zh\TinyWall.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <Component Id="LocSatelliteLib_zh" Guid="{82D0CD05-1024-41EF-B491-FA2A13DFB088}" Win64="$(var.Win64)">
+              <File Id="LocSatelliteDLL_zh" Source="Sources\ProgramFiles\SimpleDeFence\zh\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
             </Component>
           </Directory>
           <Directory Id="DOCDIR" Name="doc">
             <Component Id="DocFAQComp" Win64="$(var.Win64)">
-              <File Id="DocFAQFile" Source="Sources\ProgramFiles\TinyWall\doc\faq.html" Vital="yes" KeyPath="yes" Checksum="yes" />
+              <File Id="DocFAQFile" Source="Sources\ProgramFiles\SimpleDeFence\doc\faq.html" Vital="yes" KeyPath="yes" Checksum="yes" />
             </Component>
             <Directory Id="DOCCSSDIR" Name="css">
               <Component Id="DocCss00Comp" Win64="$(var.Win64)">
-                <File Id="DocCss00File" Source="Sources\ProgramFiles\TinyWall\doc\css\1140.css" Vital="yes" KeyPath="yes" Checksum="yes" />
+                <File Id="DocCss00File" Source="Sources\ProgramFiles\SimpleDeFence\doc\css\1140.css" Vital="yes" KeyPath="yes" Checksum="yes" />
               </Component>
               <Component Id="DocCss02Comp" Win64="$(var.Win64)">
-                <File Id="DocCss02File" Source="Sources\ProgramFiles\TinyWall\doc\css\style.css" Vital="yes" KeyPath="yes" Checksum="yes" />
+                <File Id="DocCss02File" Source="Sources\ProgramFiles\SimpleDeFence\doc\css\style.css" Vital="yes" KeyPath="yes" Checksum="yes" />
               </Component>
             </Directory>
           </Directory>
@@ -289,14 +289,14 @@
       
       <!-- ProgramData -->
       <Directory Id="CommonAppDataFolder" Name="CommonAppData">
-        <Directory Id="AppDataDir" Name="TinyWall">
-          <Component Id="Database" Guid="{669B4911-0B8E-4AC6-8319-41511DF94626}" Win64="$(var.Win64)">
-            <File Id="DatabaseJson" Source="Sources\CommonAppData\TinyWall\profiles.json" Vital="yes" KeyPath="yes" />
+        <Directory Id="AppDataDir" Name="SimpleDeFence">
+          <Component Id="Database" Guid="{93D21865-93BD-4DF0-85FA-7DF5CD4BAB74}" Win64="$(var.Win64)">
+            <File Id="DatabaseJson" Source="Sources\CommonAppData\SimpleDeFence\profiles.json" Vital="yes" KeyPath="yes" />
           </Component>
-          <Component Id="hosts" Guid="{3AF39B32-B459-4A47-860F-B4E679712BD8}" Win64="$(var.Win64)">
-            <File Id="HostsBCK" Source="Sources\CommonAppData\TinyWall\hosts.bck" Vital="yes" KeyPath="yes" />
+          <Component Id="hosts" Guid="{F3ABB78F-BA69-47E0-98B4-439C74018233}" Win64="$(var.Win64)">
+            <File Id="HostsBCK" Source="Sources\CommonAppData\SimpleDeFence\hosts.bck" Vital="yes" KeyPath="yes" />
           </Component>
-          <Component Id="RemoveAppDataDir" Guid="{EE339191-7EC0-4F07-AF89-6527658FC9D7}" Win64="$(var.Win64)" Transitive="yes">
+          <Component Id="RemoveAppDataDir" Guid="{602DBDBF-489B-4F86-849B-30FDBE6D5EFF}" Win64="$(var.Win64)" Transitive="yes">
             <RemoveFile Id="AppDataDirFiles" On='install' Name='*' />
             <RemoveFolder Id="AppDataDirFolder" On='install' />
             <Condition><![CDATA[NOT OLDER_UPGRADEABLE_FOUND]]></Condition>
@@ -307,16 +307,16 @@
       <!-- Start Menu -->
       <Directory Id="ProgramMenuFolder" Name="Programs">
         <Directory Id="ProgramMenuDir" Name="$(var.ProductName)">
-          <Component Id="ProgramMenuDir" Guid="{14A26A5D-7F56-485F-98DE-9407F1E93F57}" Win64="$(var.Win64)">
+          <Component Id="ProgramMenuDir" Guid="{5A29C3A4-558D-498B-95A4-1FCC24DA2EFB}" Win64="$(var.Win64)">
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
             <RegistryValue Root='HKCU' Key='Software\[ProductName]' Type='string' Value='' KeyPath='yes' />
-            <Shortcut Id="ControllerShortcut" Icon="TinyWallIcon.exe" Directory="ProgramMenuDir" Name="TinyWall Controller" Target="[INSTALLDIR]TinyWall.exe">
-              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 5" Value="KPados.TinyWall.Controller" /> <!-- System.AppUserModel.ID -->
+            <Shortcut Id="ControllerShortcut" Icon="TinyWallIcon.exe" Directory="ProgramMenuDir" Name="SimpleDeFence Controller" Target="[INSTALLDIR]SimpleDeFence.exe">
+              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 5" Value="fcoltro.SimpleDeFence.Controller" /> <!-- System.AppUserModel.ID -->
               <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 12" Value="1" />                         <!-- System.AppUserModel.StartPinOption, http://support.microsoft.com/kb/2745126/en-us -->
               <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 8" Value="1" />                          <!-- System.AppUserModel.ExcludeFromShowInNewInstall -->
             </Shortcut>
-            <Shortcut Id="DevelToolShortcut" Icon="TinyWallIcon.exe" Directory="ProgramMenuDir" Name="TinyWall Dev Helper" Arguments="/develtool" Target="[INSTALLDIR]TinyWall.exe">
-              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 5" Value="KPados.TinyWall.DevelTool" />  <!-- System.AppUserModel.ID -->
+            <Shortcut Id="DevelToolShortcut" Icon="TinyWallIcon.exe" Directory="ProgramMenuDir" Name="SimpleDeFence Dev Helper" Arguments="/develtool" Target="[INSTALLDIR]SimpleDeFence.exe">
+              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 5" Value="fcoltro.SimpleDeFence.DevelTool" />  <!-- System.AppUserModel.ID -->
               <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 12" Value="1" />                         <!-- System.AppUserModel.StartPinOption, http://support.microsoft.com/kb/2745126/en-us -->
               <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 8" Value="1" />                          <!-- System.AppUserModel.ExcludeFromShowInNewInstall -->
             </Shortcut>
@@ -324,7 +324,7 @@
             <util:InternetShortcut Id="WebsiteShortcut" Name="Website" Target="$(var.ProductURL)"/>
             <util:InternetShortcut Id="ReleaseNotesShortcut" Name="Release Notes" Target="$(var.ReleaseNotesURL)"/>
             <!-- <Shortcut Id="UninstallProduct"
-                      Name="Uninstall TinyWall"
+                      Name="Uninstall SimpleDeFence"
                       Target="[$(var.System32Dir)]msiexec.exe"
                       Arguments="/x [ProductCode]" /> -->
           </Component>
@@ -334,14 +334,14 @@
     </Directory>
 
     <!-- Registry -->
-    <Component Id="RegistryKeys" Guid="{85FFE113-2363-4EF9-AAA4-05F522907839}" Directory="INSTALLDIR" Win64="$(var.Win64)">
-      <RegistryKey Id='RegInstallDir' Root='HKLM' Key='Software\TinyWall' ForceDeleteOnUninstall='yes'>
+    <Component Id="RegistryKeys" Guid="{6653D907-039F-40A3-A4F5-90DAB4E78028}" Directory="INSTALLDIR" Win64="$(var.Win64)">
+      <RegistryKey Id='RegInstallDir' Root='HKLM' Key='Software\SimpleDeFence' ForceDeleteOnUninstall='yes'>
         <RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]'/>
       </RegistryKey>
     </Component>
 
     <!-- Icons -->
-    <Icon Id="TinyWallIcon.exe" SourceFile="Sources\ProgramFiles\TinyWall\TinyWall.ico" />
+    <Icon Id="TinyWallIcon.exe" SourceFile="Sources\ProgramFiles\SimpleDeFence\SimpleDeFence.ico" />
 
     <!-- Dependencies groupping -->
     <ComponentGroup Id="Dependencies">

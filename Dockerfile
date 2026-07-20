@@ -21,9 +21,9 @@ RUN Set-ExecutionPolicy Bypass -Scope Process -Force; `
 WORKDIR C:\src
 COPY . .
 
-RUN dotnet restore TinyWall/TinyWall.csproj
+RUN dotnet restore SimpleDeFence/SimpleDeFence.csproj
 
 ARG CONFIGURATION=Release
-RUN msbuild TinyWall/TinyWall.csproj /p:Configuration=$env:CONFIGURATION /p:RestorePackages=false
+RUN msbuild SimpleDeFence/SimpleDeFence.csproj /p:Configuration=$env:CONFIGURATION /p:RestorePackages=false
 
-CMD Copy-Item -Recurse -Force C:\src\TinyWall\bin\* C:\out\
+CMD Copy-Item -Recurse -Force C:\src\SimpleDeFence\bin\* C:\out\
