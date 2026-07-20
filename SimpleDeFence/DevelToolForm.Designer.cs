@@ -1,4 +1,4 @@
-﻿namespace pylorak.SimpleDeFence
+﻿namespace SimpleDeFence
 {
     partial class DevelToolForm
     {

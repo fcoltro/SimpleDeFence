@@ -1,4 +1,4 @@
-﻿namespace pylorak.SimpleDeFence
+﻿namespace SimpleDeFence
 {
     partial class PasswordForm
     {
@@ -41,7 +41,7 @@
             // 
             resources.ApplyResources(this.btnCancel, "btnCancel");
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Image = global::pylorak.SimpleDeFence.Resources.Icons.cancel;
+            this.btnCancel.Image = global::SimpleDeFence.Resources.Icons.cancel;
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -49,7 +49,7 @@
             // btnOK
             // 
             resources.ApplyResources(this.btnOK, "btnOK");
-            this.btnOK.Image = global::pylorak.SimpleDeFence.Resources.Icons.accept;
+            this.btnOK.Image = global::SimpleDeFence.Resources.Icons.accept;
             this.btnOK.Name = "btnOK";
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
@@ -68,7 +68,7 @@
             // pictureBox1
             // 
             resources.ApplyResources(this.pictureBox1, "pictureBox1");
-            this.pictureBox1.Image = global::pylorak.SimpleDeFence.Resources.Icons._lock;
+            this.pictureBox1.Image = global::SimpleDeFence.Resources.Icons._lock;
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.TabStop = false;
             // 

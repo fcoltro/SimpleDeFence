@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public enum FirewallMode
     {

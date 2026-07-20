@@ -2,9 +2,9 @@
 using System.IO.Pipes;
 using System.Security.Principal;
 using System.Threading;
-using pylorak.Utilities;
+using SimpleDeFence.Utilities;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal delegate TwMessage PipeDataReceived(TwMessage req);
 
@@ -96,7 +96,7 @@ namespace pylorak.SimpleDeFence
 
             string clientFilePath = Utils.GetPathOfProcess((uint)clientPid);
 
-            return clientFilePath.Equals(pylorak.Windows.ProcessManager.ExecutablePath, StringComparison.OrdinalIgnoreCase);
+            return clientFilePath.Equals(SimpleDeFence.Windows.ProcessManager.ExecutablePath, StringComparison.OrdinalIgnoreCase);
 #else
             return true;
 #endif

@@ -1,6 +1,6 @@
 ﻿using DarkModeForms;
-using pylorak.Utilities;
-using pylorak.Windows;
+using SimpleDeFence.Utilities;
+using SimpleDeFence.Windows;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal partial class SettingsForm : Form
     {
@@ -690,7 +690,7 @@ namespace pylorak.SimpleDeFence
 
         private void btnGithub_Click(object sender, EventArgs e)
         {
-            var psi = new ProcessStartInfo(@"https://github.com/pylorak/tinywall") { UseShellExecute = true };
+            var psi = new ProcessStartInfo(@"https://github.com/fcoltro/SimpleDeFence") { UseShellExecute = true };
             Process.Start(psi)?.Dispose();
         }
     }

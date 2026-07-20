@@ -8,13 +8,13 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Management;
 using System.Threading;
-using pylorak.Windows;
-using pylorak.Windows.Services;
-using pylorak.Windows.WFP;
-using pylorak.Windows.WFP.Interop;
-using pylorak.Utilities;
+using SimpleDeFence.Windows;
+using SimpleDeFence.Windows.Services;
+using SimpleDeFence.Windows.WFP;
+using SimpleDeFence.Windows.WFP.Interop;
+using SimpleDeFence.Utilities;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public sealed class TinyWallServer : IDisposable
     {
@@ -29,7 +29,7 @@ namespace pylorak.SimpleDeFence
             DefaultBlock = 3000000,
         }
 
-        private static readonly Guid TINYWALL_PROVIDER_KEY = new("{66CA412C-4453-4F1E-A973-C16E433E34D0}");
+        private static readonly Guid TINYWALL_PROVIDER_KEY = new("{69E15520-9A9F-409E-AA6A-2F009D6B7295}");
 
         private readonly BlockingCollection<TwRequest> Q = new(32);
         private readonly PipeServerEndpoint ServerPipe;
@@ -358,7 +358,7 @@ namespace pylorak.SimpleDeFence
 
             // Install provider
             var provider = new FWPM_PROVIDER0();
-            provider.displayData.name = "Karoly Pados";
+            provider.displayData.name = "fcoltro";
             provider.displayData.description = "SimpleDeFence Provider";
             provider.serviceName = TinyWallService.SERVICE_NAME;
             provider.flags = FWPM_PROVIDER_FLAGS.FWPM_PROVIDER_FLAG_PERSISTENT;
@@ -413,7 +413,7 @@ namespace pylorak.SimpleDeFence
 
         private static Guid GetSublayerKey(LayerKeyEnum layer)
         {
-            return layer switch
+            var wellKnownLayerKey = layer switch
             {
                 LayerKeyEnum.FWPM_LAYER_OUTBOUND_ICMP_ERROR_V6 => WfpSublayerKeys.FWPM_LAYER_OUTBOUND_ICMP_ERROR_V6,
                 LayerKeyEnum.FWPM_LAYER_OUTBOUND_ICMP_ERROR_V4 => WfpSublayerKeys.FWPM_LAYER_OUTBOUND_ICMP_ERROR_V4,
@@ -431,6 +431,18 @@ namespace pylorak.SimpleDeFence
                 LayerKeyEnum.FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V4 => WfpSublayerKeys.FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V4,
                 _ => throw new ArgumentException("Invalid or not support layerEnum."),
             };
+
+            // WfpSublayerKeys holds Microsoft's well-known layer GUIDs, reused here as a
+            // convenient per-layer unique sublayer key. Forked builds share this source code,
+            // so XOR in our own provider key to keep each product's registered sublayers
+            // distinct - otherwise two installs of this codebase under different product
+            // identities (e.g. this fork alongside upstream TinyWall) would fight over the
+            // same sublayer keys if both ran on the same machine.
+            byte[] a = wellKnownLayerKey.ToByteArray();
+            byte[] b = TINYWALL_PROVIDER_KEY.ToByteArray();
+            for (int i = 0; i < a.Length; i++)
+                a[i] ^= b[i];
+            return new Guid(a);
         }
 
         private static Guid GetLayerKey(LayerKeyEnum layer)
@@ -521,7 +533,7 @@ namespace pylorak.SimpleDeFence
                 System.Diagnostics.Debug.Assert(!r.AppContainerSid.Equals("*"));
 
                 // Skip filter if OS is not supported
-                if (!pylorak.Windows.VersionInfo.Win81OrNewer)
+                if (!SimpleDeFence.Windows.VersionInfo.Win81OrNewer)
                     return;
 
                 if (!LayerIsIcmpError(layer))

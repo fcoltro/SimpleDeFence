@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using pylorak.Windows;
+using SimpleDeFence.Windows;
 
-namespace pylorak.SimpleDeFence.Parser
+namespace SimpleDeFence.Parser
 {
     public sealed class ParserFolderVariable : ParserVariable
     {

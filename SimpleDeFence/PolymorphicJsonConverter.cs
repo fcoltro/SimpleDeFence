@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public abstract class PolymorphicJsonConverter<T> : JsonConverter<T>
     {

@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public class ExceptionPolicyConverter : PolymorphicJsonConverter<ExceptionPolicy>
     {

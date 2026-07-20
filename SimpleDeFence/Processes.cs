@@ -1,6 +1,6 @@
 ﻿using DarkModeForms;
-using pylorak.Utilities;
-using pylorak.Windows;
+using SimpleDeFence.Utilities;
+using SimpleDeFence.Windows;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal partial class ProcessesForm : Form
     {

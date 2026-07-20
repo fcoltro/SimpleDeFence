@@ -10,7 +10,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Globalization;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal partial class DevelToolForm : Form
     {
@@ -391,7 +391,7 @@ namespace pylorak.SimpleDeFence
                 string[] candidateFiles = Directory.GetFiles(dirPath, pattern, SearchOption.AllDirectories);
                 foreach (var filePath in candidateFiles)
                 {
-                    var signedStatus = pylorak.Windows.WinTrust.VerifyFileAuthenticode(filePath);
+                    var signedStatus = SimpleDeFence.Windows.WinTrust.VerifyFileAuthenticode(filePath);
                     if (signedStatus == Windows.WinTrust.VerifyResult.SIGNATURE_MISSING)
                     {
                         filesToSign.Add("\"" + filePath + "\"");

@@ -6,7 +6,7 @@ using Microsoft.Samples.TaskDialog;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace pylorak.SimpleDeFence.DatabaseClasses
+namespace SimpleDeFence.DatabaseClasses
 {
     [DataContract(Namespace = "SimpleDeFence")]
     class AppDatabase : ISerializable<AppDatabase>

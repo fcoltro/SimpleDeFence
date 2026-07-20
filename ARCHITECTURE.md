@@ -9,9 +9,9 @@ knowing where the seams and risks already are.
 
 Two clean, well-scoped modules and one big blob:
 
-- `pylorak.Windows.Services` (`ServiceBase`, 105 nodes, cohesion 0.50) — Windows service lifecycle,
+- `SimpleDeFence.Windows.Services` (`ServiceBase`, 105 nodes, cohesion 0.50) — Windows service lifecycle,
   cleanly separated.
-- `pylorak.Windows.WFP` + `pylorak.Windows` (rule/filter primitives, path/handle utilities, ~590
+- `SimpleDeFence.Windows.WFP` + `SimpleDeFence.Windows` (rule/filter primitives, path/handle utilities, ~590
   nodes combined) — reasonably cohesive native-interop layer.
 - The main app (`SimpleDeFence/`) is one 659-node community with only 0.31 cohesion — nearly everything
   user-facing (forms, controller, service, dark-mode theming) is tangled together rather than split
@@ -31,7 +31,7 @@ Candidates for decomposition before/during the rewrite:
 Standout hotspots inside `TinyWallServer`:
 - `ConstructFilter` (SimpleDeFence/TinyWallService.cs:71) — 86 outgoing edges, touches nearly everything.
 - `AssembleActiveRules` (SimpleDeFence/TinyWallService.cs:71) — 221 lines.
-- `PathMapper.ConvertPath` (pylorak.Windows/PathMapper.cs:335) — 161 lines, 55 outgoing edges; the
+- `PathMapper.ConvertPath` (SimpleDeFence.Windows/PathMapper.cs:335) — 161 lines, 55 outgoing edges; the
   `%VarName%`-style path-variable resolver used throughout rule matching.
 
 ## Test coverage — the real risk

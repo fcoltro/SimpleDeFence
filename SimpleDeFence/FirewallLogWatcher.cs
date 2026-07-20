@@ -3,10 +3,10 @@ using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Runtime.InteropServices;
 using Microsoft.Samples;
-using pylorak.Utilities;
-using pylorak.Windows;
+using SimpleDeFence.Utilities;
+using SimpleDeFence.Windows;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal class FirewallLogWatcher : Disposable
     {

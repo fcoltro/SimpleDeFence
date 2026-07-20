@@ -9,9 +9,9 @@ using System.Xml;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using pylorak.Utilities;
+using SimpleDeFence.Utilities;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public interface ISerializable<T>
     {

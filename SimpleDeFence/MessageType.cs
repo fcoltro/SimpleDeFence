@@ -1,4 +1,4 @@
-﻿namespace pylorak.SimpleDeFence
+﻿namespace SimpleDeFence
 {
     // Possible message types from controller to service
     public enum MessageType

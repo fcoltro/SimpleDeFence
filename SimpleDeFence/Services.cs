@@ -1,13 +1,13 @@
 ﻿using DarkModeForms;
 using Microsoft.Win32;
-using pylorak.Windows;
+using SimpleDeFence.Windows;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ServiceProcess;
 using System.Windows.Forms;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal partial class ServicesForm : Form
     {

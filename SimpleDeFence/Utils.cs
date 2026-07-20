@@ -1,6 +1,6 @@
 ﻿using Microsoft.Samples.TaskDialog;
 using Microsoft.Win32;
-using pylorak.Windows;
+using SimpleDeFence.Windows;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +16,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal static class ExtensionMethods
     {

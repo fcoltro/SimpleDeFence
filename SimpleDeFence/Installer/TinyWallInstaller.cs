@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace pylorak.SimpleDeFence.Installer
+namespace SimpleDeFence.Installer
 {
     [RunInstaller(true)]
     public class TinyWallInstaller : System.Configuration.Install.Installer

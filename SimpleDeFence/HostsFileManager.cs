@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using pylorak.Utilities;
+using SimpleDeFence.Utilities;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal class HostsFileManager : Disposable
     {

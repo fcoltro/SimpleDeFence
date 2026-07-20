@@ -6,9 +6,9 @@ using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Samples.TaskDialog;
-using pylorak.Windows;
+using SimpleDeFence.Windows;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
 
     internal class Updater

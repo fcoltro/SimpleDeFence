@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using pylorak.Windows;
-using pylorak.SimpleDeFence.Parser;
+using SimpleDeFence.Windows;
+using SimpleDeFence.Parser;
 
-namespace pylorak.SimpleDeFence.DatabaseClasses
+namespace SimpleDeFence.DatabaseClasses
 {
     [DataContract(Namespace = "SimpleDeFence")]
     public sealed class SubjectIdentity : ISerializable<SubjectIdentity>

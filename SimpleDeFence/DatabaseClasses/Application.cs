@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace pylorak.SimpleDeFence.DatabaseClasses
+namespace SimpleDeFence.DatabaseClasses
 {
     [DataContract(Namespace = "SimpleDeFence")]
     public class Application : ISerializable<Application>

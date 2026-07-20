@@ -4,10 +4,10 @@ using System.Text;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using pylorak.Utilities;
+using SimpleDeFence.Utilities;
 using System.Text.Json.Serialization.Metadata;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/PKSoft")]
     public sealed class ControllerSettings : ISerializable<ControllerSettings>

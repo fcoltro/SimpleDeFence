@@ -1,6 +1,6 @@
 ﻿using DarkModeForms;
-using pylorak.Windows;
-using pylorak.Windows.NetStat;
+using SimpleDeFence.Windows;
+using SimpleDeFence.Windows.NetStat;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +11,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Windows.Forms;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal partial class ConnectionsForm : Form
     {
@@ -121,7 +121,7 @@ namespace pylorak.SimpleDeFence
             }
 
             // Finished reading tables, continues with log processing
-            var fwLog = pylorak.SimpleDeFence.Controller.EndReadFwLog(fwLogRequest.Response);
+            var fwLog = SimpleDeFence.Controller.EndReadFwLog(fwLogRequest.Response);
 
             // Show log entries if requested by user
             if (chkShowBlocked.Checked)

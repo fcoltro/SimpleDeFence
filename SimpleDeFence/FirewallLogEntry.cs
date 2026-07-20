@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public enum EventLogEvent
     {

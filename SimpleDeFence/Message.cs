@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public class TwMessageConverter : PolymorphicJsonConverter<TwMessage>
     {

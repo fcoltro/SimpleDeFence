@@ -3,10 +3,10 @@ using System.Security.Cryptography.X509Certificates;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using pylorak.Windows;
-using pylorak.SimpleDeFence.Parser;
+using SimpleDeFence.Windows;
+using SimpleDeFence.Parser;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public class ExceptionSubjectConverter : PolymorphicJsonConverter<ExceptionSubject>
     {

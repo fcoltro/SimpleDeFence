@@ -1,5 +1,5 @@
 ﻿
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal enum StartUpMode
     {

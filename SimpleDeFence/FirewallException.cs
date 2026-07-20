@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     // The default value must have value Zero.
     public enum AppExceptionTimer

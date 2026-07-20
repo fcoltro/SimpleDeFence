@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public static class Hasher
     {

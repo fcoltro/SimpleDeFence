@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     [DataContract(Namespace = "SimpleDeFence")]
     public class UpdateModule

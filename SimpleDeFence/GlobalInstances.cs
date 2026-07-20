@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Diagnostics.CodeAnalysis;
-using pylorak.SimpleDeFence.DatabaseClasses;
+using SimpleDeFence.DatabaseClasses;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal static class GlobalInstances
     {

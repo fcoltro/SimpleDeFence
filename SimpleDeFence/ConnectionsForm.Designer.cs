@@ -1,4 +1,4 @@
-﻿namespace pylorak.SimpleDeFence
+﻿namespace SimpleDeFence
 {
     partial class ConnectionsForm
     {
@@ -157,14 +157,14 @@
             // 
             // mnuUnblock
             // 
-            this.mnuUnblock.Image = global::pylorak.SimpleDeFence.Resources.Icons.executable;
+            this.mnuUnblock.Image = global::SimpleDeFence.Resources.Icons.executable;
             this.mnuUnblock.Name = "mnuUnblock";
             resources.ApplyResources(this.mnuUnblock, "mnuUnblock");
             this.mnuUnblock.Click += new System.EventHandler(this.mnuUnblock_Click);
             // 
             // mnuCloseProcess
             // 
-            this.mnuCloseProcess.Image = global::pylorak.SimpleDeFence.Resources.Icons.exit;
+            this.mnuCloseProcess.Image = global::SimpleDeFence.Resources.Icons.exit;
             this.mnuCloseProcess.Name = "mnuCloseProcess";
             resources.ApplyResources(this.mnuCloseProcess, "mnuCloseProcess");
             this.mnuCloseProcess.Click += new System.EventHandler(this.mnuCloseProcess_Click);
@@ -176,7 +176,7 @@
             this.mnuProcessLibrary,
             this.mnuFileNameOnTheWeb,
             this.mnuRemoteAddressOnTheWeb});
-            this.mnuSearch.Image = global::pylorak.SimpleDeFence.Resources.Icons.search;
+            this.mnuSearch.Image = global::SimpleDeFence.Resources.Icons.search;
             this.mnuSearch.Name = "mnuSearch";
             resources.ApplyResources(this.mnuSearch, "mnuSearch");
             // 

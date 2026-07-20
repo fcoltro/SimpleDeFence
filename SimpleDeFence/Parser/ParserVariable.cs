@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pylorak.SimpleDeFence.Parser
+namespace SimpleDeFence.Parser
 {
     public abstract class ParserVariable
     {

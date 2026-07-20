@@ -2,9 +2,9 @@
 using System.Collections.Concurrent;
 using System.IO.Pipes;
 using System.Threading;
-using pylorak.Utilities;
+using SimpleDeFence.Utilities;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public class PipeClientEndpoint
     {

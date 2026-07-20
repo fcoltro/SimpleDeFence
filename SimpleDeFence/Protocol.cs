@@ -1,4 +1,4 @@
-﻿namespace pylorak.SimpleDeFence
+﻿namespace SimpleDeFence
 {
     // Actually valid protocol numbers and interpretations can be found on:
     // http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xml

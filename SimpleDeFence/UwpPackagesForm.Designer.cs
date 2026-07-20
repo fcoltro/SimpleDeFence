@@ -1,4 +1,4 @@
-﻿namespace pylorak.SimpleDeFence
+﻿namespace SimpleDeFence
 {
     partial class UwpPackagesForm
     {
@@ -42,7 +42,7 @@
             // 
             resources.ApplyResources(this.btnCancel, "btnCancel");
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Image = global::pylorak.SimpleDeFence.Resources.Icons.cancel;
+            this.btnCancel.Image = global::SimpleDeFence.Resources.Icons.cancel;
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -50,7 +50,7 @@
             // btnOK
             // 
             resources.ApplyResources(this.btnOK, "btnOK");
-            this.btnOK.Image = global::pylorak.SimpleDeFence.Resources.Icons.accept;
+            this.btnOK.Image = global::SimpleDeFence.Resources.Icons.accept;
             this.btnOK.Name = "btnOK";
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.btnOK_Click);

@@ -2,9 +2,9 @@
 using System.Threading;
 using System.IO;
 using System.Net;
-using pylorak.Utilities;
+using SimpleDeFence.Utilities;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     static class Program
     {
@@ -39,7 +39,7 @@ namespace pylorak.SimpleDeFence
             tw.Start(Array.Empty<string>());
             tw.StartedEvent.WaitOne();
 #else
-            pylorak.Windows.Services.ServiceBase.Run(tw);
+            SimpleDeFence.Windows.Services.ServiceBase.Run(tw);
 #endif
             return 0;
         }
@@ -178,7 +178,7 @@ namespace pylorak.SimpleDeFence
                     using (var srv = new TinyWallService())
                     {
 #if !DEBUG
-                        pylorak.Windows.PathMapper.Instance.AutoUpdate = false;
+                        SimpleDeFence.Windows.PathMapper.Instance.AutoUpdate = false;
 #endif
                         StartService(srv);
 #if DEBUG

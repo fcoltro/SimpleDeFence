@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using pylorak.Utilities;
+using SimpleDeFence.Utilities;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public sealed class Controller
     {

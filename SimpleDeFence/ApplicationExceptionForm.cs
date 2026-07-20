@@ -1,13 +1,13 @@
 ﻿using DarkModeForms;
 using Microsoft.Samples.TaskDialog;
-using pylorak.Windows;
+using SimpleDeFence.Windows;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal partial class ApplicationExceptionForm : Form
     {

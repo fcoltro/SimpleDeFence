@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace pylorak.SimpleDeFence.Parser
+namespace SimpleDeFence.Parser
 {
     public static class RecursiveParser
     {

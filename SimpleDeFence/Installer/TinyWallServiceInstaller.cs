@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.ServiceProcess;
-using pylorak.Windows.Services;
+using SimpleDeFence.Windows.Services;
 
-namespace pylorak.SimpleDeFence.Installer
+namespace SimpleDeFence.Installer
 {
     internal class TinyWallServiceInstaller : System.Configuration.Install.Installer
     {

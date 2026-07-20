@@ -7,10 +7,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Samples.TaskDialog;
-using pylorak.Utilities;
-using pylorak.Windows;
+using SimpleDeFence.Utilities;
+using SimpleDeFence.Windows;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal sealed class TinyWallController : ApplicationContext
     {
@@ -80,7 +80,7 @@ namespace pylorak.SimpleDeFence
             // Tray
             // 
             resources.ApplyResources(this.Tray, "Tray");
-            this.Tray.Icon = global::pylorak.SimpleDeFence.Resources.Icons.firewall;
+            this.Tray.Icon = global::SimpleDeFence.Resources.Icons.firewall;
             this.Tray.Visible = false;
             this.Tray.BalloonTipClicked += new System.EventHandler(this.Tray_BalloonTipClicked);
             this.Tray.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Tray_MouseClick);
@@ -111,7 +111,7 @@ namespace pylorak.SimpleDeFence
             // mnuTrafficRate
             // 
             this.mnuTrafficRate.AccessibleRole = System.Windows.Forms.AccessibleRole.StaticText;
-            this.mnuTrafficRate.Image = global::pylorak.SimpleDeFence.Resources.Icons.info;
+            this.mnuTrafficRate.Image = global::SimpleDeFence.Resources.Icons.info;
             this.mnuTrafficRate.Name = "mnuTrafficRate";
             resources.ApplyResources(this.mnuTrafficRate, "mnuTrafficRate");
             // 
@@ -164,28 +164,28 @@ namespace pylorak.SimpleDeFence
             // 
             // mnuManage
             // 
-            this.mnuManage.Image = global::pylorak.SimpleDeFence.Resources.Icons.manage;
+            this.mnuManage.Image = global::SimpleDeFence.Resources.Icons.manage;
             this.mnuManage.Name = "mnuManage";
             resources.ApplyResources(this.mnuManage, "mnuManage");
             this.mnuManage.Click += new System.EventHandler(this.mnuManage_Click);
             // 
             // mnuConnections
             // 
-            this.mnuConnections.Image = global::pylorak.SimpleDeFence.Resources.Icons.connections;
+            this.mnuConnections.Image = global::SimpleDeFence.Resources.Icons.connections;
             this.mnuConnections.Name = "mnuConnections";
             resources.ApplyResources(this.mnuConnections, "mnuConnections");
             this.mnuConnections.Click += new System.EventHandler(this.mnuConnections_Click);
             // 
             // mnuLock
             // 
-            this.mnuLock.Image = global::pylorak.SimpleDeFence.Resources.Icons.lock_small;
+            this.mnuLock.Image = global::SimpleDeFence.Resources.Icons.lock_small;
             this.mnuLock.Name = "mnuLock";
             resources.ApplyResources(this.mnuLock, "mnuLock");
             this.mnuLock.Click += new System.EventHandler(this.mnuLock_Click);
             // 
             // mnuElevate
             // 
-            this.mnuElevate.Image = global::pylorak.SimpleDeFence.Resources.Icons.w7uacshield;
+            this.mnuElevate.Image = global::SimpleDeFence.Resources.Icons.w7uacshield;
             this.mnuElevate.Name = "mnuElevate";
             resources.ApplyResources(this.mnuElevate, "mnuElevate");
             this.mnuElevate.Click += new System.EventHandler(this.mnuElevate_Click);
@@ -214,21 +214,21 @@ namespace pylorak.SimpleDeFence
             // 
             // mnuWhitelistByExecutable
             // 
-            this.mnuWhitelistByExecutable.Image = global::pylorak.SimpleDeFence.Resources.Icons.executable;
+            this.mnuWhitelistByExecutable.Image = global::SimpleDeFence.Resources.Icons.executable;
             this.mnuWhitelistByExecutable.Name = "mnuWhitelistByExecutable";
             resources.ApplyResources(this.mnuWhitelistByExecutable, "mnuWhitelistByExecutable");
             this.mnuWhitelistByExecutable.Click += new System.EventHandler(this.mnuWhitelistByExecutable_Click);
             // 
             // mnuWhitelistByProcess
             // 
-            this.mnuWhitelistByProcess.Image = global::pylorak.SimpleDeFence.Resources.Icons.process;
+            this.mnuWhitelistByProcess.Image = global::SimpleDeFence.Resources.Icons.process;
             this.mnuWhitelistByProcess.Name = "mnuWhitelistByProcess";
             resources.ApplyResources(this.mnuWhitelistByProcess, "mnuWhitelistByProcess");
             this.mnuWhitelistByProcess.Click += new System.EventHandler(this.mnuWhitelistByProcess_Click);
             // 
             // mnuWhitelistByWindow
             // 
-            this.mnuWhitelistByWindow.Image = global::pylorak.SimpleDeFence.Resources.Icons.window;
+            this.mnuWhitelistByWindow.Image = global::SimpleDeFence.Resources.Icons.window;
             this.mnuWhitelistByWindow.Name = "mnuWhitelistByWindow";
             resources.ApplyResources(this.mnuWhitelistByWindow, "mnuWhitelistByWindow");
             this.mnuWhitelistByWindow.Click += new System.EventHandler(this.mnuWhitelistByWindow_Click);
@@ -240,7 +240,7 @@ namespace pylorak.SimpleDeFence
             // 
             // mnuQuit
             // 
-            this.mnuQuit.Image = global::pylorak.SimpleDeFence.Resources.Icons.exit;
+            this.mnuQuit.Image = global::SimpleDeFence.Resources.Icons.exit;
             this.mnuQuit.Name = "mnuQuit";
             resources.ApplyResources(this.mnuQuit, "mnuQuit");
             this.mnuQuit.Click += new System.EventHandler(this.mnuQuit_Click);
@@ -416,7 +416,7 @@ namespace pylorak.SimpleDeFence
                     {
                         Utils.Invoke(SyncCtx, (SendOrPostCallback)delegate (object o)
                         {
-                            string prompt = string.Format(CultureInfo.CurrentCulture, pylorak.SimpleDeFence.Resources.Messages.UpdateAvailableBubble, MainAppModule.ComponentVersion);
+                            string prompt = string.Format(CultureInfo.CurrentCulture, SimpleDeFence.Resources.Messages.UpdateAvailableBubble, MainAppModule.ComponentVersion);
                             ShowBalloonTip(prompt, ToolTipIcon.Info, 5000, StartUpdate, MainAppModule.UpdateURL);
                         });
                     }

@@ -2,9 +2,9 @@
 using System.IO;
 using System.Diagnostics.Eventing.Reader;
 using NetFwTypeLib;
-using pylorak.Utilities;
+using SimpleDeFence.Utilities;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     class WindowsFirewall : Disposable
     {

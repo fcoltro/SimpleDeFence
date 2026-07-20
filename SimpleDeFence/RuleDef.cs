@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     [DataContract(Namespace = "SimpleDeFence")]
     public class RuleDef

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using pylorak.Windows;
+using SimpleDeFence.Windows;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal class ProcessInfo
     {

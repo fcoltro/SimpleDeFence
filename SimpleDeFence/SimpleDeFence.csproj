@@ -11,7 +11,7 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <RootNamespace>pylorak.SimpleDeFence</RootNamespace>
+    <RootNamespace>SimpleDeFence</RootNamespace>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
 
     <!-- Used for WinRT access in .Net 4.8, not needed with .NET 5+ -->
@@ -49,11 +49,11 @@
 
 	<Compile Include="../Microsoft.Samples/*.cs" LinkBase="Microsoft.Samples" />
 	<Compile Include="../Microsoft.Samples/TaskDialog/*.cs" LinkBase="Microsoft.Samples.TaskDialog" />
-    <Compile Include="../pylorak.Utilities/*.cs" LinkBase="pylorak.Utilities" />
-    <Compile Include="../pylorak.Windows/*.cs" LinkBase="pylorak.Windows" />
-    <Compile Include="../pylorak.Windows/NetStat/*.cs" LinkBase="pylorak.Windows.NetStat" />
-    <Compile Include="../pylorak.Windows.Services/*.cs" LinkBase="pylorak.Windows.Services" />
-    <Compile Include="../pylorak.Windows.WFP/*.cs" LinkBase="pylorak.Windows.WFP" />
+    <Compile Include="../SimpleDeFence.Utilities/*.cs" LinkBase="SimpleDeFence.Utilities" />
+    <Compile Include="../SimpleDeFence.Windows/*.cs" LinkBase="SimpleDeFence.Windows" />
+    <Compile Include="../SimpleDeFence.Windows/NetStat/*.cs" LinkBase="SimpleDeFence.Windows.NetStat" />
+    <Compile Include="../SimpleDeFence.Windows.Services/*.cs" LinkBase="SimpleDeFence.Windows.Services" />
+    <Compile Include="../SimpleDeFence.Windows.WFP/*.cs" LinkBase="SimpleDeFence.Windows.WFP" />
     <PackageReference Include="Nullable" Version="1.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

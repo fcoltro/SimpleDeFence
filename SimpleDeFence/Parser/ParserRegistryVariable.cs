@@ -1,8 +1,8 @@
 ﻿using System;
-using pylorak.Windows;
+using SimpleDeFence.Windows;
 using Microsoft.Win32;
 
-namespace pylorak.SimpleDeFence.Parser
+namespace SimpleDeFence.Parser
 {
     public sealed class ParserRegistryVariable : ParserVariable
     {

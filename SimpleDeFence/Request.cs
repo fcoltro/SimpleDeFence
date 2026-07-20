@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public class TwRequest
     {

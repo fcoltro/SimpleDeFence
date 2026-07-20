@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace pylorak.SimpleDeFence.Parser
+namespace SimpleDeFence.Parser
 {
     public sealed class ParserNoTrailingSlashVariable : ParserVariable
     {

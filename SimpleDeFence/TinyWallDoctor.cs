@@ -4,12 +4,12 @@ using System.Configuration.Install;
 using System.Diagnostics;
 using System.ServiceProcess;
 using TaskScheduler;
-using pylorak.Windows;
-using pylorak.Windows.Services;
-using pylorak.Windows.WFP;
-using pylorak.Windows.WFP.Interop;
+using SimpleDeFence.Windows;
+using SimpleDeFence.Windows.Services;
+using SimpleDeFence.Windows.WFP;
+using SimpleDeFence.Windows.WFP.Interop;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal static class TinyWallDoctor
     {

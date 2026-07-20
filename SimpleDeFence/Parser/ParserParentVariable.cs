@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace pylorak.SimpleDeFence.Parser
+namespace SimpleDeFence.Parser
 {
     public sealed class ParserParentVariable : ParserVariable
     {

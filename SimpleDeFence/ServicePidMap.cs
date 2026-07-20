@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ServiceProcess;
-using pylorak.Windows.Services;
+using SimpleDeFence.Windows.Services;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public class ServicePidMap
     {

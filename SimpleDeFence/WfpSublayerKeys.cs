@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public static class WfpSublayerKeys
     {

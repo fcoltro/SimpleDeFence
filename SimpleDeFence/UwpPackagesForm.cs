@@ -1,12 +1,12 @@
 ﻿using DarkModeForms;
-using pylorak.Windows;
+using SimpleDeFence.Windows;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public partial class UwpPackagesForm : Form
     {

@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal partial class PasswordForm : Form
     {

@@ -20,17 +20,17 @@
 /Microsoft.Samples/obj/
 /Microsoft.Samples/bin/
 
-/pylorak.Utilities/obj/
-/pylorak.Utilities/bin/
+/SimpleDeFence.Utilities/obj/
+/SimpleDeFence.Utilities/bin/
 
-/pylorak.Windows/obj/
-/pylorak.Windows/bin/
+/SimpleDeFence.Windows/obj/
+/SimpleDeFence.Windows/bin/
 
-/pylorak.Windows.Services/obj/
-/pylorak.Windows.Services/bin/
+/SimpleDeFence.Windows.Services/obj/
+/SimpleDeFence.Windows.Services/bin/
 
-/pylorak.Windows.WFP/bin/
-/pylorak.Windows.WFP/obj/
+/SimpleDeFence.Windows.WFP/bin/
+/SimpleDeFence.Windows.WFP/obj/
 
 /MsiSetup/obj/
 /MsiSetup/bin/

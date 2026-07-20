@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Windows.Forms;
-using pylorak.Utilities;
+using SimpleDeFence.Utilities;
 using Windows.ApplicationModel.Store.Preview.InstallControl;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     internal class AsyncIconScanner : Disposable
     {

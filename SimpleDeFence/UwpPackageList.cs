@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
 using Windows.Management.Deployment;
-using pylorak.Windows;
+using SimpleDeFence.Windows;
 using System.Collections;
 using System.Collections.ObjectModel;
 
-namespace pylorak.SimpleDeFence
+namespace SimpleDeFence
 {
     public class UwpPackageList : IReadOnlyList<UwpPackageList.Package>
     {
