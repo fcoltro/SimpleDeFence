@@ -1297,13 +1297,27 @@
         },
         {
           "Subject": {
-            "SubjectType": 2,
+            "SubjectType": 3,
+            "ServiceName": "UsoSvc",
             "ExecutablePath": "{folder:sys32}\\svchost.exe"
           },
           "Policy": {
             "PolicyType": 3,
             "LocalNetworkOnly": false,
-            "AllowedRemoteTcpConnectPorts": "443,80"
+            "AllowedRemoteTcpConnectPorts": "*"
+          }
+        },
+        {
+          "Subject": {
+            "SubjectType": 3,
+            "ServiceName": "DoSvc",
+            "ExecutablePath": "{folder:sys32}\\svchost.exe"
+          },
+          "Policy": {
+            "PolicyType": 3,
+            "LocalNetworkOnly": false,
+            "AllowedRemoteTcpConnectPorts": "*",
+            "AllowedRemoteUdpConnectPorts": "*"
           }
         }
       ],

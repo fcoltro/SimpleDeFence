@@ -23,7 +23,28 @@ attribution. This document tracks where the project is headed.
 - [x] Code structure review of the existing C#/.NET codebase — see [ARCHITECTURE.md](ARCHITECTURE.md).
 - [x] "Add folder" exception: recursively scan a folder for `.exe`/`.dll` and add them all as
       application exceptions in one action.
-- [ ] Investigate isolating Windows Update traffic as a distinct, controllable exception.
+- [x] Investigate isolating Windows Update traffic as a distinct, controllable exception. **Finding:**
+      the WFP engine already supports genuine per-service isolation (`ServiceNameFilterCondition` in
+      `SimpleDeFence.Windows.WFP/FilterCondition.cs` derives the real Windows service SID and conditions
+      on `FWPM_CONDITION_ALE_USER_ID` — this is not a gap, it already works). The actual bug was in the
+      data: the bundled `Windows_Update` app-database entry only scoped this to `wuauserv`, which is
+      **stopped** on modern Windows (verified on this machine) — `UsoSvc` (Update Orchestrator, the real
+      driver since Windows 10) and `DoSvc` (Delivery Optimization, handles payload downloads) do the
+      actual work now and weren't covered. To compensate, the entry fell back to an *unscoped*
+      `svchost.exe` rule restricted only to ports 443/80 — which grants every other service sharing
+      `svchost.exe` the same access, defeating the isolation goal entirely.
+      Fixed by adding precise `ServiceSubject` components for `UsoSvc` and `DoSvc` and removing the
+      broad fallback, in both `SimpleDeFence/Database/SpecialApplications/Special Windows Update.json`
+      (source) and `MsiSetup/Sources/CommonAppData/SimpleDeFence/profiles.json` (the compiled file an
+      actual install loads — normally regenerated from the source via `/develtool`'s Database Creator,
+      patched directly here since that tool needs a built Windows app to run).
+      **Known limitation, not fixed:** BITS is also used by Windows Update on some paths, but it's
+      generic shared infrastructure used by many unrelated callers (Store, third-party installers) —
+      WFP can't distinguish a BITS job made on Windows Update's behalf from any other caller's, so
+      adding it here would reopen the same "grants access to everything else too" problem. Also not
+      covered: Delivery Optimization's peer-to-peer *inbound* listening (default port 7680) if a user
+      has LAN/Internet peer caching enabled beyond the default — this fix only covers `DoSvc`'s
+      outbound connections.
 - [ ] Dark-theme GUI support.
 - [ ] Better hosts file handling.
 - [ ] Unified dialog boxes (consolidate the various ad-hoc dialogs into a consistent pattern).
