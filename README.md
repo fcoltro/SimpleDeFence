@@ -1,19 +1,19 @@
 <br />
 <div align="center">
-  <h3 align="center">TinyWall</h3>
+  <h3 align="center">SimpleDeFence</h3>
 
   <p align="center">
     A free, lightweight and non-intrusive firewall
     <br />
-    <a href="https://tinywall.pados.hu"><strong>Website »</strong></a> | <a href="https://tinywall.pados.hu/download.php"><strong>Download »</strong></a>
+    Fork of <a href="https://tinywall.pados.hu">TinyWall</a>, being modernized with a Rust core and a Tauri/Tailwind GUI.
   </p>
 </div>
 
 ## About
 
-TinyWall is a free, lightweight, and non-intrusive, secure by default firewall for Windows. Built to just simply sit in your system tray, quietly blocking any application you did not explicitly allow network access. TinyWall installs no kernel drivers, so it cannot negatively influence system stability. It also repects your privacy and collects absolutely no data about the user or their computer.
+SimpleDeFence is a free, lightweight, and non-intrusive, secure by default firewall for Windows. Built to just simply sit in your system tray, quietly blocking any application you did not explicitly allow network access. It installs no kernel drivers, so it cannot negatively influence system stability. It also respects your privacy and collects absolutely no data about the user or their computer.
 
-This repository houses the source code of TinyWall as found at its [official website](https://tinywall.pados.hu).
+This project is a fork of [TinyWall](https://github.com/pylorak/TinyWall) by Károly Pados, currently a straight rebuild of the original C#/.NET codebase under a new name. See [NOTICE.md](NOTICE.md) for attribution details and [ROADMAP.md](ROADMAP.md) for where the project is headed, including a planned rewrite of the core in Rust with a Tauri + Tailwind CSS GUI.
 
 ## How to build
 
@@ -22,6 +22,8 @@ This repository houses the source code of TinyWall as found at its [official web
 - Microsoft Visual Studio 2026 (or 2022)
 - [Wix v3.14 Toolset](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm)
 - [Visual Studio extension for Wix v3 Toolset](https://marketplace.visualstudio.com/items?itemName=WixToolset.WixToolsetVisualStudio2022Extension)
+
+Alternatively, see [Dockerfile](Dockerfile) for a containerized build environment (Windows containers required) that only needs Docker installed.
 
 ### To build the application
 
@@ -45,18 +47,12 @@ This repository houses the source code of TinyWall as found at its [official web
 
 ## Contributing
 
-Feel free to open issues, feature- or pull-requests. I kindly ask for patience though, as TinyWall is in maintenance mode and my responses are often delayed. Nevertheless all issues and requests are looked at. 
-
-New features are more likely to get implemented if you provide the necessary code changes yourself. The process for that is the same as for most other projects here on GitHub, in short:
+Feel free to open issues, feature- or pull-requests.
 1. Fork the Project
 1. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 1. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 1. Push to the Branch (`git push origin feature/AmazingFeature`)
 1. Open a Pull Request on GitHub
-
-For complex features or large changes, please contact me first if your changes are still within the vision of TinyWall staying small, efficient and simple.
-
-If your goal with forking is not code contribution but to build and distribute your own binaries, please choose a name dissimilar to "TinyWall" to avoid confusing users.
 
 ## License
 
@@ -69,8 +65,6 @@ If your goal with forking is not code contribution but to build and distribute y
 
 ## Contact
 
-Károly Pados - find e-mail at the bottom of the project website
+GitHub: <https://github.com/fcoltro/SimpleDeFence>
 
-Website: <https://tinywall.pados.hu>
-
-GitHub: <https://github.com/pylorak/tinywall>
+Upstream project (TinyWall) by Károly Pados: <https://github.com/pylorak/TinyWall>
