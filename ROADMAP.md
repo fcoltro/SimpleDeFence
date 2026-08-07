@@ -88,11 +88,32 @@ the core stays C#/.NET and untouched throughout this phase either way.
       the existing "statically compiled into the application" build model intact.
 - [x] Stand up a WinUI 3 shell that talks to the **existing, unchanged C# service** — same process
       family, same language, can reuse `Protocol.cs`/`PipeServerEndpoint`/`PipeClientEndpoint` as-is.
-      `SimpleDeFence.UI` builds and its first screen calls `Controller.GetServerConfig` over the
-      existing `SimpleDeFenceController` named pipe to show connection/mode/lock state.
-      **Not yet verified at runtime against a live service** — compile-verified only.
-- [ ] Use XAML Islands (or equivalent interop) to migrate screen-by-screen, not big-bang — keep
-      WinForms forms working and buildable throughout until each WinUI 3 replacement reaches parity.
+      `SimpleDeFence.UI` runs, renders, and calls `Controller.GetServerConfig` /
+      `Controller.SwitchFirewallMode` over the existing `SimpleDeFenceController` named pipe to
+      show connection/mode/lock state and switch modes. Mode labels are taken from the WinForms
+      GUI's `Messages.resx` so both name modes identically, Learning keeps its confirmation
+      prompt, and an unrecognised response is reported as a failure rather than a success.
+      **Verified at runtime only on the disconnected path** — the dev machine has upstream
+      TinyWall installed rather than SimpleDeFence, so no `SimpleDeFenceController` pipe exists
+      to exercise the connected path against. Installing SimpleDeFence alongside a running
+      TinyWall was deliberately not attempted: two WFP-manipulating firewalls on one machine is
+      a good way to lose network access.
+- [x] ~~Use XAML Islands~~ — **dropped (2026-08-07).** WinUI 3 islands can't be hosted in this app:
+      the Windows App SDK refuses any target below .NET 6 (`Microsoft.WindowsAppSDK.Base.targets`:
+      *"This version of the Windows App SDK requires .NET 6.0"*), and `SimpleDeFence.csproj` is
+      net48. Hosting an island would mean migrating the whole WinForms app off .NET Framework
+      first — and `System.Configuration.Install` (`ManagedInstallerClass` in `TinyWallDoctor.cs`,
+      both `Installer/` classes) has no .NET 5+ equivalent, so the service install/uninstall path
+      would have to be rewritten before any GUI work could start.
+- [ ] Migrate at the **process boundary** instead — the "or equivalent interop" this phase allowed
+      for. `SimpleDeFence.UI` is already a separate process talking to the unchanged service over
+      the existing named pipe, which is exactly the core-vs-GUI seam ARCHITECTURE.md identified, so
+      no interop layer is needed at all. Both GUIs are plain IPC clients and can run side by side:
+      keep the WinForms GUI as the default, add WinUI 3 screens incrementally, and retire each old
+      form once its replacement reaches parity. The net48 app stays buildable throughout, and
+      migrating it off .NET Framework becomes an independent, optional decision rather than a
+      prerequisite. Note the controller owns a single-instance mutex and the tray icon, so running
+      both GUIs at once needs that arbitration handled.
 - [ ] Investigate VS 2026's Copilot-assisted "Modernize" tooling for the WinForms → WinUI 3 migration
       itself, since Microsoft built it for exactly this transition.
 - [ ] Port feature-by-feature from the WinForms GUI, validating parity before removing each old form.

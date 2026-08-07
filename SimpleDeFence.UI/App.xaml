@@ -1,5 +1,13 @@
 <Application
     x:Class="SimpleDeFence.UI.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls">
+
+    <Application.Resources>
+        <!-- Brings in the WinUI control templates and theme resources (the *TextBlockStyle
+             keys, control default styles, ...). Without this every {StaticResource} lookup
+             fails and the app dies during XAML parse with 0x802B000A. -->
+        <controls:XamlControlsResources/>
+    </Application.Resources>
 </Application>
