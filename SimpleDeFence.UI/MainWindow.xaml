@@ -7,33 +7,27 @@
         <MicaBackdrop/>
     </Window.SystemBackdrop>
 
-    <ScrollViewer>
-        <StackPanel Padding="28" Spacing="18" MaxWidth="560" HorizontalAlignment="Left">
+    <NavigationView x:Name="Nav"
+                    IsBackButtonVisible="Collapsed"
+                    IsSettingsVisible="False"
+                    PaneDisplayMode="Left"
+                    IsPaneToggleButtonVisible="False"
+                    OpenPaneLength="200"
+                    SelectionChanged="Nav_SelectionChanged">
 
-            <StackPanel Spacing="2">
-                <TextBlock Text="SimpleDeFence" Style="{StaticResource TitleLargeTextBlockStyle}"/>
-                <TextBlock x:Name="StatusText" Text="Connecting..."
-                           Style="{StaticResource BodyTextBlockStyle}" Opacity="0.8"/>
-            </StackPanel>
+        <NavigationView.MenuItems>
+            <NavigationViewItem Content="Status" Tag="status" IsSelected="True">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="Home"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Content="Applications" Tag="applications">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="AllApps"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
 
-            <InfoBar x:Name="Notice" IsOpen="False" IsClosable="True"/>
-
-            <StackPanel Spacing="8">
-                <TextBlock Text="Firewall mode" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                <RadioButtons x:Name="ModeRadios" IsEnabled="False"
-                              SelectionChanged="ModeRadios_SelectionChanged"/>
-                <TextBlock x:Name="LockNote" Visibility="Collapsed"
-                           Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"
-                           TextWrapping="Wrap"
-                           Text="The configuration is locked. Unlock it before changing the mode."/>
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Spacing="12">
-                <Button x:Name="RefreshButton" Content="Refresh" Click="RefreshButton_Click"/>
-                <ProgressRing x:Name="Busy" IsActive="False" Width="20" Height="20"
-                              VerticalAlignment="Center"/>
-            </StackPanel>
-
-        </StackPanel>
-    </ScrollViewer>
+        <Frame x:Name="ContentFrame"/>
+    </NavigationView>
 </Window>

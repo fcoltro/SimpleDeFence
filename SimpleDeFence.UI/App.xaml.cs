@@ -1,10 +1,14 @@
 using Microsoft.UI.Xaml;
+using SimpleDeFence.UI.Services;
 
 namespace SimpleDeFence.UI
 {
     public partial class App : Application
     {
         private Window? m_window;
+
+        // Shared by every page so they agree on connection state and the config changeset.
+        internal static FirewallClient Firewall { get; } = new();
 
         public App()
         {

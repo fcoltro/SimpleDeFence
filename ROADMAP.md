@@ -117,6 +117,12 @@ the core stays C#/.NET and untouched throughout this phase either way.
 - [ ] Investigate VS 2026's Copilot-assisted "Modernize" tooling for the WinForms → WinUI 3 migration
       itself, since Microsoft built it for exactly this transition.
 - [ ] Port feature-by-feature from the WinForms GUI, validating parity before removing each old form.
+      Ported so far, behind a `NavigationView` shell with a shared `FirewallClient` so pages agree on
+      connection state and the config changeset: **Status** (firewall mode switching) and
+      **Applications** (read-only exception list with filtering). Both are so far verified only in
+      the disconnected state — see the runtime-verification caveat above.
+      Still to port: adding/editing/removing exceptions, the Connections window, hosts-file and
+      password/lock management, the tray icon and its menu, and the DevelTool.
 
 ## Development environment
 
