@@ -20,6 +20,12 @@
 /Microsoft.Samples/obj/
 /Microsoft.Samples/bin/
 
+/SimpleDeFence.Core/obj/
+/SimpleDeFence.Core/bin/
+
+/SimpleDeFence.UI/obj/
+/SimpleDeFence.UI/bin/
+
 /SimpleDeFence.Utilities/obj/
 /SimpleDeFence.Utilities/bin/
 

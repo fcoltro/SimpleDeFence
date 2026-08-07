@@ -23,8 +23,6 @@ This project is a fork of [TinyWall](https://github.com/pylorak/TinyWall) by Ká
 - [Wix v3.14 Toolset](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm)
 - [Visual Studio extension for Wix v3 Toolset](https://marketplace.visualstudio.com/items?itemName=WixToolset.WixToolsetVisualStudio2022Extension)
 
-Alternatively, see [Dockerfile](Dockerfile) for a containerized build environment (Windows containers required) that only needs Docker installed.
-
 ### To build the application
 
 1. Open the solution file in Visual Studio and compile the `SimpleDeFence` project. The other projects referenced inside the solution need not be built separately as they will be statically compiled into the application.

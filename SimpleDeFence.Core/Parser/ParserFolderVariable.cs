@@ -20,7 +20,7 @@ namespace SimpleDeFence.Parser
                     "pf" or "pf64" => ProgramFilesx64(),
                     "pf32" => ProgramFilesx86(),
                     "sys32" => NativeSys32(),
-                    "twpath" => Path.GetDirectoryName(Utils.ExecutablePath),
+                    "twpath" => Path.GetDirectoryName(CoreUtils.ExecutablePath),
                     "LocalAppData" => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "windows" => Environment.GetEnvironmentVariable("windir"),
                     _ => str,

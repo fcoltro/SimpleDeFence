@@ -208,7 +208,7 @@ namespace SimpleDeFence.DatabaseClasses
 
         public JsonTypeInfo<AppDatabase> GetJsonTypeInfo()
         {
-            return SourceGenerationContext.Default.AppDatabase;
+            return AppSourceGenerationContext.Default.AppDatabase;
         }
     }
 }

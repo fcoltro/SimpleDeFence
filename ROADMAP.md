@@ -80,8 +80,17 @@ The core (WFP rule construction, IPC, service lifecycle) still has zero test cov
 firewall into a new language first is the wrong order of operations regardless of GUI framework, so
 the core stays C#/.NET and untouched throughout this phase either way.
 
-- [ ] Stand up a WinUI 3 shell that talks to the **existing, unchanged C# service** — same process
+- [x] Extract `SimpleDeFence.Core` — the protocol/IPC/config-model classes ARCHITECTURE.md identified
+      as the core-vs-GUI seam, moved out of `SimpleDeFence/` into their own project. It multi-targets
+      `net48;net10.0-windows` so the existing WinForms app and the new WinUI 3 app can both consume
+      it (`SimpleDeFence.Utilities` and `SimpleDeFence.Windows` were multi-targeted to match). The
+      WinForms app still glob-compiles these sources rather than referencing the assembly, keeping
+      the existing "statically compiled into the application" build model intact.
+- [x] Stand up a WinUI 3 shell that talks to the **existing, unchanged C# service** — same process
       family, same language, can reuse `Protocol.cs`/`PipeServerEndpoint`/`PipeClientEndpoint` as-is.
+      `SimpleDeFence.UI` builds and its first screen calls `Controller.GetServerConfig` over the
+      existing `SimpleDeFenceController` named pipe to show connection/mode/lock state.
+      **Not yet verified at runtime against a live service** — compile-verified only.
 - [ ] Use XAML Islands (or equivalent interop) to migrate screen-by-screen, not big-bang — keep
       WinForms forms working and buildable throughout until each WinUI 3 replacement reaches parity.
 - [ ] Investigate VS 2026's Copilot-assisted "Modernize" tooling for the WinForms → WinUI 3 migration
@@ -90,10 +99,16 @@ the core stays C#/.NET and untouched throughout this phase either way.
 
 ## Development environment
 
-- [Dockerfile](Dockerfile) provides a containerized build of the current .NET Framework 4.8 app
-  (requires Docker Desktop in Windows container mode, since net48 doesn't run on Linux containers).
+- `SimpleDeFence.Core`, `SimpleDeFence.UI`, `SimpleDeFence.Utilities` and `SimpleDeFence.Windows`
+  build with a plain `dotnet build` — no Visual Studio needed.
+- The **WinForms app (`SimpleDeFence.csproj`) does not**. It carries two `<COMReference>` entries
+  (`NetFwTypeLib`, `TaskScheduler`) whose `ResolveComReference` task requires .NET Framework MSBuild
+  plus the NETFX SDK tools (`TlbImp.exe`/`AxImp.exe`). `dotnet build` fails it with `MSB4803`, and
+  Framework MSBuild without those tools fails with `MSB3091`. Building it locally needs the
+  ".NET Framework 4.8 SDK" / "Windows SDK — .NET Framework tools" component installed. CI's Windows
+  runners already have it, so `.github/workflows/build.yml` is unaffected.
 - The WinUI 3 work in Phase 2 stays in the same .NET/Windows toolchain — no new dev environment
-  needed beyond a current Windows App SDK workload in Visual Studio.
+  needed beyond a current Windows App SDK workload.
 
 ## Backlog inherited from upstream
 

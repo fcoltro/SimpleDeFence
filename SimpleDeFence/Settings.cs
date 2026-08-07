@@ -130,7 +130,7 @@ namespace SimpleDeFence
 
         public JsonTypeInfo<ControllerSettings> GetJsonTypeInfo()
         {
-            return SourceGenerationContext.Default.ControllerSettings;
+            return AppSourceGenerationContext.Default.ControllerSettings;
         }
     }
 
@@ -218,7 +218,7 @@ namespace SimpleDeFence
 
         public JsonTypeInfo<ConfigContainer> GetJsonTypeInfo()
         {
-            return SourceGenerationContext.Default.ConfigContainer;
+            return AppSourceGenerationContext.Default.ConfigContainer;
         }
     }
 

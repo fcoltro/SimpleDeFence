@@ -54,6 +54,11 @@
     <Compile Include="../SimpleDeFence.Windows/NetStat/*.cs" LinkBase="SimpleDeFence.Windows.NetStat" />
     <Compile Include="../SimpleDeFence.Windows.Services/*.cs" LinkBase="SimpleDeFence.Windows.Services" />
     <Compile Include="../SimpleDeFence.Windows.WFP/*.cs" LinkBase="SimpleDeFence.Windows.WFP" />
+    <Compile Include="../SimpleDeFence.Core/*.cs" LinkBase="SimpleDeFence.Core" />
+    <Compile Include="../SimpleDeFence.Core/Parser/*.cs" LinkBase="SimpleDeFence.Core.Parser" />
+    <!-- SimpleDeFence.Utilities already supplies IsExternalInit here; Core carries its own copy
+         only for its standalone net48 build. Compiling both into this app is CS0101. -->
+    <Compile Remove="../SimpleDeFence.Core/CsInitSupport.cs" />
     <PackageReference Include="Nullable" Version="1.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

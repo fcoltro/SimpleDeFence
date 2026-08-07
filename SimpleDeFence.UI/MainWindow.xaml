@@ -1,0 +1,19 @@
+<Window
+    x:Class="SimpleDeFence.UI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Padding="24" RowSpacing="12" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="SimpleDeFence" Style="{StaticResource TitleLargeTextBlockStyle}"/>
+        <TextBlock Grid.Row="1" x:Name="StatusText" Text="Connecting..." Style="{StaticResource BodyLargeTextBlockStyle}"/>
+        <TextBlock Grid.Row="2" x:Name="DetailText" Text="" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+        <Button Grid.Row="3" x:Name="RefreshButton" Content="Refresh" Click="RefreshButton_Click" HorizontalAlignment="Left"/>
+    </Grid>
+</Window>

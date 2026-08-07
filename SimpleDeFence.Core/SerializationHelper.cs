@@ -51,13 +51,8 @@ namespace SimpleDeFence
     [JsonSerializable(typeof(RuleListPolicy))]
     [JsonSerializable(typeof(FirewallExceptionV3))]
     [JsonSerializable(typeof(ServerConfiguration))]
-    [JsonSerializable(typeof(ControllerSettings))]
     [JsonSerializable(typeof(UpdateDescriptor))]
-    [JsonSerializable(typeof(ConfigContainer))]
     [JsonSerializable(typeof(ServerState))]
-    [JsonSerializable(typeof(DatabaseClasses.SubjectIdentity))]
-    [JsonSerializable(typeof(DatabaseClasses.Application))]
-    [JsonSerializable(typeof(DatabaseClasses.AppDatabase))]
     internal partial class SourceGenerationContext : JsonSerializerContext
     {
     }
