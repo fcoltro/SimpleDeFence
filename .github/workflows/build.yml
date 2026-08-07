@@ -94,4 +94,9 @@ jobs:
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
       with:
         name: ${{ steps.version.outputs.msi_name }}
-        path: MsiSetup/bin/Release/SimpleDeFenceInstaller.msi
+        # MsiSetup.wixproj appends the platform to OutputName, so the x86 build
+        # produces SimpleDeFence_x86.msi - not the old TinyWall-era installer name.
+        path: MsiSetup/bin/Release/SimpleDeFence_x86.msi
+        # Without this the job goes green while uploading nothing, which is how
+        # the stale path above went unnoticed.
+        if-no-files-found: error
