@@ -23,7 +23,15 @@ namespace SimpleDeFence.UI.Themes
             if (Application.Current.Resources.TryGetValue(resourceKey, out var brush))
                 return brush;
 
-            return new SolidColorBrush(Microsoft.UI.Colors.Gray);
+            // Even the defensive path stays theme-aware. A hardcoded colour here would survive
+            // into high-contrast themes as a fixed grey, which is precisely what binding these
+            // to system semantic brushes exists to prevent.
+            if (Application.Current.Resources.TryGetValue("SystemFillColorNeutralBrush", out var systemNeutral))
+                return systemNeutral;
+
+            // Nothing resolvable: absence of colour rather than a wrong colour. The icon and
+            // word still carry the status, since status is never signalled by colour alone.
+            return new SolidColorBrush(Microsoft.UI.Colors.Transparent);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
