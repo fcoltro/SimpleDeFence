@@ -121,13 +121,26 @@ the core stays C#/.NET and untouched throughout this phase either way.
       (decided 2026-08-08). Chosen over relaxing `AuthAsServer`, because widening the check is a
       weakening of a real security control in a firewall; folding the GUI into the existing
       executable leaves that control untouched. Prerequisites, in order:
-    - [ ] **Replace the two `<COMReference>`s** — this is a hard build blocker, not a preference.
-          `dotnet build` cannot run `ResolveComReference` at all (`MSB4803`), and .NET Framework
-          MSBuild cannot build a net10 target (`MSB4018` — it fails to load the SDK's
-          `Microsoft.Deployment.DotNet.Releases`). So no toolchain can build this project as net10
-          while the COM references remain. The surface is small: `NetFwTypeLib` is used only in
-          `WindowsFirewall.cs`, and `TaskScheduler` only at two sites in `TinyWallDoctor.cs`.
-          Replace with hand-written `[ComImport]` interop or CsWin32-generated bindings.
+    - [x] **Replace the two `<COMReference>`s** — done 2026-08-08. This was a hard build blocker,
+          not a preference: `dotnet build` cannot run `ResolveComReference` at all (`MSB4803`), and
+          .NET Framework MSBuild cannot build a net10 target (`MSB4018` — it fails to load the
+          SDK's `Microsoft.Deployment.DotNet.Releases`), so no toolchain could build this project
+          as net10 while they remained.
+          Both APIs are IDispatch-scriptable, so the call sites now bind late via
+          `Type.GetTypeFromProgID`, with the former interop enums as explicit constants in
+          `WindowsFirewallInterop.cs` / `TaskSchedulerInterop.cs`. Late binding was chosen over
+          hand-written `[ComImport]` interfaces because those need exact interface GUIDs and vtable
+          ordering, where a mistake corrupts memory instead of failing cleanly.
+          **Verified at runtime**, not just compiled: installed in the VM, the Windows Firewall
+          `SimpleDeFence Compat` inbound/outbound rules are created, notifications are suppressed
+          on all three profiles, and the `SimpleDeFence Controller` logon task is registered Ready
+          with RunLevel Highest and the correct action path. That check mattered because `dynamic`
+          moves these failures to run time and both call sites sit in `catch` blocks that swallow
+          exceptions — a typo would have been silently invisible.
+          One unverified detail: the registered task reports `LogonType=Group` rather than
+          `InteractiveToken`. This is believed to be Task Scheduler normalising, since setting
+          `Principal.GroupId` makes it a group principal, but it has not been A/B tested against a
+          build using the old generated interop.
     - [ ] **Rewrite the service install/uninstall path.** `System.Configuration.Install` does not
           exist on .NET 5+, which rules out `ManagedInstallerClass.InstallHelper` in
           `TinyWallDoctor.cs` and both `Installer/` classes. The repo already has
