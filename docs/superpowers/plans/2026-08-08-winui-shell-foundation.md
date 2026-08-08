@@ -975,6 +975,23 @@ namespace SimpleDeFence.UI
 
         private async void ModeChip_Click(object sender, RoutedEventArgs e)
         {
+            // Guard re-entrancy. Without this a double-click (or a held Enter key while the chip
+            // has focus) interleaves two refreshes and can leave two flyouts open, so two mode
+            // switches race and the chip ends up showing whichever finished last rather than what
+            // the user actually chose - a stale success could paint over a real failure.
+            ModeChip.IsEnabled = false;
+            try
+            {
+                await ModeChipClickCoreAsync();
+            }
+            finally
+            {
+                ModeChip.IsEnabled = true;
+            }
+        }
+
+        private async System.Threading.Tasks.Task ModeChipClickCoreAsync()
+        {
             await Shell.RefreshAsync();
 
             if (!Shell.CanSwitchMode)
