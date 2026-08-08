@@ -105,96 +105,21 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
-        // Mirrors SettingsForm.ListItemFromAppException so both GUIs describe an entry the same way.
+        // The describing itself lives in Core (ExceptionDescriptor) so both GUIs can render an
+        // entry identically, and so it can be unit tested without standing up any UI.
         private static ExceptionRow RowFrom(FirewallExceptionV3 ex)
         {
-            string name, kind, detail;
-
-            // Switch on SubjectType, not the runtime type: ServiceSubject derives from
-            // ExecutableSubject, so a type-pattern switch silently matches services as
-            // executables. SettingsForm switches on SubjectType for the same reason.
-            switch (ex.Subject.SubjectType)
-            {
-                case SubjectType.Executable:
-                {
-                    var exe = (ExecutableSubject)ex.Subject;
-                    name = exe.ExecutableName;
-                    kind = "Executable";
-                    detail = exe.ExecutablePath;
-                    break;
-                }
-
-                case SubjectType.Service:
-                {
-                    var svc = (ServiceSubject)ex.Subject;
-                    name = svc.ServiceName;
-                    kind = "Service";
-                    detail = svc.ExecutablePath;
-                    break;
-                }
-
-                case SubjectType.AppContainer:
-                {
-                    var uwp = (AppContainerSubject)ex.Subject;
-                    name = uwp.DisplayName;
-                    kind = "UWP Package";
-                    detail = $"{uwp.PublisherId}, {uwp.Publisher}";
-                    break;
-                }
-
-                case SubjectType.Global:
-                    name = "All applications";
-                    kind = "Global";
-                    detail = string.Empty;
-                    break;
-
-                default:
-                    name = ex.Subject.ToString() ?? "Unknown";
-                    kind = "Unknown";
-                    detail = string.Empty;
-                    break;
-            }
+            var d = ExceptionDescriptor.Describe(ex);
 
             return new ExceptionRow
             {
-                Name = name,
-                Kind = kind,
-                Detail = detail,
-                Policy = DescribePolicy(ex.Policy),
+                Name = d.Name,
+                Kind = d.Kind,
+                Detail = d.Detail,
+                Policy = d.Policy,
                 Created = ex.CreationDate.ToString("yyyy/MM/dd HH:mm", CultureInfo.CurrentCulture),
-                IsBlocked = ex.Policy.PolicyType == PolicyType.HardBlock,
+                IsBlocked = d.IsBlocked,
             };
-        }
-
-        private static string DescribePolicy(ExceptionPolicy policy) => policy switch
-        {
-            HardBlockPolicy => "Blocked",
-            UnrestrictedPolicy u => u.LocalNetworkOnly ? "Unrestricted (LAN only)" : "Unrestricted",
-            TcpUdpPolicy t => DescribeTcpUdp(t),
-            RuleListPolicy r => $"{r.Rules.Count} custom rule{(r.Rules.Count == 1 ? "" : "s")}",
-            _ => "Unknown",
-        };
-
-        private static string DescribeTcpUdp(TcpUdpPolicy p)
-        {
-            var parts = new List<string>();
-            Add(parts, "TCP out", p.AllowedRemoteTcpConnectPorts);
-            Add(parts, "UDP out", p.AllowedRemoteUdpConnectPorts);
-            Add(parts, "TCP in", p.AllowedLocalTcpListenerPorts);
-            Add(parts, "UDP in", p.AllowedLocalUdpListenerPorts);
-
-            if (parts.Count == 0)
-                return "No ports allowed";
-
-            var text = string.Join(", ", parts);
-            return p.LocalNetworkOnly ? text + " (LAN only)" : text;
-
-            static void Add(List<string> into, string label, string? ports)
-            {
-                if (string.IsNullOrEmpty(ports))
-                    return;
-                into.Add($"{label} {(ports == "*" ? "all" : ports)}");
-            }
         }
 
         private void SetBusy(bool busy)

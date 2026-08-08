@@ -45,6 +45,11 @@ safety net that doesn't currently exist.** Before either of those, the highest-l
 adding characterization tests around `ConstructFilter`/`AssembleActiveRules` and IPC message
 handling.
 
+**Update (2026-08-08):** a `SimpleDeFence.Tests` project now exists (xunit, net10, covering
+`SimpleDeFence.Core`) and runs in CI. It currently only covers `ExceptionDescriptor` — the
+shared rule-description logic both GUIs render entries from. The core hotspots named above are
+still untested; the project is now there to put those tests in.
+
 ## Architectural seams for the WinUI 3 migration (Phase 2)
 
 From bridge-node/chokepoint analysis, a core-vs-GUI split lines up naturally with the existing

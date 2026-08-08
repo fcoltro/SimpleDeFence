@@ -42,6 +42,11 @@ jobs:
     - name: Build
       run: msbuild SimpleDeFence/SimpleDeFence.csproj /p:Configuration=${{ matrix.configuration }} /p:RestorePackages=false
 
+    # Runs on the .NET SDK rather than Framework MSBuild - SimpleDeFence.Tests targets net10
+    # and covers SimpleDeFence.Core, which both GUIs share.
+    - name: Test
+      run: dotnet test SimpleDeFence.Tests/SimpleDeFence.Tests.csproj --configuration ${{ matrix.configuration }}
+
     - name: Upload build output
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
       with:
