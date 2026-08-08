@@ -728,6 +728,13 @@ Create `SimpleDeFence.UI/Themes/StatusResources.xaml`:
     <SolidColorBrush x:Key="StatusNeutralBrush"     Color="{ThemeResource SystemFillColorNeutral}"/>
     <SolidColorBrush x:Key="StatusAccentAltBrush"   Color="{ThemeResource SystemAccentColorLight2}"/>
 
+    <!-- Each of these keys must actually resolve on the SDK version in use. A ThemeResource that
+         does not resolve fails silently to a default rather than erroring, so the dot renders a
+         flat grey and the mode looks indistinguishable from Disabled. Verify by eye that every
+         mode produces a visibly distinct dot; if a token does not resolve, substitute one that
+         does and note the substitution here. -->
+
+
     <local:ModeStateToBrushConverter x:Key="ModeStateToBrush"/>
 </ResourceDictionary>
 ```
@@ -870,11 +877,15 @@ Replace `SimpleDeFence.UI/MainWindow.xaml` with:
                        Style="{StaticResource CaptionTextBlockStyle}"/>
         </Grid>
 
+        <!-- The pane toggle stays visible. Below roughly 640px NavigationView collapses the pane
+             into an overlay, and with no toggle button there is no way to open it - which would
+             make the mode chip unreachable at narrow widths and break the "status is always
+             visible" premise the chip exists for. -->
         <NavigationView x:Name="Nav" Grid.Row="1"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
                         PaneDisplayMode="Auto"
-                        IsPaneToggleButtonVisible="False"
+                        IsPaneToggleButtonVisible="True"
                         OpenPaneLength="220"
                         SelectionChanged="Nav_SelectionChanged">
 
