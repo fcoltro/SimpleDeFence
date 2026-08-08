@@ -9,6 +9,15 @@ namespace SimpleDeFence.UI.Services
     /// </summary>
     internal sealed class SampleFirewallClient : IFirewallClient
     {
+        private readonly bool _locked;
+
+        /// <param name="locked">
+        /// Simulates a locked service, which refuses mode changes. Without this the sample client
+        /// could only ever succeed, leaving the GUI's failure handling unreachable and therefore
+        /// unverifiable until the real client becomes usable.
+        /// </param>
+        public SampleFirewallClient(bool locked = false) => _locked = locked;
+
         public ServerConfiguration? Config { get; private set; }
         public ServerState? State { get; private set; }
         public bool Connected { get; private set; }
@@ -22,8 +31,8 @@ namespace SimpleDeFence.UI.Services
             State ??= new ServerState
             {
                 Mode = FirewallMode.Normal,
-                Locked = false,
-                HasPassword = false,
+                Locked = _locked,
+                HasPassword = _locked,
             };
 
             Connected = true;
@@ -35,9 +44,16 @@ namespace SimpleDeFence.UI.Services
 
         public Task<MessageType> SwitchModeAsync(FirewallMode mode)
         {
-            if (State is not null)
-                State.Mode = mode;
+            // Mirrors the responses the real client can return, so the GUI's failure branches
+            // are reachable while building against sample data.
+            if (_locked)
+                return Task.FromResult(MessageType.RESPONSE_LOCKED);
 
+            // Never report success for a change that did not happen.
+            if (State is null)
+                return Task.FromResult(MessageType.RESPONSE_ERROR);
+
+            State.Mode = mode;
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.MODE_SWITCH);
         }

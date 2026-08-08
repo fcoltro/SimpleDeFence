@@ -20,18 +20,21 @@ namespace SimpleDeFence.UI
 
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
-            if (UseSampleData())
-                Firewall = new SampleFirewallClient();
+            // --sample-locked also implies sample data; it simulates a locked service so the
+            // GUI's refusal handling can be exercised.
+            bool locked = HasSwitch("--sample-locked");
+            if (locked || HasSwitch("--sample-data"))
+                Firewall = new SampleFirewallClient(locked);
 
             m_window = new MainWindow();
             m_window.Activate();
         }
 
-        private static bool UseSampleData()
+        private static bool HasSwitch(string name)
         {
             foreach (var arg in Environment.GetCommandLineArgs())
             {
-                if (string.Equals(arg, "--sample-data", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(arg, name, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
             return false;
