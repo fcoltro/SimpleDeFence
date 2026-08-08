@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Diagnostics.Eventing.Reader;
-using NetFwTypeLib;
 using SimpleDeFence.Utilities;
 
 namespace SimpleDeFence
@@ -102,56 +101,56 @@ namespace SimpleDeFence
             base.Dispose(disposing);
         }
 
-        private static INetFwPolicy2 GetFwPolicy2()
+        private static dynamic GetFwPolicy2()
         {
             Type tNetFwPolicy2 = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
-            return (INetFwPolicy2)Activator.CreateInstance(tNetFwPolicy2);
+            return Activator.CreateInstance(tNetFwPolicy2);
         }
 
-        private static INetFwRule CreateFwRule(string name, NET_FW_ACTION_ action, NET_FW_RULE_DIRECTION_ dir)
+        private static dynamic CreateFwRule(string name, int action, int dir)
         {
             Type tNetFwRule = Type.GetTypeFromProgID("HNetCfg.FwRule");
-            INetFwRule rule = (INetFwRule)Activator.CreateInstance(tNetFwRule);
+            dynamic rule = Activator.CreateInstance(tNetFwRule);
 
             rule.Name = name;
             rule.Action = action;
             rule.Direction = dir;
             rule.Grouping = "SimpleDeFence";
-            rule.Profiles = (int)NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_PRIVATE | (int)NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_PUBLIC | (int)NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_DOMAIN;
+            rule.Profiles = NetFwProfileType2.Private | NetFwProfileType2.Public | NetFwProfileType2.Domain;
             rule.Enabled = true;
-            if ((NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN == dir) && (NET_FW_ACTION_.NET_FW_ACTION_ALLOW == action))
+            if ((NetFwRuleDirection.In == dir) && (NetFwAction.Allow == action))
                 rule.EdgeTraversal = true;
 
             return rule;
         }
 
-        private static void MpsNotificationsDisable(INetFwPolicy2 pol, bool disable)
+        private static void MpsNotificationsDisable(dynamic pol, bool disable)
         {
-            if (pol.NotificationsDisabled[NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_PRIVATE] != disable)
-                pol.NotificationsDisabled[NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_PRIVATE] = disable;
-            if (pol.NotificationsDisabled[NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_PUBLIC] != disable)
-                pol.NotificationsDisabled[NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_PUBLIC] = disable;
-            if (pol.NotificationsDisabled[NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_DOMAIN] != disable)
-                pol.NotificationsDisabled[NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_DOMAIN] = disable;
+            if (pol.NotificationsDisabled[NetFwProfileType2.Private] != disable)
+                pol.NotificationsDisabled[NetFwProfileType2.Private] = disable;
+            if (pol.NotificationsDisabled[NetFwProfileType2.Public] != disable)
+                pol.NotificationsDisabled[NetFwProfileType2.Public] = disable;
+            if (pol.NotificationsDisabled[NetFwProfileType2.Domain] != disable)
+                pol.NotificationsDisabled[NetFwProfileType2.Domain] = disable;
         }
 
         private static void DisableMpsSvc()
         {
             try
             {
-                INetFwPolicy2 fwPolicy2 = GetFwPolicy2();
+                dynamic fwPolicy2 = GetFwPolicy2();
 
                 // Disable Windows Firewall notifications
                 MpsNotificationsDisable(fwPolicy2, true);
 
                 // Add new rules
                 string newRuleId = $"SimpleDeFence Compat [{Utils.RandomString(6)}]";
-                fwPolicy2.Rules.Add(CreateFwRule(newRuleId, NET_FW_ACTION_.NET_FW_ACTION_ALLOW, NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN));
-                fwPolicy2.Rules.Add(CreateFwRule(newRuleId, NET_FW_ACTION_.NET_FW_ACTION_ALLOW, NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_OUT));
+                fwPolicy2.Rules.Add(CreateFwRule(newRuleId, NetFwAction.Allow, NetFwRuleDirection.In));
+                fwPolicy2.Rules.Add(CreateFwRule(newRuleId, NetFwAction.Allow, NetFwRuleDirection.Out));
 
                 // Remove earlier rules
-                INetFwRules rules = fwPolicy2.Rules;
-                foreach (INetFwRule rule in rules)
+                dynamic rules = fwPolicy2.Rules;
+                foreach (dynamic rule in (System.Collections.IEnumerable)rules)
                 {
                     string ruleName = rule.Name;
                     if (!string.IsNullOrEmpty(ruleName) && ruleName.Contains("SimpleDeFence") && (ruleName != newRuleId))
@@ -165,16 +164,17 @@ namespace SimpleDeFence
         {
             try
             {
-                INetFwPolicy2 fwPolicy2 = GetFwPolicy2();
+                dynamic fwPolicy2 = GetFwPolicy2();
 
                 // Enable Windows Firewall notifications
                 MpsNotificationsDisable(fwPolicy2, false);
 
                 // Remove earlier rules
-                INetFwRules rules = fwPolicy2.Rules;
-                foreach (INetFwRule rule in rules)
+                dynamic rules = fwPolicy2.Rules;
+                foreach (dynamic rule in (System.Collections.IEnumerable)rules)
                 {
-                    if ((rule.Grouping != null) && rule.Grouping.Equals("SimpleDeFence"))
+                    string grouping = rule.Grouping;
+                    if ((grouping != null) && grouping.Equals("SimpleDeFence"))
                         rules.Remove(rule.Name);
                 }
             }

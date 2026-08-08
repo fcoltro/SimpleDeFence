@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Configuration.Install;
 using System.Diagnostics;
 using System.ServiceProcess;
-using TaskScheduler;
 using SimpleDeFence.Windows;
 using SimpleDeFence.Windows.Services;
 using SimpleDeFence.Windows.WFP;
@@ -214,8 +213,7 @@ namespace SimpleDeFence
             try
             {
                 // Disable automatic start of controller
-                var taskService = new TaskScheduler.TaskScheduler();
-                taskService.Connect();
+                dynamic taskService = TaskScheduler.ConnectedService();
                 taskService.GetFolder(@"\").DeleteTask(CONTROLLER_START_TASKSCH_NAME, 0);
             }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_INSTALLER); }
@@ -277,26 +275,27 @@ namespace SimpleDeFence
             {
                 const string INTERACTIVE_GROUP_SID = "S-1-5-4";
                 const int TASK_CREATE_OR_UPDATE = 6;
-                var taskService = new TaskScheduler.TaskScheduler();
-                taskService.Connect();
-                var td = taskService.NewTask(0);
+                dynamic taskService = TaskScheduler.ConnectedService();
+                dynamic td = taskService.NewTask(0);
                 td.RegistrationInfo.Author = "SimpleDeFence, Károly Pados";
                 td.RegistrationInfo.Description = "This task starts the SimpleDeFence tray icon when a user is logged in.";
                 td.Settings.Enabled = true;
                 td.Principal.GroupId = INTERACTIVE_GROUP_SID;
-                td.Principal.LogonType = _TASK_LOGON_TYPE.TASK_LOGON_INTERACTIVE_TOKEN;
-                td.Principal.RunLevel = _TASK_RUNLEVEL.TASK_RUNLEVEL_HIGHEST;
-                td.Settings.Compatibility = _TASK_COMPATIBILITY.TASK_COMPATIBILITY_V2;
+                td.Principal.LogonType = TaskLogonType.InteractiveToken;
+                td.Principal.RunLevel = TaskRunLevel.Highest;
+                td.Settings.Compatibility = TaskCompatibility.V2;
                 td.Settings.Enabled = true;
                 td.Settings.StopIfGoingOnBatteries = false;
                 td.Settings.Hidden = false;
                 td.Settings.DisallowStartIfOnBatteries = false;
                 td.Settings.ExecutionTimeLimit = "PT0S";
-                td.Settings.MultipleInstances = _TASK_INSTANCES_POLICY.TASK_INSTANCES_PARALLEL;
-                td.Triggers.Create(_TASK_TRIGGER_TYPE2.TASK_TRIGGER_LOGON);
-                var act = (IExecAction)td.Actions.Create(_TASK_ACTION_TYPE.TASK_ACTION_EXEC);
+                td.Settings.MultipleInstances = TaskInstancesPolicy.Parallel;
+                td.Triggers.Create(TaskTriggerType2.Logon);
+                dynamic act = td.Actions.Create(TaskActionType.Exec);
                 act.Path = Utils.ExecutablePath;
-                taskService.GetFolder(@"\").RegisterTaskDefinition(CONTROLLER_START_TASKSCH_NAME, td, TASK_CREATE_OR_UPDATE, null, null, _TASK_LOGON_TYPE.TASK_LOGON_INTERACTIVE_TOKEN);
+                // RegisterTaskDefinition takes a trailing optional sddl parameter; late binding
+                // does not fill optionals in, so it is passed explicitly.
+                taskService.GetFolder(@"\").RegisterTaskDefinition(CONTROLLER_START_TASKSCH_NAME, td, TASK_CREATE_OR_UPDATE, null, null, TaskLogonType.InteractiveToken, null);
             }
             catch (System.Runtime.InteropServices.COMException e)
             {

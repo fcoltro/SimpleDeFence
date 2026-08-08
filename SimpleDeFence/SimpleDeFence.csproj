@@ -34,6 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Configuration.Install" />
+    <!-- Required by the late-bound COM call sites (dynamic). Part of the shared framework on
+         .NET 5+, so this reference is net48-only. -->
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Management" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceProcess" />
@@ -66,25 +69,10 @@
     <PackageReference Include="System.Memory" Version="4.5.4" />
     <PackageReference Include="System.Text.Json" Version="6.0.11" />
 
-    <COMReference Include="NetFwTypeLib">
-      <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>0</VersionMinor>
-      <VersionMajor>1</VersionMajor>
-      <Guid>58fbcf7c-e7a9-467c-80b3-fc65e8fcca08</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </COMReference>
-
-    <COMReference Include="TaskScheduler">
-      <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>0</VersionMinor>
-      <VersionMajor>1</VersionMajor>
-      <Guid>e34cb9f1-c7f7-424c-be29-027dcc09363a</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </COMReference>
+    <!-- The NetFwTypeLib and TaskScheduler COMReferences were removed in favour of late-bound
+         COM (see WindowsFirewallInterop.cs). ResolveComReference only runs under .NET Framework
+         MSBuild, which cannot build a .NET 10 target, so no toolchain could build this project
+         once it is retargeted while those references remained. -->
 
     <EmbeddedResource Update="Resources\Exceptions.resx">
       <Generator>ResXFileCodeGenerator</Generator>
