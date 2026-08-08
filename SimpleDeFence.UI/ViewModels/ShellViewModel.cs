@@ -17,7 +17,7 @@ namespace SimpleDeFence.UI.ViewModels
         private string _statusLine = string.Empty;
         private bool _isConnected;
         private bool _isLocked;
-        private bool _busy;
+        private bool _isBusy;
 
         public ShellViewModel(IFirewallClient client) => _client = client;
 
@@ -25,9 +25,24 @@ namespace SimpleDeFence.UI.ViewModels
         public string ModeGlyph { get => _modeGlyph; private set => Set(ref _modeGlyph, value); }
         public string ModeStateKey { get => _modeStateKey; private set => Set(ref _modeStateKey, value); }
         public string StatusLine { get => _statusLine; private set => Set(ref _statusLine, value); }
-        public bool IsConnected { get => _isConnected; private set => Set(ref _isConnected, value); }
-        public bool IsLocked { get => _isLocked; private set => Set(ref _isLocked, value); }
-        public bool IsBusy { get => _busy; private set => Set(ref _busy, value); }
+        // CanSwitchMode is computed from these three and has no backing field of its own, so each
+        // must announce it. Without this a bound control keeps its old enabled state - including
+        // staying enabled during an in-flight switch, which invites overlapping pipe calls.
+        public bool IsConnected
+        {
+            get => _isConnected;
+            private set { if (Set(ref _isConnected, value)) OnPropertyChanged(nameof(CanSwitchMode)); }
+        }
+        public bool IsLocked
+        {
+            get => _isLocked;
+            private set { if (Set(ref _isLocked, value)) OnPropertyChanged(nameof(CanSwitchMode)); }
+        }
+        public bool IsBusy
+        {
+            get => _isBusy;
+            private set { if (Set(ref _isBusy, value)) OnPropertyChanged(nameof(CanSwitchMode)); }
+        }
 
         /// <summary>True only when the user may actually change the mode.</summary>
         public bool CanSwitchMode => IsConnected && !IsLocked && !IsBusy;
@@ -37,8 +52,17 @@ namespace SimpleDeFence.UI.ViewModels
         public async Task RefreshAsync()
         {
             IsBusy = true;
-            await _client.RefreshAsync();
-            IsBusy = false;
+            try
+            {
+                await _client.RefreshAsync();
+            }
+            finally
+            {
+                // A throw here must not leave the mode control disabled for the rest of the
+                // app's life.
+                IsBusy = false;
+            }
+
             Update();
         }
 
@@ -110,4 +134,6 @@ namespace SimpleDeFence.UI.ViewModels
         };
     }
 }
+
+
 
