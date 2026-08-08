@@ -50,6 +50,21 @@ handling.
 shared rule-description logic both GUIs render entries from. The core hotspots named above are
 still untested; the project is now there to put those tests in.
 
+## The IPC boundary is authenticated (found 2026-08-08)
+
+`PipeServerEndpoint.AuthAsServer` (SimpleDeFence/PipeServerEndpoint.cs:91) resolves the connecting
+client's PID to an executable path and requires it to equal `ProcessManager.ExecutablePath` — the
+service's own running image. Anything else is refused, and `Controller` surfaces that as
+`COM_ERROR`.
+
+This makes the core-vs-GUI seam below a **process-internal** seam, not a process boundary. Any GUI
+must live in the same executable as the service, or the check has to change. The WinForms GUI
+satisfies it only because `SimpleDeFence.exe` runs as both service and controller depending on its
+command line.
+
+Two things make this easy to miss: it is compiled out under `#if !DEBUG`, so development builds
+accept any client, and nothing fails until a Release install is exercised against a real service.
+
 ## Architectural seams for the WinUI 3 migration (Phase 2)
 
 From bridge-node/chokepoint analysis, a core-vs-GUI split lines up naturally with the existing

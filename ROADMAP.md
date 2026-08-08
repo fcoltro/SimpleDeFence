@@ -105,15 +105,39 @@ the core stays C#/.NET and untouched throughout this phase either way.
       first — and `System.Configuration.Install` (`ManagedInstallerClass` in `TinyWallDoctor.cs`,
       both `Installer/` classes) has no .NET 5+ equivalent, so the service install/uninstall path
       would have to be rewritten before any GUI work could start.
-- [ ] Migrate at the **process boundary** instead — the "or equivalent interop" this phase allowed
-      for. `SimpleDeFence.UI` is already a separate process talking to the unchanged service over
-      the existing named pipe, which is exactly the core-vs-GUI seam ARCHITECTURE.md identified, so
-      no interop layer is needed at all. Both GUIs are plain IPC clients and can run side by side:
-      keep the WinForms GUI as the default, add WinUI 3 screens incrementally, and retire each old
-      form once its replacement reaches parity. The net48 app stays buildable throughout, and
-      migrating it off .NET Framework becomes an independent, optional decision rather than a
-      prerequisite. Note the controller owns a single-instance mutex and the tray icon, so running
-      both GUIs at once needs that arbitration handled.
+- [x] ~~Migrate at the **process boundary**~~ — **also dropped (2026-08-08). The service refuses to
+      talk to a separate GUI executable at all.** `PipeServerEndpoint.AuthAsServer` compares the
+      connecting client's executable path against `ProcessManager.ExecutablePath` — the service's
+      own running image — and rejects anything else. That is deliberate anti-tampering: it stops
+      arbitrary processes from driving the firewall. The WinForms GUI passes only because
+      `SimpleDeFence.exe` is *both* the service and the controller, so the paths are identical.
+      A separate `SimpleDeFence.UI.exe` can never pass.
+      The check is compiled out under `#if !DEBUG`, so it is invisible in Debug builds and only a
+      real Release install reveals it. Found by installing the CI-built MSI in a Hyper-V VM and
+      running a console probe against the live service: `GetServerConfig` returned `COM_ERROR`.
+      The earlier claim here that "both GUIs are plain IPC clients and can run side by side" was
+      simply wrong.
+- [ ] **Migrate `SimpleDeFence.csproj` from net48 to .NET 10 and ship one executable**
+      (decided 2026-08-08). Chosen over relaxing `AuthAsServer`, because widening the check is a
+      weakening of a real security control in a firewall; folding the GUI into the existing
+      executable leaves that control untouched. Prerequisites, in order:
+    - [ ] **Replace the two `<COMReference>`s** — this is a hard build blocker, not a preference.
+          `dotnet build` cannot run `ResolveComReference` at all (`MSB4803`), and .NET Framework
+          MSBuild cannot build a net10 target (`MSB4018` — it fails to load the SDK's
+          `Microsoft.Deployment.DotNet.Releases`). So no toolchain can build this project as net10
+          while the COM references remain. The surface is small: `NetFwTypeLib` is used only in
+          `WindowsFirewall.cs`, and `TaskScheduler` only at two sites in `TinyWallDoctor.cs`.
+          Replace with hand-written `[ComImport]` interop or CsWin32-generated bindings.
+    - [ ] **Rewrite the service install/uninstall path.** `System.Configuration.Install` does not
+          exist on .NET 5+, which rules out `ManagedInstallerClass.InstallHelper` in
+          `TinyWallDoctor.cs` and both `Installer/` classes. The repo already has
+          `SimpleDeFence.Windows.Services/ServiceControlManager.cs` wrapping the Win32 service
+          APIs, so this is likely a port onto existing code rather than new work.
+    - [ ] Re-target remaining framework references: `System.Management` and `System.ServiceProcess`
+          become NuGet packages; the `Windows.*` WinRT references are unnecessary on .NET 5+.
+    - [ ] Decide MSI packaging: self-contained (large MSI, no runtime prerequisite) versus
+          framework-dependent (small MSI, requires the .NET 10 runtime on target machines).
+    - [ ] Only then add the WinUI 3 GUI into the same executable, and port screens.
 - [ ] Investigate VS 2026's Copilot-assisted "Modernize" tooling for the WinForms → WinUI 3 migration
       itself, since Microsoft built it for exactly this transition.
 - [ ] Port feature-by-feature from the WinForms GUI, validating parity before removing each old form.
@@ -134,6 +158,11 @@ the core stays C#/.NET and untouched throughout this phase either way.
   Framework MSBuild without those tools fails with `MSB3091`. Building it locally needs the
   ".NET Framework 4.8 SDK" / "Windows SDK — .NET Framework tools" component installed. CI's Windows
   runners already have it, so `.github/workflows/build.yml` is unaffected.
+- When building it with Framework MSBuild, run **`-t:Restore` and `-t:Build` as separate
+  invocations**. There is no net48 targeting pack installed; the reference assemblies come from the
+  `Microsoft.NETFramework.ReferenceAssemblies` package, which sets `FrameworkPathOverride` through
+  generated `nuget.g.props`. Those props are only picked up by a fresh project evaluation, so
+  `-t:Restore;Build` in one invocation fails with `MSB3644` even though the package restored fine.
 - The WinUI 3 work in Phase 2 stays in the same .NET/Windows toolchain — no new dev environment
   needed beyond a current Windows App SDK workload.
 
