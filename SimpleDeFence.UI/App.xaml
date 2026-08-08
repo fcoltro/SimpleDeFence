@@ -5,9 +5,14 @@
     xmlns:controls="using:Microsoft.UI.Xaml.Controls">
 
     <Application.Resources>
-        <!-- Brings in the WinUI control templates and theme resources (the *TextBlockStyle
-             keys, control default styles, ...). Without this every {StaticResource} lookup
-             fails and the app dies during XAML parse with 0x802B000A. -->
-        <controls:XamlControlsResources/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Brings in the WinUI control templates and theme resources. Without this every
+                     {StaticResource} lookup fails and the app dies during XAML parse with
+                     0x802B000A. -->
+                <controls:XamlControlsResources/>
+                <ResourceDictionary Source="ms-appx:///Themes/StatusResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

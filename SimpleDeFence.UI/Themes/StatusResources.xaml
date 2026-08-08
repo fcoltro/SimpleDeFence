@@ -1,0 +1,15 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SimpleDeFence.UI.Themes">
+
+    <!-- Status colours are roles bound to the WinUI system semantic brushes rather than hex
+         literals, so they track the OS theme and high-contrast modes automatically. -->
+    <SolidColorBrush x:Key="StatusSuccessBrush"     Color="{ThemeResource SystemFillColorSuccess}"/>
+    <SolidColorBrush x:Key="StatusCautionBrush"     Color="{ThemeResource SystemFillColorCaution}"/>
+    <SolidColorBrush x:Key="StatusInformationBrush" Color="{ThemeResource SystemFillColorAttention}"/>
+    <SolidColorBrush x:Key="StatusNeutralBrush"     Color="{ThemeResource SystemFillColorNeutral}"/>
+    <SolidColorBrush x:Key="StatusAccentAltBrush"   Color="{ThemeResource SystemAccentColorLight2}"/>
+
+    <local:ModeStateToBrushConverter x:Key="ModeStateToBrush"/>
+</ResourceDictionary>
