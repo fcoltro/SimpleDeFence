@@ -340,6 +340,15 @@ namespace SimpleDeFence.UI.Services
     /// </summary>
     internal sealed class SampleFirewallClient : IFirewallClient
     {
+        private readonly bool _locked;
+
+        /// <param name="locked">
+        /// Simulates a locked service, which refuses mode changes. Without this the sample client
+        /// could only ever succeed, leaving the GUI's failure handling unreachable and therefore
+        /// unverifiable until the real client becomes usable.
+        /// </param>
+        public SampleFirewallClient(bool locked = false) => _locked = locked;
+
         public ServerConfiguration? Config { get; private set; }
         public ServerState? State { get; private set; }
         public bool Connected { get; private set; }
@@ -353,8 +362,8 @@ namespace SimpleDeFence.UI.Services
             State ??= new ServerState
             {
                 Mode = FirewallMode.Normal,
-                Locked = false,
-                HasPassword = false,
+                Locked = _locked,
+                HasPassword = _locked,
             };
 
             Connected = true;
@@ -366,9 +375,16 @@ namespace SimpleDeFence.UI.Services
 
         public Task<MessageType> SwitchModeAsync(FirewallMode mode)
         {
-            if (State is not null)
-                State.Mode = mode;
+            // Mirrors the responses the real client can return, so the GUI's failure branches
+            // are reachable while building against sample data.
+            if (_locked)
+                return Task.FromResult(MessageType.RESPONSE_LOCKED);
 
+            // Never report success for a change that did not happen.
+            if (State is null)
+                return Task.FromResult(MessageType.RESPONSE_ERROR);
+
+            State.Mode = mode;
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.MODE_SWITCH);
         }
@@ -437,18 +453,21 @@ namespace SimpleDeFence.UI
 
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
-            if (UseSampleData())
-                Firewall = new SampleFirewallClient();
+            // --sample-locked also implies sample data; it simulates a locked service so the
+            // GUI's refusal handling can be exercised.
+            bool locked = HasSwitch("--sample-locked");
+            if (locked || HasSwitch("--sample-data"))
+                Firewall = new SampleFirewallClient(locked);
 
             m_window = new MainWindow();
             m_window.Activate();
         }
 
-        private static bool UseSampleData()
+        private static bool HasSwitch(string name)
         {
             foreach (var arg in Environment.GetCommandLineArgs())
             {
-                if (string.Equals(arg, "--sample-data", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(arg, name, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
             return false;
@@ -468,6 +487,8 @@ Expected: `Build succeeded`, 0 errors
 SimpleDeFence.UI/bin/Debug/net10.0-windows10.0.19041.0/win-x64/SimpleDeFence.UI.exe --sample-data
 ```
 Expected: the window opens and the Applications page lists **6 exceptions** (firefox.exe, git-remote-https.exe, UsoSvc, DoSvc, tracker.exe, All applications) instead of "Not connected". Then close it and run **without** the switch — it must show "Not connected" again, proving the real client is still the default.
+
+Also run with `--sample-locked` and confirm the Applications page still lists the 6 exceptions (a locked service still serves config). The refusal path itself is exercised in Task 6, where the mode chip surfaces `RESPONSE_LOCKED`.
 
 - [ ] **Step 5: Commit**
 
