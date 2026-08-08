@@ -9,7 +9,7 @@ namespace SimpleDeFence.UI.Services
     /// cached config/state and the same changeset - the equivalent of the single Controller the
     /// WinForms GUI keeps in GlobalInstances.
     /// </summary>
-    internal sealed class FirewallClient
+    internal sealed class FirewallClient : IFirewallClient
     {
         // Same pipe name the WinForms controller uses (GlobalInstances.cs) - this talks to the
         // existing, unchanged C# service over its current IPC protocol.
