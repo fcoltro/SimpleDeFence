@@ -7,7 +7,19 @@
          literals, so they track the OS theme and high-contrast modes automatically. -->
     <SolidColorBrush x:Key="StatusSuccessBrush"     Color="{ThemeResource SystemFillColorSuccess}"/>
     <SolidColorBrush x:Key="StatusCautionBrush"     Color="{ThemeResource SystemFillColorCaution}"/>
-    <SolidColorBrush x:Key="StatusInformationBrush" Color="{ThemeResource SystemFillColorAttention}"/>
+    <!-- "SystemFillColorAttention" (a bare Color) does not exist on this WinAppSDK version - only
+         SystemFillColorAttentionBrush and SystemFillColorAttentionBackground do (confirmed by
+         inspecting the resolved generic.xaml). The Color-based lookup above silently failed and
+         ModeStateToBrushConverter's fallback took over, rendering StatusNeutralBrush's grey for
+         every "Information" state (Block all) instead of a distinct colour.
+         SystemFillColorAttentionBrush (tried first) and AccentFillColorDefaultBrush (the
+         documented fallback) both resolve without error, but both alias SystemAccentColorLight2
+         in dark theme - identical to StatusAccentAltBrush below, which would make Block all and
+         Autolearn render the same colour (measured: both (76,194,255) with either choice).
+         Using SystemFillColorCriticalBrush instead: a real, always-resolving sibling of
+         SystemFillColorSuccess/Caution above, visually distinct from all four other states, and a
+         reasonable fit for "blocks all traffic" being the most restrictive posture. -->
+    <StaticResource x:Key="StatusInformationBrush" ResourceKey="SystemFillColorCriticalBrush"/>
     <SolidColorBrush x:Key="StatusNeutralBrush"     Color="{ThemeResource SystemFillColorNeutral}"/>
     <SolidColorBrush x:Key="StatusAccentAltBrush"   Color="{ThemeResource SystemAccentColorLight2}"/>
 

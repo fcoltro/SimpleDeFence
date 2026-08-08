@@ -24,11 +24,15 @@
                        Style="{StaticResource CaptionTextBlockStyle}"/>
         </Grid>
 
+        <!-- The pane toggle stays visible. Below roughly 640px NavigationView collapses the pane
+             into an overlay, and with no toggle button there is no way to open it - which would
+             make the mode chip unreachable at narrow widths and break the "status is always
+             visible" premise the chip exists for. -->
         <NavigationView x:Name="Nav" Grid.Row="1"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
                         PaneDisplayMode="Auto"
-                        IsPaneToggleButtonVisible="False"
+                        IsPaneToggleButtonVisible="True"
                         OpenPaneLength="220"
                         SelectionChanged="Nav_SelectionChanged">
 
