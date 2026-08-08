@@ -4,30 +4,73 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Window.SystemBackdrop>
-        <MicaBackdrop/>
+        <MicaBackdrop Kind="BaseAlt"/>
     </Window.SystemBackdrop>
 
-    <NavigationView x:Name="Nav"
-                    IsBackButtonVisible="Collapsed"
-                    IsSettingsVisible="False"
-                    PaneDisplayMode="Left"
-                    IsPaneToggleButtonVisible="False"
-                    OpenPaneLength="200"
-                    SelectionChanged="Nav_SelectionChanged">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <NavigationView.MenuItems>
-            <NavigationViewItem Content="Status" Tag="status" IsSelected="True">
-                <NavigationViewItem.Icon>
-                    <SymbolIcon Symbol="Home"/>
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItem Content="Applications" Tag="applications">
-                <NavigationViewItem.Icon>
-                    <SymbolIcon Symbol="AllApps"/>
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-        </NavigationView.MenuItems>
+        <!-- Drag region for the extended title bar. -->
+        <Grid x:Name="AppTitleBar" Grid.Row="0" Height="40" Padding="16,0"
+              ColumnSpacing="12" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="SimpleDeFence" VerticalAlignment="Center"
+                       Style="{StaticResource CaptionTextBlockStyle}"/>
+        </Grid>
 
-        <Frame x:Name="ContentFrame"/>
-    </NavigationView>
+        <NavigationView x:Name="Nav" Grid.Row="1"
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="False"
+                        PaneDisplayMode="Auto"
+                        IsPaneToggleButtonVisible="False"
+                        OpenPaneLength="220"
+                        SelectionChanged="Nav_SelectionChanged">
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Rules" Tag="rules" IsSelected="True">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE71D;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <!-- Mode chip: status is ambient, not a destination. Colour + icon + word, never
+                 colour alone. -->
+            <NavigationView.PaneFooter>
+                <Button x:Name="ModeChip" Margin="12,8,12,16" Padding="12,8"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        Click="ModeChip_Click"
+                        AutomationProperties.Name="Firewall mode">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <!-- Not "Converter={StaticResource ModeStateToBrush}": on this WinAppSDK
+                             version, an x:Bind converter lookup at a <Window> root fails to build
+                             (CS1503 in generated code - SetConverterLookupRoot needs a
+                             FrameworkElement, which Window is not). Calling the same converter as
+                             a bound function keeps it compiled x:Bind and reuses the converter and
+                             its brushes without hitting that codegen path. -->
+                        <Ellipse Width="10" Height="10" VerticalAlignment="Center"
+                                 Fill="{x:Bind ModeStateToBrush(Shell.ModeStateKey), Mode=OneWay}"/>
+                        <FontIcon FontSize="14" VerticalAlignment="Center"
+                                  Glyph="{x:Bind Shell.ModeGlyph, Mode=OneWay}"/>
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind Shell.ModeLabel, Mode=OneWay}"
+                                       Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{x:Bind Shell.StatusLine, Mode=OneWay}"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Opacity="0.7" TextWrapping="Wrap" MaxWidth="150"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+            </NavigationView.PaneFooter>
+
+            <Frame x:Name="ContentFrame"/>
+        </NavigationView>
+    </Grid>
 </Window>
