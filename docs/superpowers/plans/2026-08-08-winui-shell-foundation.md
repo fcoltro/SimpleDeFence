@@ -894,22 +894,16 @@ namespace SimpleDeFence.UI
             _ = Shell.RefreshAsync();
         }
 
-        // Only the destinations that actually exist are listed. Connections and Settings are
-        // added by their own plans; a nav entry pointing at an empty placeholder page would be
-        // worse than no entry at all.
+        // Rules is currently the only destination; Connections and Settings arrive in their own
+        // plans, at which point this maps item.Tag to a page type. A nav entry pointing at an
+        // empty placeholder page would be worse than no entry at all.
         private void Nav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.SelectedItem is not NavigationViewItem item)
+            if (args.SelectedItem is not NavigationViewItem)
                 return;
 
-            Type page = item.Tag as string switch
-            {
-                "rules" => typeof(ApplicationsPage),
-                _ => typeof(ApplicationsPage),
-            };
-
-            if (ContentFrame.CurrentSourcePageType != page)
-                ContentFrame.Navigate(page, null, new EntranceNavigationTransitionInfo());
+            if (ContentFrame.CurrentSourcePageType != typeof(ApplicationsPage))
+                ContentFrame.Navigate(typeof(ApplicationsPage), null, new EntranceNavigationTransitionInfo());
         }
 
         private async void ModeChip_Click(object sender, RoutedEventArgs e)
