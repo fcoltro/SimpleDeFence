@@ -91,6 +91,7 @@ namespace SimpleDeFence.Localization
             public const string AllowSuccessTitle = "connections.allowSuccess.title";
             public const string AllowSuccessBody = "connections.allowSuccess.body";
             public const string AllowFailedTitle = "connections.allowFailed.title";
+            public const string AllowFailedLockedDetail = "connections.allowFailed.lockedDetail";
         }
 
         public static class Subject

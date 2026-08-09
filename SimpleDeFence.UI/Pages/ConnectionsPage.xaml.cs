@@ -22,11 +22,26 @@ namespace SimpleDeFence.UI.Pages
         public string State { get; init; } = string.Empty;
     }
 
+    /// <summary>Blocked row as shown in a list, carrying what "Allow this app" needs to act on.</summary>
+    public sealed class BlockedListItem
+    {
+        public string AppName { get; init; } = string.Empty;
+        public string Detail { get; init; } = string.Empty;
+        public string When { get; init; } = string.Empty;
+        public string? AppPath { get; init; }
+        public string? PackageId { get; init; }
+
+        public event EventHandler? AllowRequested;
+        public void RequestAllow() => AllowRequested?.Invoke(this, EventArgs.Empty);
+        public void AllowButton_Click(object sender, RoutedEventArgs e) => RequestAllow();
+    }
+
     public sealed partial class ConnectionsPage : Page
     {
         private ConnectionsSnapshot _snapshot = new();
         private readonly ObservableCollection<ConnectionListItem> _connected = new();
         private readonly ObservableCollection<ConnectionListItem> _open = new();
+        private readonly ObservableCollection<BlockedListItem> _blocked = new();
         private bool _busy;
 
         public ConnectionsPage()
@@ -36,6 +51,7 @@ namespace SimpleDeFence.UI.Pages
             // navigating to Rules and back, instead of Frame recreating it - the closest match to
             // the spec's "collapsible, remembered state" without persisting to disk.
             NavigationCacheMode = NavigationCacheMode.Enabled;
+            BlockedList.ItemsSource = _blocked;
             ConnectedList.ItemsSource = _connected;
             OpenList.ItemsSource = _open;
             Loaded += ConnectionsPage_Loaded;
@@ -104,10 +120,71 @@ namespace SimpleDeFence.UI.Pages
         private static void SetHeader(TextBlock target, string titleKey, int count)
             => target.Text = Loc.T(titleKey) + " " + Loc.T(LocKeys.Connections.SectionCount, count);
 
-        // Overridden by Task 5, which adds the Blocked list and its Allow action. Left as a
-        // count-only stub here so this task is independently verifiable.
-        private int BlockedCount() => _snapshot.Blocked.Count;
-        private void RebuildBlocked(IEnumerable<BlockedRow> rows) { }
+        private int BlockedCount() => _blocked.Count;
+
+        private void RebuildBlocked(IEnumerable<BlockedRow> rows)
+        {
+            _blocked.Clear();
+            foreach (var row in rows)
+            {
+                var item = new BlockedListItem
+                {
+                    AppName = string.IsNullOrEmpty(row.AppName) ? Loc.T(LocKeys.Common.Unknown) : row.AppName,
+                    Detail = $"{row.Protocol} {row.Direction} → {row.RemoteAddress}:{row.RemotePort}",
+                    When = row.Timestamp.ToString("HH:mm:ss"),
+                    AppPath = row.AppPath,
+                    PackageId = row.PackageId,
+                };
+                item.AllowRequested += async (_, _) => await AllowAsync(item);
+                _blocked.Add(item);
+            }
+        }
+
+        private async Task AllowAsync(BlockedListItem item)
+        {
+            ExceptionSubject subject = !string.IsNullOrEmpty(item.PackageId)
+                ? new AppContainerSubject(item.PackageId, item.AppName, string.Empty, string.Empty)
+                : new ExecutableSubject(item.AppPath ?? string.Empty);
+
+            MessageType resp;
+            try
+            {
+                resp = await App.Firewall.AllowAsync(subject, new TcpUdpPolicy(true));
+            }
+            catch (Exception ex)
+            {
+                await ShowAllowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), ex.Message);
+                return;
+            }
+
+            if (resp == MessageType.PUT_SETTINGS)
+            {
+                await ShowAllowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle),
+                    Loc.T(LocKeys.Connections.AllowSuccessBody, item.AppName));
+                await RefreshAsync();
+            }
+            else
+            {
+                var body = resp switch
+                {
+                    MessageType.RESPONSE_LOCKED => Loc.T(LocKeys.Connections.AllowFailedLockedDetail),
+                    _ => Loc.T(LocKeys.Mode.SwitchFailedGenericDetail, resp),
+                };
+                await ShowAllowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), body);
+            }
+        }
+
+        private async Task ShowAllowResultAsync(string title, string body)
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                Title = title,
+                Content = body,
+                CloseButtonText = Loc.T(LocKeys.Common.Ok),
+            };
+            await dialog.ShowAsync();
+        }
 
         private static ConnectionListItem ItemFrom(ConnectionRow row) => new()
         {

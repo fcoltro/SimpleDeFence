@@ -41,7 +41,29 @@
                     <StackPanel>
                         <TextBlock x:Name="BlockedEmpty" Text="{loc:Loc Key=connections.empty.blocked}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
-                        <ListView x:Name="BlockedList" SelectionMode="None"/>
+                        <ListView x:Name="BlockedList" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="local:BlockedListItem">
+                                    <Grid Padding="0,6" ColumnSpacing="14"
+                                          Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="220"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <FontIcon Grid.Column="0" FontSize="14" Glyph="&#xE785;" VerticalAlignment="Center"
+                                                  Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                                        <TextBlock Grid.Column="1" Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="2" Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="3" Text="{x:Bind When}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="4" Content="{loc:Loc Key=connections.allow}"
+                                                Click="{x:Bind AllowButton_Click}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </StackPanel>
                 </Expander>
 

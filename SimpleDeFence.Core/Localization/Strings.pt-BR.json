@@ -90,7 +90,8 @@
       "body": "{0} agora pode se conectar."
     },
     "allowFailed": {
-      "title": "Não foi possível adicionar a exceção"
+      "title": "Não foi possível adicionar a exceção",
+      "lockedDetail": "Desbloqueie a configuração antes de adicionar uma exceção."
     }
   },
 

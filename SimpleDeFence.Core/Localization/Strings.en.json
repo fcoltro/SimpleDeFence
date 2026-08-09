@@ -90,7 +90,8 @@
       "body": "{0} can now connect."
     },
     "allowFailed": {
-      "title": "Could not add the exception"
+      "title": "Could not add the exception",
+      "lockedDetail": "Unlock the configuration before adding an exception."
     }
   },
 
