@@ -38,7 +38,7 @@
 **Modified:**
 - `SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj` — multi-target net48;net10
 - `SimpleDeFence.Windows.Services/ServiceControlManager.cs` — drop dead CAS attributes blocking net10
-- `SimpleDeFence.Windows/ProcessInfo.cs` — new file (moved from `SimpleDeFence/ProcessInfo.cs`)
+- `SimpleDeFence.Windows.Services/ProcessInfo.cs` — new file (moved from `SimpleDeFence/ProcessInfo.cs`; lives alongside `ServicePidMap`, not in `SimpleDeFence.Windows` — see Task 1 Step 1's note on why)
 - `SimpleDeFence.Windows.Services/ServicePidMap.cs` — new file (moved from `SimpleDeFence/ServicePidMap.cs`)
 - `SimpleDeFence/Processes.cs` — adjust the one call site that used the removed `ProcessInfo` overload
 - `SimpleDeFence.UI/Services/IFirewallClient.cs` — add `GetConnectionsAsync()`, `AllowAsync(...)`
@@ -49,34 +49,36 @@
 - `SimpleDeFence.Core/Localization/LocKeys.cs`, `Strings.en.json`, `Strings.pt-BR.json` — new `connections.*` keys
 
 **Deleted:**
-- `SimpleDeFence/ProcessInfo.cs`, `SimpleDeFence/ServicePidMap.cs` (moved, see above — WinForms still gets them via the existing glob include of `../SimpleDeFence.Windows/*.cs` and `../SimpleDeFence.Windows.Services/*.cs`, so no `.csproj` change needed on the WinForms side)
+- `SimpleDeFence/ProcessInfo.cs`, `SimpleDeFence/ServicePidMap.cs` (moved, see above — WinForms still gets them via the existing glob include of `../SimpleDeFence.Windows.Services/*.cs`, so no `.csproj` change needed on the WinForms side; four call sites do need a new `using`, see Task 1 Step 6)
 
 ---
 
 ### Task 1: Portable process/service identity
 
-Moves `ProcessInfo` and `ServicePidMap` out of the WinForms-only `SimpleDeFence` project into the already-shared `SimpleDeFence.Windows`/`SimpleDeFence.Windows.Services` projects, and multi-targets the latter to net10, so the WinUI app can resolve "which app owns this connection" the same way `ConnectionsForm` does today. No behaviour change for WinForms — its build already glob-includes both target folders (`SimpleDeFence.csproj` lines 57, 59), so it keeps compiling the same source, just from its new location.
+Moves `ProcessInfo` and `ServicePidMap` out of the WinForms-only `SimpleDeFence` project into the already-shared `SimpleDeFence.Windows.Services` project, and multi-targets the latter to net10, so the WinUI app can resolve "which app owns this connection" the same way `ConnectionsForm` does today. No behaviour change for WinForms — its build already glob-includes that target folder (`SimpleDeFence.csproj` line 59), so it keeps compiling the same source, just from its new location.
 
 **Files:**
-- Create: `SimpleDeFence.Windows/ProcessInfo.cs`
-- Create: `SimpleDeFence.Windows.Services/ServicePidMap.cs`
+- Create: `SimpleDeFence.Windows.Services/ProcessInfo.cs`, `SimpleDeFence.Windows.Services/ServicePidMap.cs`
 - Delete: `SimpleDeFence/ProcessInfo.cs`, `SimpleDeFence/ServicePidMap.cs`
-- Modify: `SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj`, `SimpleDeFence.Windows.Services/ServiceControlManager.cs`, `SimpleDeFence.Windows/SimpleDeFence.Windows.csproj`, `SimpleDeFence/Processes.cs`
+- Modify: `SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj`, `SimpleDeFence.Windows.Services/ServiceControlManager.cs`, `SimpleDeFence/Processes.cs`, `SimpleDeFence/ConnectionsForm.cs`, `SimpleDeFence/SimpleDeFenceController.cs`, `SimpleDeFence/ApplicationExceptionForm.cs`
 
 **Interfaces:**
 - Consumes: `UwpPackageList` (`SimpleDeFence.Core/UwpPackageList.cs`, namespace `SimpleDeFence`), `ServiceControlManager` (existing, same project)
-- Produces: `SimpleDeFence.Windows.ProcessInfo` (`Pid`, `Path`, `Package`, `Services`, two `Create` overloads), `SimpleDeFence.Windows.Services.ServicePidMap` (ctor, `GetServicesInPid(uint)`)
+- Produces: `SimpleDeFence.Windows.Services.ProcessInfo` (`Pid`, `Path`, `Package`, `Services`, two `Create` overloads), `SimpleDeFence.Windows.Services.ServicePidMap` (ctor, `GetServicesInPid(uint)`)
 
 - [ ] **Step 1: Move `ProcessInfo`, dropping the WinForms-only overload**
 
 The current `SimpleDeFence/ProcessInfo.cs` has three `Create` overloads; only two are portable (the third calls `Utils.GetPathOfProcessUseTwService(pid, GlobalInstances.Controller)`, both WinForms-app-local statics). Grep confirms exactly one call site uses that overload — `SimpleDeFence/Processes.cs:101` — everything else (including `ConnectionsForm.cs`, the file this plan's screen replaces) already uses the two portable ones.
 
-Delete `SimpleDeFence/ProcessInfo.cs`. Create `SimpleDeFence.Windows/ProcessInfo.cs`:
+**`ProcessInfo` goes into `SimpleDeFence.Windows.Services`, not `SimpleDeFence.Windows`, and this is not a free choice — building the project graph the other way round doesn't compile.** `ProcessInfo` needs `UwpPackageList`, which lives in `SimpleDeFence.Core`. `SimpleDeFence.Core.csproj` already has `<ProjectReference Include="..\SimpleDeFence.Windows\SimpleDeFence.Windows.csproj" />` (for `SafeSidHandle`, which `UwpPackageList`'s WinRT P/Invoke needs). So `SimpleDeFence.Windows` → `SimpleDeFence.Core` would close a cycle: `Core → Windows → Core`. `SimpleDeFence.Windows.Services` is downstream of both (it already references `Windows`) and neither `Core` nor `Windows` reference it back, so `Windows.Services → Core` is the only direction that doesn't cycle. `ServicePidMap` already lives here, so this also keeps the two types that are always used together in the same project.
+
+Delete `SimpleDeFence/ProcessInfo.cs`. Create `SimpleDeFence.Windows.Services/ProcessInfo.cs`:
 
 ```csharp
+using SimpleDeFence;
 using System.Collections.Generic;
 
-namespace SimpleDeFence.Windows
+namespace SimpleDeFence.Windows.Services
 {
     public class ProcessInfo
     {
@@ -115,15 +117,7 @@ namespace SimpleDeFence.Windows
 }
 ```
 
-Note `ServicePidMap` here has no namespace qualifier: it moves to `SimpleDeFence.Windows.Services` in Step 2, and this file will need `using SimpleDeFence.Windows.Services;` — add it now:
-
-```csharp
-using System.Collections.Generic;
-using SimpleDeFence.Windows.Services;
-
-namespace SimpleDeFence.Windows
-{
-```
+(`ServicePidMap` needs no `using` here — it's in the same namespace, added in Step 2.)
 
 - [ ] **Step 2: Move `ServicePidMap`**
 
@@ -236,6 +230,10 @@ Replace `SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj` w
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\SimpleDeFence.Windows\SimpleDeFence.Windows.csproj" />
+		<!-- For UwpPackageList (ProcessInfo.cs, Step 1). Core itself references Windows (for
+		     SafeSidHandle), so this direction only - Windows/Core must never reference
+		     Windows.Services back, or the project graph cycles. -->
+		<ProjectReference Include="..\SimpleDeFence.Core\SimpleDeFence.Core.csproj" />
 	</ItemGroup>
 </Project>
 ```
@@ -244,18 +242,29 @@ Replace `SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj` w
 
 `ServiceControlManager.cs` has `[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]` on 7 methods/the constructor, from `System.Security.Permissions` — a CAS (Code Access Security) mechanism that was already inert under .NET Framework's default full-trust hosting and doesn't exist in the BCL on .NET Core/5+ at all. Remove the `using System.Security.Permissions;` line and every occurrence of `[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]` (there are 7, all byte-for-byte identical — use a find-all-occurrences replace, not a one-by-one edit).
 
-- [ ] **Step 6: Let `SimpleDeFence.Windows` resolve `UwpPackageList`**
+- [ ] **Step 6: Point the WinForms call sites at the new namespace**
 
-`ProcessInfo.cs` (Step 1) references `UwpPackageList`, which lives in `SimpleDeFence.Core`. `SimpleDeFence.Windows.csproj` doesn't reference Core today. Add it:
+`ProcessInfo` and `ServicePidMap` moved from namespace `SimpleDeFence` (same namespace as every WinForms form, needing no `using`) to `SimpleDeFence.Windows.Services`. Four WinForms files reference `ProcessInfo` by its bare name and need the new `using` added (grep confirms these are the only four: `grep -rln "ProcessInfo\b" SimpleDeFence/*.cs`):
 
-```xml
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleDeFence.Utilities\SimpleDeFence.Utilities.csproj" />
-    <ProjectReference Include="..\SimpleDeFence.Core\SimpleDeFence.Core.csproj" />
-  </ItemGroup>
+In `SimpleDeFence/ConnectionsForm.cs`, after the existing `using SimpleDeFence.Windows.NetStat;`:
+```csharp
+using SimpleDeFence.Windows.Services;
 ```
 
-(Replaces the existing `<ItemGroup>` that only has the `Utilities` reference.)
+In `SimpleDeFence/Processes.cs`, after the existing `using SimpleDeFence.Windows;`:
+```csharp
+using SimpleDeFence.Windows.Services;
+```
+
+In `SimpleDeFence/SimpleDeFenceController.cs`, after the existing `using SimpleDeFence.Windows;`:
+```csharp
+using SimpleDeFence.Windows.Services;
+```
+
+In `SimpleDeFence/ApplicationExceptionForm.cs`, after the existing `using SimpleDeFence.Windows;`:
+```csharp
+using SimpleDeFence.Windows.Services;
+```
 
 - [ ] **Step 7: Build both net48 and net10 legs**
 
@@ -270,13 +279,13 @@ export MSBuildSDKsPath="C:\Program Files\dotnet\sdk\10.0.302\Sdks" MSBuildEnable
 "$MSB" SimpleDeFence/SimpleDeFence.csproj -t:Restore -v:quiet -nologo
 "$MSB" SimpleDeFence/SimpleDeFence.csproj -t:Build -p:Configuration=Debug -v:minimal -nologo
 ```
-Expected: `Build succeeded`, 0 errors — confirms the WinForms app still compiles `ProcessInfo`/`ServicePidMap` from their new glob-included locations, and `Processes.cs` compiles with the Step 3 fix.
+Expected: `Build succeeded`, 0 errors — confirms the WinForms app still compiles `ProcessInfo`/`ServicePidMap` from their new glob-included location, with the Step 3 and Step 6 fixes in place.
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add SimpleDeFence.Windows/ProcessInfo.cs SimpleDeFence.Windows/SimpleDeFence.Windows.csproj SimpleDeFence.Windows.Services/ServicePidMap.cs SimpleDeFence.Windows.Services/ServiceControlManager.cs SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj SimpleDeFence/ProcessInfo.cs SimpleDeFence/ServicePidMap.cs SimpleDeFence/Processes.cs
-git commit -m "Move process/service identity to the shared Windows projects, multi-target net10"
+git add SimpleDeFence.Windows.Services/ProcessInfo.cs SimpleDeFence.Windows.Services/ServicePidMap.cs SimpleDeFence.Windows.Services/ServiceControlManager.cs SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj SimpleDeFence/ProcessInfo.cs SimpleDeFence/ServicePidMap.cs SimpleDeFence/Processes.cs SimpleDeFence/ConnectionsForm.cs SimpleDeFence/SimpleDeFenceController.cs SimpleDeFence/ApplicationExceptionForm.cs
+git commit -m "Move process/service identity to Windows.Services, multi-target net10"
 ```
 
 ---
@@ -554,7 +563,7 @@ git commit -m "Add Core connection-activity filtering, shared by both GUIs"
 - Modify: `SimpleDeFence.UI/Services/IFirewallClient.cs`, `SimpleDeFence.UI/Services/FirewallClient.cs`, `SimpleDeFence.UI/Services/SampleFirewallClient.cs`, `SimpleDeFence.UI/SimpleDeFence.UI.csproj`
 
 **Interfaces:**
-- Consumes: `Controller.BeginReadFwLog()`/`EndReadFwLog()`/`TryGetProcessPath()` (Core), `ConnectionActivity` (Task 2), `SimpleDeFence.Windows.NetStat.NetStat`/`TcpRow`/`UdpRow`, `SimpleDeFence.Windows.ProcessInfo`, `SimpleDeFence.Windows.Services.ServicePidMap`, `UwpPackageList` (all Task 1/existing)
+- Consumes: `Controller.BeginReadFwLog()`/`EndReadFwLog()`/`TryGetProcessPath()` (Core), `ConnectionActivity` (Task 2), `SimpleDeFence.Windows.NetStat.NetStat`/`TcpRow`/`UdpRow`, `SimpleDeFence.Windows.Services.ProcessInfo`/`ServicePidMap`, `UwpPackageList` (all Task 1/existing)
 - Produces: `SimpleDeFence.UI.Services.ConnectionRow`, `BlockedRow`, `ConnectionsSnapshot`; `IFirewallClient.GetConnectionsAsync()`, `IFirewallClient.AllowAsync(ExceptionSubject, ExceptionPolicy)`
 
 - [ ] **Step 1: Add the DTOs**
@@ -631,7 +640,7 @@ In `SimpleDeFence.UI/SimpleDeFence.UI.csproj`, add the project reference (this t
 
 - [ ] **Step 4: Implement the real client**
 
-In `SimpleDeFence.UI/Services/FirewallClient.cs`, add `using System.Collections.Generic;` and `using SimpleDeFence.Windows;` and `using SimpleDeFence.Windows.NetStat;` and `using SimpleDeFence.Windows.Services;` to the top of the file, then add these members (after `SwitchModeAsync`):
+In `SimpleDeFence.UI/Services/FirewallClient.cs`, add `using System.Collections.Generic;` and `using SimpleDeFence.Windows.NetStat;` and `using SimpleDeFence.Windows.Services;` to the top of the file (`ProcessInfo` and `ServicePidMap` both live in `Windows.Services` per Task 1's correction — no separate `SimpleDeFence.Windows` using is needed), then add these members (after `SwitchModeAsync`):
 
 ```csharp
         public Task<ConnectionsSnapshot> GetConnectionsAsync()
