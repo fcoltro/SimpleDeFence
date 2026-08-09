@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SimpleDeFence.UI.Services
@@ -56,6 +57,72 @@ namespace SimpleDeFence.UI.Services
             State.Mode = mode;
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.MODE_SWITCH);
+        }
+
+        public Task<ConnectionsSnapshot> GetConnectionsAsync()
+        {
+            var snapshot = new ConnectionsSnapshot
+            {
+                Blocked = new List<BlockedRow>
+                {
+                    new()
+                    {
+                        Timestamp = DateTime.Now.AddSeconds(-40),
+                        ProcessId = 4242,
+                        AppName = "tracker.exe",
+                        AppPath = @"C:\Users\sample\AppData\Local\Telemetry\tracker.exe",
+                        Protocol = "TCP",
+                        Direction = "Out",
+                        RemoteAddress = "203.0.113.9",
+                        RemotePort = 443,
+                    },
+                },
+                Connected = new List<ConnectionRow>
+                {
+                    new()
+                    {
+                        ProcessId = 5150,
+                        AppName = "firefox.exe",
+                        AppPath = @"C:\Program Files\Mozilla Firefox\firefox.exe",
+                        Protocol = "TCP",
+                        LocalAddress = "10.0.0.5",
+                        LocalPort = 51234,
+                        RemoteAddress = "142.250.72.14",
+                        RemotePort = 443,
+                        State = "Established",
+                    },
+                },
+                Open = new List<ConnectionRow>
+                {
+                    new()
+                    {
+                        ProcessId = 1044,
+                        AppName = "DoSvc",
+                        AppPath = @"C:\Windows\System32\svchost.exe",
+                        Protocol = "UDP",
+                        LocalAddress = "0.0.0.0",
+                        LocalPort = 5353,
+                        RemoteAddress = string.Empty,
+                        RemotePort = 0,
+                        State = "Listen",
+                    },
+                },
+            };
+
+            return Task.FromResult(snapshot);
+        }
+
+        public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy)
+        {
+            if (_locked)
+                return Task.FromResult(MessageType.RESPONSE_LOCKED);
+
+            if (Config is null)
+                return Task.FromResult(MessageType.RESPONSE_ERROR);
+
+            Config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) });
+            Changed?.Invoke(this, EventArgs.Empty);
+            return Task.FromResult(MessageType.PUT_SETTINGS);
         }
 
         private static ServerConfiguration BuildConfig()

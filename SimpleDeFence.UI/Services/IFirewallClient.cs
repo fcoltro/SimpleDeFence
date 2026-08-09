@@ -20,5 +20,12 @@ namespace SimpleDeFence.UI.Services
 
         Task RefreshAsync();
         Task<MessageType> SwitchModeAsync(FirewallMode mode);
+
+        /// <summary>Blocked/Connected/Open, gathered fresh on every call - no caching, this is a
+        /// point-in-time view of live network state.</summary>
+        Task<ConnectionsSnapshot> GetConnectionsAsync();
+
+        /// <summary>Commits a new exception for the given subject with the given policy.</summary>
+        Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy);
     }
 }

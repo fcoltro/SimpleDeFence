@@ -30,6 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleDeFence.Core\SimpleDeFence.Core.csproj" />
+    <ProjectReference Include="..\SimpleDeFence.Windows.Services\SimpleDeFence.Windows.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
