@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using SimpleDeFence;
+using SimpleDeFence.Localization;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -66,7 +67,7 @@ namespace SimpleDeFence.UI.Pages
             SetBusy(false);
 
             if (!App.Firewall.Connected)
-                ShowNotice(InfoBarSeverity.Error, "Not connected", App.Firewall.LastError ?? string.Empty);
+                ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Status.NotConnected), App.Firewall.LastError ?? string.Empty);
             else
                 Notice.IsOpen = false;
 
@@ -81,8 +82,10 @@ namespace SimpleDeFence.UI.Pages
                 : profile.AppExceptions.Select(RowFrom).OrderBy(r => r.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
 
             SummaryText.Text = App.Firewall.Connected
-                ? $"{_all.Count} exception{(_all.Count == 1 ? "" : "s")} in profile \"{profile?.ProfileName}\""
-                : "Not connected";
+                ? (_all.Count == 1
+                    ? Loc.T(LocKeys.Applications.SummaryOne, profile?.ProfileName)
+                    : Loc.T(LocKeys.Applications.Summary, _all.Count, profile?.ProfileName))
+                : Loc.T(LocKeys.Status.NotConnected);
 
             ApplyFilter();
         }

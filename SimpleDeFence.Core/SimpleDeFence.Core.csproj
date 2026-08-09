@@ -35,6 +35,22 @@
     <PackageReference Include="System.Text.Json" Version="6.0.11" />
   </ItemGroup>
   <ItemGroup>
+    <!-- One file per language holds every string in the app. Embedded rather than shipped loose so
+         a translation cannot go missing at runtime. WithCulture="false" is required: MSBuild's
+         culture-detection heuristic (the same one that builds Foo.en.resx into a satellite
+         resources.dll) matches "Strings.en.json" too, silently rerouting it into a satellite
+         assembly under a different logical name than the one below - Loc.Load then finds nothing
+         and every locale silently falls back to English. LogicalName pins the exact name Loc.cs
+         looks up: SimpleDeFence.Localization.Strings.<culture>.json -->
+    <EmbeddedResource Include="Localization\Strings.*.json" WithCulture="false"
+                       LogicalName="SimpleDeFence.Localization.%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Lets LocTests read Loc.Load(culture) directly, to check key parity per-locale without
+         mutating the shared static culture that Loc.SetCulture affects process-wide. -->
+    <InternalsVisibleTo Include="SimpleDeFence.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\SimpleDeFence.Windows\SimpleDeFence.Windows.csproj" />
   </ItemGroup>
 </Project>

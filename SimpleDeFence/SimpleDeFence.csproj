@@ -59,6 +59,13 @@
     <Compile Include="../SimpleDeFence.Windows.WFP/*.cs" LinkBase="SimpleDeFence.Windows.WFP" />
     <Compile Include="../SimpleDeFence.Core/*.cs" LinkBase="SimpleDeFence.Core" />
     <Compile Include="../SimpleDeFence.Core/Parser/*.cs" LinkBase="SimpleDeFence.Core.Parser" />
+    <!-- ExceptionDescriptor.cs and FirewallModeInfo.cs (both top-level, globbed above) depend on
+         SimpleDeFence.Localization.Loc/LocKeys. Neither is actually called from WinForms code -
+         localization is WinUI-only by design - but the glob still needs this folder or the build
+         fails with CS0234. Loc.Load finds no embedded resources in this app (those are only
+         embedded into SimpleDeFence.Core.dll), so if these ever were called here every string
+         would render as its bracketed fallback; harmless today since nothing calls them. -->
+    <Compile Include="../SimpleDeFence.Core/Localization/*.cs" LinkBase="SimpleDeFence.Core.Localization" />
     <!-- SimpleDeFence.Utilities already supplies IsExternalInit here; Core carries its own copy
          only for its standalone net48 build. Compiling both into this app is CS0101. -->
     <Compile Remove="../SimpleDeFence.Core/CsInitSupport.cs" />

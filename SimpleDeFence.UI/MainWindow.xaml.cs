@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using SimpleDeFence.Localization;
 using SimpleDeFence.UI.Pages;
 using SimpleDeFence.UI.Themes;
 using SimpleDeFence.UI.ViewModels;
@@ -24,7 +25,7 @@ namespace SimpleDeFence.UI
             Shell = new ShellViewModel(App.Firewall);
             InitializeComponent();
 
-            Title = "SimpleDeFence";
+            Title = Loc.T(LocKeys.App.Name);
 
             // Run the nav pane to the top edge - the standard Windows 11 app shape.
             ExtendsContentIntoTitleBar = true;
@@ -73,10 +74,10 @@ namespace SimpleDeFence.UI
             if (!Shell.CanSwitchMode)
             {
                 await ShowMessageAsync(
-                    Shell.IsConnected ? "Configuration is locked" : "Not connected",
+                    Shell.IsConnected ? Loc.T(LocKeys.Status.Locked) : Loc.T(LocKeys.Status.NotConnected),
                     Shell.IsConnected
-                        ? "Unlock the configuration before changing the mode."
-                        : "Could not reach the SimpleDeFence service. Is it installed and running?");
+                        ? Loc.T(LocKeys.Status.LockedDetail)
+                        : Loc.T(LocKeys.Status.NotConnectedDetail));
                 return;
             }
 
@@ -108,7 +109,7 @@ namespace SimpleDeFence.UI
             }
             catch (Exception ex)
             {
-                await ShowMessageAsync("Could not reach the service", ex.Message);
+                await ShowMessageAsync(Loc.T(LocKeys.Mode.SwitchFailedUnreachableTitle), ex.Message);
                 return;
             }
 
@@ -119,11 +120,12 @@ namespace SimpleDeFence.UI
             {
                 var (title, body) = resp switch
                 {
-                    MessageType.RESPONSE_LOCKED => ("SimpleDeFence is currently locked",
-                        "Unlock the configuration before changing the mode."),
-                    MessageType.COM_ERROR => ("Communication with the service failed",
-                        "The mode was not changed."),
-                    _ => ("Operation failed", $"The service returned {resp}. The mode was not changed."),
+                    MessageType.RESPONSE_LOCKED => (Loc.T(LocKeys.Mode.SwitchFailedLockedTitle),
+                        Loc.T(LocKeys.Status.LockedDetail)),
+                    MessageType.COM_ERROR => (Loc.T(LocKeys.Mode.SwitchFailedComErrorTitle),
+                        Loc.T(LocKeys.Mode.SwitchFailedComErrorDetail)),
+                    _ => (Loc.T(LocKeys.Mode.SwitchFailedGenericTitle),
+                        Loc.T(LocKeys.Mode.SwitchFailedGenericDetail, resp)),
                 };
                 await ShowMessageAsync(title, body);
             }
@@ -134,13 +136,10 @@ namespace SimpleDeFence.UI
             var dialog = new ContentDialog
             {
                 XamlRoot = Content.XamlRoot,
-                Title = "Start automatic learning?",
-                Content = "In automatic learning mode SimpleDeFence allows all traffic and remembers "
-                        + "which applications used the network, then adds exceptions for them when you "
-                        + "leave the mode. Rules cannot be learned for Special Exceptions.\n\n"
-                        + "Only use this on a system you are confident is free of malware.",
-                PrimaryButtonText = "Enter learning mode",
-                CloseButtonText = "Cancel",
+                Title = Loc.T(LocKeys.Mode.LearningConfirmTitle),
+                Content = Loc.T(LocKeys.Mode.LearningConfirmBody),
+                PrimaryButtonText = Loc.T(LocKeys.Mode.LearningConfirmConfirm),
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
                 DefaultButton = ContentDialogButton.Close,
             };
 
@@ -154,7 +153,7 @@ namespace SimpleDeFence.UI
                 XamlRoot = Content.XamlRoot,
                 Title = title,
                 Content = body,
-                CloseButtonText = "OK",
+                CloseButtonText = Loc.T(LocKeys.Common.Ok),
             };
             await dialog.ShowAsync();
         }

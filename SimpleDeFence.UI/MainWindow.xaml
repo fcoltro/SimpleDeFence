@@ -1,7 +1,8 @@
 <Window
     x:Class="SimpleDeFence.UI.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:loc="using:SimpleDeFence.UI.Localization">
 
     <Window.SystemBackdrop>
         <MicaBackdrop Kind="BaseAlt"/>
@@ -20,7 +21,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="SimpleDeFence" VerticalAlignment="Center"
+            <TextBlock Grid.Column="0" Text="{loc:Loc Key=app.name}" VerticalAlignment="Center"
                        Style="{StaticResource CaptionTextBlockStyle}"/>
         </Grid>
 
@@ -37,7 +38,7 @@
                         SelectionChanged="Nav_SelectionChanged">
 
             <NavigationView.MenuItems>
-                <NavigationViewItem Content="Rules" Tag="rules" IsSelected="True">
+                <NavigationViewItem Content="{loc:Loc Key=nav.rules}" Tag="rules" IsSelected="True">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE71D;"/>
                     </NavigationViewItem.Icon>
@@ -51,7 +52,7 @@
                         HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                         Background="{ThemeResource LayerFillColorDefaultBrush}"
                         Click="ModeChip_Click"
-                        AutomationProperties.Name="Firewall mode">
+                        AutomationProperties.Name="{loc:Loc Key=nav.modeChip}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <!-- Not "Converter={StaticResource ModeStateToBrush}": on this WinAppSDK
                              version, an x:Bind converter lookup at a <Window> root fails to build

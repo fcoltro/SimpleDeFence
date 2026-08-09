@@ -1,4 +1,5 @@
-﻿using SimpleDeFence.UI.Services;
+﻿using SimpleDeFence.Localization;
+using SimpleDeFence.UI.Services;
 using System.Threading.Tasks;
 
 namespace SimpleDeFence.UI.ViewModels
@@ -11,7 +12,7 @@ namespace SimpleDeFence.UI.ViewModels
     {
         private readonly IFirewallClient _client;
 
-        private string _modeLabel = "Connecting...";
+        private string _modeLabel = Loc.T(LocKeys.Common.Connecting);
         private string _modeGlyph = "";      // Segoe Fluent: Unknown
         private string _modeStateKey = "Neutral";
         private string _statusLine = string.Empty;
@@ -92,7 +93,7 @@ namespace SimpleDeFence.UI.ViewModels
 
             if (!IsConnected)
             {
-                ModeLabel = "Not connected";
+                ModeLabel = Loc.T(LocKeys.Status.NotConnected);
                 ModeGlyph = "";       // Segoe Fluent: Error
                 ModeStateKey = "Neutral";
                 StatusLine = _client.LastError ?? string.Empty;
@@ -103,7 +104,7 @@ namespace SimpleDeFence.UI.ViewModels
                 ModeGlyph = GlyphFor(mode);
                 ModeStateKey = StateKeyFor(mode);
                 StatusLine = IsLocked
-                    ? "Configuration is locked"
+                    ? Loc.T(LocKeys.Status.Locked)
                     : FirewallModes.DescriptionFor(mode);
             }
 

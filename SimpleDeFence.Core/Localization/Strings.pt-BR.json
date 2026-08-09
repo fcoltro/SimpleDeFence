@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+
+  "nav": {
+    "rules": "Regras",
+    "modeChip": "Modo do firewall"
+  },
+
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "refresh": "Atualizar",
+    "loading": "Carregando...",
+    "connecting": "Conectando...",
+    "unknown": "Desconhecido"
+  },
+
+  "status": {
+    "notConnected": "Sem conexão",
+    "notConnectedDetail": "Não foi possível acessar o serviço do SimpleDeFence. Ele está instalado e em execução?",
+    "locked": "Configuração bloqueada",
+    "lockedDetail": "Desbloqueie a configuração antes de alterar o modo.",
+    "connected": "Conectado"
+  },
+
+  "mode": {
+    "normal": {
+      "label": "Normal",
+      "description": "O firewall está funcionando conforme recomendado."
+    },
+    "blockAll": {
+      "label": "Bloquear tudo",
+      "description": "O firewall está bloqueando todo o tráfego de entrada e saída."
+    },
+    "allowOutgoing": {
+      "label": "Permitir saída",
+      "description": "O firewall permite conexões de saída."
+    },
+    "disabled": {
+      "label": "Desativado",
+      "description": "O firewall está desativado."
+    },
+    "learning": {
+      "label": "Aprendizado",
+      "description": "O firewall está aprendendo enquanto permite todo o tráfego."
+    },
+    "switchFailed": {
+      "lockedTitle": "O SimpleDeFence está bloqueado",
+      "comErrorTitle": "Falha na comunicação com o serviço",
+      "comErrorDetail": "O modo não foi alterado.",
+      "genericTitle": "A operação falhou",
+      "genericDetail": "O serviço retornou {0}. O modo não foi alterado.",
+      "unreachableTitle": "Não foi possível acessar o serviço"
+    },
+    "learningConfirm": {
+      "title": "Iniciar o aprendizado automático?",
+      "body": "No modo de aprendizado automático o SimpleDeFence permite todo o tráfego e memoriza quais aplicativos usaram a rede, criando exceções para eles ao sair do modo. Não é possível aprender regras para Exceções Especiais.\n\nUse apenas em um sistema que você tenha confiança estar livre de malware.",
+      "confirm": "Entrar no modo de aprendizado"
+    }
+  },
+
+  "applications": {
+    "title": "Aplicativos",
+    "filterPlaceholder": "Filtrar por nome ou caminho",
+    "summary": "{0} exceções no perfil \"{1}\"",
+    "summaryOne": "1 exceção no perfil \"{0}\"",
+    "empty": "Nenhuma exceção de aplicativo ainda."
+  },
+
+  "subject": {
+    "executable": "Executável",
+    "service": "Serviço",
+    "uwpPackage": "Pacote UWP",
+    "global": "Global",
+    "allApplications": "Todos os aplicativos"
+  },
+
+  "policy": {
+    "blocked": "Bloqueado",
+    "unrestricted": "Sem restrições",
+    "unrestrictedLan": "Sem restrições (somente LAN)",
+    "noPorts": "Nenhuma porta permitida",
+    "lanOnlySuffix": "{0} (somente LAN)",
+    "customRuleOne": "1 regra personalizada",
+    "customRuleMany": "{0} regras personalizadas",
+    "tcpOut": "TCP saída",
+    "udpOut": "UDP saída",
+    "tcpIn": "TCP entrada",
+    "udpIn": "UDP entrada",
+    "allPorts": "todas"
+  }
+}

@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using SimpleDeFence.Localization;
 using SimpleDeFence.UI.Services;
 using System;
 
@@ -20,6 +21,15 @@ namespace SimpleDeFence.UI
 
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
+            // Must run before any XAML is touched: MainWindow's constructor resolves Loc.T for
+            // its Title, and every {loc:Loc} markup extension in the tree resolves during
+            // InitializeComponent - both need the right culture selected first.
+            var langOverride = ArgValue("--lang");
+            if (langOverride is not null)
+                Loc.SetCulture(langOverride);
+            else
+                Loc.UseSystemCulture();
+
             // --sample-locked also implies sample data; it simulates a locked service so the
             // GUI's refusal handling can be exercised.
             bool locked = HasSwitch("--sample-locked");
@@ -38,6 +48,18 @@ namespace SimpleDeFence.UI
                     return true;
             }
             return false;
+        }
+
+        /// <summary>Reads "--name value" from the command line, or null if absent.</summary>
+        private static string? ArgValue(string name)
+        {
+            var args = Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length - 1; ++i)
+            {
+                if (string.Equals(args[i], name, StringComparison.OrdinalIgnoreCase))
+                    return args[i + 1];
+            }
+            return null;
         }
     }
 }

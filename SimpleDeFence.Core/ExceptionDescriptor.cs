@@ -1,3 +1,4 @@
+using SimpleDeFence.Localization;
 using System.Collections.Generic;
 
 namespace SimpleDeFence
@@ -27,8 +28,8 @@ namespace SimpleDeFence
     /// Turns a <see cref="FirewallExceptionV3"/> into display fields. Lives in Core rather than in a
     /// GUI so the WinForms and WinUI front-ends can describe an entry identically.
     ///
-    /// Strings here are English-only. The WinForms GUI keeps using its localized resx; this exists
-    /// for the WinUI GUI, which has no localization yet.
+    /// Text comes from <see cref="Loc"/>. The WinForms GUI keeps using its own localized resx
+    /// (unaffected - it does not call this class); this is for the WinUI GUI.
     /// </summary>
     public static class ExceptionDescriptor
     {
@@ -51,17 +52,17 @@ namespace SimpleDeFence
             SubjectType.Executable => ((ExecutableSubject)subject).ExecutableName,
             SubjectType.Service => ((ServiceSubject)subject).ServiceName,
             SubjectType.AppContainer => ((AppContainerSubject)subject).DisplayName,
-            SubjectType.Global => "All applications",
-            _ => "Unknown",
+            SubjectType.Global => Loc.T(LocKeys.Subject.AllApplications),
+            _ => Loc.T(LocKeys.Common.Unknown),
         };
 
         public static string SubjectKind(ExceptionSubject subject) => subject.SubjectType switch
         {
-            SubjectType.Executable => "Executable",
-            SubjectType.Service => "Service",
-            SubjectType.AppContainer => "UWP Package",
-            SubjectType.Global => "Global",
-            _ => "Unknown",
+            SubjectType.Executable => Loc.T(LocKeys.Subject.Executable),
+            SubjectType.Service => Loc.T(LocKeys.Subject.Service),
+            SubjectType.AppContainer => Loc.T(LocKeys.Subject.UwpPackage),
+            SubjectType.Global => Loc.T(LocKeys.Subject.Global),
+            _ => Loc.T(LocKeys.Common.Unknown),
         };
 
         public static string SubjectDetail(ExceptionSubject subject) => subject.SubjectType switch
@@ -79,38 +80,40 @@ namespace SimpleDeFence
             switch (policy.PolicyType)
             {
                 case PolicyType.HardBlock:
-                    return "Blocked";
+                    return Loc.T(LocKeys.Policy.Blocked);
 
                 case PolicyType.Unrestricted:
                     return ((UnrestrictedPolicy)policy).LocalNetworkOnly
-                        ? "Unrestricted (LAN only)"
-                        : "Unrestricted";
+                        ? Loc.T(LocKeys.Policy.UnrestrictedLan)
+                        : Loc.T(LocKeys.Policy.Unrestricted);
 
                 case PolicyType.TcpUdpOnly:
                     return DescribeTcpUdp((TcpUdpPolicy)policy);
 
                 case PolicyType.RuleList:
                     int count = ((RuleListPolicy)policy).Rules.Count;
-                    return count == 1 ? "1 custom rule" : count + " custom rules";
+                    return count == 1
+                        ? Loc.T(LocKeys.Policy.CustomRuleOne)
+                        : Loc.T(LocKeys.Policy.CustomRuleMany, count);
 
                 default:
-                    return "Unknown";
+                    return Loc.T(LocKeys.Common.Unknown);
             }
         }
 
         private static string DescribeTcpUdp(TcpUdpPolicy p)
         {
             var parts = new List<string>();
-            Add(parts, "TCP out", p.AllowedRemoteTcpConnectPorts);
-            Add(parts, "UDP out", p.AllowedRemoteUdpConnectPorts);
-            Add(parts, "TCP in", p.AllowedLocalTcpListenerPorts);
-            Add(parts, "UDP in", p.AllowedLocalUdpListenerPorts);
+            Add(parts, Loc.T(LocKeys.Policy.TcpOut), p.AllowedRemoteTcpConnectPorts);
+            Add(parts, Loc.T(LocKeys.Policy.UdpOut), p.AllowedRemoteUdpConnectPorts);
+            Add(parts, Loc.T(LocKeys.Policy.TcpIn), p.AllowedLocalTcpListenerPorts);
+            Add(parts, Loc.T(LocKeys.Policy.UdpIn), p.AllowedLocalUdpListenerPorts);
 
             if (parts.Count == 0)
-                return "No ports allowed";
+                return Loc.T(LocKeys.Policy.NoPorts);
 
             var text = string.Join(", ", parts);
-            return p.LocalNetworkOnly ? text + " (LAN only)" : text;
+            return p.LocalNetworkOnly ? Loc.T(LocKeys.Policy.LanOnlySuffix, text) : text;
         }
 
         private static void Add(List<string> into, string label, string? ports)
@@ -118,7 +121,7 @@ namespace SimpleDeFence
             if (string.IsNullOrEmpty(ports))
                 return;
 
-            into.Add(label + " " + (ports == "*" ? "all" : ports));
+            into.Add(label + " " + (ports == "*" ? Loc.T(LocKeys.Policy.AllPorts) : ports));
         }
     }
 }

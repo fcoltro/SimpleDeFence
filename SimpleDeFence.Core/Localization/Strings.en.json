@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+
+  "nav": {
+    "rules": "Rules",
+    "modeChip": "Firewall mode"
+  },
+
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "connecting": "Connecting...",
+    "unknown": "Unknown"
+  },
+
+  "status": {
+    "notConnected": "Not connected",
+    "notConnectedDetail": "Could not reach the SimpleDeFence service. Is it installed and running?",
+    "locked": "Configuration is locked",
+    "lockedDetail": "Unlock the configuration before changing the mode.",
+    "connected": "Connected"
+  },
+
+  "mode": {
+    "normal": {
+      "label": "Normal",
+      "description": "The firewall is operating as recommended."
+    },
+    "blockAll": {
+      "label": "Block all",
+      "description": "The firewall is blocking all incoming and outgoing traffic."
+    },
+    "allowOutgoing": {
+      "label": "Allow outgoing",
+      "description": "The firewall allows outgoing connections."
+    },
+    "disabled": {
+      "label": "Disabled",
+      "description": "The firewall is disabled."
+    },
+    "learning": {
+      "label": "Autolearn",
+      "description": "The firewall is learning while letting all traffic through."
+    },
+    "switchFailed": {
+      "lockedTitle": "SimpleDeFence is currently locked",
+      "comErrorTitle": "Communication with the service failed",
+      "comErrorDetail": "The mode was not changed.",
+      "genericTitle": "Operation failed",
+      "genericDetail": "The service returned {0}. The mode was not changed.",
+      "unreachableTitle": "Could not reach the service"
+    },
+    "learningConfirm": {
+      "title": "Start automatic learning?",
+      "body": "In automatic learning mode SimpleDeFence allows all traffic and remembers which applications used the network, then adds exceptions for them when you leave the mode. Rules cannot be learned for Special Exceptions.\n\nOnly use this on a system you are confident is free of malware.",
+      "confirm": "Enter learning mode"
+    }
+  },
+
+  "applications": {
+    "title": "Applications",
+    "filterPlaceholder": "Filter by name or path",
+    "summary": "{0} exceptions in profile \"{1}\"",
+    "summaryOne": "1 exception in profile \"{0}\"",
+    "empty": "No application exceptions yet."
+  },
+
+  "subject": {
+    "executable": "Executable",
+    "service": "Service",
+    "uwpPackage": "UWP Package",
+    "global": "Global",
+    "allApplications": "All applications"
+  },
+
+  "policy": {
+    "blocked": "Blocked",
+    "unrestricted": "Unrestricted",
+    "unrestrictedLan": "Unrestricted (LAN only)",
+    "noPorts": "No ports allowed",
+    "lanOnlySuffix": "{0} (LAN only)",
+    "customRuleOne": "1 custom rule",
+    "customRuleMany": "{0} custom rules",
+    "tcpOut": "TCP out",
+    "udpOut": "UDP out",
+    "tcpIn": "TCP in",
+    "udpIn": "UDP in",
+    "allPorts": "all"
+  }
+}

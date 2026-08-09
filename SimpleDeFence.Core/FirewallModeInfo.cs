@@ -1,3 +1,4 @@
+using SimpleDeFence.Localization;
 using System.Collections.Generic;
 
 namespace SimpleDeFence
@@ -6,14 +7,21 @@ namespace SimpleDeFence
     public sealed class FirewallModeInfo
     {
         public FirewallMode Mode { get; }
-        public string Label { get; }
-        public string Description { get; }
 
-        public FirewallModeInfo(FirewallMode mode, string label, string description)
+        private readonly string _labelKey;
+        private readonly string _descriptionKey;
+
+        // Resolved on each access, not baked in at construction: this array is built once as a
+        // static readonly field, so if Label/Description captured a string at that point they
+        // would never reflect a later Loc.SetCulture call.
+        public string Label => Loc.T(_labelKey);
+        public string Description => Loc.T(_descriptionKey);
+
+        public FirewallModeInfo(FirewallMode mode, string labelKey, string descriptionKey)
         {
             Mode = mode;
-            Label = label;
-            Description = description;
+            _labelKey = labelKey;
+            _descriptionKey = descriptionKey;
         }
     }
 
@@ -26,16 +34,11 @@ namespace SimpleDeFence
     {
         private static readonly FirewallModeInfo[] _selectable =
         {
-            new FirewallModeInfo(FirewallMode.Normal, "Normal",
-                "The firewall is operating as recommended."),
-            new FirewallModeInfo(FirewallMode.BlockAll, "Block all",
-                "The firewall is blocking all incoming and outgoing traffic."),
-            new FirewallModeInfo(FirewallMode.AllowOutgoing, "Allow outgoing",
-                "The firewall allows outgoing connections."),
-            new FirewallModeInfo(FirewallMode.Disabled, "Disabled",
-                "The firewall is disabled."),
-            new FirewallModeInfo(FirewallMode.Learning, "Autolearn",
-                "The firewall is learning while letting all traffic through."),
+            new FirewallModeInfo(FirewallMode.Normal, LocKeys.Mode.NormalLabel, LocKeys.Mode.NormalDescription),
+            new FirewallModeInfo(FirewallMode.BlockAll, LocKeys.Mode.BlockAllLabel, LocKeys.Mode.BlockAllDescription),
+            new FirewallModeInfo(FirewallMode.AllowOutgoing, LocKeys.Mode.AllowOutgoingLabel, LocKeys.Mode.AllowOutgoingDescription),
+            new FirewallModeInfo(FirewallMode.Disabled, LocKeys.Mode.DisabledLabel, LocKeys.Mode.DisabledDescription),
+            new FirewallModeInfo(FirewallMode.Learning, LocKeys.Mode.LearningLabel, LocKeys.Mode.LearningDescription),
         };
 
         public static IReadOnlyList<FirewallModeInfo> Selectable => _selectable;
@@ -54,7 +57,7 @@ namespace SimpleDeFence
         public static string LabelFor(FirewallMode mode)
         {
             int i = IndexOf(mode);
-            return i >= 0 ? _selectable[i].Label : "Unknown";
+            return i >= 0 ? _selectable[i].Label : Loc.T(LocKeys.Common.Unknown);
         }
 
         public static string DescriptionFor(FirewallMode mode)
