@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ServiceProcess;
-using SimpleDeFence.Windows.Services;
 
-namespace SimpleDeFence
+namespace SimpleDeFence.Windows.Services
 {
     public class ServicePidMap
     {

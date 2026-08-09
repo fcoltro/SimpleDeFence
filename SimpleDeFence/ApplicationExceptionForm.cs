@@ -1,6 +1,7 @@
 ﻿using DarkModeForms;
 using Microsoft.Samples.TaskDialog;
 using SimpleDeFence.Windows;
+using SimpleDeFence.Windows.Services;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using SimpleDeFence.Windows;
+using SimpleDeFence;
+using System.Collections.Generic;
 
-namespace SimpleDeFence
+namespace SimpleDeFence.Windows.Services
 {
-    internal class ProcessInfo
+    public class ProcessInfo
     {
         public uint Pid;
         public string Path;
@@ -18,15 +18,6 @@ namespace SimpleDeFence
             Services = services;
         }
 
-        public static ProcessInfo Create(uint pid, UwpPackageList uwp, ServicePidMap servicePids)
-        {
-            return new ProcessInfo(
-                pid,
-                Utils.GetPathOfProcessUseTwService(pid, GlobalInstances.Controller),
-                uwp.FindPackageForProcess(pid),
-                servicePids.GetServicesInPid(pid)
-            );
-        }
         public static ProcessInfo Create(uint pid, string path, UwpPackageList uwp, ServicePidMap servicePids)
         {
             return new ProcessInfo(
@@ -47,4 +38,3 @@ namespace SimpleDeFence
         }
     }
 }
-

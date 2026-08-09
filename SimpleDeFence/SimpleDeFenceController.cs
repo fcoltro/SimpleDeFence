@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Microsoft.Samples.TaskDialog;
 using SimpleDeFence.Utilities;
 using SimpleDeFence.Windows;
+using SimpleDeFence.Windows.Services;
 
 namespace SimpleDeFence
 {

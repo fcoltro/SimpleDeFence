@@ -1,6 +1,7 @@
 ﻿using DarkModeForms;
 using SimpleDeFence.Utilities;
 using SimpleDeFence.Windows;
+using SimpleDeFence.Windows.Services;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -98,7 +99,7 @@ namespace SimpleDeFence
                 {
                     using var p = procs[i];
                     var pid = unchecked((uint)p.Id);
-                    var e = ProcessInfo.Create(pid, packageList, service_pids);
+                    var e = ProcessInfo.Create(pid, Utils.GetPathOfProcessUseTwService(pid, GlobalInstances.Controller), packageList, service_pids);
 
                     if (string.IsNullOrEmpty(e.Path))
                         continue;

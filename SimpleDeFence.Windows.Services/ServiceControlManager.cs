@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Security.Permissions;
 using System.ServiceProcess;
 using System.Runtime.InteropServices;
 
@@ -28,7 +27,6 @@ namespace SimpleDeFence.Windows.Services
             return service;
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public ServiceControlManager()
         {
             // Open the service control manager
@@ -47,7 +45,6 @@ namespace SimpleDeFence.Windows.Services
         /// Dertermines whether the nominated service is set to restart on failure.
         /// </summary>
         /// <exception cref="ComponentModel.Win32Exception">"Unable to query the Service configuration."</exception>
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         internal bool HasRestartOnFailure(string serviceName)
         {
             const int bufferSize = 1024 * 8;
@@ -107,7 +104,6 @@ namespace SimpleDeFence.Windows.Services
         /// <summary>
         /// Sets the nominated service to restart on failure.
         /// </summary>
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public void SetRestartOnFailure(string serviceName, bool restartOnFailure)
         {
             const uint delay = 1000;
@@ -165,7 +161,6 @@ namespace SimpleDeFence.Windows.Services
             }
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public void SetStartupMode(string serviceName, ServiceStartMode mode)
         {
             using var service = OpenService(
@@ -190,7 +185,6 @@ namespace SimpleDeFence.Windows.Services
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public void SetLoadOrderGroup(string serviceName, string group)
         {
             using var service = OpenService(
@@ -215,7 +209,6 @@ namespace SimpleDeFence.Windows.Services
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public uint GetStartupMode(string serviceName)
         {
             using var service = OpenService(serviceName, ServiceAccessRights.SERVICE_QUERY_CONFIG);
@@ -231,7 +224,6 @@ namespace SimpleDeFence.Windows.Services
             return query_srv_config.dwStartType;
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public uint? GetServicePid(string serviceName)
         {
             using var service = OpenService(serviceName, ServiceAccessRights.SERVICE_QUERY_STATUS);
