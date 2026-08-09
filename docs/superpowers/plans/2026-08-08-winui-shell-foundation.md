@@ -17,7 +17,12 @@
 - **The real client is the default in every configuration.** Sample data is only reachable via the `--sample-data` command-line switch.
 - **All IPC calls stay off the UI thread.**
 - **Never let an unrecognised response look like success** — an action that did not take must not appear to have taken.
-- The WinUI GUI is English-only; the WinForms GUI keeps its localized resx. No localization work here.
+- ~~The WinUI GUI is English-only; the WinForms GUI keeps its localized resx. No localization work here.~~
+  **Superseded** (commit `d5c3d7c`, after Task 6 shipped): localization for the WinUI GUI was
+  requested after all, via a single-file-per-language scheme (`SimpleDeFence.Core/Localization`,
+  `LocKeys`/`LocTests`) rather than resx, so translators get one file and `SimpleDeFence.Tests` can
+  cover key drift. Recorded here, flagged by the final whole-branch review, so this document
+  matches the tree instead of contradicting it.
 - **Nothing is removed from the WinForms app.** It stays buildable throughout.
 - Build the net48 app with `-t:Restore` and `-t:Build` as **separate** MSBuild invocations (see ROADMAP.md).
 
@@ -885,6 +890,8 @@ Replace `SimpleDeFence.UI/MainWindow.xaml` with:
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
                         PaneDisplayMode="Auto"
+                        CompactModeThresholdWidth="641"
+                        ExpandedModeThresholdWidth="641"
                         IsPaneToggleButtonVisible="True"
                         OpenPaneLength="220"
                         SelectionChanged="Nav_SelectionChanged">
