@@ -81,10 +81,11 @@ namespace SimpleDeFence.UI.Pages
                 ? new List<ExceptionRow>()
                 : profile.AppExceptions.Select(RowFrom).OrderBy(r => r.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
 
+            var profileName = profile?.ProfileName ?? string.Empty;
             SummaryText.Text = App.Firewall.Connected
                 ? (_all.Count == 1
-                    ? Loc.T(LocKeys.Applications.SummaryOne, profile?.ProfileName)
-                    : Loc.T(LocKeys.Applications.Summary, _all.Count, profile?.ProfileName))
+                    ? Loc.T(LocKeys.Applications.SummaryOne, profileName)
+                    : Loc.T(LocKeys.Applications.Summary, _all.Count, profileName))
                 : Loc.T(LocKeys.Status.NotConnected);
 
             ApplyFilter();

@@ -28,11 +28,20 @@
         <!-- The pane toggle stays visible. Below roughly 640px NavigationView collapses the pane
              into an overlay, and with no toggle button there is no way to open it - which would
              make the mode chip unreachable at narrow widths and break the "status is always
-             visible" premise the chip exists for. -->
+             visible" premise the chip exists for.
+
+             ExpandedModeThresholdWidth is set equal to CompactModeThresholdWidth's default (641)
+             so Auto's icon-only Compact rail is never chosen: below 641px the pane is Minimal
+             (reachable via the toggle above), at or above it the pane jumps straight to the fully
+             expanded state. Without this, windows between ~641-1007px landed in Compact, where the
+             pane column is too narrow to show the mode chip's text at all - hiding status at very
+             ordinary window sizes, not just narrow ones. -->
         <NavigationView x:Name="Nav" Grid.Row="1"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
                         PaneDisplayMode="Auto"
+                        CompactModeThresholdWidth="641"
+                        ExpandedModeThresholdWidth="641"
                         IsPaneToggleButtonVisible="True"
                         OpenPaneLength="220"
                         SelectionChanged="Nav_SelectionChanged">
