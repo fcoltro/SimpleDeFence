@@ -15,14 +15,14 @@ namespace SimpleDeFence
 {
     internal partial class ConnectionsForm : Form
     {
-        private readonly TinyWallController Controller;
+        private readonly SimpleDeFenceController Controller;
         private readonly AsyncIconScanner IconScanner;
         private readonly Size IconSize = new((int)Math.Round(16 * Utils.DpiScalingFactor), (int)Math.Round(16 * Utils.DpiScalingFactor));
         private readonly DarkModeCS? DarkMode;
         private readonly WmPaintFilter? ListRepaintFilter;
         private bool EnableListUpdate = false;
 
-        internal ConnectionsForm(TinyWallController ctrl)
+        internal ConnectionsForm(SimpleDeFenceController ctrl)
         {
             InitializeComponent();
             Utils.SetRightToLeft(this);

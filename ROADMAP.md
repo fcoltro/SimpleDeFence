@@ -11,12 +11,26 @@ attribution. This document tracks where the project is headed.
 - [x] Full functional rename (service name, `%ProgramData%` folder, WFP rule grouping tag,
       `DataContract` namespaces, C# namespace, project/solution/exe names, installer/MSI product
       name + registry key + regenerated GUIDs, named pipe/mutex/self-update identifiers,
-      tray/about strings). Class names (`TinyWallController`, `TinyWallService`, `TinyWallDoctor`,
-      etc.) and resx resource *keys* were deliberately left as-is — internal identifiers only, no
-      user-facing or collision-relevant meaning, renaming them would balloon the diff for no
-      benefit. The bundled installer FAQ (`MsiSetup/Sources/ProgramFiles/SimpleDeFence/doc/faq.html`)
-      still reads as TinyWall prose with real links to the upstream project/site — needs an
-      editorial pass, not a mechanical one, so it's left as a follow-up.
+      tray/about strings). Class names and resx resource *keys* were deliberately left as-is at
+      the time — internal identifiers only, no user-facing or collision-relevant meaning, renaming
+      them would balloon the diff for no benefit. The bundled installer FAQ
+      (`MsiSetup/Sources/ProgramFiles/SimpleDeFence/doc/faq.html`) still reads as TinyWall prose
+      with real links to the upstream project/site — needs an editorial pass, not a mechanical
+      one, so it's left as a follow-up.
+- [x] **Reversed (2026-08-09):** class/file identifiers renamed after all — `TinyWallController` →
+      `SimpleDeFenceController`, `TinyWallService` → `SimpleDeFenceService`, `TinyWallServer` →
+      `SimpleDeFenceServer` (the inner WFP/IPC/lifecycle class inside `SimpleDeFenceService.cs`,
+      distinct from the `ServiceBase` host wrapper), `TinyWallDoctor` → `SimpleDeFenceDoctor`,
+      `Installer/TinyWallInstaller` → `SimpleDeFenceInstaller`, `Installer/TinyWallServiceInstaller`
+      → `SimpleDeFenceServiceInstaller`, plus the `Utils.TinyWallVersion` property. The 18-file
+      `MainForm.*.resx` family's `DependentUpon` moved with `SimpleDeFenceController.cs`.
+      **resx resource *keys* in `Resources/Messages.resx` (`TinyWallIsCurrentlyLocked`,
+      `TinyWallSettingsFileFilter`, etc.) were deliberately left alone again** — same reasoning as
+      above, now compounded by touching all 18 language files' matching keys plus the generated
+      `.Designer.cs`, which is a materially larger and riskier change than a class rename. Attribution
+      untouched throughout: `NOTICE.md`, `LICENSE.txt`, `Changelog.txt`, the GPL-required copyright
+      lines, and the accurate "fork of TinyWall" description in `SimpleDeFence.csproj` all still
+      correctly name the upstream project.
 
 ## Phase 1 — Code structure review & incremental features (C#/.NET, current stack)
 
@@ -102,7 +116,7 @@ the core stays C#/.NET and untouched throughout this phase either way.
       the Windows App SDK refuses any target below .NET 6 (`Microsoft.WindowsAppSDK.Base.targets`:
       *"This version of the Windows App SDK requires .NET 6.0"*), and `SimpleDeFence.csproj` is
       net48. Hosting an island would mean migrating the whole WinForms app off .NET Framework
-      first — and `System.Configuration.Install` (`ManagedInstallerClass` in `TinyWallDoctor.cs`,
+      first — and `System.Configuration.Install` (`ManagedInstallerClass` in `SimpleDeFenceDoctor.cs`,
       both `Installer/` classes) has no .NET 5+ equivalent, so the service install/uninstall path
       would have to be rewritten before any GUI work could start.
 - [x] ~~Migrate at the **process boundary**~~ — **also dropped (2026-08-08). The service refuses to
@@ -143,7 +157,7 @@ the core stays C#/.NET and untouched throughout this phase either way.
           build using the old generated interop.
     - [ ] **Rewrite the service install/uninstall path.** `System.Configuration.Install` does not
           exist on .NET 5+, which rules out `ManagedInstallerClass.InstallHelper` in
-          `TinyWallDoctor.cs` and both `Installer/` classes. The repo already has
+          `SimpleDeFenceDoctor.cs` and both `Installer/` classes. The repo already has
           `SimpleDeFence.Windows.Services/ServiceControlManager.cs` wrapping the Win32 service
           APIs, so this is likely a port onto existing code rather than new work.
     - [ ] Re-target remaining framework references: `System.Management` and `System.ServiceProcess`

@@ -10,10 +10,10 @@
     <Compile Update="..\Microsoft.Samples\TaskDialog\TaskDialogCommonDialog.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="Installer\TinyWallInstaller.cs">
+    <Compile Update="Installer\SimpleDeFenceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="Installer\TinyWallServiceInstaller.cs">
+    <Compile Update="Installer\SimpleDeFenceServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>

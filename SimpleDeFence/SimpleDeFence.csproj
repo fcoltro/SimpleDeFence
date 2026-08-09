@@ -194,7 +194,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Update="Processes.resx">
@@ -364,55 +364,55 @@
       <DependentUpon>ConnectionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.bg.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.es.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.he-IL.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.hu.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.de.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.fr.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.tr.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.cs.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.it.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.ja.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.ko.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.nl.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.pl.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.pt-BR.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.ru.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.uk.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="MainForm.zh.resx">
-      <DependentUpon>TinyWallController.cs</DependentUpon>
+      <DependentUpon>SimpleDeFenceController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="PasswordForm.bg.resx">
       <DependentUpon>PasswordForm.cs</DependentUpon>

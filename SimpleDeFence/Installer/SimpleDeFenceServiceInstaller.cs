@@ -5,14 +5,14 @@ using SimpleDeFence.Windows.Services;
 
 namespace SimpleDeFence.Installer
 {
-    internal class TinyWallServiceInstaller : System.Configuration.Install.Installer
+    internal class SimpleDeFenceServiceInstaller : System.Configuration.Install.Installer
     {
         // Service Account Information
         private readonly ServiceProcessInstaller serviceProcessInstaller = new();
         // Service Information
         private readonly ServiceInstaller serviceInstaller = new();
 
-        internal TinyWallServiceInstaller()
+        internal SimpleDeFenceServiceInstaller()
         {
             try
             {
@@ -20,13 +20,13 @@ namespace SimpleDeFence.Installer
                 serviceProcessInstaller.Username = null;
                 serviceProcessInstaller.Password = null;
 
-                serviceInstaller.DisplayName = TinyWallService.SERVICE_DISPLAY_NAME;
+                serviceInstaller.DisplayName = SimpleDeFenceService.SERVICE_DISPLAY_NAME;
                 serviceInstaller.StartType = ServiceStartMode.Automatic;
                 // This must be identical to the WindowsService.ServiceBase name
                 // set in the constructor of WindowsService.cs
-                serviceInstaller.ServiceName = TinyWallService.SERVICE_NAME;
+                serviceInstaller.ServiceName = SimpleDeFenceService.SERVICE_NAME;
                 // Depends on other services
-                serviceInstaller.ServicesDependedOn = TinyWallService.ServiceDependencies;
+                serviceInstaller.ServicesDependedOn = SimpleDeFenceService.ServiceDependencies;
 
                 this.Installers.Add(serviceProcessInstaller);
                 this.Installers.Add(serviceInstaller);
@@ -44,7 +44,7 @@ namespace SimpleDeFence.Installer
             try
             {
                 using var scm = new ServiceControlManager();
-                scm.SetLoadOrderGroup(TinyWallService.SERVICE_NAME, @"NetworkProvider");
+                scm.SetLoadOrderGroup(SimpleDeFenceService.SERVICE_NAME, @"NetworkProvider");
             }
             catch { }
         }

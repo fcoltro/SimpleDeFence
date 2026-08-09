@@ -23,14 +23,14 @@ Candidates for decomposition before/during the rewrite:
 
 | Class | Lines | Concern mix |
 |---|---|---|
-| `TinyWallServer` (SimpleDeFence/TinyWallService.cs:19) | 1948 | WFP rule construction + IPC message handling + service lifecycle, all in one class |
-| `TinyWallController` (SimpleDeFence/TinyWallController.cs:15) | 1367 | UI orchestration + business logic (talks to the server, drives every form) |
+| `SimpleDeFenceServer` (SimpleDeFence/SimpleDeFenceService.cs:19) | 1948 | WFP rule construction + IPC message handling + service lifecycle, all in one class |
+| `SimpleDeFenceController` (SimpleDeFence/SimpleDeFenceController.cs:15) | 1367 | UI orchestration + business logic (talks to the server, drives every form) |
 | `DarkModeCS` (SimpleDeFence/DarkModeCS.cs:21) | 1233 | Vendored third-party theming lib — not worth refactoring, WinUI 3's built-in dark mode replaces it in Phase 2 |
 | `SettingsForm` + Designer (SimpleDeFence/SettingsForm.cs:15, SimpleDeFence/SettingsForm.Designer.cs:3) | 682 + 676 | Typical WinForms code-behind bulk |
 
-Standout hotspots inside `TinyWallServer`:
-- `ConstructFilter` (SimpleDeFence/TinyWallService.cs:71) — 86 outgoing edges, touches nearly everything.
-- `AssembleActiveRules` (SimpleDeFence/TinyWallService.cs:71) — 221 lines.
+Standout hotspots inside `SimpleDeFenceServer`:
+- `ConstructFilter` (SimpleDeFence/SimpleDeFenceService.cs:71) — 86 outgoing edges, touches nearly everything.
+- `AssembleActiveRules` (SimpleDeFence/SimpleDeFenceService.cs:71) — 221 lines.
 - `PathMapper.ConvertPath` (SimpleDeFence.Windows/PathMapper.cs:335) — 161 lines, 55 outgoing edges; the
   `%VarName%`-style path-variable resolver used throughout rule matching.
 
@@ -38,7 +38,7 @@ Standout hotspots inside `TinyWallServer`:
 
 20 high-degree hotspot nodes have zero test coverage, including the entire core: `ConstructFilter`,
 `TwMessage` (the IPC message dispatcher), `PathMapper.ConvertPath`, `ServiceBase`,
-`TinyWallController`. Only `PathMapper` has any tests at all (`TestConversion`).
+`SimpleDeFenceController`. Only `PathMapper` has any tests at all (`TestConversion`).
 
 This matters for the roadmap: **renaming internals and porting to Rust both need a regression
 safety net that doesn't currently exist.** Before either of those, the highest-leverage move is
@@ -73,7 +73,7 @@ structure — this stays true regardless of GUI framework, since the core (C#, u
 
 - **Core (stays C#, untouched):** rule construction/install (`ConstructFilter`, `InstallFirewallRules`),
   IPC protocol, `ServiceBase` lifecycle, `PathMapper`.
-- **GUI-only (migrates to WinUI 3):** `TinyWallController`, all `*Form` classes, `DarkModeCS` (WinUI 3
+- **GUI-only (migrates to WinUI 3):** `SimpleDeFenceController`, all `*Form` classes, `DarkModeCS` (WinUI 3
   has first-class dark mode support, so this vendored theming lib goes away entirely rather than
   needing a replacement).
 

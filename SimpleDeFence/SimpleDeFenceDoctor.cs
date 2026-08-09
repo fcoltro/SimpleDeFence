@@ -10,7 +10,7 @@ using SimpleDeFence.Windows.WFP.Interop;
 
 namespace SimpleDeFence
 {
-    internal static class TinyWallDoctor
+    internal static class SimpleDeFenceDoctor
     {
         private static readonly string CONTROLLER_START_TASKSCH_NAME = "SimpleDeFence Controller";
 
@@ -19,7 +19,7 @@ namespace SimpleDeFence
 #if !DEBUG
             try
             {
-                using var sc = new ServiceController(TinyWallService.SERVICE_NAME);
+                using var sc = new ServiceController(SimpleDeFenceService.SERVICE_NAME);
                 return (sc.Status == ServiceControllerStatus.Running) || (sc.Status == ServiceControllerStatus.StartPending);
             }
             catch(Exception e)
@@ -37,7 +37,7 @@ namespace SimpleDeFence
 #if !DEBUG
             try
             {
-                using var sc = new ServiceController(TinyWallService.SERVICE_NAME);
+                using var sc = new ServiceController(SimpleDeFenceService.SERVICE_NAME);
                 return (sc.Status == ServiceControllerStatus.Stopped);
             }
             catch
@@ -51,7 +51,7 @@ namespace SimpleDeFence
 
         internal static bool EnsureServiceInstalledAndRunning(string logContext, bool installing)
         {
-            if (TinyWallDoctor.IsServiceRunning(logContext, installing))
+            if (SimpleDeFenceDoctor.IsServiceRunning(logContext, installing))
                 return true;
 
             if (Utils.RunningAsAdmin())
@@ -67,12 +67,12 @@ namespace SimpleDeFence
                 }
 
                 // Ensure dependencies
-                TinyWallDoctor.EnsureHealth(logContext);
+                SimpleDeFenceDoctor.EnsureHealth(logContext);
 
                 // Start service
                 try
                 {
-                    using var sc = new ServiceController(TinyWallService.SERVICE_NAME);
+                    using var sc = new ServiceController(SimpleDeFenceService.SERVICE_NAME);
                     if (sc.Status == ServiceControllerStatus.Stopped)
                     {
                         sc.Start();
@@ -133,7 +133,7 @@ namespace SimpleDeFence
             // Stop service
             try
             {
-                if (TinyWallDoctor.IsServiceRunning(Utils.LOG_ID_INSTALLER, false))
+                if (SimpleDeFenceDoctor.IsServiceRunning(Utils.LOG_ID_INSTALLER, false))
                 {
                     var twController = new Controller("SimpleDeFenceController");
 
@@ -200,7 +200,7 @@ namespace SimpleDeFence
                 // Remove persistent WFP objects
                 using var WfpEngine = new Engine("SimpleDeFence Uninstall Session", "", FWPM_SESSION_FLAGS.None, 5000);
                 using var trx = WfpEngine.BeginTransaction();
-                TinyWallServer.DeleteWfpObjects(WfpEngine, true);
+                SimpleDeFenceServer.DeleteWfpObjects(WfpEngine, true);
                 trx.Commit();
             }
             catch (Exception e)
@@ -256,8 +256,8 @@ namespace SimpleDeFence
             try
             {
                 using var scm = new ServiceControlManager();
-                scm.SetStartupMode(TinyWallService.SERVICE_NAME, ServiceStartMode.Automatic);
-                scm.SetRestartOnFailure(TinyWallService.SERVICE_NAME, true);
+                scm.SetStartupMode(SimpleDeFenceService.SERVICE_NAME, ServiceStartMode.Automatic);
+                scm.SetRestartOnFailure(SimpleDeFenceService.SERVICE_NAME, true);
             }
             catch (System.ComponentModel.Win32Exception e)
             {
@@ -312,7 +312,7 @@ namespace SimpleDeFence
         {
             // First, do a recursive scan of all service dependencies
             var deps = new HashSet<string>();
-            foreach (var srv in TinyWallService.ServiceDependencies)
+            foreach (var srv in SimpleDeFenceService.ServiceDependencies)
             {
                 using var sc = new ServiceController(srv);
                 ScanServiceDependencies(sc, deps);

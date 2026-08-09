@@ -19,7 +19,7 @@ namespace SimpleDeFence
             return 0;
         }
         
-        private static int StartService(TinyWallService tw)
+        private static int StartService(SimpleDeFenceService tw)
         {
 #if DEBUG
             if (!Utils.RunningAsAdmin())
@@ -52,19 +52,19 @@ namespace SimpleDeFence
             do
             {
                 RestartOnQuit = false;
-                System.Windows.Forms.Application.Run(new TinyWallController(opts));
+                System.Windows.Forms.Application.Run(new SimpleDeFenceController(opts));
             } while (RestartOnQuit);
             return 0;
         }
 
         private static int InstallService()
         {
-            return TinyWallDoctor.EnsureServiceInstalledAndRunning(Utils.LOG_ID_INSTALLER, true) ? 0 : -1;
+            return SimpleDeFenceDoctor.EnsureServiceInstalledAndRunning(Utils.LOG_ID_INSTALLER, true) ? 0 : -1;
         }
 
         private static int UninstallService()
         {
-            return TinyWallDoctor.Uninstall();
+            return SimpleDeFenceDoctor.Uninstall();
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace SimpleDeFence
                 case StartUpMode.DevelTool:
                     return StartDevelTool();
                 case StartUpMode.SelfHosted:
-                    using (var srv = new TinyWallService())
+                    using (var srv = new SimpleDeFenceService())
                     {
                         StartService(srv);
                         int ret = StartController(opts);
@@ -175,7 +175,7 @@ namespace SimpleDeFence
                         return ret;
                     }
                 case StartUpMode.Service:
-                    using (var srv = new TinyWallService())
+                    using (var srv = new SimpleDeFenceService())
                     {
 #if !DEBUG
                         SimpleDeFence.Windows.PathMapper.Instance.AutoUpdate = false;

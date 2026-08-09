@@ -625,7 +625,7 @@ namespace SimpleDeFence
             return _rng.Next(0, int.MaxValue);
         }
 
-        internal static Version TinyWallVersion { get; } = typeof(Utils).Assembly.GetName().Version;
+        internal static Version SimpleDeFenceVersion { get; } = typeof(Utils).Assembly.GetName().Version;
 
         private readonly static object logLocker = new();
         internal static readonly string LOG_ID_SERVICE   = "service";
@@ -636,7 +636,7 @@ namespace SimpleDeFence
             Utils.Log(
                 string.Join(
                     Environment.NewLine, new string[] {
-                    $"SimpleDeFence version: {Utils.TinyWallVersion}",
+                    $"SimpleDeFence version: {Utils.SimpleDeFenceVersion}",
                     $"Windows version: {VersionInfo.WindowsVersionString}",
                     e.ToString()
                 }),

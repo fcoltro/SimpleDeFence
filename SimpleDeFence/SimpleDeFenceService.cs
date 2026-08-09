@@ -16,7 +16,7 @@ using SimpleDeFence.Utilities;
 
 namespace SimpleDeFence
 {
-    public sealed class TinyWallServer : IDisposable
+    public sealed class SimpleDeFenceServer : IDisposable
     {
         private enum FilterWeights : ulong
         {
@@ -360,7 +360,7 @@ namespace SimpleDeFence
             var provider = new FWPM_PROVIDER0();
             provider.displayData.name = "fcoltro";
             provider.displayData.description = "SimpleDeFence Provider";
-            provider.serviceName = TinyWallService.SERVICE_NAME;
+            provider.serviceName = SimpleDeFenceService.SERVICE_NAME;
             provider.flags = FWPM_PROVIDER_FLAGS.FWPM_PROVIDER_FLAG_PERSISTENT;
             provider.providerKey = TINYWALL_PROVIDER_KEY;
             var providerKey = WfpEngine.RegisterProvider(ref provider);
@@ -1650,7 +1650,7 @@ namespace SimpleDeFence
                 try { wfp.UnregisterProvider(TINYWALL_PROVIDER_KEY); } catch { }
         }
 
-        public TinyWallServer()
+        public SimpleDeFenceServer()
         {
             // Make sure the very-first command is a REINIT
             Q.Add(new TwRequest(TwMessageSimple.CreateRequest(MessageType.REINIT)));
@@ -1706,7 +1706,7 @@ namespace SimpleDeFence
             service.FinishStateChange();
 #if !DEBUG
             // Basic software health checks
-            TinyWallDoctor.EnsureHealth(Utils.LOG_ID_SERVICE);
+            SimpleDeFenceDoctor.EnsureHealth(Utils.LOG_ID_SERVICE);
 #endif
 
             MinuteTimer.Change(60000, 60000);
@@ -1964,7 +1964,7 @@ namespace SimpleDeFence
 
 #if !DEBUG
             // Basic software health checks
-            TinyWallDoctor.EnsureHealth(Utils.LOG_ID_SERVICE);
+            SimpleDeFenceDoctor.EnsureHealth(Utils.LOG_ID_SERVICE);
 #else
                 using (var wfp = new Engine("SimpleDeFence Cleanup Session", "", FWPM_SESSION_FLAGS.None, 5000))
                 using (var trx = wfp.BeginTransaction())
@@ -1978,7 +1978,7 @@ namespace SimpleDeFence
     }
 
 
-    internal sealed class TinyWallService : ServiceBase
+    internal sealed class SimpleDeFenceService : ServiceBase
     {
         internal readonly static string[] ServiceDependencies = new string[]
         {
@@ -1990,12 +1990,12 @@ namespace SimpleDeFence
         internal const string SERVICE_NAME = "SimpleDeFence";
         internal const string SERVICE_DISPLAY_NAME = "SimpleDeFence Service";
 
-        private TinyWallServer? Server;
+        private SimpleDeFenceServer? Server;
         private Thread? FirewallWorkerThread;
 #if !DEBUG
         private bool IsComputerShuttingDown;
 #endif
-        internal TinyWallService()
+        internal SimpleDeFenceService()
             : base()
         {
             this.AcceptedControls = ServiceAcceptedControl.SERVICE_ACCEPT_SHUTDOWN;
@@ -2014,7 +2014,7 @@ namespace SimpleDeFence
         {
             try
             {
-                using (Server = new TinyWallServer())
+                using (Server = new SimpleDeFenceServer())
                 {
                     Server.Run(this);
                 }

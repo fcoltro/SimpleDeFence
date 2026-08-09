@@ -12,7 +12,7 @@ using SimpleDeFence.Windows;
 
 namespace SimpleDeFence
 {
-    internal sealed class TinyWallController : ApplicationContext
+    internal sealed class SimpleDeFenceController : ApplicationContext
     {
         #region Vom Windows Form-Designer generierter Code
 
@@ -50,7 +50,7 @@ namespace SimpleDeFence
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TinyWallController));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SimpleDeFenceController));
             this.Tray = new System.Windows.Forms.NotifyIcon(this.components);
             this.TrayMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuTrafficRate = new System.Windows.Forms.ToolStripMenuItem();
@@ -323,7 +323,7 @@ namespace SimpleDeFence
             }
         }
 
-        public TinyWallController(CmdLineArgs opts)
+        public SimpleDeFenceController(CmdLineArgs opts)
         {
             this.StartupOpts = opts;
 
@@ -701,7 +701,7 @@ namespace SimpleDeFence
             e.Cancel = false;
             if (FirewallState.Mode == FirewallMode.Unknown)
             {
-                if (!TinyWallDoctor.IsServiceRunning(Utils.LOG_ID_GUI, false))
+                if (!SimpleDeFenceDoctor.IsServiceRunning(Utils.LOG_ID_GUI, false))
                 {
                     ShowBalloonTip(Resources.Messages.TheTinyWallServiceIsUnavailable, ToolTipIcon.Error, 10000);
                     e.Cancel = true;
@@ -1184,7 +1184,7 @@ namespace SimpleDeFence
 
         private void ApplyControllerSettings()
         {
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(TinyWallController));
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(SimpleDeFenceController));
             SetHotkey(resources, ref HotKeyWhitelistWindow, new HandledEventHandler(HotKeyWhitelistWindow_Pressed), Keys.W, mnuWhitelistByWindow, "mnuWhitelistByWindow");
             SetHotkey(resources, ref HotKeyWhitelistExecutable, new HandledEventHandler(HotKeyWhitelistExecutable_Pressed), Keys.E, mnuWhitelistByExecutable, "mnuWhitelistByExecutable");
             SetHotkey(resources, ref HotKeyWhitelistProcess, new HandledEventHandler(HotKeyWhitelistProcess_Pressed), Keys.P, mnuWhitelistByProcess, "mnuWhitelistByProcess");
@@ -1338,7 +1338,7 @@ namespace SimpleDeFence
 #if !DEBUG
             if (comError)
             {
-                if (TinyWallDoctor.EnsureServiceInstalledAndRunning(Utils.LOG_ID_GUI, false))
+                if (SimpleDeFenceDoctor.EnsureServiceInstalledAndRunning(Utils.LOG_ID_GUI, false))
                     LoadSettingsFromServer(out comError, true);
                 else
                     MessageBox.Show(Resources.Messages.TheTinyWallServiceIsUnavailable, Resources.Messages.SimpleDeFence, MessageBoxButtons.OK, MessageBoxIcon.Error);
