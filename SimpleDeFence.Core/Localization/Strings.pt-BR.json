@@ -69,6 +69,31 @@
     "empty": "Nenhuma exceção de aplicativo ainda."
   },
 
+  "connections": {
+    "title": "Conexões",
+    "section": {
+      "blocked": "Bloqueadas",
+      "connected": "Conectadas",
+      "open": "Abertas",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "Nada bloqueado nos últimos 5 minutos.",
+      "connected": "Nenhuma conexão estabelecida.",
+      "open": "Nenhuma porta aberta."
+    },
+    "filterPlaceholder": "Filtrar por nome do aplicativo",
+    "autoRefresh": "Atualização automática",
+    "allow": "Permitir este aplicativo",
+    "allowSuccess": {
+      "title": "Exceção adicionada",
+      "body": "{0} agora pode se conectar."
+    },
+    "allowFailed": {
+      "title": "Não foi possível adicionar a exceção"
+    }
+  },
+
   "subject": {
     "executable": "Executável",
     "service": "Serviço",

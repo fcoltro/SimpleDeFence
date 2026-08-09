@@ -75,6 +75,24 @@ namespace SimpleDeFence.Localization
             public const string Empty = "applications.empty";
         }
 
+        public static class Connections
+        {
+            public const string Title = "connections.title";
+            public const string SectionBlocked = "connections.section.blocked";
+            public const string SectionConnected = "connections.section.connected";
+            public const string SectionOpen = "connections.section.open";
+            public const string SectionCount = "connections.section.count";
+            public const string EmptyBlocked = "connections.empty.blocked";
+            public const string EmptyConnected = "connections.empty.connected";
+            public const string EmptyOpen = "connections.empty.open";
+            public const string FilterPlaceholder = "connections.filterPlaceholder";
+            public const string AutoRefresh = "connections.autoRefresh";
+            public const string Allow = "connections.allow";
+            public const string AllowSuccessTitle = "connections.allowSuccess.title";
+            public const string AllowSuccessBody = "connections.allowSuccess.body";
+            public const string AllowFailedTitle = "connections.allowFailed.title";
+        }
+
         public static class Subject
         {
             public const string Executable = "subject.executable";

@@ -69,6 +69,31 @@
     "empty": "No application exceptions yet."
   },
 
+  "connections": {
+    "title": "Connections",
+    "section": {
+      "blocked": "Blocked",
+      "connected": "Connected",
+      "open": "Open",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "Nothing blocked in the last 5 minutes.",
+      "connected": "No established connections.",
+      "open": "No listening ports."
+    },
+    "filterPlaceholder": "Filter by app name",
+    "autoRefresh": "Auto-refresh",
+    "allow": "Allow this app",
+    "allowSuccess": {
+      "title": "Exception added",
+      "body": "{0} can now connect."
+    },
+    "allowFailed": {
+      "title": "Could not add the exception"
+    }
+  },
+
   "subject": {
     "executable": "Executable",
     "service": "Service",
