@@ -5,6 +5,10 @@
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <RootNamespace>SimpleDeFence.UI</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Same mark used by the MSI/installer icon and the web favicon set (SimpleDeFence.Assets).
+         Unpackaged WinUI 3 apps (WindowsPackageType=None, no appxmanifest logos) get their
+         window/taskbar icon from the exe's embedded Win32 icon resource, which this sets. -->
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <Platforms>x86;x64;ARM64</Platforms>
     <UseWinUI>true</UseWinUI>
     <Nullable>enable</Nullable>
