@@ -107,6 +107,12 @@ namespace SimpleDeFence.Localization
             public const string AllApplications = "subject.allApplications";
         }
 
+        public static class Rules
+        {
+            public const string SpecialKind = "rules.specialKind";
+            public const string SpecialPolicy = "rules.specialPolicy";
+        }
+
         public static class Policy
         {
             public const string Blocked = "policy.blocked";

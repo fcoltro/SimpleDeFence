@@ -122,5 +122,9 @@
     "tcpIn": "TCP in",
     "udpIn": "UDP in",
     "allPorts": "all"
+  },
+  "rules": {
+    "specialKind": "Special exception",
+    "specialPolicy": "Predefined"
   }
 }
