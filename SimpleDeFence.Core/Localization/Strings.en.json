@@ -157,6 +157,26 @@
       "lockedDetail": "Unlock the configuration before changing this exception.",
       "genericDetail": "The service returned {0}. The exception was not changed."
     },
-    "add": "Add"
+    "add": "Add",
+    "detail": {
+      "title": "Rule",
+      "policyBlocked": "Blocked",
+      "policyUnrestricted": "Unrestricted",
+      "policyUnrestrictedLan": "Unrestricted (LAN only)",
+      "policyTcpUdp": "TCP/UDP only",
+      "tcpOut": "TCP out",
+      "udpOut": "UDP out",
+      "tcpIn": "TCP in",
+      "udpIn": "UDP in",
+      "lanOnly": "LAN only",
+      "apply": "Apply",
+      "customRulesReadOnly": "Custom rule lists can't be edited here yet.",
+      "applySuccess": "Policy updated.",
+      "applyFailed": {
+        "title": "Could not update the policy",
+        "lockedDetail": "Unlock the configuration before changing this rule.",
+        "genericDetail": "The service returned {0}. The policy was not changed."
+      }
+    }
   }
 }

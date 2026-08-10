@@ -38,30 +38,81 @@
                     <Expander.Header>
                         <TextBlock x:Name="AppsHeader" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     </Expander.Header>
-                    <StackPanel>
-                        <TextBlock x:Name="AppsEmpty" Style="{StaticResource BodyTextBlockStyle}"
-                                   Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
-                        <ListView x:Name="AppsList" SelectionMode="Multiple"
-                                  SelectionChanged="AppsList_SelectionChanged">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="local:RuleListItem">
-                                    <Grid Padding="0,6" ColumnSpacing="14"
-                                          Background="{x:Bind RowBackground}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="220"/>
-                                            <ColumnDefinition Width="110"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Grid.Column="1" Text="{x:Bind Kind}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
-                                        <TextBlock Grid.Column="2" Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Grid.Column="3" Text="{x:Bind Policy}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </StackPanel>
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*" MinWidth="320"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock x:Name="AppsEmpty" Style="{StaticResource BodyTextBlockStyle}"
+                                       Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
+                            <ListView x:Name="AppsList" SelectionMode="Multiple"
+                                      SelectionChanged="AppsList_SelectionChanged">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="local:RuleListItem">
+                                        <Grid Padding="0,6" ColumnSpacing="14"
+                                              Background="{x:Bind RowBackground}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="220"/>
+                                                <ColumnDefinition Width="110"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="1" Text="{x:Bind Kind}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
+                                            <TextBlock Grid.Column="2" Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="3" Text="{x:Bind Policy}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+
+                        <Border x:Name="DetailPane" Grid.Column="1" Visibility="Collapsed"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                CornerRadius="4" Padding="16" VerticalAlignment="Top">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="{loc:Loc Key=rules.detail.title}" Style="{StaticResource SubtitleTextBlockStyle}"/>
+
+                                <StackPanel Spacing="2">
+                                    <TextBlock x:Name="DetailName" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="DetailKind" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
+                                    <TextBlock x:Name="DetailSubjectDetail" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <TextBlock x:Name="DetailReadOnlyNote" Text="{loc:Loc Key=rules.detail.customRulesReadOnly}"
+                                           TextWrapping="Wrap" Visibility="Collapsed"/>
+
+                                <StackPanel x:Name="DetailEditorFields" Spacing="8">
+                                    <RadioButton x:Name="PresetBlocked" Content="{loc:Loc Key=rules.detail.policyBlocked}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+                                    <RadioButton x:Name="PresetUnrestricted" Content="{loc:Loc Key=rules.detail.policyUnrestricted}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+                                    <RadioButton x:Name="PresetUnrestrictedLan" Content="{loc:Loc Key=rules.detail.policyUnrestrictedLan}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+                                    <RadioButton x:Name="PresetTcpUdp" Content="{loc:Loc Key=rules.detail.policyTcpUdp}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+
+                                    <StackPanel x:Name="TcpUdpFields" Spacing="6" Margin="26,0,0,0">
+                                        <TextBlock Text="{loc:Loc Key=rules.detail.tcpOut}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                        <TextBox x:Name="TcpOutBox"/>
+                                        <TextBlock Text="{loc:Loc Key=rules.detail.udpOut}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                        <TextBox x:Name="UdpOutBox"/>
+                                        <TextBlock Text="{loc:Loc Key=rules.detail.tcpIn}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                        <TextBox x:Name="TcpInBox"/>
+                                        <TextBlock Text="{loc:Loc Key=rules.detail.udpIn}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                        <TextBox x:Name="UdpInBox"/>
+                                        <CheckBox x:Name="LanOnlyCheck" Content="{loc:Loc Key=rules.detail.lanOnly}"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Button x:Name="ApplyButton" Content="{loc:Loc Key=rules.detail.apply}"
+                                        Click="ApplyButton_Click" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </Expander>
 
                 <Expander IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">

@@ -54,6 +54,10 @@ namespace SimpleDeFence.UI.Pages
         private bool _busy;
         private bool _committing;
 
+        /// <summary>The single selected application row the detail pane is currently editing, or
+        /// null when zero/multiple rows are selected (the pane is collapsed in that case).</summary>
+        private RuleListItem? _selectedDetailItem;
+
         public RulesPage()
         {
             InitializeComponent();
@@ -165,7 +169,11 @@ namespace SimpleDeFence.UI.Pages
 
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilter();
 
-        private void AppsList_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateRemoveButton();
+        private void AppsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateRemoveButton();
+            UpdateDetailPane();
+        }
 
         private void UpdateRemoveButton()
         {
@@ -174,6 +182,98 @@ namespace SimpleDeFence.UI.Pages
             RemoveButton.Content = count > 0
                 ? Loc.T(LocKeys.Rules.Remove) + " " + Loc.T(LocKeys.Connections.SectionCount, count)
                 : Loc.T(LocKeys.Rules.Remove);
+        }
+
+        /// <summary>Shows/hides the detail pane based on selection count, and seeds it from the
+        /// single selected row's policy. Only ever touches local UI state - never commits or shows
+        /// a dialog, so it is safe to call from a selection-changed handler.</summary>
+        private void UpdateDetailPane()
+        {
+            var selected = AppsList.SelectedItems.Cast<RuleListItem>().ToList();
+            if (selected.Count != 1)
+            {
+                _selectedDetailItem = null;
+                DetailPane.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            _selectedDetailItem = selected[0];
+            DetailPane.Visibility = Visibility.Visible;
+            SeedDetailPane(_selectedDetailItem);
+        }
+
+        private void SeedDetailPane(RuleListItem item)
+        {
+            var row = item.Row;
+            DetailName.Text = row.Name;
+            DetailKind.Text = row.Kind;
+            DetailSubjectDetail.Text = row.Detail;
+            DetailSubjectDetail.Visibility = string.IsNullOrEmpty(row.Detail) ? Visibility.Collapsed : Visibility.Visible;
+
+            var policy = row.Exception!.Policy;
+            bool readOnly = policy.PolicyType == PolicyType.RuleList;
+            DetailReadOnlyNote.Visibility = readOnly ? Visibility.Visible : Visibility.Collapsed;
+            DetailEditorFields.Visibility = readOnly ? Visibility.Collapsed : Visibility.Visible;
+
+            if (!readOnly)
+            {
+                // Reset before seeding so a preset that leaves a field blank (e.g. Blocked) does not
+                // keep a value carried over from the previously selected row.
+                TcpOutBox.Text = string.Empty;
+                UdpOutBox.Text = string.Empty;
+                TcpInBox.Text = string.Empty;
+                UdpInBox.Text = string.Empty;
+                LanOnlyCheck.IsChecked = false;
+
+                // Pattern-matched against the actual ExceptionPolicy subclass shapes in
+                // SimpleDeFence.Core/ExceptionPolicy.cs - not the PolicyType enum - so this stays
+                // correct if a subclass ever changes without a matching PolicyType edit.
+                switch (policy)
+                {
+                    case HardBlockPolicy:
+                        PresetBlocked.IsChecked = true;
+                        break;
+                    case UnrestrictedPolicy { LocalNetworkOnly: true }:
+                        PresetUnrestrictedLan.IsChecked = true;
+                        break;
+                    case UnrestrictedPolicy:
+                        PresetUnrestricted.IsChecked = true;
+                        break;
+                    case TcpUdpPolicy tcpUdp:
+                        PresetTcpUdp.IsChecked = true;
+                        TcpOutBox.Text = tcpUdp.AllowedRemoteTcpConnectPorts ?? string.Empty;
+                        UdpOutBox.Text = tcpUdp.AllowedRemoteUdpConnectPorts ?? string.Empty;
+                        TcpInBox.Text = tcpUdp.AllowedLocalTcpListenerPorts ?? string.Empty;
+                        UdpInBox.Text = tcpUdp.AllowedLocalUdpListenerPorts ?? string.Empty;
+                        LanOnlyCheck.IsChecked = tcpUdp.LocalNetworkOnly;
+                        break;
+                }
+            }
+
+            UpdateTcpUdpFieldsEnabled();
+            UpdateApplyButtonEnabled();
+        }
+
+        /// <summary>Local UI state only (which fields are enabled) - fires from a RadioButton's own
+        /// Checked event, so per the Task 4 reentrancy fix it must never commit or show a dialog.</summary>
+        private void PresetRadio_Checked(object sender, RoutedEventArgs e) => UpdateTcpUdpFieldsEnabled();
+
+        private void UpdateTcpUdpFieldsEnabled()
+        {
+            // StackPanel (unlike its Control children) has no IsEnabled of its own to cascade, so
+            // each field is toggled individually.
+            bool enabled = PresetTcpUdp.IsChecked == true;
+            TcpOutBox.IsEnabled = enabled;
+            UdpOutBox.IsEnabled = enabled;
+            TcpInBox.IsEnabled = enabled;
+            UdpInBox.IsEnabled = enabled;
+            LanOnlyCheck.IsEnabled = enabled;
+        }
+
+        private void UpdateApplyButtonEnabled()
+        {
+            var readOnly = _selectedDetailItem?.Row.Exception!.Policy.PolicyType == PolicyType.RuleList;
+            ApplyButton.IsEnabled = _selectedDetailItem is not null && !readOnly && !_committing;
         }
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
@@ -212,6 +312,96 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
+        /// <summary>
+        /// Plain Button.Click handler - the same safe shape RemoveButton_Click already uses. This is
+        /// the only place in the detail pane allowed to call CommitAsync/show a dialog; the
+        /// RadioButton/CheckBox handlers above only ever touch local UI state, per the Task 4
+        /// reentrancy fix (firing a ContentDialog synchronously from inside another control's own
+        /// event dispatch corrupts WinUI against the sample client's synchronously-completing tasks).
+        /// </summary>
+        private async void ApplyButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing || _selectedDetailItem is null)
+                return;
+
+            var original = _selectedDetailItem.Row.Exception!;
+            if (original.Policy.PolicyType == PolicyType.RuleList)
+                return; // Apply is disabled for this row; guard in case that ever drifts.
+
+            // Captured now, not read back off _selectedDetailItem after the commit: RefreshAsync
+            // below rebuilds _apps, which resets AppsList's selection and (via
+            // AppsList_SelectionChanged -> UpdateDetailPane) nulls _selectedDetailItem out from
+            // under this handler.
+            var rowName = _selectedDetailItem.Row.Name;
+            var newPolicy = BuildPolicyFromEditor();
+
+            FirewallExceptionV3 edited;
+            try
+            {
+                edited = RuleEdit.ApplyPreset(original, newPolicy);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Unreachable given the guard above, but a thrown exception must not look like
+                // nothing happened.
+                await ShowResultAsync(Loc.T(LocKeys.Rules.DetailApplyFailedTitle), ex.Message);
+                return;
+            }
+
+            var resp = await CommitAsync(profile =>
+                profile.AddExceptions(new List<FirewallExceptionV3> { edited }));
+
+            if (resp == MessageType.PUT_SETTINGS)
+            {
+                // Refresh first: RefreshAsync's own success path unconditionally sets
+                // Notice.IsOpen = false, so setting the confirmation before refreshing would just
+                // have it wiped out again before it was ever seen. A lightweight, non-blocking
+                // InfoBar (unlike Remove's dialog) is enough here - Apply is a frequent, low-risk
+                // action on a single row, and the refreshed row already shows the new policy text.
+                // Success (Success severity) and failure (Error severity, from
+                // ShowResultAsync/ShowNotice elsewhere) are always paired with distinct
+                // title/message text, never signalled by colour alone.
+                await RefreshAsync();
+                ShowNotice(InfoBarSeverity.Success, Loc.T(LocKeys.Rules.DetailApplySuccess), rowName);
+            }
+            else
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Rules.DetailApplyFailedTitle), FailureDetail(resp,
+                    LocKeys.Rules.DetailApplyFailedLockedDetail, LocKeys.Rules.DetailApplyFailedGenericDetail));
+            }
+        }
+
+        /// <summary>Reads the preset editor's current state into the matching ExceptionPolicy
+        /// subclass. TCP/UDP is the fallback branch: it is the only preset besides the mutually
+        /// exclusive radios above, and exactly one of the four is always checked once a row has been
+        /// seeded (SeedDetailPane always sets one).</summary>
+        private ExceptionPolicy BuildPolicyFromEditor()
+        {
+            if (PresetBlocked.IsChecked == true)
+                return new HardBlockPolicy();
+
+            if (PresetUnrestricted.IsChecked == true)
+                return new UnrestrictedPolicy { LocalNetworkOnly = false };
+
+            if (PresetUnrestrictedLan.IsChecked == true)
+                return new UnrestrictedPolicy { LocalNetworkOnly = true };
+
+            return new TcpUdpPolicy
+            {
+                AllowedRemoteTcpConnectPorts = NormalizePorts(TcpOutBox.Text),
+                AllowedRemoteUdpConnectPorts = NormalizePorts(UdpOutBox.Text),
+                AllowedLocalTcpListenerPorts = NormalizePorts(TcpInBox.Text),
+                AllowedLocalUdpListenerPorts = NormalizePorts(UdpInBox.Text),
+                LocalNetworkOnly = LanOnlyCheck.IsChecked == true,
+            };
+        }
+
+        private static string? NormalizePorts(string text)
+        {
+            var trimmed = text?.Trim();
+            return string.IsNullOrEmpty(trimmed) ? null : trimmed;
+        }
+
         private async Task ToggleSpecialAsync(SpecialListItem item, bool enabled)
         {
             // Serializes with Remove and with other toggles: only one commit in flight at a time.
@@ -242,6 +432,7 @@ namespace SimpleDeFence.UI.Pages
         {
             _committing = true;
             UpdateRemoveButton();
+            UpdateApplyButtonEnabled();
             try
             {
                 return await App.Firewall.CommitProfileChangesAsync(mutate);
@@ -255,6 +446,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 _committing = false;
                 UpdateRemoveButton();
+                UpdateApplyButtonEnabled();
             }
         }
 

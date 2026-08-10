@@ -132,6 +132,23 @@ namespace SimpleDeFence.Localization
             public const string SpecialToggleFailedLockedDetail = "rules.specialToggleFailed.lockedDetail";
             public const string SpecialToggleFailedGenericDetail = "rules.specialToggleFailed.genericDetail";
             public const string Add = "rules.add";
+
+            public const string DetailTitle = "rules.detail.title";
+            public const string DetailPolicyBlocked = "rules.detail.policyBlocked";
+            public const string DetailPolicyUnrestricted = "rules.detail.policyUnrestricted";
+            public const string DetailPolicyUnrestrictedLan = "rules.detail.policyUnrestrictedLan";
+            public const string DetailPolicyTcpUdp = "rules.detail.policyTcpUdp";
+            public const string DetailTcpOut = "rules.detail.tcpOut";
+            public const string DetailUdpOut = "rules.detail.udpOut";
+            public const string DetailTcpIn = "rules.detail.tcpIn";
+            public const string DetailUdpIn = "rules.detail.udpIn";
+            public const string DetailLanOnly = "rules.detail.lanOnly";
+            public const string DetailApply = "rules.detail.apply";
+            public const string DetailCustomRulesReadOnly = "rules.detail.customRulesReadOnly";
+            public const string DetailApplySuccess = "rules.detail.applySuccess";
+            public const string DetailApplyFailedTitle = "rules.detail.applyFailed.title";
+            public const string DetailApplyFailedLockedDetail = "rules.detail.applyFailed.lockedDetail";
+            public const string DetailApplyFailedGenericDetail = "rules.detail.applyFailed.genericDetail";
         }
 
         public static class Policy

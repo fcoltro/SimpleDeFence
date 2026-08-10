@@ -157,6 +157,26 @@
       "lockedDetail": "Desbloqueie a configuração antes de alterar esta exceção.",
       "genericDetail": "O serviço retornou {0}. A exceção não foi alterada."
     },
-    "add": "Adicionar"
+    "add": "Adicionar",
+    "detail": {
+      "title": "Regra",
+      "policyBlocked": "Bloqueado",
+      "policyUnrestricted": "Sem restrições",
+      "policyUnrestrictedLan": "Sem restrições (somente LAN)",
+      "policyTcpUdp": "Somente TCP/UDP",
+      "tcpOut": "TCP saída",
+      "udpOut": "UDP saída",
+      "tcpIn": "TCP entrada",
+      "udpIn": "UDP entrada",
+      "lanOnly": "Somente LAN",
+      "apply": "Aplicar",
+      "customRulesReadOnly": "Listas de regras personalizadas ainda não podem ser editadas aqui.",
+      "applySuccess": "Política atualizada.",
+      "applyFailed": {
+        "title": "Não foi possível atualizar a política",
+        "lockedDetail": "Desbloqueie a configuração antes de alterar esta regra.",
+        "genericDetail": "O serviço retornou {0}. A política não foi alterada."
+      }
+    }
   }
 }
