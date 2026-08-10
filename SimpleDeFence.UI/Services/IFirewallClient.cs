@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using SimpleDeFence.DatabaseClasses;
 
 namespace SimpleDeFence.UI.Services
 {
@@ -27,5 +29,22 @@ namespace SimpleDeFence.UI.Services
 
         /// <summary>Commits a new exception for the given subject with the given policy.</summary>
         Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy);
+
+        /// <summary>
+        /// The one commit path: clone the cached config, mutate the clone's active profile, put
+        /// it back. Only PUT_SETTINGS means the change took; anything else (locked, changeset
+        /// conflict, unrecognised) is a failure the caller must show as one.
+        /// </summary>
+        Task<MessageType> CommitProfileChangesAsync(Action<ServerProfileConfiguration> mutate);
+
+        /// <summary>The bundled app database (special-exception definitions), or null when the
+        /// file is absent/unreadable - a missing database is a normal state, not an error.</summary>
+        Task<AppDatabase?> GetAppDatabaseAsync();
+
+        /// <summary>Running processes with resolved paths, for the process picker.</summary>
+        Task<IReadOnlyList<ProcessListEntry>> GetRunningProcessesAsync();
+
+        /// <summary>Visible top-level windows, for the window picker.</summary>
+        Task<IReadOnlyList<WindowListEntry>> GetTopLevelWindowsAsync();
     }
 }

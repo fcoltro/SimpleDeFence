@@ -31,6 +31,23 @@ namespace SimpleDeFence.UI.Services
         public int RemotePort { get; init; }
     }
 
+    /// <summary>One row of the process picker: a running process with its resolved path.</summary>
+    internal sealed class ProcessListEntry
+    {
+        public uint ProcessId { get; init; }
+        public string Name { get; init; } = string.Empty;
+        public string Path { get; init; } = string.Empty;
+    }
+
+    /// <summary>One row of the window picker: a visible top-level window and its process.</summary>
+    internal sealed class WindowListEntry
+    {
+        public string Title { get; init; } = string.Empty;
+        public uint ProcessId { get; init; }
+        public string ProcessName { get; init; } = string.Empty;
+        public string ProcessPath { get; init; } = string.Empty;
+    }
+
     /// <summary>Everything the Connections screen renders in one refresh.</summary>
     internal sealed class ConnectionsSnapshot
     {

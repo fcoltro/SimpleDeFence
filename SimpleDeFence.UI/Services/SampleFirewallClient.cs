@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SimpleDeFence.DatabaseClasses;
 
 namespace SimpleDeFence.UI.Services
 {
@@ -113,6 +114,10 @@ namespace SimpleDeFence.UI.Services
         }
 
         public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy)
+            => CommitProfileChangesAsync(profile =>
+                profile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
+
+        public Task<MessageType> CommitProfileChangesAsync(Action<ServerProfileConfiguration> mutate)
         {
             if (_locked)
                 return Task.FromResult(MessageType.RESPONSE_LOCKED);
@@ -120,9 +125,51 @@ namespace SimpleDeFence.UI.Services
             if (Config is null)
                 return Task.FromResult(MessageType.RESPONSE_ERROR);
 
-            Config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) });
+            mutate(Config.ActiveProfile);
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.PUT_SETTINGS);
+        }
+
+        public Task<AppDatabase?> GetAppDatabaseAsync()
+        {
+            // A small built-in set so the Special group is exercisable on sample data: one
+            // recommended, one optional, one hidden (never rendered).
+            var db = new AppDatabase(new List<Application>
+            {
+                MakeSpecial("Windows_Update", recommended: true),
+                MakeSpecial("Gaming", recommended: false),
+                MakeSpecial("Hidden_Service", recommended: true, hidden: true),
+            });
+            return Task.FromResult<AppDatabase?>(db);
+        }
+
+        private static Application MakeSpecial(string name, bool recommended, bool hidden = false)
+        {
+            var app = new Application { Name = name };
+            app.Flags!["TWUI:SPECIAL"] = null;
+            if (recommended) app.Flags["TWUI:RECOMMENDED"] = null;
+            if (hidden) app.Flags["TWUI:HIDDEN"] = null;
+            return app;
+        }
+
+        public Task<IReadOnlyList<ProcessListEntry>> GetRunningProcessesAsync()
+        {
+            IReadOnlyList<ProcessListEntry> list = new List<ProcessListEntry>
+            {
+                new() { ProcessId = 5150, Name = "firefox", Path = @"C:\Program Files\Mozilla Firefox\firefox.exe" },
+                new() { ProcessId = 4242, Name = "tracker", Path = @"C:\Users\sample\AppData\Local\Telemetry\tracker.exe" },
+            };
+            return Task.FromResult(list);
+        }
+
+        public Task<IReadOnlyList<WindowListEntry>> GetTopLevelWindowsAsync()
+        {
+            IReadOnlyList<WindowListEntry> list = new List<WindowListEntry>
+            {
+                new() { Title = "Mozilla Firefox", ProcessId = 5150, ProcessName = "firefox.exe", ProcessPath = @"C:\Program Files\Mozilla Firefox\firefox.exe" },
+                new() { Title = "Settings", ProcessId = 1044, ProcessName = "svchost.exe", ProcessPath = @"C:\Windows\System32\svchost.exe" },
+            };
+            return Task.FromResult(list);
         }
 
         private static ServerConfiguration BuildConfig()

@@ -1,7 +1,9 @@
 using SimpleDeFence.Windows.NetStat;
 using SimpleDeFence.Windows.Services;
+using SimpleDeFence.DatabaseClasses;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading;
@@ -107,14 +109,21 @@ namespace SimpleDeFence.UI.Services
         }
 
         public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy)
+            => CommitProfileChangesAsync(profile =>
+                profile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
+
+        public Task<MessageType> CommitProfileChangesAsync(Action<ServerProfileConfiguration> mutate)
         {
             return Task.Run(() =>
             {
                 if (Config is null)
                     return MessageType.RESPONSE_ERROR;
 
-                var clone = SerializationHelper.Deserialize(SerializationHelper.Serialize(Config), Config);
-                clone.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) });
+                // Work on a deep copy so the GUI never holds a half-applied state: only a
+                // successful PUT replaces the cached config.
+                var clone = SerializationHelper.Deserialize<ServerConfiguration>(
+                    SerializationHelper.Serialize(Config), new ServerConfiguration());
+                mutate(clone.ActiveProfile);
 
                 var resp = _controller.SetServerConfig(clone, _changeset);
                 if (resp is TwMessagePutSettings putResp && resp.Type == MessageType.PUT_SETTINGS)
@@ -126,6 +135,80 @@ namespace SimpleDeFence.UI.Services
                 }
 
                 return resp.Type;
+            });
+        }
+
+        public Task<AppDatabase?> GetAppDatabaseAsync()
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    var path = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                        "SimpleDeFence", "profiles.json");
+                    return File.Exists(path) ? AppDatabase.Load(path) : null;
+                }
+                catch (Exception)
+                {
+                    // A missing/unreadable database is a normal state (service not installed,
+                    // permissions), not an error - the Special group renders its empty state.
+                    return (AppDatabase?)null;
+                }
+            });
+        }
+
+        public Task<IReadOnlyList<ProcessListEntry>> GetRunningProcessesAsync()
+        {
+            return Task.Run(() =>
+            {
+                var list = new List<ProcessListEntry>();
+                foreach (var p in System.Diagnostics.Process.GetProcesses())
+                {
+                    using (p)
+                    {
+                        var path = ResolvePath(unchecked((uint)p.Id));
+                        // No path means we cannot build a rule for it - leave it out rather than
+                        // offering a row that would commit a broken exception.
+                        if (string.IsNullOrEmpty(path))
+                            continue;
+
+                        list.Add(new ProcessListEntry
+                        {
+                            ProcessId = unchecked((uint)p.Id),
+                            Name = p.ProcessName,
+                            Path = path,
+                        });
+                    }
+                }
+
+                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+                return (IReadOnlyList<ProcessListEntry>)list;
+            });
+        }
+
+        public Task<IReadOnlyList<WindowListEntry>> GetTopLevelWindowsAsync()
+        {
+            return Task.Run(() =>
+            {
+                var list = new List<WindowListEntry>();
+                foreach (var w in SimpleDeFence.Windows.TopLevelWindows.EnumerateVisible())
+                {
+                    var path = ResolvePath(w.ProcessId);
+                    if (string.IsNullOrEmpty(path))
+                        continue;
+
+                    list.Add(new WindowListEntry
+                    {
+                        Title = w.Title,
+                        ProcessId = w.ProcessId,
+                        ProcessName = Path.GetFileName(path),
+                        ProcessPath = path,
+                    });
+                }
+
+                list.Sort((a, b) => string.Compare(a.Title, b.Title, StringComparison.CurrentCultureIgnoreCase));
+                return (IReadOnlyList<WindowListEntry>)list;
             });
         }
 
