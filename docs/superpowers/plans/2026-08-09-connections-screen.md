@@ -1121,6 +1121,16 @@ namespace SimpleDeFence.UI.Pages
 > (error InfoBar with the exception message) while keeping the last-good snapshot on screen — an
 > all-clear is never faked. Final shape: body in `try { ... } catch (Exception ex) { ShowNotice(...) }
 > finally { SetBusy(false); }`, `Rebuild()` after the `finally`. See `ConnectionsPage.xaml.cs`.
+>
+> **Review fix round 2 (2026-08-09, after a hostile re-read of the page):** further amendments:
+> - `Rebuild()` and `BlockedCount()` one-line wrappers collapsed; `RefreshAsync` calls
+>   `ApplyFilter()` directly.
+> - The filter matches the *displayed* name: an unnamed row renders as localized "Unknown" and is
+>   findable by typing exactly that (matching raw `AppName` made such rows unfilterable).
+> - A section emptied by an active filter says "Nothing matches the current filter."
+>   (`connections.empty.filtered`) instead of claiming nothing happened.
+> - A gather failure shows `connections.gatherFailed.title` ("Could not read connection data")
+>   instead of reusing `status.notConnected` — the page can fail to gather while still connected.
 
 - [x] **Step 4: Write the page XAML**
 
@@ -1383,6 +1393,21 @@ Note the `AppContainerSubject(item.PackageId, item.AppName, string.Empty, string
 
 Add `using System.Threading.Tasks;` if not already present (it is, from Task 4).
 
+> **Review fix round 2 (2026-08-09, after a hostile re-read of the page):** the Allow handler above
+> is amended:
+> - Allow actions are serialized (`_allowBusy`). Until the result dialog is up the page is not
+>   modal, so a second click could fire a concurrent commit — and two concurrent `ContentDialog`s
+>   on one XamlRoot throw out of the async-void handler, crashing the app. The guard covers both.
+> - A `ContentDialog.ShowAsync` failure (another dialog already open, e.g. the mode chip's
+>   Learning confirmation) falls back to the InfoBar instead of crashing — the outcome still has
+>   to reach the user.
+> - An unidentifiable app (no path, no package — e.g. the process already exited) is refused
+>   honestly (`connections.allowFailed.unidentified`) instead of committing
+>   `ExecutableSubject("")`, a broken rule that matches nothing.
+> - The generic failure arm uses `connections.allowFailed.genericDetail` ("The exception was not
+>   added") — the plan's text reused `mode.switchFailed.genericDetail`, which claims the *mode*
+>   was not changed and is a lie in this context.
+
 - [x] **Step 4: Add the item template to the XAML**
 
 In `SimpleDeFence.UI/Pages/ConnectionsPage.xaml`, replace `<ListView x:Name="BlockedList" SelectionMode="None"/>` with:
@@ -1504,6 +1529,10 @@ In `ConnectionsPage.xaml.cs`, add the timer and its handlers:
 > silently dead while the toggle still reads on — an inert control that claims to be working.
 > Final shape: `if (AutoRefreshToggle.IsOn) _autoRefreshTimer.Start();` inside
 > `ConnectionsPage_Loaded` before the refresh.
+>
+> **Review fix round 2 (2026-08-09, after a hostile re-read of the page):** switching auto-refresh
+> on also refreshes immediately instead of waiting up to a full 5s interval for the first tick —
+> the control no longer appears inert right after being enabled.
 
 - [x] **Step 2: Add Connections as a nav destination, landing first**
 
