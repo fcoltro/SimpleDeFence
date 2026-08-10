@@ -85,6 +85,7 @@ namespace SimpleDeFence.Localization
             public const string EmptyBlocked = "connections.empty.blocked";
             public const string EmptyConnected = "connections.empty.connected";
             public const string EmptyOpen = "connections.empty.open";
+            public const string EmptyFiltered = "connections.empty.filtered";
             public const string FilterPlaceholder = "connections.filterPlaceholder";
             public const string AutoRefresh = "connections.autoRefresh";
             public const string Allow = "connections.allow";
@@ -92,6 +93,9 @@ namespace SimpleDeFence.Localization
             public const string AllowSuccessBody = "connections.allowSuccess.body";
             public const string AllowFailedTitle = "connections.allowFailed.title";
             public const string AllowFailedLockedDetail = "connections.allowFailed.lockedDetail";
+            public const string AllowFailedGenericDetail = "connections.allowFailed.genericDetail";
+            public const string AllowFailedUnidentified = "connections.allowFailed.unidentified";
+            public const string GatherFailedTitle = "connections.gatherFailed.title";
         }
 
         public static class Subject

@@ -80,7 +80,8 @@
     "empty": {
       "blocked": "Nada bloqueado nos últimos 5 minutos.",
       "connected": "Nenhuma conexão estabelecida.",
-      "open": "Nenhuma porta aberta."
+      "open": "Nenhuma porta aberta.",
+      "filtered": "Nada corresponde ao filtro atual."
     },
     "filterPlaceholder": "Filtrar por nome do aplicativo",
     "autoRefresh": "Atualização automática",
@@ -91,7 +92,12 @@
     },
     "allowFailed": {
       "title": "Não foi possível adicionar a exceção",
-      "lockedDetail": "Desbloqueie a configuração antes de adicionar uma exceção."
+      "lockedDetail": "Desbloqueie a configuração antes de adicionar uma exceção.",
+      "genericDetail": "O serviço retornou {0}. A exceção não foi adicionada.",
+      "unidentified": "O aplicativo não pôde ser identificado (sem caminho nem pacote), portanto nenhuma exceção foi adicionada."
+    },
+    "gatherFailed": {
+      "title": "Não foi possível ler os dados de conexão"
     }
   },
 

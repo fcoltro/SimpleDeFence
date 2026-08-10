@@ -80,7 +80,8 @@
     "empty": {
       "blocked": "Nothing blocked in the last 5 minutes.",
       "connected": "No established connections.",
-      "open": "No listening ports."
+      "open": "No listening ports.",
+      "filtered": "Nothing matches the current filter."
     },
     "filterPlaceholder": "Filter by app name",
     "autoRefresh": "Auto-refresh",
@@ -91,7 +92,12 @@
     },
     "allowFailed": {
       "title": "Could not add the exception",
-      "lockedDetail": "Unlock the configuration before adding an exception."
+      "lockedDetail": "Unlock the configuration before adding an exception.",
+      "genericDetail": "The service returned {0}. The exception was not added.",
+      "unidentified": "The application could not be identified (no path or package), so no exception was added."
+    },
+    "gatherFailed": {
+      "title": "Could not read connection data"
     }
   },
 

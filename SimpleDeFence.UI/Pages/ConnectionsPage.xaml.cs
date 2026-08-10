@@ -44,6 +44,7 @@ namespace SimpleDeFence.UI.Pages
         private readonly ObservableCollection<BlockedListItem> _blocked = new();
         private readonly DispatcherTimer _autoRefreshTimer = new() { Interval = TimeSpan.FromSeconds(5) };
         private bool _busy;
+        private bool _allowBusy;
 
         public ConnectionsPage()
         {
@@ -60,12 +61,22 @@ namespace SimpleDeFence.UI.Pages
             Unloaded += (_, _) => _autoRefreshTimer.Stop();
         }
 
-        private void AutoRefreshToggle_Toggled(object sender, RoutedEventArgs e)
+        private async void AutoRefreshToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (AutoRefreshToggle.IsOn)
-                _autoRefreshTimer.Start();
+            {
+                // Refresh immediately rather than waiting up to a full interval for the first
+                // tick, or the control appears inert right after being switched on. Re-check the
+                // toggle after the await: if it was switched back off while the refresh was in
+                // flight, starting the timer here would leave it running behind an "off" control.
+                await RefreshAsync();
+                if (AutoRefreshToggle.IsOn)
+                    _autoRefreshTimer.Start();
+            }
             else
+            {
                 _autoRefreshTimer.Stop();
+            }
         }
 
         private async void ConnectionsPage_Loaded(object sender, RoutedEventArgs e)
@@ -109,7 +120,7 @@ namespace SimpleDeFence.UI.Pages
                 // the refresh and the gather). That must not look like an all-clear: surface the
                 // failure and keep the last good data on screen, where the error InfoBar keeps it
                 // honest until the user refreshes again.
-                ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Status.NotConnected), ex.Message);
+                ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Connections.GatherFailedTitle), ex.Message);
             }
             finally
             {
@@ -119,11 +130,6 @@ namespace SimpleDeFence.UI.Pages
                 SetBusy(false);
             }
 
-            Rebuild();
-        }
-
-        private void Rebuild()
-        {
             ApplyFilter();
         }
 
@@ -132,7 +138,11 @@ namespace SimpleDeFence.UI.Pages
         private void ApplyFilter()
         {
             var term = FilterBox.Text?.Trim() ?? string.Empty;
-            bool Matches(string name) => term.Length == 0 || name.Contains(term, StringComparison.CurrentCultureIgnoreCase);
+            var unknown = Loc.T(LocKeys.Common.Unknown);
+            // Match what is displayed, not the raw value: an unnamed row shows as "Unknown" and
+            // must be findable by typing exactly that.
+            bool Matches(string name) => term.Length == 0
+                || (string.IsNullOrEmpty(name) ? unknown : name).Contains(term, StringComparison.CurrentCultureIgnoreCase);
 
             _connected.Clear();
             foreach (var row in _snapshot.Connected.Where(r => Matches(r.AppName)))
@@ -144,21 +154,33 @@ namespace SimpleDeFence.UI.Pages
 
             RebuildBlocked(_snapshot.Blocked.Where(r => Matches(r.AppName)));
 
-            SetHeader(BlockedHeaderText, LocKeys.Connections.SectionBlocked, BlockedCount());
+            SetHeader(BlockedHeaderText, LocKeys.Connections.SectionBlocked, _blocked.Count);
             SetHeader(ConnectedHeaderText, LocKeys.Connections.SectionConnected, _connected.Count);
             SetHeader(OpenHeaderText, LocKeys.Connections.SectionOpen, _open.Count);
 
             // Empty states read reassuringly rather than like a failure - an empty Blocked list is
-            // a *good* outcome on a firewall.
-            ConnectedEmpty.Visibility = _connected.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-            OpenEmpty.Visibility = _open.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-            BlockedEmpty.Visibility = BlockedCount() == 0 ? Visibility.Visible : Visibility.Collapsed;
+            // a *good* outcome on a firewall. But a filter hiding every row is not the same thing
+            // as nothing happening, so it gets its own wording.
+            var filtered = Loc.T(LocKeys.Connections.EmptyFiltered);
+            SetEmptyState(ConnectedEmpty, _connected.Count, LocKeys.Connections.EmptyConnected, term, filtered);
+            SetEmptyState(OpenEmpty, _open.Count, LocKeys.Connections.EmptyOpen, term, filtered);
+            SetEmptyState(BlockedEmpty, _blocked.Count, LocKeys.Connections.EmptyBlocked, term, filtered);
+        }
+
+        private static void SetEmptyState(TextBlock target, int count, string emptyKey, string term, string filteredText)
+        {
+            if (count != 0)
+            {
+                target.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            target.Text = term.Length == 0 ? Loc.T(emptyKey) : filteredText;
+            target.Visibility = Visibility.Visible;
         }
 
         private static void SetHeader(TextBlock target, string titleKey, int count)
             => target.Text = Loc.T(titleKey) + " " + Loc.T(LocKeys.Connections.SectionCount, count);
-
-        private int BlockedCount() => _blocked.Count;
 
         private void RebuildBlocked(IEnumerable<BlockedRow> rows)
         {
@@ -168,7 +190,11 @@ namespace SimpleDeFence.UI.Pages
                 var item = new BlockedListItem
                 {
                     AppName = string.IsNullOrEmpty(row.AppName) ? Loc.T(LocKeys.Common.Unknown) : row.AppName,
-                    Detail = $"{row.Protocol} {row.Direction} → {row.RemoteAddress}:{row.RemotePort}",
+                    // Security-log listen/bind events have no remote endpoint - render them
+                    // without a dangling "→ :0".
+                    Detail = string.IsNullOrEmpty(row.RemoteAddress) || row.RemotePort == 0
+                        ? $"{row.Protocol} {row.Direction}"
+                        : $"{row.Protocol} {row.Direction} → {row.RemoteAddress}:{row.RemotePort}",
                     When = row.Timestamp.ToString("HH:mm:ss"),
                     AppPath = row.AppPath,
                     PackageId = row.PackageId,
@@ -180,9 +206,41 @@ namespace SimpleDeFence.UI.Pages
 
         private async Task AllowAsync(BlockedListItem item)
         {
-            ExceptionSubject subject = !string.IsNullOrEmpty(item.PackageId)
-                ? new AppContainerSubject(item.PackageId, item.AppName, string.Empty, string.Empty)
-                : new ExecutableSubject(item.AppPath ?? string.Empty);
+            // Serialize Allow actions. Until the result dialog is up the page is not blocked, so
+            // without this guard a second click fires a concurrent commit - and when both finish,
+            // the second ContentDialog.ShowAsync throws (only one dialog can be open per XamlRoot),
+            // escaping through this async-void caller as an app crash.
+            if (_allowBusy)
+                return;
+
+            _allowBusy = true;
+            try
+            {
+                await AllowAsyncCore(item);
+            }
+            finally
+            {
+                _allowBusy = false;
+            }
+        }
+
+        private async Task AllowAsyncCore(BlockedListItem item)
+        {
+            ExceptionSubject? subject = null;
+            if (!string.IsNullOrEmpty(item.PackageId))
+                subject = new AppContainerSubject(item.PackageId, item.AppName, string.Empty, string.Empty);
+            else if (!string.IsNullOrEmpty(item.AppPath))
+                subject = new ExecutableSubject(item.AppPath);
+
+            // Never commit a rule for an app we cannot name (e.g. the process already exited) -
+            // an empty ExecutableSubject would be a broken exception that matches nothing, which
+            // is exactly the kind of silent no-op a firewall GUI must not produce.
+            if (subject is null)
+            {
+                await ShowAllowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle),
+                    Loc.T(LocKeys.Connections.AllowFailedUnidentified));
+                return;
+            }
 
             MessageType resp;
             try
@@ -206,7 +264,7 @@ namespace SimpleDeFence.UI.Pages
                 var body = resp switch
                 {
                     MessageType.RESPONSE_LOCKED => Loc.T(LocKeys.Connections.AllowFailedLockedDetail),
-                    _ => Loc.T(LocKeys.Mode.SwitchFailedGenericDetail, resp),
+                    _ => Loc.T(LocKeys.Connections.AllowFailedGenericDetail, resp),
                 };
                 await ShowAllowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), body);
             }
@@ -221,7 +279,18 @@ namespace SimpleDeFence.UI.Pages
                 Content = body,
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),
             };
-            await dialog.ShowAsync();
+
+            try
+            {
+                await dialog.ShowAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // Only one ContentDialog can be open per XamlRoot. If another dialog (e.g. the mode
+                // chip's Learning confirmation) is up, fall back to the InfoBar rather than crash -
+                // the outcome still has to reach the user.
+                ShowNotice(InfoBarSeverity.Informational, title, body);
+            }
         }
 
         private static ConnectionListItem ItemFrom(ConnectionRow row) => new()
