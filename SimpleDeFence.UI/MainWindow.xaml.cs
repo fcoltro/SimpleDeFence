@@ -31,23 +31,29 @@ namespace SimpleDeFence.UI
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
 
-            ContentFrame.Navigate(typeof(ApplicationsPage));
+            ContentFrame.Navigate(typeof(ConnectionsPage));
             _ = Shell.RefreshAsync();
         }
 
         internal Brush ModeStateToBrush(string modeStateKey)
             => (Brush)s_modeStateToBrush.Convert(modeStateKey, typeof(Brush), null!, null!);
 
-        // Rules is currently the only destination; Connections and Settings arrive in their own
-        // plans, at which point this maps item.Tag to a page type. A nav entry pointing at an
-        // empty placeholder page would be worse than no entry at all.
         private void Nav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.SelectedItem is not NavigationViewItem)
+            if (args.SelectedItem is not NavigationViewItem item)
                 return;
 
-            if (ContentFrame.CurrentSourcePageType != typeof(ApplicationsPage))
-                ContentFrame.Navigate(typeof(ApplicationsPage), null, new EntranceNavigationTransitionInfo());
+            // Settings arrives in its own plan; until then Connections and Rules are the only
+            // two destinations.
+            var targetType = (string)item.Tag switch
+            {
+                "connections" => typeof(ConnectionsPage),
+                "rules" => typeof(ApplicationsPage),
+                _ => typeof(ConnectionsPage),
+            };
+
+            if (ContentFrame.CurrentSourcePageType != targetType)
+                ContentFrame.Navigate(targetType, null, new EntranceNavigationTransitionInfo());
         }
 
         private async void ModeChip_Click(object sender, RoutedEventArgs e)

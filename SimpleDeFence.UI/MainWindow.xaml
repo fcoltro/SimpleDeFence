@@ -47,7 +47,12 @@
                         SelectionChanged="Nav_SelectionChanged">
 
             <NavigationView.MenuItems>
-                <NavigationViewItem Content="{loc:Loc Key=nav.rules}" Tag="rules" IsSelected="True">
+                <NavigationViewItem Content="{loc:Loc Key=connections.title}" Tag="connections" IsSelected="True">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE774;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="{loc:Loc Key=nav.rules}" Tag="rules">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE71D;"/>
                     </NavigationViewItem.Icon>

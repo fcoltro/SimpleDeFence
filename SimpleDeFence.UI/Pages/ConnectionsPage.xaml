@@ -22,11 +22,14 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" x:Name="FilterBox" PlaceholderText="{loc:Loc Key=connections.filterPlaceholder}"
                      TextChanged="FilterBox_TextChanged" MaxWidth="360" HorizontalAlignment="Left"/>
-            <Button Grid.Column="1" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"/>
-            <ProgressRing Grid.Column="2" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
+            <ToggleSwitch Grid.Column="1" x:Name="AutoRefreshToggle" OnContent="{loc:Loc Key=connections.autoRefresh}"
+                          OffContent="{loc:Loc Key=connections.autoRefresh}" Toggled="AutoRefreshToggle_Toggled"/>
+            <Button Grid.Column="2" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"/>
+            <ProgressRing Grid.Column="3" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
         </Grid>
 
         <ScrollViewer Grid.Row="3">

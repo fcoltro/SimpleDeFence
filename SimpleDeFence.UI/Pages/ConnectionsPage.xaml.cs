@@ -42,6 +42,7 @@ namespace SimpleDeFence.UI.Pages
         private readonly ObservableCollection<ConnectionListItem> _connected = new();
         private readonly ObservableCollection<ConnectionListItem> _open = new();
         private readonly ObservableCollection<BlockedListItem> _blocked = new();
+        private readonly DispatcherTimer _autoRefreshTimer = new() { Interval = TimeSpan.FromSeconds(5) };
         private bool _busy;
 
         public ConnectionsPage()
@@ -55,6 +56,16 @@ namespace SimpleDeFence.UI.Pages
             ConnectedList.ItemsSource = _connected;
             OpenList.ItemsSource = _open;
             Loaded += ConnectionsPage_Loaded;
+            _autoRefreshTimer.Tick += async (_, _) => await RefreshAsync();
+            Unloaded += (_, _) => _autoRefreshTimer.Stop();
+        }
+
+        private void AutoRefreshToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (AutoRefreshToggle.IsOn)
+                _autoRefreshTimer.Start();
+            else
+                _autoRefreshTimer.Stop();
         }
 
         private async void ConnectionsPage_Loaded(object sender, RoutedEventArgs e) => await RefreshAsync();
