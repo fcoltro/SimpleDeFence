@@ -68,7 +68,17 @@ namespace SimpleDeFence.UI.Pages
                 _autoRefreshTimer.Stop();
         }
 
-        private async void ConnectionsPage_Loaded(object sender, RoutedEventArgs e) => await RefreshAsync();
+        private async void ConnectionsPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Auto-refresh must survive navigation: this page is cached (NavigationCacheMode.Enabled),
+            // so its instance lives on after Unloaded stops the timer. Without restarting here a user
+            // who turned auto-refresh on, visited Rules, and came back would find the toggle still
+            // flipped on but nothing ticking - a silent lie.
+            if (AutoRefreshToggle.IsOn)
+                _autoRefreshTimer.Start();
+
+            await RefreshAsync();
+        }
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
 
@@ -78,20 +88,37 @@ namespace SimpleDeFence.UI.Pages
                 return;
 
             SetBusy(true);
-            await App.Firewall.RefreshAsync();
-
-            if (!App.Firewall.Connected)
+            try
             {
-                ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Status.NotConnected), App.Firewall.LastError ?? string.Empty);
-                _snapshot = new ConnectionsSnapshot();
+                await App.Firewall.RefreshAsync();
+
+                if (!App.Firewall.Connected)
+                {
+                    ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Status.NotConnected), App.Firewall.LastError ?? string.Empty);
+                    _snapshot = new ConnectionsSnapshot();
+                }
+                else
+                {
+                    Notice.IsOpen = false;
+                    _snapshot = await App.Firewall.GetConnectionsAsync();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Notice.IsOpen = false;
-                _snapshot = await App.Firewall.GetConnectionsAsync();
+                // The real client's log/NetStat gathering can throw (e.g. the service dies between
+                // the refresh and the gather). That must not look like an all-clear: surface the
+                // failure and keep the last good data on screen, where the error InfoBar keeps it
+                // honest until the user refreshes again.
+                ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Status.NotConnected), ex.Message);
+            }
+            finally
+            {
+                // A throw must not leave the page busy forever, permanently disabling the refresh
+                // button and cancelling auto-refresh - same rationale as ShellViewModel.RefreshAsync
+                // (shell plan Task 4 ruling).
+                SetBusy(false);
             }
 
-            SetBusy(false);
             Rebuild();
         }
 
