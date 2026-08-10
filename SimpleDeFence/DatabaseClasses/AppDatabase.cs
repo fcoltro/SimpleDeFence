@@ -1,19 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Globalization;
 using Microsoft.Samples.TaskDialog;
-using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 
 namespace SimpleDeFence.DatabaseClasses
 {
-    [DataContract(Namespace = "SimpleDeFence")]
-    class AppDatabase : ISerializable<AppDatabase>
+    public partial class AppDatabase
     {
-        [DataMember(Name = "KnownApplications")]
-        private readonly List<Application> _KnownApplications;
-
         public static string DBPath
         {
             get { return System.IO.Path.Combine(Utils.AppDataPath, "profiles.json"); }
@@ -21,60 +14,7 @@ namespace SimpleDeFence.DatabaseClasses
 
         public static AppDatabase Load()
         {
-            return SerializationHelper.DeserializeFromFile(DBPath, new AppDatabase());
-        }
-
-        public void Save(string filePath)
-        {
-            SerializationHelper.SerializeToFile(this, filePath);
-        }
-
-        [JsonConstructor]
-        public AppDatabase(List<Application> knownApplications)
-        {
-            _KnownApplications = knownApplications;
-        }
-
-        public AppDatabase() :
-            this(new List<Application>())
-        { }
-
-        public List<Application> KnownApplications
-        {
-            get { return _KnownApplications; }
-        }
-
-        public Application? GetApplicationByName(string name)
-        {
-            foreach (Application app in _KnownApplications)
-            {
-                if (app.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
-                    return app;
-            }
-
-            return null;
-        }
-
-        public List<FirewallExceptionV3> FastSearchMachineForKnownApps()
-        {
-            var ret = new List<FirewallExceptionV3>();
-
-            foreach (DatabaseClasses.Application app in KnownApplications)
-            {
-                if (app.HasFlag("TWUI:Special"))
-                    continue;
-
-                foreach (SubjectIdentity id in app.Components)
-                {
-                    List<ExceptionSubject> subjects = id.SearchForFile();
-                    foreach (var subject in subjects)
-                    {
-                        ret.Add(id.InstantiateException(subject));
-                    }
-                }
-            }
-
-            return ret;
+            return Load(DBPath);
         }
 
         internal Application? TryGetApp(ExecutableSubject fromSubject, out FirewallExceptionV3? fwex, bool matchSpecial)
@@ -110,7 +50,6 @@ namespace SimpleDeFence.DatabaseClasses
             }
             else if (fromSubject is ExecutableSubject exeSubject)
             {
-                // Try to find an application this subject might belong to
                 app = TryGetApp(exeSubject, out FirewallExceptionV3? _, false);
                 if (app == null)
                 {
@@ -118,8 +57,6 @@ namespace SimpleDeFence.DatabaseClasses
                     return exceptions;
                 }
 
-                // Now that we have the app, try to instantiate firewall exceptions
-                // for all components.
                 string pathHint = System.IO.Path.GetDirectoryName(exeSubject.ExecutablePath);
                 foreach (SubjectIdentity id in app.Components)
                 {
@@ -128,19 +65,15 @@ namespace SimpleDeFence.DatabaseClasses
                     {
                         var tmp = id.InstantiateException(subject);
                         if (fromSubject.Equals(subject))
-                            // Make sure original subject is at index 0
                             exceptions.Insert(0, tmp);
                         else
                             exceptions.Add(tmp);
                     }
                 }
 
-                // If we have found dependencies, ask the user what to do
                 if ((exceptions.Count > 1) && guiPrompt)
                 {
-
-                    // Try to get localized name
-                    string localizedAppName = Resources.Exceptions.ResourceManager.GetString(app.Name);
+string localizedAppName = Resources.Exceptions.ResourceManager.GetString(app.Name);
                     localizedAppName = string.IsNullOrEmpty(localizedAppName) ? app.Name : localizedAppName;
 
                     Utils.SplitFirstLine(string.Format(CultureInfo.InvariantCulture, Resources.Messages.UnblockApp, localizedAppName), out string firstLine, out string contentLines);
@@ -173,7 +106,6 @@ namespace SimpleDeFence.DatabaseClasses
                         case 101:
                             break;
                         case 102:
-                            // Remove all exceptions with a different subject than the input argument
                             for (int i = exceptions.Count - 1; i >= 0; --i)
                             {
                                 if (exceptions[i].Subject is ExecutableSubject exesub)
@@ -204,11 +136,6 @@ namespace SimpleDeFence.DatabaseClasses
             }
 
             return exceptions;
-        }
-
-        public JsonTypeInfo<AppDatabase> GetJsonTypeInfo()
-        {
-            return AppSourceGenerationContext.Default.AppDatabase;
         }
     }
 }

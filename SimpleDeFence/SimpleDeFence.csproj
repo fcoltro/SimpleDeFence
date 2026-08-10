@@ -66,6 +66,7 @@
          embedded into SimpleDeFence.Core.dll), so if these ever were called here every string
          would render as its bracketed fallback; harmless today since nothing calls them. -->
     <Compile Include="../SimpleDeFence.Core/Localization/*.cs" LinkBase="SimpleDeFence.Core.Localization" />
+    <Compile Include="../SimpleDeFence.Core/Database/*.cs" LinkBase="SimpleDeFence.Core.Database" />
     <!-- SimpleDeFence.Utilities already supplies IsExternalInit here; Core carries its own copy
          only for its standalone net48 build. Compiling both into this app is CS0101. -->
     <Compile Remove="../SimpleDeFence.Core/CsInitSupport.cs" />
