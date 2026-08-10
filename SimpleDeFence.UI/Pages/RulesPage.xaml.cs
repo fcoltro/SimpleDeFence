@@ -54,7 +54,7 @@ namespace SimpleDeFence.UI.Pages
         private bool _busy;
         private bool _committing;
 
-        /// <summary>Guards the Add split button's two pickers, separate from _committing (Remove/
+        /// <summary>Guards the Add split button's four pickers, separate from _committing (Remove/
         /// Apply): serializes AllowAsync calls started from here so a rapid double-invoke cannot
         /// fire two concurrent commits and, worse, two overlapping result dialogs (only one
         /// ContentDialog can be open per XamlRoot) - same rationale as ConnectionsPage's
@@ -338,6 +338,40 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
+        /// <summary>Same safe shape as AddPickExecutable_Click/AddPickUwp_Click above.</summary>
+        private async void AddPickProcess_Click(object sender, RoutedEventArgs e)
+        {
+            if (_addBusy)
+                return;
+
+            _addBusy = true;
+            try
+            {
+                await PickProcessAsync();
+            }
+            finally
+            {
+                _addBusy = false;
+            }
+        }
+
+        /// <summary>Same safe shape as AddPickExecutable_Click/AddPickUwp_Click above.</summary>
+        private async void AddPickWindow_Click(object sender, RoutedEventArgs e)
+        {
+            if (_addBusy)
+                return;
+
+            _addBusy = true;
+            try
+            {
+                await PickWindowAsync();
+            }
+            finally
+            {
+                _addBusy = false;
+            }
+        }
+
         /// <summary>Builds and shows the UWP package picker dialog, then (if a package was picked)
         /// commits it before returning. UwpPackageList enumerates the real OS package catalog
         /// (Windows.Management.Deployment.PackageManager) regardless of --sample-data - there is no
@@ -424,7 +458,118 @@ namespace SimpleDeFence.UI.Pages
                 await CommitAddAsync(new AppContainerSubject(package), package.Name);
         }
 
-        /// <summary>Shared commit path for both Add pickers - identical operation to Connections'
+        /// <summary>Builds and shows the running-process picker dialog via the shared
+        /// PickFromListAsync helper below, then (if a process was picked) commits it before
+        /// returning. Same commit-after-ShowAsync-returns shape as PickUwpAsync, for the same
+        /// _addBusy-lifecycle reason: AddPickProcess_Click's single `await PickProcessAsync()` must
+        /// stay pending until the commit (and its result dialog) are done, not just until the picker
+        /// dialog closes.</summary>
+        private async Task PickProcessAsync()
+        {
+            var processes = await App.Firewall.GetRunningProcessesAsync();
+
+            var picked = await PickFromListAsync(
+                Loc.T(LocKeys.Rules.PickProcessTitle),
+                processes,
+                (process, term) =>
+                    process.Name.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0
+                    || process.Path.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0,
+                process => (process.Name, process.Path));
+
+            if (picked is { } process)
+                await CommitAddAsync(new ExecutableSubject(process.Path), process.Name);
+        }
+
+        /// <summary>Same shape as PickProcessAsync above, for visible top-level windows. The window's
+        /// title (not its process name) is the display name in the result dialog/refreshed row -
+        /// it's the identifying detail the user actually picked from the list.</summary>
+        private async Task PickWindowAsync()
+        {
+            var windows = await App.Firewall.GetTopLevelWindowsAsync();
+
+            var picked = await PickFromListAsync(
+                Loc.T(LocKeys.Rules.PickWindowTitle),
+                windows,
+                (window, term) =>
+                    window.Title.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0
+                    || window.ProcessName.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0,
+                window => (window.Title, window.ProcessName));
+
+            if (picked is { } window)
+                await CommitAddAsync(new ExecutableSubject(window.ProcessPath), window.Title);
+        }
+
+        /// <summary>Shared filterable-list-in-a-dialog shape for the process and window pickers
+        /// above, factored out because those two are structurally identical (a reference-type row
+        /// DTO, a two-field substring filter, a two-line row) once PickUwpAsync's own row type is set
+        /// aside. PickUwpAsync is deliberately NOT rebuilt on top of this: UwpPackageList.Package is a
+        /// struct, and an unconstrained "T? picked" can't distinguish "nothing picked" from
+        /// "default(Package)" the way it can for a reference type - forcing it in would either need
+        /// an awkward extra bool or silently mishandle Cancel, so the `where T : class` constraint
+        /// here is intentional, not an oversight.
+        ///
+        /// Same commit-free ItemClick shape PickUwpAsync established (and Task 6's fix corrected):
+        /// ItemClick only records the pick and calls Hide() - never commits - because ItemClick fires
+        /// as its own separate, un-awaited dispatcher continuation. The caller commits after this
+        /// method returns, still inside its own await chain, so whichever *_Click handler set
+        /// _addBusy keeps it true for the full pick-then-commit operation.</summary>
+        private async Task<T?> PickFromListAsync<T>(string title, IReadOnlyList<T> items,
+            Func<T, string, bool> matches, Func<T, (string Primary, string Secondary)> toRow)
+            where T : class
+        {
+            var listView = new ListView
+            {
+                SelectionMode = ListViewSelectionMode.None,
+                IsItemClickEnabled = true,
+                MaxHeight = 360,
+            };
+
+            void Populate(string term)
+            {
+                listView.Items.Clear();
+                foreach (var item in items)
+                {
+                    if (term.Length > 0 && !matches(item, term))
+                        continue;
+
+                    var (primary, secondary) = toRow(item);
+                    var row = new StackPanel { Tag = item, Padding = new Thickness(4) };
+                    row.Children.Add(new TextBlock { Text = primary, TextTrimming = TextTrimming.CharacterEllipsis });
+                    row.Children.Add(new TextBlock { Text = secondary, FontSize = 12, Opacity = 0.8, TextTrimming = TextTrimming.CharacterEllipsis });
+                    listView.Items.Add(row);
+                }
+            }
+
+            Populate(string.Empty);
+
+            var filterBox = new TextBox { PlaceholderText = Loc.T(LocKeys.Rules.FilterPlaceholder) };
+            filterBox.TextChanged += (_, _) => Populate(filterBox.Text?.Trim() ?? string.Empty);
+
+            var panel = new StackPanel { Spacing = 8, Width = 420 };
+            panel.Children.Add(filterBox);
+            panel.Children.Add(listView);
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                Title = title,
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                Content = panel,
+            };
+
+            T? picked = null;
+            listView.ItemClick += (_, args) =>
+            {
+                var row = (FrameworkElement)args.ClickedItem;
+                picked = (T)row.Tag;
+                dialog.Hide();
+            };
+
+            await dialog.ShowAsync();
+            return picked;
+        }
+
+        /// <summary>Shared commit path for all four Add pickers - identical operation to Connections'
         /// "Allow this app", so it reuses the same loc keys and reporting pattern.</summary>
         private async Task CommitAddAsync(ExceptionSubject subject, string displayName)
         {

@@ -163,6 +163,8 @@
     "addPickWindow": "Window...",
     "addPickUwp": "UWP app...",
     "pickUwpTitle": "Choose a UWP app",
+    "pickProcessTitle": "Choose a running process",
+    "pickWindowTitle": "Choose a window",
     "detail": {
       "title": "Rule",
       "policyBlocked": "Blocked",

@@ -163,6 +163,8 @@
     "addPickWindow": "Janela...",
     "addPickUwp": "Aplicativo UWP...",
     "pickUwpTitle": "Escolher um aplicativo UWP",
+    "pickProcessTitle": "Escolher um processo em execução",
+    "pickWindowTitle": "Escolher uma janela",
     "detail": {
       "title": "Regra",
       "policyBlocked": "Bloqueado",
