@@ -338,12 +338,24 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
-        /// <summary>Builds and shows the UWP package picker dialog. UwpPackageList enumerates the
-        /// real OS package catalog (Windows.Management.Deployment.PackageManager) regardless of
-        /// --sample-data - there is no sample-data seam for it, unlike the rest of this page's
-        /// data. The package list is materialized once up front; UwpPackageList caches internally
-        /// per-instance, but there is no reason to re-query the OS every time the filter box
-        /// changes.</summary>
+        /// <summary>Builds and shows the UWP package picker dialog, then (if a package was picked)
+        /// commits it before returning. UwpPackageList enumerates the real OS package catalog
+        /// (Windows.Management.Deployment.PackageManager) regardless of --sample-data - there is no
+        /// sample-data seam for it, unlike the rest of this page's data. The package list is
+        /// materialized once up front; UwpPackageList caches internally per-instance, but there is
+        /// no reason to re-query the OS every time the filter box changes.
+        ///
+        /// The commit happens here, after ShowAsync() returns, rather than inline inside
+        /// ListView.ItemClick: ItemClick fires as its own separate, un-awaited dispatcher
+        /// continuation, decoupled from whatever awaited the ShowAsync() call that it completes by
+        /// calling dialog.Hide(). Committing from inside ItemClick would let CommitAddAsync (and its
+        /// result dialog) run entirely after PickUwpAsync had already returned control to
+        /// AddPickUwp_Click, which resets _addBusy = false as soon as its single `await
+        /// PickUwpAsync()` completes - leaving _addBusy false for the whole commit and defeating the
+        /// reentrancy guard. Capturing the pick and awaiting the commit here, after ShowAsync()
+        /// returns, keeps it inside PickUwpAsync's own await chain so _addBusy covers the full
+        /// operation, symmetric with AddPickExecutable_Click and matching the ConnectionsPage
+        /// _allowBusy precedent.</summary>
         private async Task PickUwpAsync()
         {
             var allPackages = new UwpPackageList().ToList();
@@ -393,19 +405,23 @@ namespace SimpleDeFence.UI.Pages
                 Content = panel,
             };
 
-            // ListView.ItemClick fires as a plain top-level dispatcher callback (not nested inside
-            // another control's own event handling), the same shape the Task 6 brief calls out as
-            // safe. Hide() the picker dialog before committing: only one ContentDialog can be open
-            // per XamlRoot, so CommitAddAsync's own result dialog would otherwise fail to show.
-            listView.ItemClick += async (_, args) =>
+            // ItemClick only records the pick and hides the dialog - it must not commit itself (see
+            // the method doc above for why). Hide() completes the await dialog.ShowAsync() below,
+            // which is where the commit actually happens: only one ContentDialog can be open per
+            // XamlRoot, so CommitAddAsync's own result dialog would otherwise fail to show while the
+            // picker is still up.
+            UwpPackageList.Package? picked = null;
+            listView.ItemClick += (_, args) =>
             {
                 var row = (FrameworkElement)args.ClickedItem;
-                var package = (UwpPackageList.Package)row.Tag;
+                picked = (UwpPackageList.Package)row.Tag;
                 dialog.Hide();
-                await CommitAddAsync(new AppContainerSubject(package), package.Name);
             };
 
             await dialog.ShowAsync();
+
+            if (picked is { } package)
+                await CommitAddAsync(new AppContainerSubject(package), package.Name);
         }
 
         /// <summary>Shared commit path for both Add pickers - identical operation to Connections'
