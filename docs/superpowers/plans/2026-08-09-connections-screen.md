@@ -66,7 +66,7 @@ Moves `ProcessInfo` and `ServicePidMap` out of the WinForms-only `SimpleDeFence`
 - Consumes: `UwpPackageList` (`SimpleDeFence.Core/UwpPackageList.cs`, namespace `SimpleDeFence`), `ServiceControlManager` (existing, same project)
 - Produces: `SimpleDeFence.Windows.Services.ProcessInfo` (`Pid`, `Path`, `Package`, `Services`, two `Create` overloads), `SimpleDeFence.Windows.Services.ServicePidMap` (ctor, `GetServicesInPid(uint)`)
 
-- [ ] **Step 1: Move `ProcessInfo`, dropping the WinForms-only overload**
+- [x] **Step 1: Move `ProcessInfo`, dropping the WinForms-only overload**
 
 The current `SimpleDeFence/ProcessInfo.cs` has three `Create` overloads; only two are portable (the third calls `Utils.GetPathOfProcessUseTwService(pid, GlobalInstances.Controller)`, both WinForms-app-local statics). Grep confirms exactly one call site uses that overload — `SimpleDeFence/Processes.cs:101` — everything else (including `ConnectionsForm.cs`, the file this plan's screen replaces) already uses the two portable ones.
 
@@ -119,7 +119,7 @@ namespace SimpleDeFence.Windows.Services
 
 (`ServicePidMap` needs no `using` here — it's in the same namespace, added in Step 2.)
 
-- [ ] **Step 2: Move `ServicePidMap`**
+- [x] **Step 2: Move `ServicePidMap`**
 
 Delete `SimpleDeFence/ServicePidMap.cs`. Create `SimpleDeFence.Windows.Services/ServicePidMap.cs` (identical body, new namespace):
 
@@ -174,7 +174,7 @@ namespace SimpleDeFence.Windows.Services
 
 (Same file as before — it already lived next to `ServiceControlManager`'s *usage*, it just wasn't in the same *project*. No logic changes.)
 
-- [ ] **Step 3: Fix the one broken WinForms call site**
+- [x] **Step 3: Fix the one broken WinForms call site**
 
 `SimpleDeFence/Processes.cs:101` used the removed `ProcessInfo.Create(pid, uwp, servicePids)` overload (the one that resolved the path itself via `GlobalInstances.Controller`). Replace it with the portable 4-arg overload, resolving the path inline the same way that overload used to:
 
@@ -186,7 +186,7 @@ becomes:
 var e = ProcessInfo.Create(pid, Utils.GetPathOfProcessUseTwService(pid, GlobalInstances.Controller), packageList, service_pids);
 ```
 
-- [ ] **Step 4: Multi-target `SimpleDeFence.Windows.Services` to net10**
+- [x] **Step 4: Multi-target `SimpleDeFence.Windows.Services` to net10**
 
 `ServiceControlManager.cs` needs `System.ServiceProcess.ServiceController` on net10 — `System.ServiceProcess` (the net48 framework `<Reference>`) doesn't resolve there. `ServiceBase.cs` (a *different* file in this project, unrelated to anything this task needs) uses `[InstallerType(typeof(System.ServiceProcess.ServiceProcessInstaller))]`, which depends on the `System.Configuration.Install` installer pipeline — a piece of the full-framework installer model with no .NET Core/5+ equivalent at all, so it's excluded from the net10 leg rather than ported (the actual Windows Service host stays net48-only until the .NET 10 service migration in ROADMAP.md).
 
@@ -238,11 +238,11 @@ Replace `SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj` w
 </Project>
 ```
 
-- [ ] **Step 5: Drop the CAS attributes blocking net10 compilation**
+- [x] **Step 5: Drop the CAS attributes blocking net10 compilation**
 
 `ServiceControlManager.cs` has `[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]` on 7 methods/the constructor, from `System.Security.Permissions` — a CAS (Code Access Security) mechanism that was already inert under .NET Framework's default full-trust hosting and doesn't exist in the BCL on .NET Core/5+ at all. Remove the `using System.Security.Permissions;` line and every occurrence of `[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]` (there are 7, all byte-for-byte identical — use a find-all-occurrences replace, not a one-by-one edit).
 
-- [ ] **Step 6: Point the WinForms call sites at the new namespace**
+- [x] **Step 6: Point the WinForms call sites at the new namespace**
 
 `ProcessInfo` and `ServicePidMap` moved from namespace `SimpleDeFence` (same namespace as every WinForms form, needing no `using`) to `SimpleDeFence.Windows.Services`. Four WinForms files reference `ProcessInfo` by its bare name and need the new `using` added (grep confirms these are the only four: `grep -rln "ProcessInfo\b" SimpleDeFence/*.cs`):
 
@@ -266,7 +266,7 @@ In `SimpleDeFence/ApplicationExceptionForm.cs`, after the existing `using Simple
 using SimpleDeFence.Windows.Services;
 ```
 
-- [ ] **Step 7: Build both net48 and net10 legs**
+- [x] **Step 7: Build both net48 and net10 legs**
 
 ```bash
 dotnet build SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj -c Debug -v:minimal -nologo
@@ -281,7 +281,7 @@ export MSBuildSDKsPath="C:\Program Files\dotnet\sdk\10.0.302\Sdks" MSBuildEnable
 ```
 Expected: `Build succeeded`, 0 errors — confirms the WinForms app still compiles `ProcessInfo`/`ServicePidMap` from their new glob-included location, with the Step 3 and Step 6 fixes in place.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add SimpleDeFence.Windows.Services/ProcessInfo.cs SimpleDeFence.Windows.Services/ServicePidMap.cs SimpleDeFence.Windows.Services/ServiceControlManager.cs SimpleDeFence.Windows.Services/SimpleDeFence.Windows.Services.csproj SimpleDeFence/ProcessInfo.cs SimpleDeFence/ServicePidMap.cs SimpleDeFence/Processes.cs SimpleDeFence/ConnectionsForm.cs SimpleDeFence/SimpleDeFenceController.cs SimpleDeFence/ApplicationExceptionForm.cs
@@ -300,7 +300,7 @@ git commit -m "Move process/service identity to Windows.Services, multi-target n
 - Consumes: `FirewallLogEntry`, `EventLogEvent` (`SimpleDeFence.Core/FirewallLogEntry.cs`, already exist)
 - Produces: `SimpleDeFence.ConnectionActivity` with `static FirewallLogEntry Collapse(FirewallLogEntry)`, `static IReadOnlyList<FirewallLogEntry> RecentBlocked(IEnumerable<FirewallLogEntry>, DateTime now, TimeSpan window)`, `static string DisplayName(string? path, string? packageDisplayName, IReadOnlyCollection<string>? services)`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `SimpleDeFence.Tests/ConnectionActivityTests.cs`:
 
@@ -437,12 +437,12 @@ namespace SimpleDeFence.Tests
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test SimpleDeFence.Tests/SimpleDeFence.Tests.csproj`
 Expected: FAIL — `The type or namespace name 'ConnectionActivity' could not be found`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `SimpleDeFence.Core/ConnectionActivity.cs`:
 
@@ -532,12 +532,12 @@ namespace SimpleDeFence
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `dotnet test SimpleDeFence.Tests/SimpleDeFence.Tests.csproj`
 Expected: PASS — all tests green
 
-- [ ] **Step 5: Verify the net48 WinForms app still compiles**
+- [x] **Step 5: Verify the net48 WinForms app still compiles**
 
 ```bash
 MSB="/c/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/MSBuild/Current/Bin/MSBuild.exe"
@@ -547,7 +547,7 @@ export MSBuildSDKsPath="C:\Program Files\dotnet\sdk\10.0.302\Sdks" MSBuildEnable
 ```
 Expected: `Build succeeded`, 0 errors
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add SimpleDeFence.Core/ConnectionActivity.cs SimpleDeFence.Tests/ConnectionActivityTests.cs
@@ -566,7 +566,7 @@ git commit -m "Add Core connection-activity filtering, shared by both GUIs"
 - Consumes: `Controller.BeginReadFwLog()`/`EndReadFwLog()`/`TryGetProcessPath()` (Core), `ConnectionActivity` (Task 2), `SimpleDeFence.Windows.NetStat.NetStat`/`TcpRow`/`UdpRow`, `SimpleDeFence.Windows.Services.ProcessInfo`/`ServicePidMap`, `UwpPackageList` (all Task 1/existing)
 - Produces: `SimpleDeFence.UI.Services.ConnectionRow`, `BlockedRow`, `ConnectionsSnapshot`; `IFirewallClient.GetConnectionsAsync()`, `IFirewallClient.AllowAsync(ExceptionSubject, ExceptionPolicy)`
 
-- [ ] **Step 1: Add the DTOs**
+- [x] **Step 1: Add the DTOs**
 
 Create `SimpleDeFence.UI/Services/ConnectionsSnapshot.cs`:
 
@@ -614,7 +614,7 @@ namespace SimpleDeFence.UI.Services
 }
 ```
 
-- [ ] **Step 2: Extend the interface**
+- [x] **Step 2: Extend the interface**
 
 In `SimpleDeFence.UI/Services/IFirewallClient.cs`, add two members inside the interface body (after `SwitchModeAsync`):
 
@@ -627,7 +627,7 @@ In `SimpleDeFence.UI/Services/IFirewallClient.cs`, add two members inside the in
         Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy);
 ```
 
-- [ ] **Step 3: Reference `SimpleDeFence.Windows.Services` from the UI project**
+- [x] **Step 3: Reference `SimpleDeFence.Windows.Services` from the UI project**
 
 In `SimpleDeFence.UI/SimpleDeFence.UI.csproj`, add the project reference (this transitively brings in `SimpleDeFence.Windows` too, since `Windows.Services` already references it):
 
@@ -638,7 +638,7 @@ In `SimpleDeFence.UI/SimpleDeFence.UI.csproj`, add the project reference (this t
   </ItemGroup>
 ```
 
-- [ ] **Step 4: Implement the real client**
+- [x] **Step 4: Implement the real client**
 
 In `SimpleDeFence.UI/Services/FirewallClient.cs`, add `using System.Collections.Generic;` and `using SimpleDeFence.Windows.NetStat;` and `using SimpleDeFence.Windows.Services;` to the top of the file (`ProcessInfo` and `ServicePidMap` both live in `Windows.Services` per Task 1's correction — no separate `SimpleDeFence.Windows` using is needed), then add these members (after `SwitchModeAsync`):
 
@@ -769,7 +769,7 @@ In `SimpleDeFence.UI/Services/FirewallClient.cs`, add `using System.Collections.
 
 Add `using System;`, `using System.Linq;`, and `using System.Net.NetworkInformation;` (for `TcpState`) to the top of the file alongside the ones already there.
 
-- [ ] **Step 5: Implement the sample client**
+- [x] **Step 5: Implement the sample client**
 
 In `SimpleDeFence.UI/Services/SampleFirewallClient.cs`, add:
 
@@ -843,12 +843,12 @@ In `SimpleDeFence.UI/Services/SampleFirewallClient.cs`, add:
 
 Add `using System.Collections.Generic;` to the top of the file.
 
-- [ ] **Step 6: Build**
+- [x] **Step 6: Build**
 
 Run: `dotnet build SimpleDeFence.UI/SimpleDeFence.UI.csproj -c Debug -v:minimal -nologo`
 Expected: `Build succeeded`, 0 errors
 
-- [ ] **Step 7: Verify the net48 WinForms app still compiles**
+- [x] **Step 7: Verify the net48 WinForms app still compiles**
 
 ```bash
 MSB="/c/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/MSBuild/Current/Bin/MSBuild.exe"
@@ -858,7 +858,7 @@ export MSBuildSDKsPath="C:\Program Files\dotnet\sdk\10.0.302\Sdks" MSBuildEnable
 ```
 Expected: `Build succeeded`, 0 errors (this task doesn't touch anything WinForms glob-compiles, so this is a regression check, not expected to find anything)
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add SimpleDeFence.UI/Services/ SimpleDeFence.UI/SimpleDeFence.UI.csproj
@@ -879,7 +879,7 @@ Builds the page shell: three `Expander` sections (Blocked / Connected / Open) wi
 - Consumes: `App.Firewall.GetConnectionsAsync()` (Task 3), `ConnectionRow`/`BlockedRow` (Task 3)
 - Produces: `SimpleDeFence.UI.Pages.ConnectionsPage`, `ConnectionsPage.ConnectionListItem` (view row for Connected/Open), `ConnectionsPage.BlockedListItem` (view row for Blocked, Task 5 adds the Allow button binding)
 
-- [ ] **Step 1: Add localization keys**
+- [x] **Step 1: Add localization keys**
 
 In `SimpleDeFence.Core/Localization/LocKeys.cs`, add a new nested class after `Applications`:
 
@@ -963,12 +963,12 @@ In `SimpleDeFence.Core/Localization/Strings.pt-BR.json`, add the matching Portug
 
 ```
 
-- [ ] **Step 2: Run the localization tests to verify key parity**
+- [x] **Step 2: Run the localization tests to verify key parity**
 
 Run: `dotnet test SimpleDeFence.Tests/SimpleDeFence.Tests.csproj --filter FullyQualifiedName~LocTests`
 Expected: PASS — confirms the new `LocKeys.Connections.*` constants match both JSON files exactly (this is `LocTests`' whole purpose; a mismatch here means a typo in one of the three places just edited).
 
-- [ ] **Step 3: Write the page code-behind**
+- [x] **Step 3: Write the page code-behind**
 
 Create `SimpleDeFence.UI/Pages/ConnectionsPage.xaml.cs`:
 
@@ -1111,7 +1111,18 @@ namespace SimpleDeFence.UI.Pages
 }
 ```
 
-- [ ] **Step 4: Write the page XAML**
+> **Review fix (2026-08-09, final whole-branch review):** the `RefreshAsync` above is amended.
+> The plan's snippet could leave the page permanently busy: `GetConnectionsAsync()` runs the real
+> client's raw log/NetStat gathering (`BeginReadFwLog`/`TryGetProcessPath`), which can throw if the
+> pipe dies mid-gather, and without a `finally` that throw would leave `_busy` stuck true — the
+> refresh button and auto-refresh disabled for the rest of the app's life, exactly the defect class
+> the shell plan's Task 4 review ruled on for `ShellViewModel.RefreshAsync`. The `catch` also stops
+> the exception from crashing out of the `async void` Loaded handler, and surfaces it honestly
+> (error InfoBar with the exception message) while keeping the last-good snapshot on screen — an
+> all-clear is never faked. Final shape: body in `try { ... } catch (Exception ex) { ShowNotice(...) }
+> finally { SetBusy(false); }`, `Rebuild()` after the `finally`. See `ConnectionsPage.xaml.cs`.
+
+- [x] **Step 4: Write the page XAML**
 
 Create `SimpleDeFence.UI/Pages/ConnectionsPage.xaml`:
 
@@ -1230,12 +1241,12 @@ Create `SimpleDeFence.UI/Pages/ConnectionsPage.xaml`:
 
 Note `BlockedList` deliberately has no `ItemTemplate` yet — Task 5 adds `BlockedListItem` and its template together with the Allow button, since they're the same piece of work.
 
-- [ ] **Step 5: Build**
+- [x] **Step 5: Build**
 
 Run: `dotnet build SimpleDeFence.UI/SimpleDeFence.UI.csproj -c Debug -v:minimal -nologo`
 Expected: `Build succeeded`, 0 errors
 
-- [ ] **Step 6: Verify by running against sample data**
+- [x] **Step 6: Verify by running against sample data**
 
 ```bash
 SimpleDeFence.UI/bin/Debug/net10.0-windows10.0.19041.0/win-x64/SimpleDeFence.UI.exe --sample-data
@@ -1243,7 +1254,7 @@ SimpleDeFence.UI/bin/Debug/net10.0-windows10.0.19041.0/win-x64/SimpleDeFence.UI.
 
 `ConnectionsPage` isn't reachable from the nav yet (Task 6). Verify it directly by temporarily changing `ContentFrame.Navigate(typeof(ApplicationsPage))` to `ContentFrame.Navigate(typeof(ConnectionsPage))` in `MainWindow.xaml.cs`'s constructor, running, and confirming: three sections render, headers show live counts, Connected shows the sample firefox.exe row, Open shows the sample DoSvc row, filtering by "firefox" narrows to just that row. Then **revert the temporary change** (Task 6 does this properly, wired into the nav).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add SimpleDeFence.UI/Pages/ConnectionsPage.xaml SimpleDeFence.UI/Pages/ConnectionsPage.xaml.cs SimpleDeFence.Core/Localization/
@@ -1261,7 +1272,7 @@ git commit -m "Add ConnectionsPage shell with Connected/Open sections"
 - Consumes: `App.Firewall.AllowAsync(ExceptionSubject, ExceptionPolicy)` (Task 3), `BlockedRow` (Task 3)
 - Produces: `ConnectionsPage.BlockedListItem` (`AppName`, `Detail`, `When`, `AllowCommand`-equivalent via `Click`)
 
-- [ ] **Step 1: Add the Blocked row view model with its Allow action**
+- [x] **Step 1: Add the Blocked row view model with its Allow action**
 
 In `SimpleDeFence.UI/Pages/ConnectionsPage.xaml.cs`, add a new class above `ConnectionsPage` (next to `ConnectionListItem`):
 
@@ -1280,7 +1291,7 @@ In `SimpleDeFence.UI/Pages/ConnectionsPage.xaml.cs`, add a new class above `Conn
     }
 ```
 
-- [ ] **Step 2: Replace the Blocked stub with the real implementation**
+- [x] **Step 2: Replace the Blocked stub with the real implementation**
 
 Replace the `BlockedCount`/`RebuildBlocked` stub pair from Task 4 with:
 
@@ -1316,7 +1327,7 @@ In the constructor, wire up the list's items source next to the other two:
             BlockedList.ItemsSource = _blocked;
 ```
 
-- [ ] **Step 3: Add the Allow handler**
+- [x] **Step 3: Add the Allow handler**
 
 Add this method to `ConnectionsPage`:
 
@@ -1372,7 +1383,7 @@ Note the `AppContainerSubject(item.PackageId, item.AppName, string.Empty, string
 
 Add `using System.Threading.Tasks;` if not already present (it is, from Task 4).
 
-- [ ] **Step 4: Add the item template to the XAML**
+- [x] **Step 4: Add the item template to the XAML**
 
 In `SimpleDeFence.UI/Pages/ConnectionsPage.xaml`, replace `<ListView x:Name="BlockedList" SelectionMode="None"/>` with:
 
@@ -1412,12 +1423,12 @@ In `SimpleDeFence.UI/Pages/ConnectionsPage.xaml`, replace `<ListView x:Name="Blo
 
 Every status/action row here also carries an icon and text alongside the red background - colour is never the only signal, matching the Global Constraint carried over from the shell plan.
 
-- [ ] **Step 5: Build**
+- [x] **Step 5: Build**
 
 Run: `dotnet build SimpleDeFence.UI/SimpleDeFence.UI.csproj -c Debug -v:minimal -nologo`
 Expected: `Build succeeded`, 0 errors
 
-- [ ] **Step 6: Verify by running against sample data**
+- [x] **Step 6: Verify by running against sample data**
 
 Same temporary-navigate trick as Task 4 Step 6 (`ContentFrame.Navigate(typeof(ConnectionsPage))`), then:
 1. Blocked section shows the sample tracker.exe attempt, with a red-tinted row, a blocked icon, and an "Allow this app" button — colour, icon, and word together.
@@ -1426,7 +1437,7 @@ Same temporary-navigate trick as Task 4 Step 6 (`ContentFrame.Navigate(typeof(Co
 
 Revert the temporary navigation change afterward (Task 6 does this properly).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add SimpleDeFence.UI/Pages/ConnectionsPage.xaml SimpleDeFence.UI/Pages/ConnectionsPage.xaml.cs
@@ -1446,7 +1457,7 @@ Wires `ConnectionsPage` into the shell as the landing destination, and adds the 
 - Consumes: `ConnectionsPage` (Tasks 4-5)
 - Produces: `MainWindow` now navigates to `ConnectionsPage` first; nav has two destinations
 
-- [ ] **Step 1: Add the auto-refresh toggle**
+- [x] **Step 1: Add the auto-refresh toggle**
 
 In `SimpleDeFence.UI/Pages/ConnectionsPage.xaml`, add a `ToggleSwitch` to the filter row (Grid.Row="2"), between the filter box and the refresh button — change that Grid's column definitions and add the control:
 
@@ -1487,7 +1498,14 @@ In `ConnectionsPage.xaml.cs`, add the timer and its handlers:
 
 `DispatcherTimer` is `Microsoft.UI.Xaml.DispatcherTimer` - already covered by the existing `using Microsoft.UI.Xaml;`.
 
-- [ ] **Step 2: Add Connections as a nav destination, landing first**
+> **Review fix (2026-08-09, final whole-branch review):** `ConnectionsPage_Loaded` also restarts
+> the timer when `AutoRefreshToggle.IsOn`. The page is cached (`NavigationCacheMode.Enabled`), so
+> after `Unloaded` stops it, navigating to Rules and back would otherwise leave auto-refresh
+> silently dead while the toggle still reads on — an inert control that claims to be working.
+> Final shape: `if (AutoRefreshToggle.IsOn) _autoRefreshTimer.Start();` inside
+> `ConnectionsPage_Loaded` before the refresh.
+
+- [x] **Step 2: Add Connections as a nav destination, landing first**
 
 In `SimpleDeFence.UI/MainWindow.xaml`, replace the `NavigationView.MenuItems` block:
 
@@ -1506,7 +1524,7 @@ In `SimpleDeFence.UI/MainWindow.xaml`, replace the `NavigationView.MenuItems` bl
             </NavigationView.MenuItems>
 ```
 
-- [ ] **Step 3: Route by tag and land on Connections**
+- [x] **Step 3: Route by tag and land on Connections**
 
 In `SimpleDeFence.UI/MainWindow.xaml.cs`, add `using SimpleDeFence.UI.Pages;` (already present) and update the constructor and selection handler:
 
@@ -1535,12 +1553,12 @@ In `SimpleDeFence.UI/MainWindow.xaml.cs`, add `using SimpleDeFence.UI.Pages;` (a
 
 (This replaces the single-destination stub from the shell plan - the comment there already said "Rules is currently the only destination... at which point this maps item.Tag to a page type," which is exactly what's happening now.)
 
-- [ ] **Step 4: Build**
+- [x] **Step 4: Build**
 
 Run: `dotnet build SimpleDeFence.UI/SimpleDeFence.UI.csproj -c Debug -v:minimal -nologo`
 Expected: `Build succeeded`, 0 errors
 
-- [ ] **Step 5: Run and verify the whole screen end-to-end**
+- [x] **Step 5: Run and verify the whole screen end-to-end**
 
 ```bash
 SimpleDeFence.UI/bin/Debug/net10.0-windows10.0.19041.0/win-x64/SimpleDeFence.UI.exe --sample-data
@@ -1553,7 +1571,7 @@ Verify:
 4. Run without `--sample-data`: Connections shows "Not connected" (InfoBar), same as Applications does today - the real client stays the default.
 5. Run `dotnet test SimpleDeFence.Tests/SimpleDeFence.Tests.csproj` - full suite, all green, including the new `ConnectionActivityTests` and unaffected `LocTests`.
 
-- [ ] **Step 6: Verify the net48 WinForms app still compiles**
+- [x] **Step 6: Verify the net48 WinForms app still compiles**
 
 ```bash
 MSB="/c/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/MSBuild/Current/Bin/MSBuild.exe"
@@ -1563,7 +1581,7 @@ export MSBuildSDKsPath="C:\Program Files\dotnet\sdk\10.0.302\Sdks" MSBuildEnable
 ```
 Expected: `Build succeeded`, 0 errors
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A

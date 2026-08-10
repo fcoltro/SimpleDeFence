@@ -169,11 +169,14 @@ the core stays C#/.NET and untouched throughout this phase either way.
       itself, since Microsoft built it for exactly this transition.
 - [ ] Port feature-by-feature from the WinForms GUI, validating parity before removing each old form.
       Ported so far, behind a `NavigationView` shell with a shared `FirewallClient` so pages agree on
-      connection state and the config changeset: **Status** (firewall mode switching) and
-      **Applications** (read-only exception list with filtering). Both are so far verified only in
-      the disconnected state — see the runtime-verification caveat above.
-      Still to port: adding/editing/removing exceptions, the Connections window, hosts-file and
-      password/lock management, the tray icon and its menu, and the DevelTool.
+      connection state and the config changeset: the mode chip (firewall mode switching — the old
+      Status page), **Applications** (read-only exception list with filtering) and **Connections**
+      (Blocked / Connected / Open with the inline "Allow this app" commit). The WinUI screens are
+      verified against the sample-data provider and show the honest "Not connected" state against a
+      real install — the connected state against a live service awaits the .NET 10 migration (see
+      the runtime-verification caveat above).
+      Still to port: adding/editing/removing exceptions, the hosts-file and password/lock management,
+      the tray icon and its menu, and the DevelTool.
 
 ## Development environment
 
