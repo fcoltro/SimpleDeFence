@@ -233,7 +233,7 @@ namespace SimpleDeFence.UI.Pages
                 // The toggle already flipped visually; revert it to the truth.
                 await RefreshAsync();
                 await ShowResultAsync(Loc.T(LocKeys.Rules.SpecialToggleFailedTitle), FailureDetail(resp,
-                    LocKeys.Rules.RemoveFailedLockedDetail, LocKeys.Rules.RemoveFailedGenericDetail));
+                    LocKeys.Rules.SpecialToggleFailedLockedDetail, LocKeys.Rules.SpecialToggleFailedGenericDetail));
             }
         }
 

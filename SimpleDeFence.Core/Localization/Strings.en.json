@@ -153,7 +153,9 @@
       "genericDetail": "The service returned {0}. The exceptions were not removed."
     },
     "specialToggleFailed": {
-      "title": "Could not change the special exception"
+      "title": "Could not change the special exception",
+      "lockedDetail": "Unlock the configuration before changing this exception.",
+      "genericDetail": "The service returned {0}. The exception was not changed."
     },
     "add": "Add"
   }

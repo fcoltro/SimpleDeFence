@@ -129,6 +129,8 @@ namespace SimpleDeFence.Localization
             public const string RemoveFailedLockedDetail = "rules.removeFailed.lockedDetail";
             public const string RemoveFailedGenericDetail = "rules.removeFailed.genericDetail";
             public const string SpecialToggleFailedTitle = "rules.specialToggleFailed.title";
+            public const string SpecialToggleFailedLockedDetail = "rules.specialToggleFailed.lockedDetail";
+            public const string SpecialToggleFailedGenericDetail = "rules.specialToggleFailed.genericDetail";
             public const string Add = "rules.add";
         }
 
