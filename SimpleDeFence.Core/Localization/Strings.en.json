@@ -158,6 +158,11 @@
       "genericDetail": "The service returned {0}. The exception was not changed."
     },
     "add": "Add",
+    "addPickExecutable": "Executable file...",
+    "addPickProcess": "Running process...",
+    "addPickWindow": "Window...",
+    "addPickUwp": "UWP app...",
+    "pickUwpTitle": "Choose a UWP app",
     "detail": {
       "title": "Rule",
       "policyBlocked": "Blocked",

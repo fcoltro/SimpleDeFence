@@ -23,13 +23,22 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" x:Name="FilterBox" PlaceholderText="{loc:Loc Key=rules.filterPlaceholder}"
                      TextChanged="FilterBox_TextChanged" MaxWidth="360" HorizontalAlignment="Left"/>
-            <Button Grid.Column="1" x:Name="RemoveButton" Content="{loc:Loc Key=rules.remove}"
+            <SplitButton Grid.Column="1" x:Name="AddButton" Content="{loc:Loc Key=rules.add}">
+                <SplitButton.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickExecutable}" Click="AddPickExecutable_Click"/>
+                        <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickUwp}" Click="AddPickUwp_Click"/>
+                    </MenuFlyout>
+                </SplitButton.Flyout>
+            </SplitButton>
+            <Button Grid.Column="2" x:Name="RemoveButton" Content="{loc:Loc Key=rules.remove}"
                     Click="RemoveButton_Click" IsEnabled="False"/>
-            <Button Grid.Column="2" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"/>
-            <ProgressRing Grid.Column="3" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
+            <Button Grid.Column="3" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"/>
+            <ProgressRing Grid.Column="4" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
         </Grid>
 
         <ScrollViewer Grid.Row="3">

@@ -54,6 +54,13 @@ namespace SimpleDeFence.UI.Pages
         private bool _busy;
         private bool _committing;
 
+        /// <summary>Guards the Add split button's two pickers, separate from _committing (Remove/
+        /// Apply): serializes AllowAsync calls started from here so a rapid double-invoke cannot
+        /// fire two concurrent commits and, worse, two overlapping result dialogs (only one
+        /// ContentDialog can be open per XamlRoot) - same rationale as ConnectionsPage's
+        /// _allowBusy.</summary>
+        private bool _addBusy;
+
         /// <summary>The single selected application row the detail pane is currently editing, or
         /// null when zero/multiple rows are selected (the pane is collapsed in that case).</summary>
         private RuleListItem? _selectedDetailItem;
@@ -277,6 +284,157 @@ namespace SimpleDeFence.UI.Pages
         }
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
+
+        /// <summary>MenuFlyoutItem.Click - a plain top-level Click, the same safe shape
+        /// RemoveButton_Click/ApplyButton_Click already use, so committing and showing a result
+        /// dialog directly from here is fine per the Task 4 reentrancy rule.</summary>
+        private async void AddPickExecutable_Click(object sender, RoutedEventArgs e)
+        {
+            if (_addBusy)
+                return;
+
+            _addBusy = true;
+            try
+            {
+                // "Windows" is ambiguous inside SimpleDeFence.UI.Pages - it resolves to the sibling
+                // SimpleDeFence.Windows project/namespace before the platform namespace, so the
+                // picker type needs the same global:: qualification RuleListItem.RowBackground
+                // already uses for the same reason.
+                var picker = new global::Windows.Storage.Pickers.FileOpenPicker();
+                picker.FileTypeFilter.Add(".exe");
+
+                if (App.MainWindow is null)
+                    return;
+
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+                var file = await picker.PickSingleFileAsync();
+                if (file is null)
+                    return; // Cancelled - not an error, no dialog, no notice.
+
+                await CommitAddAsync(new ExecutableSubject(file.Path), file.Name);
+            }
+            finally
+            {
+                _addBusy = false;
+            }
+        }
+
+        /// <summary>Same safe shape as AddPickExecutable_Click above.</summary>
+        private async void AddPickUwp_Click(object sender, RoutedEventArgs e)
+        {
+            if (_addBusy)
+                return;
+
+            _addBusy = true;
+            try
+            {
+                await PickUwpAsync();
+            }
+            finally
+            {
+                _addBusy = false;
+            }
+        }
+
+        /// <summary>Builds and shows the UWP package picker dialog. UwpPackageList enumerates the
+        /// real OS package catalog (Windows.Management.Deployment.PackageManager) regardless of
+        /// --sample-data - there is no sample-data seam for it, unlike the rest of this page's
+        /// data. The package list is materialized once up front; UwpPackageList caches internally
+        /// per-instance, but there is no reason to re-query the OS every time the filter box
+        /// changes.</summary>
+        private async Task PickUwpAsync()
+        {
+            var allPackages = new UwpPackageList().ToList();
+
+            var listView = new ListView
+            {
+                SelectionMode = ListViewSelectionMode.None,
+                IsItemClickEnabled = true,
+                MaxHeight = 360,
+            };
+
+            void Populate(string term)
+            {
+                listView.Items.Clear();
+                foreach (var package in allPackages)
+                {
+                    // The Package struct exposes Name and PublisherId but no ready-made "family
+                    // name" property; Name + "_" + PublisherId is the real Windows Package Family
+                    // Name convention, built from the two fields that do exist.
+                    var familyName = $"{package.Name}_{package.PublisherId}";
+                    if (term.Length > 0
+                        && package.Name.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) < 0
+                        && familyName.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) < 0)
+                        continue;
+
+                    var row = new StackPanel { Tag = package, Padding = new Thickness(4) };
+                    row.Children.Add(new TextBlock { Text = package.Name, TextTrimming = TextTrimming.CharacterEllipsis });
+                    row.Children.Add(new TextBlock { Text = familyName, FontSize = 12, Opacity = 0.8, TextTrimming = TextTrimming.CharacterEllipsis });
+                    listView.Items.Add(row);
+                }
+            }
+
+            Populate(string.Empty);
+
+            var filterBox = new TextBox { PlaceholderText = Loc.T(LocKeys.Rules.FilterPlaceholder) };
+            filterBox.TextChanged += (_, _) => Populate(filterBox.Text?.Trim() ?? string.Empty);
+
+            var panel = new StackPanel { Spacing = 8, Width = 420 };
+            panel.Children.Add(filterBox);
+            panel.Children.Add(listView);
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                Title = Loc.T(LocKeys.Rules.PickUwpTitle),
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                Content = panel,
+            };
+
+            // ListView.ItemClick fires as a plain top-level dispatcher callback (not nested inside
+            // another control's own event handling), the same shape the Task 6 brief calls out as
+            // safe. Hide() the picker dialog before committing: only one ContentDialog can be open
+            // per XamlRoot, so CommitAddAsync's own result dialog would otherwise fail to show.
+            listView.ItemClick += async (_, args) =>
+            {
+                var row = (FrameworkElement)args.ClickedItem;
+                var package = (UwpPackageList.Package)row.Tag;
+                dialog.Hide();
+                await CommitAddAsync(new AppContainerSubject(package), package.Name);
+            };
+
+            await dialog.ShowAsync();
+        }
+
+        /// <summary>Shared commit path for both Add pickers - identical operation to Connections'
+        /// "Allow this app", so it reuses the same loc keys and reporting pattern.</summary>
+        private async Task CommitAddAsync(ExceptionSubject subject, string displayName)
+        {
+            MessageType resp;
+            try
+            {
+                resp = await App.Firewall.AllowAsync(subject, new TcpUdpPolicy(true));
+            }
+            catch (Exception ex)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), ex.Message);
+                return;
+            }
+
+            if (resp == MessageType.PUT_SETTINGS)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle),
+                    Loc.T(LocKeys.Connections.AllowSuccessBody, displayName));
+                await RefreshAsync();
+            }
+            else
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), FailureDetail(resp,
+                    LocKeys.Connections.AllowFailedLockedDetail, LocKeys.Connections.AllowFailedGenericDetail));
+            }
+        }
 
         private async void RemoveButton_Click(object sender, RoutedEventArgs e)
         {

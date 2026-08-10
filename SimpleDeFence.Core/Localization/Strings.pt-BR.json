@@ -158,6 +158,11 @@
       "genericDetail": "O serviço retornou {0}. A exceção não foi alterada."
     },
     "add": "Adicionar",
+    "addPickExecutable": "Arquivo executável...",
+    "addPickProcess": "Processo em execução...",
+    "addPickWindow": "Janela...",
+    "addPickUwp": "Aplicativo UWP...",
+    "pickUwpTitle": "Escolher um aplicativo UWP",
     "detail": {
       "title": "Regra",
       "policyBlocked": "Bloqueado",

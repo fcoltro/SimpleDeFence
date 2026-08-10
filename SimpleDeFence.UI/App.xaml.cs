@@ -14,6 +14,11 @@ namespace SimpleDeFence.UI
         // so fabricated firewall state can never be shown to a user by accident.
         internal static IFirewallClient Firewall { get; private set; } = new FirewallClient();
 
+        // WinUI 3 has no implicit "current window" the way WinForms did. Pickers (FileOpenPicker,
+        // etc.) need an owner HWND to initialize against, obtained via
+        // WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow).
+        internal static Window? MainWindow { get; private set; }
+
         public App()
         {
             InitializeComponent();
@@ -37,6 +42,7 @@ namespace SimpleDeFence.UI
                 Firewall = new SampleFirewallClient(locked);
 
             m_window = new MainWindow();
+            MainWindow = m_window;
             m_window.Activate();
         }
 
