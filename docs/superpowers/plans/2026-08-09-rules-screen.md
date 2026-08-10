@@ -1140,7 +1140,6 @@ Create `SimpleDeFence.UI/Pages/RulesPage.xaml`:
                         </ListView>
                     </StackPanel>
                 </Expander>
-```
 
                 <Expander IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <Expander.Header>
