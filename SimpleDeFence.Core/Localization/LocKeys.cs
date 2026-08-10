@@ -111,6 +111,25 @@ namespace SimpleDeFence.Localization
         {
             public const string SpecialKind = "rules.specialKind";
             public const string SpecialPolicy = "rules.specialPolicy";
+
+            public const string Title = "rules.title";
+            public const string SectionApplications = "rules.section.applications";
+            public const string SectionSpecialRecommended = "rules.section.specialRecommended";
+            public const string SectionSpecialOptional = "rules.section.specialOptional";
+            public const string FilterPlaceholder = "rules.filterPlaceholder";
+            public const string EmptyApplications = "rules.empty.applications";
+            public const string EmptySpecial = "rules.empty.special";
+            public const string EmptyFiltered = "rules.empty.filtered";
+            public const string Remove = "rules.remove";
+            public const string RemoveConfirmTitle = "rules.removeConfirm.title";
+            public const string RemoveConfirmBody = "rules.removeConfirm.body";
+            public const string RemoveSuccessTitle = "rules.removeSuccess.title";
+            public const string RemoveSuccessBody = "rules.removeSuccess.body";
+            public const string RemoveFailedTitle = "rules.removeFailed.title";
+            public const string RemoveFailedLockedDetail = "rules.removeFailed.lockedDetail";
+            public const string RemoveFailedGenericDetail = "rules.removeFailed.genericDetail";
+            public const string SpecialToggleFailedTitle = "rules.specialToggleFailed.title";
+            public const string Add = "rules.add";
         }
 
         public static class Policy

@@ -125,6 +125,36 @@
   },
   "rules": {
     "specialKind": "Exceção especial",
-    "specialPolicy": "Predefinida"
+    "specialPolicy": "Predefinida",
+    "title": "Regras",
+    "section": {
+      "applications": "Aplicativos",
+      "specialRecommended": "Especiais (recomendadas)",
+      "specialOptional": "Especiais (opcionais)"
+    },
+    "filterPlaceholder": "Filtrar por nome ou caminho",
+    "empty": {
+      "applications": "Nenhuma exceção de aplicativo ainda.",
+      "special": "Nenhuma exceção especial disponível.",
+      "filtered": "Nada corresponde ao filtro atual."
+    },
+    "remove": "Remover",
+    "removeConfirm": {
+      "title": "Remover exceções?",
+      "body": "Remover {0} exceção(ões)? Os aplicativos afetados voltarão a ser bloqueados."
+    },
+    "removeSuccess": {
+      "title": "Exceções removidas",
+      "body": "{0} exceção(ões) removida(s)."
+    },
+    "removeFailed": {
+      "title": "Não foi possível remover as exceções",
+      "lockedDetail": "Desbloqueie a configuração antes de remover exceções.",
+      "genericDetail": "O serviço retornou {0}. As exceções não foram removidas."
+    },
+    "specialToggleFailed": {
+      "title": "Não foi possível alterar a exceção especial"
+    },
+    "add": "Adicionar"
   }
 }

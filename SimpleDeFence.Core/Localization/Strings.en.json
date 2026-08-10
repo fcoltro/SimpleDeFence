@@ -125,6 +125,36 @@
   },
   "rules": {
     "specialKind": "Special exception",
-    "specialPolicy": "Predefined"
+    "specialPolicy": "Predefined",
+    "title": "Rules",
+    "section": {
+      "applications": "Applications",
+      "specialRecommended": "Special (recommended)",
+      "specialOptional": "Special (optional)"
+    },
+    "filterPlaceholder": "Filter by name or path",
+    "empty": {
+      "applications": "No application exceptions yet.",
+      "special": "No special exceptions available.",
+      "filtered": "Nothing matches the current filter."
+    },
+    "remove": "Remove",
+    "removeConfirm": {
+      "title": "Remove exceptions?",
+      "body": "Remove {0} exception(s)? The affected applications will be blocked again."
+    },
+    "removeSuccess": {
+      "title": "Exceptions removed",
+      "body": "{0} exception(s) were removed."
+    },
+    "removeFailed": {
+      "title": "Could not remove the exceptions",
+      "lockedDetail": "Unlock the configuration before removing exceptions.",
+      "genericDetail": "The service returned {0}. The exceptions were not removed."
+    },
+    "specialToggleFailed": {
+      "title": "Could not change the special exception"
+    },
+    "add": "Add"
   }
 }

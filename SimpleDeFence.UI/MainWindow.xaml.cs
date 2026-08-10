@@ -48,7 +48,7 @@ namespace SimpleDeFence.UI
             var targetType = (string)item.Tag switch
             {
                 "connections" => typeof(ConnectionsPage),
-                "rules" => typeof(ApplicationsPage),
+                "rules" => typeof(RulesPage),
                 _ => typeof(ConnectionsPage),
             };
 
