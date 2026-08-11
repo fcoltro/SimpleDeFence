@@ -14,7 +14,8 @@
     "refresh": "Refresh",
     "loading": "Loading...",
     "connecting": "Connecting...",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "anotherDialogOpenDetail": "Another dialog is already open. Please try again."
   },
 
   "status": {
@@ -93,6 +94,7 @@
     "allowFailed": {
       "title": "Could not add the exception",
       "lockedDetail": "Unlock the configuration before adding an exception.",
+      "staleDetail": "The configuration changed elsewhere just now; the exception was not added. Please try again.",
       "genericDetail": "The service returned {0}. The exception was not added.",
       "unidentified": "The application could not be identified (no path or package), so no exception was added."
     },
@@ -150,11 +152,13 @@
     "removeFailed": {
       "title": "Could not remove the exceptions",
       "lockedDetail": "Unlock the configuration before removing exceptions.",
+      "staleDetail": "The configuration changed elsewhere just now; the exceptions were not removed. Please try again.",
       "genericDetail": "The service returned {0}. The exceptions were not removed."
     },
     "specialToggleFailed": {
       "title": "Could not change the special exception",
       "lockedDetail": "Unlock the configuration before changing this exception.",
+      "staleDetail": "The configuration changed elsewhere just now; the exception was not changed. Please try again.",
       "genericDetail": "The service returned {0}. The exception was not changed."
     },
     "add": "Add",
@@ -165,6 +169,7 @@
     "pickUwpTitle": "Choose a UWP app",
     "pickProcessTitle": "Choose a running process",
     "pickWindowTitle": "Choose a window",
+    "pickEmpty": "No matching entries.",
     "detail": {
       "title": "Rule",
       "policyBlocked": "Blocked",
@@ -182,6 +187,7 @@
       "applyFailed": {
         "title": "Could not update the policy",
         "lockedDetail": "Unlock the configuration before changing this rule.",
+        "staleDetail": "The configuration changed elsewhere just now; the policy was not changed. Please try again.",
         "genericDetail": "The service returned {0}. The policy was not changed."
       }
     }

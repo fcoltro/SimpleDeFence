@@ -9,6 +9,15 @@
         RESPONSE_LOCKED,
         COM_ERROR,
 
+        /// <summary>
+        /// Client-side only - the service never sends this over the wire. A PUT_SETTINGS reply
+        /// still carries type PUT_SETTINGS even when TwMessagePutSettings.Warning is true (the
+        /// caller's changeset was stale, so the service applied nothing); SimpleDeFence.UI's
+        /// FirewallClient.CommitProfileChangesAsync recognises that case and returns this instead,
+        /// so a discarded change can never read as PUT_SETTINGS success.
+        /// </summary>
+        RESPONSE_STALE_CHANGESET,
+
         // Read commands (>31)
         GET_SETTINGS = 32,
         GET_PROCESS_PATH,

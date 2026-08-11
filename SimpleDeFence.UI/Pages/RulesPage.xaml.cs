@@ -54,11 +54,16 @@ namespace SimpleDeFence.UI.Pages
         private bool _busy;
         private bool _committing;
 
-        /// <summary>Guards the Add split button's four pickers, separate from _committing (Remove/
-        /// Apply): serializes AllowAsync calls started from here so a rapid double-invoke cannot
-        /// fire two concurrent commits and, worse, two overlapping result dialogs (only one
-        /// ContentDialog can be open per XamlRoot) - same rationale as ConnectionsPage's
-        /// _allowBusy.</summary>
+        /// <summary>Guards the Add split button's four pickers for the part _committing does not
+        /// cover: the picker dialog is up but no commit has started yet (CommitAsync only flips
+        /// _committing once a picker actually has something to commit). Prevents a rapid
+        /// double-invoke from opening two overlapping picker dialogs (only one ContentDialog can be
+        /// open per XamlRoot) - same rationale as ConnectionsPage's _allowBusy. Once a pick reaches
+        /// the commit stage, CommitAddAsync routes through the shared CommitAsync helper (like
+        /// Remove/Apply/Toggle), so _committing serializes that part; UpdateAddButtonEnabled gates
+        /// the Add button on both flags together, and UpdateRemoveButton/UpdateApplyButtonEnabled
+        /// gate Remove/Apply on _committing, so no two of Remove/Apply/Toggle/Add can commit at
+        /// once.</summary>
         private bool _addBusy;
 
         /// <summary>The single selected application row the detail pane is currently editing, or
@@ -189,6 +194,7 @@ namespace SimpleDeFence.UI.Pages
             RemoveButton.Content = count > 0
                 ? Loc.T(LocKeys.Rules.Remove) + " " + Loc.T(LocKeys.Connections.SectionCount, count)
                 : Loc.T(LocKeys.Rules.Remove);
+            UpdateAddButtonEnabled();
         }
 
         /// <summary>Shows/hides the detail pane based on selection count, and seeds it from the
@@ -218,7 +224,15 @@ namespace SimpleDeFence.UI.Pages
             DetailSubjectDetail.Visibility = string.IsNullOrEmpty(row.Detail) ? Visibility.Collapsed : Visibility.Visible;
 
             var policy = row.Exception!.Policy;
-            bool readOnly = policy.PolicyType == PolicyType.RuleList;
+            // Not policy.PolicyType == PolicyType.RuleList: that enum is a hand-maintained,
+            // per-subclass property (see SimpleDeFence.Core/ExceptionPolicy.cs), so it is only as
+            // trustworthy as whoever wrote the newest subclass's override. IsEditablePolicy below
+            // instead pattern-matches the same real subclass shapes the switch itself uses, so
+            // "editable" and "recognised by the switch" can never drift apart - refuse-by-default
+            // (readOnly) for anything neither of them recognises, exactly like a RuleListPolicy row,
+            // rather than risk BuildPolicyFromEditor's TcpUdpPolicy fallback silently submitting an
+            // unrelated policy on Apply.
+            bool readOnly = !IsEditablePolicy(policy);
             DetailReadOnlyNote.Visibility = readOnly ? Visibility.Visible : Visibility.Collapsed;
             DetailEditorFields.Visibility = readOnly ? Visibility.Collapsed : Visibility.Visible;
 
@@ -234,7 +248,9 @@ namespace SimpleDeFence.UI.Pages
 
                 // Pattern-matched against the actual ExceptionPolicy subclass shapes in
                 // SimpleDeFence.Core/ExceptionPolicy.cs - not the PolicyType enum - so this stays
-                // correct if a subclass ever changes without a matching PolicyType edit.
+                // correct if a subclass ever changes without a matching PolicyType edit. readOnly
+                // above already guarantees policy is one of these three cases, so there is nothing
+                // left for a default branch to do here.
                 switch (policy)
                 {
                     case HardBlockPolicy:
@@ -261,6 +277,19 @@ namespace SimpleDeFence.UI.Pages
             UpdateApplyButtonEnabled();
         }
 
+        /// <summary>True for exactly the ExceptionPolicy subclasses SeedDetailPane/
+        /// BuildPolicyFromEditor know how to edit. A RuleListPolicy row, or any future non-sealed
+        /// subclass neither of them recognises, must read as false here - shared by SeedDetailPane
+        /// (read-only note/editor visibility) and UpdateApplyButtonEnabled (Apply's enabled state)
+        /// so the two can never disagree about whether a row is editable.</summary>
+        private static bool IsEditablePolicy(ExceptionPolicy policy) => policy switch
+        {
+            HardBlockPolicy => true,
+            UnrestrictedPolicy => true,
+            TcpUdpPolicy => true,
+            _ => false,
+        };
+
         /// <summary>Local UI state only (which fields are enabled) - fires from a RadioButton's own
         /// Checked event, so per the Task 4 reentrancy fix it must never commit or show a dialog.</summary>
         private void PresetRadio_Checked(object sender, RoutedEventArgs e) => UpdateTcpUdpFieldsEnabled();
@@ -279,9 +308,18 @@ namespace SimpleDeFence.UI.Pages
 
         private void UpdateApplyButtonEnabled()
         {
-            var readOnly = _selectedDetailItem?.Row.Exception!.Policy.PolicyType == PolicyType.RuleList;
-            ApplyButton.IsEnabled = _selectedDetailItem is not null && !readOnly && !_committing;
+            var editable = _selectedDetailItem is not null && IsEditablePolicy(_selectedDetailItem.Row.Exception!.Policy);
+            ApplyButton.IsEnabled = editable && !_committing;
+            UpdateAddButtonEnabled();
         }
+
+        /// <summary>Add SplitButton is disabled for the same two reasons Remove/Apply are: a commit
+        /// (of any of the four Add pickers, or of Remove/Apply/Toggle) is in flight (_committing), or
+        /// an Add picker's own dialog is up and hasn't reached the commit stage yet (_addBusy, which
+        /// _committing does not cover since it is only set once CommitAsync is actually invoked).
+        /// Called from both UpdateRemoveButton/UpdateApplyButtonEnabled (which already run on every
+        /// _committing transition) and directly wherever _addBusy changes.</summary>
+        private void UpdateAddButtonEnabled() => AddButton.IsEnabled = !_committing && !_addBusy;
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
 
@@ -294,6 +332,7 @@ namespace SimpleDeFence.UI.Pages
                 return;
 
             _addBusy = true;
+            UpdateAddButtonEnabled();
             try
             {
                 // "Windows" is ambiguous inside SimpleDeFence.UI.Pages - it resolves to the sibling
@@ -309,7 +348,20 @@ namespace SimpleDeFence.UI.Pages
                 var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
                 WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
-                var file = await picker.PickSingleFileAsync();
+                global::Windows.Storage.StorageFile? file;
+                try
+                {
+                    file = await picker.PickSingleFileAsync();
+                }
+                catch (Exception ex)
+                {
+                    // PickSingleFileAsync is an awaited WinRT async operation on an async void
+                    // handler with no process-wide UnhandledException backstop - an exception here
+                    // (COM/interop failure) must be caught, not left to terminate the process.
+                    await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), ex.Message);
+                    return;
+                }
+
                 if (file is null)
                     return; // Cancelled - not an error, no dialog, no notice.
 
@@ -318,6 +370,7 @@ namespace SimpleDeFence.UI.Pages
             finally
             {
                 _addBusy = false;
+                UpdateAddButtonEnabled();
             }
         }
 
@@ -328,6 +381,7 @@ namespace SimpleDeFence.UI.Pages
                 return;
 
             _addBusy = true;
+            UpdateAddButtonEnabled();
             try
             {
                 await PickUwpAsync();
@@ -335,6 +389,7 @@ namespace SimpleDeFence.UI.Pages
             finally
             {
                 _addBusy = false;
+                UpdateAddButtonEnabled();
             }
         }
 
@@ -345,6 +400,7 @@ namespace SimpleDeFence.UI.Pages
                 return;
 
             _addBusy = true;
+            UpdateAddButtonEnabled();
             try
             {
                 await PickProcessAsync();
@@ -352,6 +408,7 @@ namespace SimpleDeFence.UI.Pages
             finally
             {
                 _addBusy = false;
+                UpdateAddButtonEnabled();
             }
         }
 
@@ -362,6 +419,7 @@ namespace SimpleDeFence.UI.Pages
                 return;
 
             _addBusy = true;
+            UpdateAddButtonEnabled();
             try
             {
                 await PickWindowAsync();
@@ -369,6 +427,7 @@ namespace SimpleDeFence.UI.Pages
             finally
             {
                 _addBusy = false;
+                UpdateAddButtonEnabled();
             }
         }
 
@@ -392,13 +451,31 @@ namespace SimpleDeFence.UI.Pages
         /// _allowBusy precedent.</summary>
         private async Task PickUwpAsync()
         {
-            var allPackages = new UwpPackageList().ToList();
+            // UwpPackageList.ToList() enumerates the OS package catalog (PackageManager.
+            // FindPackagesForUser plus a per-package SID-derivation P/Invoke) - on a real machine
+            // that is 150-300+ packages, so materializing it must happen off the UI thread like
+            // the other three pickers' data sources already do (GetRunningProcessesAsync,
+            // GetTopLevelWindowsAsync, and the awaited FileOpenPicker call), or the window freezes
+            // with no busy indicator for however long the enumeration takes.
+            var allPackages = await Task.Run(() => new UwpPackageList().ToList());
 
             var listView = new ListView
             {
                 SelectionMode = ListViewSelectionMode.None,
                 IsItemClickEnabled = true,
                 MaxHeight = 360,
+            };
+
+            // Shown instead of a silently-blank list box when nothing matches - including on a
+            // genuine enumeration failure: UwpPackageList swallows that into an empty Packages list
+            // (e.g. the AppXSVC service disabled), which without this looked identical to "you typed
+            // a filter that matched nothing" or "there is nothing to pick from".
+            var emptyText = new TextBlock
+            {
+                Text = Loc.T(LocKeys.Rules.PickEmpty),
+                Opacity = 0.7,
+                Margin = new Thickness(4),
+                Visibility = Visibility.Collapsed,
             };
 
             void Populate(string term)
@@ -420,6 +497,8 @@ namespace SimpleDeFence.UI.Pages
                     row.Children.Add(new TextBlock { Text = familyName, FontSize = 12, Opacity = 0.8, TextTrimming = TextTrimming.CharacterEllipsis });
                     listView.Items.Add(row);
                 }
+
+                emptyText.Visibility = listView.Items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             }
 
             Populate(string.Empty);
@@ -430,20 +509,22 @@ namespace SimpleDeFence.UI.Pages
             var panel = new StackPanel { Spacing = 8, Width = 420 };
             panel.Children.Add(filterBox);
             panel.Children.Add(listView);
+            panel.Children.Add(emptyText);
 
+            var pickTitle = Loc.T(LocKeys.Rules.PickUwpTitle);
             var dialog = new ContentDialog
             {
                 XamlRoot = Content.XamlRoot,
-                Title = Loc.T(LocKeys.Rules.PickUwpTitle),
+                Title = pickTitle,
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
                 Content = panel,
             };
 
             // ItemClick only records the pick and hides the dialog - it must not commit itself (see
-            // the method doc above for why). Hide() completes the await dialog.ShowAsync() below,
-            // which is where the commit actually happens: only one ContentDialog can be open per
-            // XamlRoot, so CommitAddAsync's own result dialog would otherwise fail to show while the
-            // picker is still up.
+            // the method doc above for why). Hide() completes the await TryShowDialogAsync(...)
+            // below, which is where the commit actually happens: only one ContentDialog can be open
+            // per XamlRoot, so CommitAddAsync's own result dialog would otherwise fail to show while
+            // the picker is still up.
             UwpPackageList.Package? picked = null;
             listView.ItemClick += (_, args) =>
             {
@@ -452,7 +533,7 @@ namespace SimpleDeFence.UI.Pages
                 dialog.Hide();
             };
 
-            await dialog.ShowAsync();
+            await TryShowDialogAsync(dialog, pickTitle, Loc.T(LocKeys.Common.AnotherDialogOpenDetail));
 
             if (picked is { } package)
                 await CommitAddAsync(new AppContainerSubject(package), package.Name);
@@ -524,6 +605,16 @@ namespace SimpleDeFence.UI.Pages
                 MaxHeight = 360,
             };
 
+            // Shown instead of a silently-blank list box when nothing matches - see PickUwpAsync's
+            // identical emptyText for why this matters beyond just an empty filter result.
+            var emptyText = new TextBlock
+            {
+                Text = Loc.T(LocKeys.Rules.PickEmpty),
+                Opacity = 0.7,
+                Margin = new Thickness(4),
+                Visibility = Visibility.Collapsed,
+            };
+
             void Populate(string term)
             {
                 listView.Items.Clear();
@@ -538,6 +629,8 @@ namespace SimpleDeFence.UI.Pages
                     row.Children.Add(new TextBlock { Text = secondary, FontSize = 12, Opacity = 0.8, TextTrimming = TextTrimming.CharacterEllipsis });
                     listView.Items.Add(row);
                 }
+
+                emptyText.Visibility = listView.Items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             }
 
             Populate(string.Empty);
@@ -548,6 +641,7 @@ namespace SimpleDeFence.UI.Pages
             var panel = new StackPanel { Spacing = 8, Width = 420 };
             panel.Children.Add(filterBox);
             panel.Children.Add(listView);
+            panel.Children.Add(emptyText);
 
             var dialog = new ContentDialog
             {
@@ -565,24 +659,21 @@ namespace SimpleDeFence.UI.Pages
                 dialog.Hide();
             };
 
-            await dialog.ShowAsync();
+            await TryShowDialogAsync(dialog, title, Loc.T(LocKeys.Common.AnotherDialogOpenDetail));
             return picked;
         }
 
         /// <summary>Shared commit path for all four Add pickers - identical operation to Connections'
-        /// "Allow this app", so it reuses the same loc keys and reporting pattern.</summary>
+        /// "Allow this app", so it reuses the same loc keys and reporting pattern. Routed through the
+        /// page's own CommitAsync (rather than calling App.Firewall.AllowAsync directly, which is
+        /// what AllowAsync itself does under the hood) so Add serializes with Remove/Apply/Toggle
+        /// through the single shared _committing guard instead of being a fifth, independent commit
+        /// path that could race them - this also gets the shared exception -> InfoBar handling
+        /// CommitAsync already gives Remove/Apply/Toggle, so no bespoke try/catch is needed here.</summary>
         private async Task CommitAddAsync(ExceptionSubject subject, string displayName)
         {
-            MessageType resp;
-            try
-            {
-                resp = await App.Firewall.AllowAsync(subject, new TcpUdpPolicy(true));
-            }
-            catch (Exception ex)
-            {
-                await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), ex.Message);
-                return;
-            }
+            var resp = await CommitAsync(profile =>
+                profile.AddExceptions(new List<FirewallExceptionV3> { new(subject, new TcpUdpPolicy(true)) }));
 
             if (resp == MessageType.PUT_SETTINGS)
             {
@@ -593,7 +684,8 @@ namespace SimpleDeFence.UI.Pages
             else
             {
                 await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), FailureDetail(resp,
-                    LocKeys.Connections.AllowFailedLockedDetail, LocKeys.Connections.AllowFailedGenericDetail));
+                    LocKeys.Connections.AllowFailedLockedDetail, LocKeys.Connections.AllowFailedStaleDetail,
+                    LocKeys.Connections.AllowFailedGenericDetail));
             }
         }
 
@@ -603,16 +695,21 @@ namespace SimpleDeFence.UI.Pages
             if (selected.Count == 0 || _committing)
                 return;
 
+            var confirmTitle = Loc.T(LocKeys.Rules.RemoveConfirmTitle);
+            var confirmBody = Loc.T(LocKeys.Rules.RemoveConfirmBody, selected.Count);
             var confirm = new ContentDialog
             {
                 XamlRoot = Content.XamlRoot,
-                Title = Loc.T(LocKeys.Rules.RemoveConfirmTitle),
-                Content = Loc.T(LocKeys.Rules.RemoveConfirmBody, selected.Count),
+                Title = confirmTitle,
+                Content = confirmBody,
                 PrimaryButtonText = Loc.T(LocKeys.Rules.Remove),
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
                 DefaultButton = ContentDialogButton.Close,
             };
-            if (await confirm.ShowAsync() != ContentDialogResult.Primary)
+            // If another dialog is already up (single-dialog-per-XamlRoot), the fallback InfoBar
+            // shows the same confirm text this dialog would have, and ContentDialogResult.None
+            // (never Primary) means Remove safely does not proceed without an actual confirmation.
+            if (await TryShowDialogAsync(confirm, confirmTitle, confirmBody) != ContentDialogResult.Primary)
                 return;
 
             var ids = selected.Select(s => s.Row.Exception!.Id).ToList();
@@ -627,7 +724,8 @@ namespace SimpleDeFence.UI.Pages
             else
             {
                 await ShowResultAsync(Loc.T(LocKeys.Rules.RemoveFailedTitle), FailureDetail(resp,
-                    LocKeys.Rules.RemoveFailedLockedDetail, LocKeys.Rules.RemoveFailedGenericDetail));
+                    LocKeys.Rules.RemoveFailedLockedDetail, LocKeys.Rules.RemoveFailedStaleDetail,
+                    LocKeys.Rules.RemoveFailedGenericDetail));
             }
         }
 
@@ -644,7 +742,7 @@ namespace SimpleDeFence.UI.Pages
                 return;
 
             var original = _selectedDetailItem.Row.Exception!;
-            if (original.Policy.PolicyType == PolicyType.RuleList)
+            if (!IsEditablePolicy(original.Policy))
                 return; // Apply is disabled for this row; guard in case that ever drifts.
 
             // Captured now, not read back off _selectedDetailItem after the commit: RefreshAsync
@@ -686,7 +784,8 @@ namespace SimpleDeFence.UI.Pages
             else
             {
                 await ShowResultAsync(Loc.T(LocKeys.Rules.DetailApplyFailedTitle), FailureDetail(resp,
-                    LocKeys.Rules.DetailApplyFailedLockedDetail, LocKeys.Rules.DetailApplyFailedGenericDetail));
+                    LocKeys.Rules.DetailApplyFailedLockedDetail, LocKeys.Rules.DetailApplyFailedStaleDetail,
+                    LocKeys.Rules.DetailApplyFailedGenericDetail));
             }
         }
 
@@ -742,7 +841,8 @@ namespace SimpleDeFence.UI.Pages
                 // The toggle already flipped visually; revert it to the truth.
                 await RefreshAsync();
                 await ShowResultAsync(Loc.T(LocKeys.Rules.SpecialToggleFailedTitle), FailureDetail(resp,
-                    LocKeys.Rules.SpecialToggleFailedLockedDetail, LocKeys.Rules.SpecialToggleFailedGenericDetail));
+                    LocKeys.Rules.SpecialToggleFailedLockedDetail, LocKeys.Rules.SpecialToggleFailedStaleDetail,
+                    LocKeys.Rules.SpecialToggleFailedGenericDetail));
             }
         }
 
@@ -769,13 +869,14 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
-        private static string FailureDetail(MessageType resp, string lockedKey, string genericKey) => resp switch
+        private static string FailureDetail(MessageType resp, string lockedKey, string staleKey, string genericKey) => resp switch
         {
             MessageType.RESPONSE_LOCKED => Loc.T(lockedKey),
+            MessageType.RESPONSE_STALE_CHANGESET => Loc.T(staleKey),
             _ => Loc.T(genericKey, resp),
         };
 
-        private async Task ShowResultAsync(string title, string body)
+        private Task ShowResultAsync(string title, string body)
         {
             var dialog = new ContentDialog
             {
@@ -785,14 +886,27 @@ namespace SimpleDeFence.UI.Pages
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),
             };
 
+            return TryShowDialogAsync(dialog, title, body);
+        }
+
+        /// <summary>Every ContentDialog.ShowAsync() call site in this page routes through here: WinUI
+        /// allows only one open ContentDialog per XamlRoot at a time, and a second ShowAsync() while
+        /// one is already open throws InvalidOperationException instead of queuing or showing
+        /// anything. This page has no process-wide UnhandledException handler backstopping its
+        /// async void entry points (deliberately - see the final-review fix wave), so an unguarded
+        /// throw here is a hard crash, not a swallowed error. The InfoBar fallback (same
+        /// Informational-severity pattern ShowResultAsync originated) is a degraded but still honest
+        /// way for the outcome to reach the user instead of nothing happening at all.</summary>
+        private async Task<ContentDialogResult> TryShowDialogAsync(ContentDialog dialog, string fallbackTitle, string fallbackMessage)
+        {
             try
             {
-                await dialog.ShowAsync();
+                return await dialog.ShowAsync();
             }
             catch (InvalidOperationException)
             {
-                // Single-dialog-per-XamlRoot rule; fall back to the InfoBar rather than crash.
-                ShowNotice(InfoBarSeverity.Informational, title, body);
+                ShowNotice(InfoBarSeverity.Informational, fallbackTitle, fallbackMessage);
+                return ContentDialogResult.None;
             }
         }
 

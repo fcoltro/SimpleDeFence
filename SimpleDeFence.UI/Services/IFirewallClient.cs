@@ -32,8 +32,12 @@ namespace SimpleDeFence.UI.Services
 
         /// <summary>
         /// The one commit path: clone the cached config, mutate the clone's active profile, put
-        /// it back. Only PUT_SETTINGS means the change took; anything else (locked, changeset
-        /// conflict, unrecognised) is a failure the caller must show as one.
+        /// it back. A returned type of PUT_SETTINGS alone is NOT sufficient to mean the change
+        /// took - the service can reply PUT_SETTINGS while having applied nothing when the
+        /// caller's changeset was stale (TwMessagePutSettings.Warning). Implementations translate
+        /// that case to MessageType.RESPONSE_STALE_CHANGESET instead, so "PUT_SETTINGS and only
+        /// PUT_SETTINGS" is the caller's complete success check; every other value (including
+        /// RESPONSE_STALE_CHANGESET, locked, or unrecognised) is a failure to show as one.
         /// </summary>
         Task<MessageType> CommitProfileChangesAsync(Action<ServerProfileConfiguration> mutate);
 

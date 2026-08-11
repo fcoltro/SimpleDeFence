@@ -30,6 +30,7 @@ namespace SimpleDeFence.Localization
             public const string Loading = "common.loading";
             public const string Connecting = "common.connecting";
             public const string Unknown = "common.unknown";
+            public const string AnotherDialogOpenDetail = "common.anotherDialogOpenDetail";
         }
 
         public static class Status
@@ -93,6 +94,7 @@ namespace SimpleDeFence.Localization
             public const string AllowSuccessBody = "connections.allowSuccess.body";
             public const string AllowFailedTitle = "connections.allowFailed.title";
             public const string AllowFailedLockedDetail = "connections.allowFailed.lockedDetail";
+            public const string AllowFailedStaleDetail = "connections.allowFailed.staleDetail";
             public const string AllowFailedGenericDetail = "connections.allowFailed.genericDetail";
             public const string AllowFailedUnidentified = "connections.allowFailed.unidentified";
             public const string GatherFailedTitle = "connections.gatherFailed.title";
@@ -127,9 +129,11 @@ namespace SimpleDeFence.Localization
             public const string RemoveSuccessBody = "rules.removeSuccess.body";
             public const string RemoveFailedTitle = "rules.removeFailed.title";
             public const string RemoveFailedLockedDetail = "rules.removeFailed.lockedDetail";
+            public const string RemoveFailedStaleDetail = "rules.removeFailed.staleDetail";
             public const string RemoveFailedGenericDetail = "rules.removeFailed.genericDetail";
             public const string SpecialToggleFailedTitle = "rules.specialToggleFailed.title";
             public const string SpecialToggleFailedLockedDetail = "rules.specialToggleFailed.lockedDetail";
+            public const string SpecialToggleFailedStaleDetail = "rules.specialToggleFailed.staleDetail";
             public const string SpecialToggleFailedGenericDetail = "rules.specialToggleFailed.genericDetail";
             public const string Add = "rules.add";
             public const string AddPickExecutable = "rules.addPickExecutable";
@@ -139,6 +143,7 @@ namespace SimpleDeFence.Localization
             public const string PickUwpTitle = "rules.pickUwpTitle";
             public const string PickProcessTitle = "rules.pickProcessTitle";
             public const string PickWindowTitle = "rules.pickWindowTitle";
+            public const string PickEmpty = "rules.pickEmpty";
 
             public const string DetailTitle = "rules.detail.title";
             public const string DetailPolicyBlocked = "rules.detail.policyBlocked";
@@ -155,6 +160,7 @@ namespace SimpleDeFence.Localization
             public const string DetailApplySuccess = "rules.detail.applySuccess";
             public const string DetailApplyFailedTitle = "rules.detail.applyFailed.title";
             public const string DetailApplyFailedLockedDetail = "rules.detail.applyFailed.lockedDetail";
+            public const string DetailApplyFailedStaleDetail = "rules.detail.applyFailed.staleDetail";
             public const string DetailApplyFailedGenericDetail = "rules.detail.applyFailed.genericDetail";
         }
 

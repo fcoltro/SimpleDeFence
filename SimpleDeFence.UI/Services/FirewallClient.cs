@@ -128,10 +128,19 @@ namespace SimpleDeFence.UI.Services
                 var resp = _controller.SetServerConfig(clone, _changeset);
                 if (resp is TwMessagePutSettings putResp && resp.Type == MessageType.PUT_SETTINGS)
                 {
+                    // Adopt the changeset/config/state either way, warning or not: they reflect the
+                    // server's current truth, so a retry after a warning starts from the right place.
                     _changeset = putResp.Changeset;
                     Config = putResp.Config;
                     if (putResp.State is not null)
                         State = putResp.State;
+
+                    // Warning=true means the service detected our changeset was stale and applied
+                    // NOTHING, even though the wire response is still typed PUT_SETTINGS (see
+                    // SimpleDeFenceService's PUT_SETTINGS handler). Reporting resp.Type here would
+                    // tell the caller a change succeeded when the service silently discarded it.
+                    if (putResp.Warning)
+                        return MessageType.RESPONSE_STALE_CHANGESET;
                 }
 
                 return resp.Type;
@@ -162,28 +171,41 @@ namespace SimpleDeFence.UI.Services
         {
             return Task.Run(() =>
             {
-                var list = new List<ProcessListEntry>();
-                foreach (var p in System.Diagnostics.Process.GetProcesses())
+                try
                 {
-                    using (p)
+                    var list = new List<ProcessListEntry>();
+                    foreach (var p in System.Diagnostics.Process.GetProcesses())
                     {
-                        var path = ResolvePath(unchecked((uint)p.Id));
-                        // No path means we cannot build a rule for it - leave it out rather than
-                        // offering a row that would commit a broken exception.
-                        if (string.IsNullOrEmpty(path))
-                            continue;
-
-                        list.Add(new ProcessListEntry
+                        using (p)
                         {
-                            ProcessId = unchecked((uint)p.Id),
-                            Name = p.ProcessName,
-                            Path = path,
-                        });
-                    }
-                }
+                            var path = ResolvePath(unchecked((uint)p.Id));
+                            // No path means we cannot build a rule for it - leave it out rather than
+                            // offering a row that would commit a broken exception.
+                            if (string.IsNullOrEmpty(path))
+                                continue;
 
-                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
-                return (IReadOnlyList<ProcessListEntry>)list;
+                            list.Add(new ProcessListEntry
+                            {
+                                ProcessId = unchecked((uint)p.Id),
+                                Name = p.ProcessName,
+                                Path = path,
+                            });
+                        }
+                    }
+
+                    list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+                    return (IReadOnlyList<ProcessListEntry>)list;
+                }
+                catch (Exception)
+                {
+                    // Process.GetProcesses()/.ProcessName can throw on a process-exit race (the
+                    // process disappears between the snapshot and reading its properties). Every
+                    // caller of this method is an async void picker entry point with no process-wide
+                    // UnhandledException backstop, so an empty list - not a crash - is how this
+                    // surfaces: same normal-state handling GetAppDatabaseAsync already gives a
+                    // missing/unreadable database.
+                    return (IReadOnlyList<ProcessListEntry>)Array.Empty<ProcessListEntry>();
+                }
             });
         }
 
@@ -191,24 +213,34 @@ namespace SimpleDeFence.UI.Services
         {
             return Task.Run(() =>
             {
-                var list = new List<WindowListEntry>();
-                foreach (var w in SimpleDeFence.Windows.TopLevelWindows.EnumerateVisible())
+                try
                 {
-                    var path = ResolvePath(w.ProcessId);
-                    if (string.IsNullOrEmpty(path))
-                        continue;
-
-                    list.Add(new WindowListEntry
+                    var list = new List<WindowListEntry>();
+                    foreach (var w in SimpleDeFence.Windows.TopLevelWindows.EnumerateVisible())
                     {
-                        Title = w.Title,
-                        ProcessId = w.ProcessId,
-                        ProcessName = Path.GetFileName(path),
-                        ProcessPath = path,
-                    });
-                }
+                        var path = ResolvePath(w.ProcessId);
+                        if (string.IsNullOrEmpty(path))
+                            continue;
 
-                list.Sort((a, b) => string.Compare(a.Title, b.Title, StringComparison.CurrentCultureIgnoreCase));
-                return (IReadOnlyList<WindowListEntry>)list;
+                        list.Add(new WindowListEntry
+                        {
+                            Title = w.Title,
+                            ProcessId = w.ProcessId,
+                            ProcessName = Path.GetFileName(path),
+                            ProcessPath = path,
+                        });
+                    }
+
+                    list.Sort((a, b) => string.Compare(a.Title, b.Title, StringComparison.CurrentCultureIgnoreCase));
+                    return (IReadOnlyList<WindowListEntry>)list;
+                }
+                catch (Exception)
+                {
+                    // EnumWindows interop (SimpleDeFence.Windows.TopLevelWindows) can fail for the
+                    // same COM/interop reasons GetRunningProcessesAsync's catch above guards against
+                    // - see that comment for why an empty list, not a crash, is the right outcome.
+                    return (IReadOnlyList<WindowListEntry>)Array.Empty<WindowListEntry>();
+                }
             });
         }
 

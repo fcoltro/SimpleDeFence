@@ -14,7 +14,8 @@
     "refresh": "Atualizar",
     "loading": "Carregando...",
     "connecting": "Conectando...",
-    "unknown": "Desconhecido"
+    "unknown": "Desconhecido",
+    "anotherDialogOpenDetail": "Outra janela já está aberta. Tente novamente."
   },
 
   "status": {
@@ -93,6 +94,7 @@
     "allowFailed": {
       "title": "Não foi possível adicionar a exceção",
       "lockedDetail": "Desbloqueie a configuração antes de adicionar uma exceção.",
+      "staleDetail": "A configuração foi alterada em outro lugar agora há pouco; a exceção não foi adicionada. Tente novamente.",
       "genericDetail": "O serviço retornou {0}. A exceção não foi adicionada.",
       "unidentified": "O aplicativo não pôde ser identificado (sem caminho nem pacote), portanto nenhuma exceção foi adicionada."
     },
@@ -150,11 +152,13 @@
     "removeFailed": {
       "title": "Não foi possível remover as exceções",
       "lockedDetail": "Desbloqueie a configuração antes de remover exceções.",
+      "staleDetail": "A configuração foi alterada em outro lugar agora há pouco; as exceções não foram removidas. Tente novamente.",
       "genericDetail": "O serviço retornou {0}. As exceções não foram removidas."
     },
     "specialToggleFailed": {
       "title": "Não foi possível alterar a exceção especial",
       "lockedDetail": "Desbloqueie a configuração antes de alterar esta exceção.",
+      "staleDetail": "A configuração foi alterada em outro lugar agora há pouco; a exceção não foi alterada. Tente novamente.",
       "genericDetail": "O serviço retornou {0}. A exceção não foi alterada."
     },
     "add": "Adicionar",
@@ -165,6 +169,7 @@
     "pickUwpTitle": "Escolher um aplicativo UWP",
     "pickProcessTitle": "Escolher um processo em execução",
     "pickWindowTitle": "Escolher uma janela",
+    "pickEmpty": "Nenhum item corresponde.",
     "detail": {
       "title": "Regra",
       "policyBlocked": "Bloqueado",
@@ -182,6 +187,7 @@
       "applyFailed": {
         "title": "Não foi possível atualizar a política",
         "lockedDetail": "Desbloqueie a configuração antes de alterar esta regra.",
+        "staleDetail": "A configuração foi alterada em outro lugar agora há pouco; a política não foi alterada. Tente novamente.",
         "genericDetail": "O serviço retornou {0}. A política não foi alterada."
       }
     }

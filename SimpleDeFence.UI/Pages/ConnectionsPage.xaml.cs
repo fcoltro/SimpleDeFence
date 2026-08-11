@@ -264,6 +264,7 @@ namespace SimpleDeFence.UI.Pages
                 var body = resp switch
                 {
                     MessageType.RESPONSE_LOCKED => Loc.T(LocKeys.Connections.AllowFailedLockedDetail),
+                    MessageType.RESPONSE_STALE_CHANGESET => Loc.T(LocKeys.Connections.AllowFailedStaleDetail),
                     _ => Loc.T(LocKeys.Connections.AllowFailedGenericDetail, resp),
                 };
                 await ShowAllowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), body);
