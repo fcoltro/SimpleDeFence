@@ -114,10 +114,10 @@ namespace SimpleDeFence.UI.Services
         }
 
         public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy)
-            => CommitProfileChangesAsync(profile =>
-                profile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
+            => CommitConfigChangesAsync(config =>
+                config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
 
-        public Task<MessageType> CommitProfileChangesAsync(Action<ServerProfileConfiguration> mutate)
+        public Task<MessageType> CommitConfigChangesAsync(Action<ServerConfiguration> mutate)
         {
             if (_locked)
                 return Task.FromResult(MessageType.RESPONSE_LOCKED);
@@ -125,7 +125,7 @@ namespace SimpleDeFence.UI.Services
             if (Config is null)
                 return Task.FromResult(MessageType.RESPONSE_ERROR);
 
-            mutate(Config.ActiveProfile);
+            mutate(Config);
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.PUT_SETTINGS);
         }

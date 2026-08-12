@@ -109,10 +109,10 @@ namespace SimpleDeFence.UI.Services
         }
 
         public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy)
-            => CommitProfileChangesAsync(profile =>
-                profile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
+            => CommitConfigChangesAsync(config =>
+                config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
 
-        public Task<MessageType> CommitProfileChangesAsync(Action<ServerProfileConfiguration> mutate)
+        public Task<MessageType> CommitConfigChangesAsync(Action<ServerConfiguration> mutate)
         {
             return Task.Run(() =>
             {
@@ -123,7 +123,7 @@ namespace SimpleDeFence.UI.Services
                 // successful PUT replaces the cached config.
                 var clone = SerializationHelper.Deserialize<ServerConfiguration>(
                     SerializationHelper.Serialize(Config), new ServerConfiguration());
-                mutate(clone.ActiveProfile);
+                mutate(clone);
 
                 var resp = _controller.SetServerConfig(clone, _changeset);
                 if (resp is TwMessagePutSettings putResp && resp.Type == MessageType.PUT_SETTINGS)
