@@ -170,13 +170,21 @@ the core stays C#/.NET and untouched throughout this phase either way.
 - [ ] Port feature-by-feature from the WinForms GUI, validating parity before removing each old form.
       Ported so far, behind a `NavigationView` shell with a shared `FirewallClient` so pages agree on
       connection state and the config changeset: the mode chip (firewall mode switching — the old
-      Status page), **Applications** (read-only exception list with filtering) and **Connections**
-      (Blocked / Connected / Open with the inline "Allow this app" commit). The WinUI screens are
-      verified against the sample-data provider and show the honest "Not connected" state against a
-      real install — the connected state against a live service awaits the .NET 10 migration (see
-      the runtime-verification caveat above).
-      Still to port: adding/editing/removing exceptions, the hosts-file and password/lock management,
-      the tray icon and its menu, and the DevelTool.
+      Status page), **Connections** (Blocked / Connected / Open with the inline "Allow this app"
+      commit) and **Rules** (the third and final design-doc destination — grouped
+      Applications/Special exceptions replacing the old read-only Applications page, with search,
+      a detail pane for preset policy editing, multi-select bulk removal, and an Add split button
+      covering all four pickers: executable file, running process, window, UWP package). The WinUI
+      screens are verified against the sample-data provider and show the honest "Not connected"
+      state against a real install — the connected state against a live service awaits the .NET 10
+      migration (see the runtime-verification caveat above).
+      Still to port: **Settings** (the last of the three design-doc destinations — no implementation
+      plan written yet, though the design doc already specifies its groups: General · Protection ·
+      Blocklists · Security (password/lock) · Updates · Maintenance), the hosts-file management,
+      the tray icon and its menu, and the DevelTool. Rules' own plan also deferred, as explicit
+      follow-ups: a custom rule-list (`RuleListPolicy`) editor, smarter "Allow this app" suggestions
+      ported from `AppDatabase.GetExceptionsForApp`, and the remaining WinForms-only add flows (disk
+      auto-detect, add-folder, drag-and-drop).
 
 ## Development environment
 
