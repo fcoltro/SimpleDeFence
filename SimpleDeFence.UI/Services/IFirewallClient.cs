@@ -30,6 +30,21 @@ namespace SimpleDeFence.UI.Services
         /// <summary>Commits a new exception for the given subject with the given policy.</summary>
         Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy);
 
+        /// <summary>Locks the configuration server-side. A no-op on the wire (still returns
+        /// MessageType.LOCK) when no password is set - PasswordLock's own Locked setter is gated
+        /// on HasPassword server-side, so this is inert rather than an error in that case; callers
+        /// should disable the "Lock now" action when State.HasPassword is false.</summary>
+        Task<MessageType> LockAsync();
+
+        /// <summary>Attempts to unlock the configuration with the given password. Success is
+        /// exactly MessageType.UNLOCK; anything else (including a wrong password) is a failure to
+        /// show as one.</summary>
+        Task<MessageType> UnlockAsync(string password);
+
+        /// <summary>Sets, changes, or clears (empty string) the password protecting the
+        /// configuration. Success is exactly MessageType.SET_PASSPHRASE.</summary>
+        Task<MessageType> SetPasswordAsync(string password);
+
         /// <summary>
         /// The one commit path: clone the cached config, mutate the whole clone, put it back. A
         /// returned type of PUT_SETTINGS alone is NOT sufficient to mean the change took - the

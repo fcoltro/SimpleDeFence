@@ -77,6 +77,15 @@ namespace SimpleDeFence.UI.Services
         public Task<MessageType> SwitchModeAsync(FirewallMode mode)
             => Task.Run(() => _controller.SwitchFirewallMode(mode));
 
+        public Task<MessageType> LockAsync()
+            => Task.Run(() => _controller.LockServer());
+
+        public Task<MessageType> UnlockAsync(string password)
+            => Task.Run(() => _controller.TryUnlockServer(password));
+
+        public Task<MessageType> SetPasswordAsync(string password)
+            => Task.Run(() => _controller.SetPassphrase(password));
+
         public Task<ConnectionsSnapshot> GetConnectionsAsync()
         {
             return Task.Run(() =>
