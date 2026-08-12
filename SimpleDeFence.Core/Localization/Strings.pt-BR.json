@@ -216,6 +216,18 @@
       "themeAuto": "Usar configuração do sistema",
       "themeLight": "Claro",
       "themeDark": "Escuro"
+    },
+    "protection": {
+      "allowLocalSubnet": "Permitir rede local",
+      "allowLocalSubnetDescription": "Sempre permitir tráfego de e para outros dispositivos na sua rede local.",
+      "displayOffBlock": "Bloquear rede quando a tela estiver desligada",
+      "displayOffBlockDescription": "Bloqueia todo o tráfego de rede enquanto a tela estiver desligada."
+    },
+    "blocklists": {
+      "enable": "Ativar listas de bloqueio",
+      "enableDescription": "Bloqueia tráfego para hosts e portas conhecidos como maliciosos.",
+      "hosts": "Bloquear hosts maliciosos",
+      "ports": "Bloquear portas maliciosas"
     }
   }
 }

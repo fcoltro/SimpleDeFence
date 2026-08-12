@@ -47,8 +47,41 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
-                <!-- Protection, Blocklists, Security, Updates, Maintenance, and About groups are
-                     added here by Tasks 5-8. -->
+                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.protection}" IsExpanded="True">
+                    <controls:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE72E;"/>
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.protection.allowLocalSubnet}"
+                                                Description="{loc:Loc Key=settings.protection.allowLocalSubnetDescription}">
+                            <ToggleSwitch x:Name="AllowLocalSubnetToggle" Toggled="AllowLocalSubnetToggle_Toggled"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.protection.displayOffBlock}"
+                                                Description="{loc:Loc Key=settings.protection.displayOffBlockDescription}">
+                            <ToggleSwitch x:Name="DisplayOffBlockToggle" Toggled="DisplayOffBlockToggle_Toggled"/>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+
+                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.blocklists}" IsExpanded="True">
+                    <controls:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE783;"/>
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.blocklists.enable}"
+                                                Description="{loc:Loc Key=settings.blocklists.enableDescription}">
+                            <ToggleSwitch x:Name="EnableBlocklistsToggle" Toggled="EnableBlocklistsToggle_Toggled"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.blocklists.hosts}">
+                            <ToggleSwitch x:Name="EnableHostsBlocklistToggle" Toggled="EnableHostsBlocklistToggle_Toggled"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.blocklists.ports}">
+                            <ToggleSwitch x:Name="EnablePortBlocklistToggle" Toggled="EnablePortBlocklistToggle_Toggled"/>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+
+                <!-- Security, Updates, Maintenance, and About groups are added here by Tasks 6-8. -->
 
             </StackPanel>
         </ScrollViewer>

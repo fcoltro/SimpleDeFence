@@ -51,7 +51,7 @@ namespace SimpleDeFence.UI.Pages
                     _seeding = true;
                     try
                     {
-                        SeedGeneral();
+                        SeedControls();
                     }
                     finally
                     {
@@ -69,7 +69,7 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
-        private void SeedGeneral()
+        private void SeedControls()
         {
             _clientSettings = ClientSettings.Load();
             ThemeCombo.SelectedIndex = _clientSettings.UiTheme switch
@@ -78,6 +78,26 @@ namespace SimpleDeFence.UI.Pages
                 "dark" => 2,
                 _ => 0,
             };
+
+            var config = App.Firewall.Config!;
+            AllowLocalSubnetToggle.IsOn = config.ActiveProfile.AllowLocalSubnet;
+            DisplayOffBlockToggle.IsOn = config.ActiveProfile.DisplayOffBlock;
+
+            EnableBlocklistsToggle.IsOn = config.Blocklists.EnableBlocklists;
+            EnableHostsBlocklistToggle.IsOn = config.Blocklists.EnableHostsBlocklist;
+            EnablePortBlocklistToggle.IsOn = config.Blocklists.EnablePortBlocklist;
+            UpdateBlocklistSubTogglesEnabled();
+        }
+
+        /// <summary>Hosts/Ports blocklist toggles are only meaningful while the master toggle is
+        /// on - same disabled-when-master-off relationship WinForms' chkEnableBlocklists_
+        /// CheckedChanged already has between chkEnableBlocklists and chkHostsBlocklist/
+        /// chkBlockMalwarePorts.</summary>
+        private void UpdateBlocklistSubTogglesEnabled()
+        {
+            var enabled = EnableBlocklistsToggle.IsOn;
+            EnableHostsBlocklistToggle.IsEnabled = enabled;
+            EnablePortBlocklistToggle.IsEnabled = enabled;
         }
 
         /// <summary>ComboBox.SelectionChanged is a plain top-level event, not nested inside
@@ -96,6 +116,67 @@ namespace SimpleDeFence.UI.Pages
             _clientSettings.UiTheme = theme;
             _clientSettings.Save();
             App.ApplyTheme(theme);
+        }
+
+        /// <summary>ToggleSwitch fires Toggled synchronously from inside its own event dispatch -
+        /// deferring via DispatcherQueue.TryEnqueue before committing is the same fix Rules Task 4
+        /// applied for the identical reentrancy hazard (see this plan's Global Constraints).</summary>
+        private void AllowLocalSubnetToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            // _seeding: ignore the Toggled fired by SeedControls programmatically setting IsOn to
+            // the just-refreshed value - that is a re-sync, not a user change. _committing: refuse
+            // a second commit while one is already in flight, the same guard
+            // RulesPage.ToggleSpecialAsync uses, rather than the narrower _busy (which only guards
+            // Refresh) this handler used before self-review caught the gap.
+            if (_seeding || _committing) return;
+            var value = AllowLocalSubnetToggle.IsOn;
+            DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.ActiveProfile.AllowLocalSubnet = value));
+        }
+
+        private void DisplayOffBlockToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding || _committing) return;
+            var value = DisplayOffBlockToggle.IsOn;
+            DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.ActiveProfile.DisplayOffBlock = value));
+        }
+
+        private void EnableBlocklistsToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding || _committing) return;
+            var value = EnableBlocklistsToggle.IsOn;
+            UpdateBlocklistSubTogglesEnabled();
+            DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.Blocklists.EnableBlocklists = value));
+        }
+
+        private void EnableHostsBlocklistToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding || _committing) return;
+            var value = EnableHostsBlocklistToggle.IsOn;
+            DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.Blocklists.EnableHostsBlocklist = value));
+        }
+
+        private void EnablePortBlocklistToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding || _committing) return;
+            var value = EnablePortBlocklistToggle.IsOn;
+            DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.Blocklists.EnablePortBlocklist = value));
+        }
+
+        /// <summary>Shared by every immediate-commit toggle in this page (Protection, Blocklists,
+        /// and later Updates/Security's Lock-hosts-file): commits, then refreshes either way so
+        /// every toggle's visual state reconciles back to the server's truth - the same pattern
+        /// RulesPage.ToggleSpecialAsync uses for the identical reason.</summary>
+        private async Task CommitToggleAsync(Action<ServerConfiguration> mutate)
+        {
+            var resp = await CommitAsync(mutate);
+            await RefreshAsync();
+
+            if (resp != MessageType.PUT_SETTINGS)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Settings.CommitFailedTitle), FailureDetail(resp,
+                    LocKeys.Settings.CommitFailedLockedDetail, LocKeys.Settings.CommitFailedStaleDetail,
+                    LocKeys.Settings.CommitFailedGenericDetail));
+            }
         }
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();

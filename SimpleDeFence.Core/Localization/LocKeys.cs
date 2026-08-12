@@ -186,6 +186,16 @@ namespace SimpleDeFence.Localization
             public const string GeneralThemeAuto = "settings.general.themeAuto";
             public const string GeneralThemeLight = "settings.general.themeLight";
             public const string GeneralThemeDark = "settings.general.themeDark";
+
+            public const string ProtectionAllowLocalSubnet = "settings.protection.allowLocalSubnet";
+            public const string ProtectionAllowLocalSubnetDescription = "settings.protection.allowLocalSubnetDescription";
+            public const string ProtectionDisplayOffBlock = "settings.protection.displayOffBlock";
+            public const string ProtectionDisplayOffBlockDescription = "settings.protection.displayOffBlockDescription";
+
+            public const string BlocklistsEnable = "settings.blocklists.enable";
+            public const string BlocklistsEnableDescription = "settings.blocklists.enableDescription";
+            public const string BlocklistsHosts = "settings.blocklists.hosts";
+            public const string BlocklistsPorts = "settings.blocklists.ports";
         }
 
         public static class Policy

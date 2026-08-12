@@ -216,6 +216,18 @@
       "themeAuto": "Use system setting",
       "themeLight": "Light",
       "themeDark": "Dark"
+    },
+    "protection": {
+      "allowLocalSubnet": "Allow local network",
+      "allowLocalSubnetDescription": "Always allow traffic to and from other devices on your local network.",
+      "displayOffBlock": "Block network when display is off",
+      "displayOffBlockDescription": "Blocks all network traffic while the screen is off."
+    },
+    "blocklists": {
+      "enable": "Enable blocklists",
+      "enableDescription": "Blocks traffic to known-malicious hosts and ports.",
+      "hosts": "Block malicious hosts",
+      "ports": "Block malicious ports"
     }
   }
 }
