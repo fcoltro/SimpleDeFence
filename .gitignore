@@ -6,6 +6,7 @@
 
 /.vs/
 /.tx/
+/.worktrees/
 
 /LocalizationPack/**/*.resx
 /LocalizationPack/**/*.pdf
