@@ -71,6 +71,11 @@ namespace SimpleDeFence.UI.Services
 
         public Task<MessageType> LockAsync()
         {
+            // LOCK is a privileged command (MessageType > 2047), so it's rejected while locked,
+            // matching the real service's behavior in SimpleDeFenceService.cs:1895-1899.
+            if (_locked)
+                return Task.FromResult(MessageType.RESPONSE_LOCKED);
+
             // Mirrors the real service: PasswordLock.Locked's setter is a no-op without a
             // password, but the response is still MessageType.LOCK either way - it is the
             // UI's job to disable "Lock now" when State.HasPassword is false, not this method's.
@@ -92,6 +97,11 @@ namespace SimpleDeFence.UI.Services
 
         public Task<MessageType> SetPasswordAsync(string password)
         {
+            // SET_PASSPHRASE is a privileged command (MessageType > 2047), so it's rejected while
+            // locked, matching the real service's behavior in SimpleDeFenceService.cs:1895-1899.
+            if (_locked)
+                return Task.FromResult(MessageType.RESPONSE_LOCKED);
+
             _hasPassword = !string.IsNullOrEmpty(password);
             if (!_hasPassword)
                 // Clearing the password also clears any lock, mirroring PasswordLock.Locked's
