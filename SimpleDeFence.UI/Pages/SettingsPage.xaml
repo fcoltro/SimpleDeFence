@@ -81,7 +81,42 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
-                <!-- Security, Updates, Maintenance, and About groups are added here by Tasks 6-8. -->
+                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.security}" IsExpanded="True">
+                    <controls:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE72E;"/>
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.security.lockHostsFile}"
+                                                Description="{loc:Loc Key=settings.security.lockHostsFileDescription}">
+                            <ToggleSwitch x:Name="LockHostsFileToggle" Toggled="LockHostsFileToggle_Toggled"/>
+                        </controls:SettingsCard>
+
+                        <controls:SettingsCard IsClickEnabled="False">
+                            <StackPanel Spacing="8" HorizontalAlignment="Stretch">
+                                <TextBlock x:Name="PasswordStatusText" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBox x:Name="NewPasswordBox" PlaceholderText="{loc:Loc Key=settings.security.newPassword}"/>
+                                <PasswordBox x:Name="NewPasswordConfirmBox" PlaceholderText="{loc:Loc Key=settings.security.confirmPassword}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Button x:Name="SetPasswordButton" Content="{loc:Loc Key=settings.security.setPassword}" Click="SetPasswordButton_Click"/>
+                                    <Button x:Name="RemovePasswordButton" Content="{loc:Loc Key=settings.security.removePassword}" Click="RemovePasswordButton_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </controls:SettingsCard>
+
+                        <controls:SettingsCard IsClickEnabled="False">
+                            <StackPanel Spacing="8" HorizontalAlignment="Stretch">
+                                <TextBlock x:Name="LockStatusText" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <Button x:Name="LockNowButton" Content="{loc:Loc Key=settings.security.lockNow}" Click="LockNowButton_Click"/>
+                                <StackPanel x:Name="UnlockPanel" Orientation="Horizontal" Spacing="8" Visibility="Collapsed">
+                                    <PasswordBox x:Name="UnlockPasswordBox" PlaceholderText="{loc:Loc Key=settings.security.unlockPasswordPlaceholder}"/>
+                                    <Button x:Name="UnlockButton" Content="{loc:Loc Key=settings.security.unlock}" Click="UnlockButton_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+
+                <!-- Updates, Maintenance, and About groups are added here by Tasks 7-8. -->
 
             </StackPanel>
         </ScrollViewer>

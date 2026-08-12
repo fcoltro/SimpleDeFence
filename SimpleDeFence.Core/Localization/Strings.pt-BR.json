@@ -228,6 +228,42 @@
       "enableDescription": "Bloqueia tráfego para hosts e portas conhecidos como maliciosos.",
       "hosts": "Bloquear hosts maliciosos",
       "ports": "Bloquear portas maliciosas"
+    },
+    "security": {
+      "lockHostsFile": "Bloquear o arquivo hosts",
+      "lockHostsFileDescription": "Impede que outros programas modifiquem o arquivo hosts.",
+      "passwordSet": "Uma senha está definida.",
+      "passwordNotSet": "Nenhuma senha está definida.",
+      "newPassword": "Nova senha",
+      "confirmPassword": "Confirmar senha",
+      "setPassword": "Definir senha",
+      "removePassword": "Remover senha",
+      "passwordMismatch": {
+        "title": "As senhas não coincidem",
+        "detail": "Digite a mesma senha nos dois campos."
+      },
+      "passwordUpdated": {
+        "title": "Senha atualizada",
+        "body": "A senha da configuração foi alterada."
+      },
+      "passwordRemoved": {
+        "body": "A senha da configuração foi removida."
+      },
+      "passwordUpdateFailed": {
+        "title": "Não foi possível atualizar a senha"
+      },
+      "lockedStatus": "A configuração está bloqueada.",
+      "unlockedStatus": "A configuração não está bloqueada.",
+      "lockNow": "Bloquear agora",
+      "lockFailed": {
+        "title": "Não foi possível bloquear a configuração"
+      },
+      "unlockPasswordPlaceholder": "Senha",
+      "unlock": "Desbloquear",
+      "unlockFailed": {
+        "title": "Não foi possível desbloquear a configuração",
+        "detail": "A senha não foi aceita."
+      }
     }
   }
 }

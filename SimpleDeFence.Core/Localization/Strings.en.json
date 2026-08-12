@@ -228,6 +228,42 @@
       "enableDescription": "Blocks traffic to known-malicious hosts and ports.",
       "hosts": "Block malicious hosts",
       "ports": "Block malicious ports"
+    },
+    "security": {
+      "lockHostsFile": "Lock the hosts file",
+      "lockHostsFileDescription": "Prevents other programs from modifying the hosts file.",
+      "passwordSet": "A password is set.",
+      "passwordNotSet": "No password is set.",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "setPassword": "Set password",
+      "removePassword": "Remove password",
+      "passwordMismatch": {
+        "title": "Passwords do not match",
+        "detail": "Type the same password in both fields."
+      },
+      "passwordUpdated": {
+        "title": "Password updated",
+        "body": "The configuration password was changed."
+      },
+      "passwordRemoved": {
+        "body": "The configuration password was removed."
+      },
+      "passwordUpdateFailed": {
+        "title": "Could not update the password"
+      },
+      "lockedStatus": "The configuration is locked.",
+      "unlockedStatus": "The configuration is not locked.",
+      "lockNow": "Lock now",
+      "lockFailed": {
+        "title": "Could not lock the configuration"
+      },
+      "unlockPasswordPlaceholder": "Password",
+      "unlock": "Unlock",
+      "unlockFailed": {
+        "title": "Could not unlock the configuration",
+        "detail": "The password was not accepted."
+      }
     }
   }
 }

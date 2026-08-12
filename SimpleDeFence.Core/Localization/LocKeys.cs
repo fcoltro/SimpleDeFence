@@ -196,6 +196,31 @@ namespace SimpleDeFence.Localization
             public const string BlocklistsEnableDescription = "settings.blocklists.enableDescription";
             public const string BlocklistsHosts = "settings.blocklists.hosts";
             public const string BlocklistsPorts = "settings.blocklists.ports";
+
+            public const string SecurityLockHostsFile = "settings.security.lockHostsFile";
+            public const string SecurityLockHostsFileDescription = "settings.security.lockHostsFileDescription";
+
+            public const string SecurityPasswordSet = "settings.security.passwordSet";
+            public const string SecurityPasswordNotSet = "settings.security.passwordNotSet";
+            public const string SecurityNewPassword = "settings.security.newPassword";
+            public const string SecurityConfirmPassword = "settings.security.confirmPassword";
+            public const string SecuritySetPassword = "settings.security.setPassword";
+            public const string SecurityRemovePassword = "settings.security.removePassword";
+            public const string SecurityPasswordMismatchTitle = "settings.security.passwordMismatch.title";
+            public const string SecurityPasswordMismatchDetail = "settings.security.passwordMismatch.detail";
+            public const string SecurityPasswordUpdatedTitle = "settings.security.passwordUpdated.title";
+            public const string SecurityPasswordUpdatedBody = "settings.security.passwordUpdated.body";
+            public const string SecurityPasswordRemovedBody = "settings.security.passwordRemoved.body";
+            public const string SecurityPasswordUpdateFailedTitle = "settings.security.passwordUpdateFailed.title";
+
+            public const string SecurityLockedStatus = "settings.security.lockedStatus";
+            public const string SecurityUnlockedStatus = "settings.security.unlockedStatus";
+            public const string SecurityLockNow = "settings.security.lockNow";
+            public const string SecurityLockFailedTitle = "settings.security.lockFailed.title";
+            public const string SecurityUnlockPasswordPlaceholder = "settings.security.unlockPasswordPlaceholder";
+            public const string SecurityUnlock = "settings.security.unlock";
+            public const string SecurityUnlockFailedTitle = "settings.security.unlockFailed.title";
+            public const string SecurityUnlockFailedDetail = "settings.security.unlockFailed.detail";
         }
 
         public static class Policy

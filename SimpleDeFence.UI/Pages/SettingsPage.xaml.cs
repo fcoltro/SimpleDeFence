@@ -87,6 +87,21 @@ namespace SimpleDeFence.UI.Pages
             EnableHostsBlocklistToggle.IsOn = config.Blocklists.EnableHostsBlocklist;
             EnablePortBlocklistToggle.IsOn = config.Blocklists.EnablePortBlocklist;
             UpdateBlocklistSubTogglesEnabled();
+
+            LockHostsFileToggle.IsOn = config.LockHostsFile;
+
+            var hasPassword = App.Firewall.State?.HasPassword ?? false;
+            var locked = App.Firewall.State?.Locked ?? false;
+
+            PasswordStatusText.Text = Loc.T(hasPassword ? LocKeys.Settings.SecurityPasswordSet : LocKeys.Settings.SecurityPasswordNotSet);
+            RemovePasswordButton.IsEnabled = hasPassword && !_committing;
+
+            LockStatusText.Text = Loc.T(locked ? LocKeys.Settings.SecurityLockedStatus : LocKeys.Settings.SecurityUnlockedStatus);
+            // Locking without a password is a server-side no-op (PasswordLock.Locked's setter is
+            // gated on HasPassword) - disabling the button when there is nothing to lock with
+            // keeps the UI from offering an action that would silently do nothing.
+            LockNowButton.IsEnabled = hasPassword && !locked && !_committing;
+            UnlockPanel.Visibility = locked ? Visibility.Visible : Visibility.Collapsed;
         }
 
         /// <summary>Hosts/Ports blocklist toggles are only meaningful while the master toggle is
@@ -162,6 +177,13 @@ namespace SimpleDeFence.UI.Pages
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.Blocklists.EnablePortBlocklist = value));
         }
 
+        private void LockHostsFileToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding || _committing) return;
+            var value = LockHostsFileToggle.IsOn;
+            DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.LockHostsFile = value));
+        }
+
         /// <summary>Shared by every immediate-commit toggle in this page (Protection, Blocklists,
         /// and later Updates/Security's Lock-hosts-file): commits, then refreshes either way so
         /// every toggle's visual state reconciles back to the server's truth - the same pattern
@@ -180,6 +202,125 @@ namespace SimpleDeFence.UI.Pages
         }
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
+
+        private async void SetPasswordButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing) return;
+
+            var password = NewPasswordBox.Text;
+            if (password != NewPasswordConfirmBox.Password)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityPasswordMismatchTitle),
+                    Loc.T(LocKeys.Settings.SecurityPasswordMismatchDetail));
+                return;
+            }
+
+            await SetPasswordAsync(password, Loc.T(LocKeys.Settings.SecurityPasswordUpdatedBody));
+        }
+
+        private async void RemovePasswordButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing) return;
+            await SetPasswordAsync(string.Empty, Loc.T(LocKeys.Settings.SecurityPasswordRemovedBody));
+        }
+
+        private async Task SetPasswordAsync(string password, string successBody)
+        {
+            _committing = true;
+            UpdateControlsEnabled();
+            MessageType resp;
+            try
+            {
+                resp = await App.Firewall.SetPasswordAsync(password);
+            }
+            catch (Exception ex)
+            {
+                _committing = false;
+                UpdateControlsEnabled();
+                await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityPasswordUpdateFailedTitle), ex.Message);
+                return;
+            }
+            _committing = false;
+
+            NewPasswordBox.Text = string.Empty;
+            NewPasswordConfirmBox.Password = string.Empty;
+
+            if (resp == MessageType.SET_PASSPHRASE)
+            {
+                await RefreshAsync();
+                ShowNotice(InfoBarSeverity.Success, Loc.T(LocKeys.Settings.SecurityPasswordUpdatedTitle), successBody);
+            }
+            else
+            {
+                await RefreshAsync();
+                await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityPasswordUpdateFailedTitle), FailureDetail(resp,
+                    LocKeys.Settings.CommitFailedLockedDetail, LocKeys.Settings.CommitFailedStaleDetail,
+                    LocKeys.Settings.CommitFailedGenericDetail));
+            }
+        }
+
+        private async void LockNowButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing) return;
+
+            _committing = true;
+            UpdateControlsEnabled();
+            MessageType resp;
+            try
+            {
+                resp = await App.Firewall.LockAsync();
+            }
+            catch (Exception ex)
+            {
+                _committing = false;
+                UpdateControlsEnabled();
+                await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityLockFailedTitle), ex.Message);
+                return;
+            }
+            _committing = false;
+
+            await RefreshAsync();
+            if (resp != MessageType.LOCK)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityLockFailedTitle), FailureDetail(resp,
+                    LocKeys.Settings.CommitFailedLockedDetail, LocKeys.Settings.CommitFailedStaleDetail,
+                    LocKeys.Settings.CommitFailedGenericDetail));
+            }
+        }
+
+        private async void UnlockButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing) return;
+
+            var password = UnlockPasswordBox.Password;
+            _committing = true;
+            UpdateControlsEnabled();
+            MessageType resp;
+            try
+            {
+                resp = await App.Firewall.UnlockAsync(password);
+            }
+            catch (Exception ex)
+            {
+                _committing = false;
+                UpdateControlsEnabled();
+                await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityUnlockFailedTitle), ex.Message);
+                return;
+            }
+            _committing = false;
+
+            UnlockPasswordBox.Password = string.Empty;
+            await RefreshAsync();
+
+            if (resp != MessageType.UNLOCK)
+            {
+                // A wrong password is the common failure here, not a lock/changeset condition -
+                // FailureDetail's generic branch ("The service returned {0}") would be honest but
+                // unhelpful, so this uses its own specific wording instead.
+                await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityUnlockFailedTitle),
+                    Loc.T(LocKeys.Settings.SecurityUnlockFailedDetail));
+            }
+        }
 
         /// <summary>One serialized commit path for every server-side setting in this page,
         /// mirroring RulesPage.CommitAsync's shape exactly (same _committing guard, same
@@ -204,12 +345,17 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
-        /// <summary>Placeholder for now (only General exists, and it has nothing to disable while
-        /// committing since it never reaches CommitAsync); Tasks 5-8 extend this to disable their
-        /// own groups' controls while _committing is true, the same pattern
-        /// RulesPage.UpdateRemoveButton/UpdateApplyButtonEnabled/UpdateAddButtonEnabled use.</summary>
+        /// <summary>Disables the Security group's buttons while a commit is in flight, the same
+        /// pattern RulesPage.UpdateRemoveButton/UpdateApplyButtonEnabled/UpdateAddButtonEnabled
+        /// use. Tasks 7-8 extend this further for their own groups' controls.</summary>
         private void UpdateControlsEnabled()
         {
+            SetPasswordButton.IsEnabled = !_committing;
+            var hasPassword = App.Firewall.State?.HasPassword ?? false;
+            var locked = App.Firewall.State?.Locked ?? false;
+            RemovePasswordButton.IsEnabled = hasPassword && !_committing;
+            LockNowButton.IsEnabled = hasPassword && !locked && !_committing;
+            UnlockButton.IsEnabled = !_committing;
         }
 
         private static string FailureDetail(MessageType resp, string lockedKey, string staleKey, string genericKey) => resp switch
