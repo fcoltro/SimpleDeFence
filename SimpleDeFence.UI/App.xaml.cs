@@ -19,6 +19,23 @@ namespace SimpleDeFence.UI
         // WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow).
         internal static Window? MainWindow { get; private set; }
 
+        /// <summary>Applies a persisted "auto"/"light"/"dark" theme string to the window's root
+        /// element. Called at launch (this file) and immediately on change from the Settings page
+        /// (Task 4's General group), so both share one mapping from the stored string to
+        /// ElementTheme.</summary>
+        internal static void ApplyTheme(string uiTheme)
+        {
+            if (MainWindow?.Content is not Microsoft.UI.Xaml.FrameworkElement root)
+                return;
+
+            root.RequestedTheme = uiTheme switch
+            {
+                "light" => Microsoft.UI.Xaml.ElementTheme.Light,
+                "dark" => Microsoft.UI.Xaml.ElementTheme.Dark,
+                _ => Microsoft.UI.Xaml.ElementTheme.Default,
+            };
+        }
+
         public App()
         {
             InitializeComponent();
@@ -43,6 +60,7 @@ namespace SimpleDeFence.UI
 
             m_window = new MainWindow();
             MainWindow = m_window;
+            ApplyTheme(ClientSettings.Load().UiTheme);
             m_window.Activate();
         }
 

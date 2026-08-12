@@ -5,6 +5,7 @@
 
   "nav": {
     "rules": "Rules",
+    "settings": "Settings",
     "modeChip": "Firewall mode"
   },
 
@@ -190,6 +191,31 @@
         "staleDetail": "The configuration changed elsewhere just now; the policy was not changed. Please try again.",
         "genericDetail": "The service returned {0}. The policy was not changed."
       }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "section": {
+      "general": "General",
+      "protection": "Protection",
+      "blocklists": "Blocklists",
+      "security": "Security",
+      "updates": "Updates",
+      "maintenance": "Maintenance",
+      "about": "About"
+    },
+    "commitFailed": {
+      "title": "Could not save the setting",
+      "lockedDetail": "Unlock the configuration before changing settings.",
+      "staleDetail": "The configuration changed elsewhere just now; the setting was not changed. Please try again.",
+      "genericDetail": "The service returned {0}. The setting was not changed."
+    },
+    "general": {
+      "theme": "App theme",
+      "themeDescription": "Applies immediately.",
+      "themeAuto": "Use system setting",
+      "themeLight": "Light",
+      "themeDark": "Dark"
     }
   }
 }

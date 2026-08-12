@@ -19,6 +19,7 @@ namespace SimpleDeFence.Localization
         public static class Nav
         {
             public const string Rules = "nav.rules";
+            public const string Settings = "nav.settings";
             public const string ModeChip = "nav.modeChip";
         }
 
@@ -162,6 +163,29 @@ namespace SimpleDeFence.Localization
             public const string DetailApplyFailedLockedDetail = "rules.detail.applyFailed.lockedDetail";
             public const string DetailApplyFailedStaleDetail = "rules.detail.applyFailed.staleDetail";
             public const string DetailApplyFailedGenericDetail = "rules.detail.applyFailed.genericDetail";
+        }
+
+        public static class Settings
+        {
+            public const string Title = "settings.title";
+            public const string SectionGeneral = "settings.section.general";
+            public const string SectionProtection = "settings.section.protection";
+            public const string SectionBlocklists = "settings.section.blocklists";
+            public const string SectionSecurity = "settings.section.security";
+            public const string SectionUpdates = "settings.section.updates";
+            public const string SectionMaintenance = "settings.section.maintenance";
+            public const string SectionAbout = "settings.section.about";
+
+            public const string CommitFailedTitle = "settings.commitFailed.title";
+            public const string CommitFailedLockedDetail = "settings.commitFailed.lockedDetail";
+            public const string CommitFailedStaleDetail = "settings.commitFailed.staleDetail";
+            public const string CommitFailedGenericDetail = "settings.commitFailed.genericDetail";
+
+            public const string GeneralTheme = "settings.general.theme";
+            public const string GeneralThemeDescription = "settings.general.themeDescription";
+            public const string GeneralThemeAuto = "settings.general.themeAuto";
+            public const string GeneralThemeLight = "settings.general.themeLight";
+            public const string GeneralThemeDark = "settings.general.themeDark";
         }
 
         public static class Policy

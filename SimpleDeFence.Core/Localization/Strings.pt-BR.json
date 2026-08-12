@@ -5,6 +5,7 @@
 
   "nav": {
     "rules": "Regras",
+    "settings": "Configurações",
     "modeChip": "Modo do firewall"
   },
 
@@ -190,6 +191,31 @@
         "staleDetail": "A configuração foi alterada em outro lugar agora há pouco; a política não foi alterada. Tente novamente.",
         "genericDetail": "O serviço retornou {0}. A política não foi alterada."
       }
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "section": {
+      "general": "Geral",
+      "protection": "Proteção",
+      "blocklists": "Listas de bloqueio",
+      "security": "Segurança",
+      "updates": "Atualizações",
+      "maintenance": "Manutenção",
+      "about": "Sobre"
+    },
+    "commitFailed": {
+      "title": "Não foi possível salvar a configuração",
+      "lockedDetail": "Desbloqueie a configuração antes de alterar as configurações.",
+      "staleDetail": "A configuração foi alterada em outro lugar agora há pouco; a configuração não foi alterada. Tente novamente.",
+      "genericDetail": "O serviço retornou {0}. A configuração não foi alterada."
+    },
+    "general": {
+      "theme": "Tema do aplicativo",
+      "themeDescription": "Aplica-se imediatamente.",
+      "themeAuto": "Usar configuração do sistema",
+      "themeLight": "Claro",
+      "themeDark": "Escuro"
     }
   }
 }
