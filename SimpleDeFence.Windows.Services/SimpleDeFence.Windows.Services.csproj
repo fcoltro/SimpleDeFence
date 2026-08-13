@@ -28,10 +28,6 @@
 		<!-- Restores ServiceController/ServiceControllerStatus for modern .NET; the framework-only
 		     System.ServiceProcess assembly reference above doesn't resolve here. -->
 		<PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.10" />
-		<!-- ServiceBase.cs hosts a Windows Service via the System.Configuration.Install installer
-		     pipeline, which has no .NET Core/5+ equivalent. Nothing this project's net10 consumers
-		     need touches it. -->
-		<Compile Remove="ServiceBase.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\SimpleDeFence.Windows\SimpleDeFence.Windows.csproj" />

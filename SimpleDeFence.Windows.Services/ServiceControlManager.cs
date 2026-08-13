@@ -33,7 +33,7 @@ namespace SimpleDeFence.Windows.Services
             SCManager = NativeMethods.OpenSCManager(
                 null,
                 null,
-                ServiceControlAccessRights.SC_MANAGER_CONNECT);
+                ServiceControlAccessRights.SC_MANAGER_CONNECT | ServiceControlAccessRights.SC_MANAGER_CREATE_SERVICE);
 
             // Verify if the SC is opened
             if (SCManager.IsInvalid)
@@ -206,6 +206,54 @@ namespace SimpleDeFence.Windows.Services
                 null);
 
             if (result == false)
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        /// <summary>
+        /// Registers a new Win32 service, LocalSystem account, automatic start. Mirrors what
+        /// SimpleDeFenceServiceInstaller (System.Configuration.Install-based, net48-only) used to
+        /// do: create the service, then set its load-order group to "NetworkProvider" - both are
+        /// needed for the firewall service to start in the right order relative to networking.
+        /// </summary>
+        public void CreateService(string serviceName, string displayName, string binaryPath, string[] dependencies)
+        {
+            const uint SERVICE_AUTO_START = 0x00000002;
+            const uint SERVICE_ERROR_NORMAL = 0x00000001;
+
+            // CreateService expects a double-null-terminated multi-string for dependencies (each
+            // entry separated by one embedded '\0', with an extra trailing '\0' so the automatic
+            // terminator .NET's Unicode string marshaling appends becomes the second one). No
+            // dependencies means a literal null pointer, not an empty string.
+            string? dependenciesMultiString = dependencies.Length == 0
+                ? null
+                : string.Join("\0", dependencies) + "\0";
+
+            using var service = NativeMethods.CreateService(
+                SCManager,
+                serviceName,
+                displayName,
+                ServiceAccessRights.SERVICE_ALL_ACCESS,
+                ServiceType.SERVICE_TYPE_WIN32_OWN_PROCESS,
+                SERVICE_AUTO_START,
+                SERVICE_ERROR_NORMAL,
+                binaryPath,
+                null,
+                IntPtr.Zero,
+                dependenciesMultiString,
+                null,
+                null);
+
+            if (service.IsInvalid)
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+
+            SetLoadOrderGroup(serviceName, @"NetworkProvider");
+        }
+
+        public void DeleteService(string serviceName)
+        {
+            using var service = OpenService(serviceName, ServiceAccessRights.DELETE);
+
+            if (!NativeMethods.DeleteService(service))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 

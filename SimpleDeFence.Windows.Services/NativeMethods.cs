@@ -30,6 +30,26 @@ namespace SimpleDeFence.Windows.Services
             ServiceAccessRights desiredAccess);
 
         [DllImport("advapi32", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern SafeServiceHandle CreateService(
+            SafeServiceHandle hSCManager,
+            string lpServiceName,
+            string lpDisplayName,
+            ServiceAccessRights dwDesiredAccess,
+            ServiceType dwServiceType,
+            uint dwStartType,
+            uint dwErrorControl,
+            string lpBinaryPathName,
+            string? lpLoadOrderGroup,
+            IntPtr lpdwTagId,
+            string? lpDependencies,
+            string? lpServiceStartName,
+            string? lpPassword);
+
+        [DllImport("advapi32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool DeleteService(SafeServiceHandle hService);
+
+        [DllImport("advapi32", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool QueryServiceConfig(
             SafeServiceHandle hService,
