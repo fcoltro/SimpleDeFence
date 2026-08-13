@@ -246,6 +246,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 config.LockHostsFile = imported.Service.LockHostsFile;
                 config.AutoUpdateCheck = imported.Service.AutoUpdateCheck;
+                config.StartupMode = imported.Service.StartupMode;
                 config.Blocklists = imported.Service.Blocklists;
                 config.Profiles = imported.Service.Profiles;
                 config.ActiveProfileName = imported.Service.ActiveProfileName;
