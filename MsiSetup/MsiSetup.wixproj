@@ -12,6 +12,14 @@
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <IncludeSearchPaths>
     </IncludeSearchPaths>
+    <!-- Root of the self-contained `dotnet publish` output that Dependencies.wxs (heat-harvested)
+         and Product.wxs's MainExecutable both resolve their Source paths against. Must match the
+         -o argument of the publish command documented in HarvestPublishDir.xslt:
+           dotnet publish SimpleDeFence/SimpleDeFence.csproj -c Release -r win-x64 -p:SelfContained=true -o SimpleDeFence/bin/Release/net10.0-windows10.0.19041.0/win-x64/publish
+         NOTE: SimpleDeFence.csproj sets AppendTargetFrameworkToOutputPath=false, so a bare
+         `dotnet publish` with no -o lands in bin\$(Configuration)\win-x64\publish instead - the
+         explicit -o above is required for this path to exist. -->
+    <DefineConstants>$(DefineConstants);PublishDir=..\SimpleDeFence\bin\$(Configuration)\net10.0-windows10.0.19041.0\win-x64\publish</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
 	<OutputName>$(OutputName)_x86</OutputName>
@@ -25,14 +33,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug</DefineConstants>
+    <DefineConstants>$(DefineConstants);Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DefineConstants>Debug</DefineConstants>
+    <DefineConstants>$(DefineConstants);Debug</DefineConstants>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <SuppressIces>
@@ -43,7 +51,7 @@
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|arm64' ">
-		<DefineConstants>Debug</DefineConstants>
+		<DefineConstants>$(DefineConstants);Debug</DefineConstants>
 		<OutputPath>bin\$(Configuration)\</OutputPath>
 		<IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
 		<SuppressIces>
@@ -55,6 +63,9 @@
 	</PropertyGroup>
 	<ItemGroup>
     <Compile Include="CustomWelcomeDlg.wxs" />
+    <!-- Generated, not hand-edited. Regenerate after every publish with the heat.exe command
+         documented in HarvestPublishDir.xslt. -->
+    <Compile Include="Dependencies.wxs" />
     <Compile Include="RemoteWarnDlg.wxs" />
     <Compile Include="Product.wxs" />
     <Compile Include="WixUI_InstallDir_Custom.wxs" />

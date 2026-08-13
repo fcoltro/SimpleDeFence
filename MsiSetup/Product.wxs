@@ -58,16 +58,12 @@
       <![CDATA[Installed OR (WINDOWSBUILDNUMBER >= 19044)]]>
     </Condition>
 
-    <!-- .Net Framework detection -->
-    <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED"/>
-    <Condition Message='This application requires .NET Framework 4.8 to be installed.'>
-      <![CDATA[WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED]]>
-    </Condition>
+    <!-- No .NET runtime detection: the payload is a self-contained net10 publish, so the whole
+         runtime ships inside the MSI and no machine-wide .NET (Framework or Core) is required. -->
 
     <!-- Feature description -->
     <Feature Id="ProductFeature" Title="Complete" Description="The complete package." ConfigurableDirectory="INSTALLDIR" Level="1">
       <ComponentRef Id='MainExecutable' />
-      <ComponentRef Id='MainExecutableConfig' />
       <ComponentRef Id='ProgramMenuDir' />
       <ComponentRef Id='RemoveAppDataDir' />
       <ComponentRef Id='RegistryKeys' />
@@ -75,8 +71,9 @@
       <ComponentRef Id='Attributions' />
       <ComponentRef Id='Database' />
       <ComponentRef Id='hosts' />
-      <ComponentGroupRef Id='Dependencies' />
-      <ComponentGroupRef Id='Localizations' />
+      <!-- Everything under the publish root - runtime, app DLL, satellite resource assemblies,
+           .deps.json/.runtimeconfig.json - comes from the heat-harvested group in Dependencies.wxs. -->
+      <ComponentGroupRef Id='PublishedDependencies' />
       <ComponentGroupRef Id='Documentation' />
     </Feature>
 
@@ -147,130 +144,36 @@
       <!-- Program Files -->
       <Directory Id="$(var.PlatformProgramFilesFolder)" Name="ProgramFiles">
         <Directory Id="INSTALLDIR" Name="SimpleDeFence">
+          <!-- The main executable stays hand-authored (and is excluded from the harvest by
+               HarvestPublishDir.xslt) purely so its File keeps the stable Id "TinyWallEXE", which
+               !(bind.fileVersion.TinyWallEXE) and the five FileKey='TinyWallEXE' custom actions
+               below both depend on; heat generates unpredictable hash-based Ids.
+               Source now points into the publish output rather than a separately staged copy, so
+               the packaged apphost is guaranteed to be the same build as the runtime beside it.
+               Assembly=".net"/AssemblyApplication were dropped: under a self-contained publish
+               SimpleDeFence.exe is a native apphost launcher (verified - its OriginalFilename is
+               "SimpleDeFence.dll" and the IL lives in that separate 1MB assembly), so it carries no
+               managed manifest for light.exe to read into the MsiAssembly table. -->
           <Component Id="MainExecutable" Guid="{422FE697-4CCC-4B6C-B5E6-F4BB54CC1AF3}" Win64="$(var.Win64)">
-            <File Id="TinyWallEXE" Source="Sources\ProgramFiles\SimpleDeFence\SimpleDeFence.exe" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
+            <File Id="TinyWallEXE" Source="$(var.PublishDir)\SimpleDeFence.exe" Vital="yes" KeyPath="yes" Checksum="yes" />
           </Component>
-          <Component Id="MainExecutableConfig" Guid="{D8D025D6-8EAB-4AA7-B77D-83EA96B40DE4}" Win64="$(var.Win64)">
-            <File Id="TinyWallCONFIG" Source="Sources\ProgramFiles\SimpleDeFence\SimpleDeFence.exe.config" KeyPath="yes" />
-          </Component>
-          <Component Id="Microsoft_Bcl_AsyncInterfaces_Lib" Guid="{2F512105-6A4B-4383-9A40-083CB0561BE5}" Win64="$(var.Win64)">
-            <File Id="Microsoft_Bcl_AsyncInterfaces_dll" Source="Sources\ProgramFiles\SimpleDeFence\Microsoft.Bcl.AsyncInterfaces.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-          </Component>
-          <Component Id="System_Buffers_Lib" Guid="{C57EA79A-D53D-4C96-8120-C2D030F39D13}" Win64="$(var.Win64)">
-            <File Id="System_Buffers_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Buffers.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-          </Component>
-          <Component Id="System_Memory_Lib" Guid="{D1BD8A4C-D66C-4EDF-A414-DD81CC18325A}" Win64="$(var.Win64)">
-            <File Id="System_Memory_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Memory.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-          </Component>
-          <Component Id="System_Numerics_Vectors_Lib" Guid="{A4C268C7-2199-4561-86ED-533A5A7CBE45}" Win64="$(var.Win64)">
-            <File Id="System_Numerics_Vectors_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Numerics.Vectors.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-          </Component>
-          <Component Id="System_Runtime_CompilerServices_Unsafe_Lib" Guid="{20D4C69C-DBE1-4DF1-9666-029DCE207E93}" Win64="$(var.Win64)">
-            <File Id="System_Runtime_CompilerServices_Unsafe_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Runtime.CompilerServices.Unsafe.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-          </Component>
-          <Component Id="System_Text_Encodings_Web_Lib" Guid="{FA88A627-F2E3-47BF-A245-79B72D91F448}" Win64="$(var.Win64)">
-            <File Id="System_Text_Encodings_Web_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Text.Encodings.Web.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-          </Component>
-          <Component Id="System_Text_Json_Lib" Guid="{A95856BD-5B66-4CAE-8870-1EA5CF3CFAD6}" Win64="$(var.Win64)">
-            <File Id="System_Text_Json_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Text.Json.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-          </Component>
-          <Component Id="System_Threading_Tasks_Extensions_Lib" Guid="{AA5566BE-26F8-483C-8F16-008AE947B1D0}" Win64="$(var.Win64)">
-            <File Id="System_Threading_Tasks_Extensions_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.Threading.Tasks.Extensions.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-          </Component>
-          <Component Id="System_ValueTuple_Lib" Guid="{61BA9FB8-3CF5-462D-8097-0829F724619F}" Win64="$(var.Win64)">
-            <File Id="System_ValueTuple_dll" Source="Sources\ProgramFiles\SimpleDeFence\System.ValueTuple.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-          </Component>
+          <!-- MainExecutableConfig removed: SimpleDeFence.exe.config is a .NET Framework convention.
+               The net10 equivalent (SimpleDeFence.dll.config, from app.config) plus .deps.json and
+               .runtimeconfig.json all sit in the publish root and are picked up by the harvest. -->
           <Component Id="License" Guid="{205DCF42-A705-401A-9868-015BA855B5DB}" Win64="$(var.Win64)">
             <File Id="LicenseRTF" Source="Sources\ProgramFiles\SimpleDeFence\License.rtf" KeyPath="yes" />
           </Component>
           <Component Id="Attributions" Guid="{2FE1A628-B97D-4C67-B240-F1A0971310EB}" Win64="$(var.Win64)">
             <File Id="AttributionsTXT" Source="Sources\ProgramFiles\SimpleDeFence\Attributions.txt" KeyPath="yes" />
           </Component>
-          <Directory Id="LOCDIR_bg" Name="bg">
-            <Component Id="LocSatelliteLib_bg" Guid="{3BE9AF16-BF40-4EAA-B49A-89435CC379BD}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_bg" Source="Sources\ProgramFiles\SimpleDeFence\bg\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_es" Name="es">
-            <Component Id="LocSatelliteLib_es" Guid="{8EBCFDB2-3734-4496-AC84-7F37B797BCAE}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_es" Source="Sources\ProgramFiles\SimpleDeFence\es\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_cs" Name="cs">
-            <Component Id="LocSatelliteLib_cs" Guid="{09F0151C-FB6D-4273-BD5D-5A52914117D1}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_cs" Source="Sources\ProgramFiles\SimpleDeFence\cs\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_heIL" Name="he-IL">
-            <Component Id="LocSatelliteLib_heIL" Guid="{309054DE-DDD1-4E41-84C7-CF8E8ED375CE}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_heIL" Source="Sources\ProgramFiles\SimpleDeFence\he-IL\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_hu" Name="hu">
-            <Component Id="LocSatelliteLib_hu" Guid="{6E827904-C113-40AA-9549-E7EF1D740DED}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_hu" Source="Sources\ProgramFiles\SimpleDeFence\hu\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_fr" Name="fr">
-            <Component Id="LocSatelliteLib_fr" Guid="{F78CB9E7-2CF4-47CD-AB3F-BAB6B86C45DE}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_fr" Source="Sources\ProgramFiles\SimpleDeFence\fr\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_ja" Name="ja">
-            <Component Id="LocSatelliteLib_ja" Guid="{AB1F4842-62C8-4D6D-8AA7-E689DD466ED9}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_ja" Source="Sources\ProgramFiles\SimpleDeFence\ja\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_de" Name="de">
-            <Component Id="LocSatelliteLib_de" Guid="{AEBFC401-59D1-4238-9E00-479A0EA4E533}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_de" Source="Sources\ProgramFiles\SimpleDeFence\de\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_nl" Name="nl">
-            <Component Id="LocSatelliteLib_nl" Guid="{50960D7D-9644-4408-BA53-32F87CEF5528}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_nl" Source="Sources\ProgramFiles\SimpleDeFence\nl\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_ko" Name="ko">
-            <Component Id="LocSatelliteLib_ko" Guid="{81C4CEFD-9A1E-4FF2-8A34-5F39E2106D0F}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_ko" Source="Sources\ProgramFiles\SimpleDeFence\ko\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_pl" Name="pl">
-            <Component Id="LocSatelliteLib_pl" Guid="{1EA37B03-88AE-403F-B325-740B0B0F80B3}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_pl" Source="Sources\ProgramFiles\SimpleDeFence\pl\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_ru" Name="ru">
-            <Component Id="LocSatelliteLib_ru" Guid="{7ED279CF-98B5-442A-A09A-CC73F6A14978}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_ru" Source="Sources\ProgramFiles\SimpleDeFence\ru\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_ptBR" Name="pt-BR">
-            <Component Id="LocSatelliteLib_ptBR" Guid="{6FA8130D-C267-403B-AC1A-73204ED4F579}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_ptBR" Source="Sources\ProgramFiles\SimpleDeFence\pt-BR\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_it" Name="it">
-            <Component Id="LocSatelliteLib_it" Guid="{5F552D3B-CF30-48F7-AE48-EC9EF14CD6A4}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_it" Source="Sources\ProgramFiles\SimpleDeFence\it\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_tr" Name="tr">
-            <Component Id="LocSatelliteLib_tr" Guid="{3B2CF05B-B23C-4CC0-B2F7-98D1AD35E103}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_tr" Source="Sources\ProgramFiles\SimpleDeFence\tr\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_uk" Name="uk">
-            <Component Id="LocSatelliteLib_uk" Guid="{81BA36CA-2F0F-49A2-8543-BFECF27ECCB4}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_uk" Source="Sources\ProgramFiles\SimpleDeFence\uk\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
-          <Directory Id="LOCDIR_zh" Name="zh">
-            <Component Id="LocSatelliteLib_zh" Guid="{82D0CD05-1024-41EF-B491-FA2A13DFB088}" Win64="$(var.Win64)">
-              <File Id="LocSatelliteDLL_zh" Source="Sources\ProgramFiles\SimpleDeFence\zh\SimpleDeFence.resources.dll" Vital="yes" KeyPath="yes" Checksum="yes" Assembly=".net" AssemblyApplication="TinyWallEXE" />
-            </Component>
-          </Directory>
+          <!-- The 17 hand-authored LOCDIR_* satellite-assembly components that used to live here
+               were removed for the same reason as the Dependencies group below: `dotnet publish`
+               emits every SimpleDeFence.resources.dll into <publish>\<lang>\, so the harvest already
+               installs all of them. Keeping both would have put the same target file under two
+               different components (ICE30) and double-declared the language directories.
+               The harvest is also strictly broader than this list was - it additionally carries the
+               WinForms runtime's own zh-Hans/zh-Hant resource assemblies, which the hand-authored
+               list never covered. -->
           <Directory Id="DOCDIR" Name="doc">
             <Component Id="DocFAQComp" Win64="$(var.Win64)">
               <File Id="DocFAQFile" Source="Sources\ProgramFiles\SimpleDeFence\doc\faq.html" Vital="yes" KeyPath="yes" Checksum="yes" />
@@ -343,39 +246,15 @@
     <!-- Icons -->
     <Icon Id="TinyWallIcon.exe" SourceFile="Sources\ProgramFiles\SimpleDeFence\SimpleDeFence.ico" />
 
-    <!-- Dependencies groupping -->
-    <ComponentGroup Id="Dependencies">
-      <ComponentRef Id="Microsoft_Bcl_AsyncInterfaces_Lib"/>
-      <ComponentRef Id="System_Buffers_Lib"/>
-      <ComponentRef Id="System_Memory_Lib"/>
-      <ComponentRef Id="System_Numerics_Vectors_Lib"/>
-      <ComponentRef Id="System_Runtime_CompilerServices_Unsafe_Lib"/>
-      <ComponentRef Id="System_Text_Encodings_Web_Lib"/>
-      <ComponentRef Id="System_Text_Json_Lib"/>
-      <ComponentRef Id="System_Threading_Tasks_Extensions_Lib"/>
-      <ComponentRef Id="System_ValueTuple_Lib"/>
-    </ComponentGroup>
+    <!-- Dependencies groupping - harvested from the self-contained publish output by heat.exe
+         (see Dependencies.wxs); hand-authoring one <Component> per file stopped being practical
+         once the app became self-contained (hundreds of runtime files vs. the ~9 small NuGet
+         package DLLs net48's framework-dependent build needed). The real Release publish of this
+         project is 293 files / 145 MB. The generated ComponentGroup is named PublishedDependencies
+         and is referenced from <Feature> above. -->
 
-    <!-- Localization groupping -->
-    <ComponentGroup Id="Localizations">
-      <ComponentRef Id="LocSatelliteLib_bg"/>
-      <ComponentRef Id="LocSatelliteLib_es"/>
-      <ComponentRef Id="LocSatelliteLib_cs"/>
-      <ComponentRef Id="LocSatelliteLib_heIL"/>
-      <ComponentRef Id="LocSatelliteLib_hu"/>
-      <ComponentRef Id="LocSatelliteLib_fr"/>
-      <ComponentRef Id="LocSatelliteLib_ja"/>
-      <ComponentRef Id="LocSatelliteLib_de"/>
-      <ComponentRef Id="LocSatelliteLib_nl"/>
-      <ComponentRef Id="LocSatelliteLib_ko"/>
-      <ComponentRef Id="LocSatelliteLib_ru"/>
-      <ComponentRef Id="LocSatelliteLib_it"/>
-      <ComponentRef Id="LocSatelliteLib_uk"/>
-      <ComponentRef Id="LocSatelliteLib_zh"/>
-      <ComponentRef Id="LocSatelliteLib_ptBR"/>
-      <ComponentRef Id="LocSatelliteLib_pl"/>
-      <ComponentRef Id="LocSatelliteLib_tr"/>
-    </ComponentGroup>
+    <!-- Localization groupping - likewise harvested; see the note where the LOCDIR_* directories
+         used to be. -->
 
     <!-- Documentation groupping -->
     <ComponentGroup Id="Documentation">
