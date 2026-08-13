@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration.Install;
 using System.Diagnostics;
 using System.ServiceProcess;
 using SimpleDeFence.Windows;
@@ -59,7 +58,8 @@ namespace SimpleDeFence
                 // Run installers
                 try
                 {
-                    ManagedInstallerClass.InstallHelper(new string[] { "/i", Utils.ExecutablePath });
+                    using var scm = new ServiceControlManager();
+                    scm.CreateService(SimpleDeFenceService.SERVICE_NAME, SimpleDeFenceService.SERVICE_DISPLAY_NAME, Utils.ExecutablePath, SimpleDeFenceService.ServiceDependencies);
                 }
                 catch(Exception e)
                 {
@@ -228,7 +228,8 @@ namespace SimpleDeFence
 
             try
             {
-                ManagedInstallerClass.InstallHelper(new string[] { "/u", Utils.ExecutablePath });
+                using var scm = new ServiceControlManager();
+                scm.DeleteService(SimpleDeFenceService.SERVICE_NAME);
             }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_INSTALLER); }
 
