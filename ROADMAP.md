@@ -171,20 +171,28 @@ the core stays C#/.NET and untouched throughout this phase either way.
       Ported so far, behind a `NavigationView` shell with a shared `FirewallClient` so pages agree on
       connection state and the config changeset: the mode chip (firewall mode switching — the old
       Status page), **Connections** (Blocked / Connected / Open with the inline "Allow this app"
-      commit) and **Rules** (the third and final design-doc destination — grouped
-      Applications/Special exceptions replacing the old read-only Applications page, with search,
-      a detail pane for preset policy editing, multi-select bulk removal, and an Add split button
-      covering all four pickers: executable file, running process, window, UWP package). The WinUI
-      screens are verified against the sample-data provider and show the honest "Not connected"
-      state against a real install — the connected state against a live service awaits the .NET 10
-      migration (see the runtime-verification caveat above).
-      Still to port: **Settings** (the last of the three design-doc destinations — no implementation
-      plan written yet, though the design doc already specifies its groups: General · Protection ·
-      Blocklists · Security (password/lock) · Updates · Maintenance), the hosts-file management,
-      the tray icon and its menu, and the DevelTool. Rules' own plan also deferred, as explicit
-      follow-ups: a custom rule-list (`RuleListPolicy`) editor, smarter "Allow this app" suggestions
-      ported from `AppDatabase.GetExceptionsForApp`, and the remaining WinForms-only add flows (disk
-      auto-detect, add-folder, drag-and-drop).
+      commit), **Rules** (grouped Applications/Special exceptions replacing the old read-only
+      Applications page, with search, a detail pane for preset policy editing, multi-select bulk
+      removal, and an Add split button covering all four pickers: executable file, running process,
+      window, UWP package), and **Settings** (the third and final design-doc destination — all 7
+      groups: General (theme), Protection, Blocklists, Security (password/lock), Updates,
+      Maintenance (`.tws` import/export), About). This completes the three-destination information
+      architecture the design doc set out (Connections, Rules, Settings). The WinUI screens are
+      verified against the sample-data provider and show the honest "Not connected" state against a
+      real install — the connected state against a live service awaits the .NET 10 migration (see
+      the runtime-verification caveat above). Settings' Import/Export file pickers (`FileOpenPicker`/
+      `FileSavePicker`) are the first WinRT pickers in this app confirmed working end-to-end on a
+      real desktop (2026-08-13) — automated verification alone couldn't detect the native dialog
+      (it's a separate top-level window outside the app's own hwnd), so a human confirmed it live.
+      Still to port: the hosts-file management, the tray icon and its menu, and the DevelTool. Rules'
+      own plan deferred, as explicit follow-ups: a custom rule-list (`RuleListPolicy`) editor, smarter
+      "Allow this app" suggestions ported from `AppDatabase.GetExceptionsForApp`, and the remaining
+      WinForms-only add flows (disk auto-detect, add-folder, drag-and-drop). Settings' own plan
+      deferred, as explicit follow-ups: "Check for updates now" (the manual action) and porting
+      `Updater`/`UpdateChecker` to Core, `ControllerSettings`/`ClientSettings` reconciliation at the
+      net10 exe-merge migration, a quicker Lock/Unlock surface in the mode chip, and retiring
+      `SettingsForm` once this screen has reached full parity (mirroring how Rules retired
+      `ApplicationsPage` only after shipping its replacement).
 
 ## Development environment
 
