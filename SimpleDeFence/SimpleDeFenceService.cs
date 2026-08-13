@@ -509,7 +509,7 @@ namespace SimpleDeFence
                 if (-1 != str.IndexOf('-'))
                 {
                     ReadOnlySpan<char> min, max;
-                    using (var enumerator = str.Split('-'))
+                    using (var enumerator = ReadOnlySpanExtension.Split(str, '-'))
                     {
                         enumerator.MoveNext(); min = enumerator.Current;
                         enumerator.MoveNext(); max = enumerator.Current;
@@ -528,7 +528,7 @@ namespace SimpleDeFence
             using var conditions = new FilterConditionList();
 
             // Application identity
-            if (!Utils.IsNullOrEmpty(r.AppContainerSid))
+            if (!string.IsNullOrEmpty(r.AppContainerSid))
             {
                 System.Diagnostics.Debug.Assert(!r.AppContainerSid.Equals("*"));
 
@@ -543,7 +543,7 @@ namespace SimpleDeFence
             }
             else
             {
-                if (!Utils.IsNullOrEmpty(r.ServiceName))
+                if (!string.IsNullOrEmpty(r.ServiceName))
                 {
                     System.Diagnostics.Debug.Assert(!r.ServiceName.Equals("*"));
                     if (!LayerIsIcmpError(layer))
@@ -552,7 +552,7 @@ namespace SimpleDeFence
                         return;
                 }
 
-                if (!Utils.IsNullOrEmpty(r.Application))
+                if (!string.IsNullOrEmpty(r.Application))
                 {
                     System.Diagnostics.Debug.Assert(!r.Application.Equals("*"));
 
@@ -564,7 +564,7 @@ namespace SimpleDeFence
             }
 
             // IP address
-            if (!Utils.IsNullOrEmpty(r.RemoteAddresses))
+            if (!string.IsNullOrEmpty(r.RemoteAddresses))
             {
                 System.Diagnostics.Debug.Assert(!r.RemoteAddresses.Equals("*"));
 
@@ -624,7 +624,7 @@ namespace SimpleDeFence
             }
 
             // Ports
-            if (!Utils.IsNullOrEmpty(r.LocalPorts))
+            if (!string.IsNullOrEmpty(r.LocalPorts))
             {
                 System.Diagnostics.Debug.Assert(!r.LocalPorts.Equals("*"));
                 foreach (var p in r.LocalPorts.AsSpan().Split(',', SpanSplitOptions.RemoveEmptyEntries))
@@ -633,7 +633,7 @@ namespace SimpleDeFence
                     conditions.Add(new PortFilterCondition(minPort, maxPort, RemoteOrLocal.Local));
                 }
             }
-            if (!Utils.IsNullOrEmpty(r.RemotePorts))
+            if (!string.IsNullOrEmpty(r.RemotePorts))
             {
                 System.Diagnostics.Debug.Assert(!r.RemotePorts.Equals("*"));
                 foreach (var p in r.RemotePorts.AsSpan().Split(',', SpanSplitOptions.RemoveEmptyEntries))
@@ -644,12 +644,12 @@ namespace SimpleDeFence
             }
 
             // ICMP
-            if (!Utils.IsNullOrEmpty(r.IcmpTypesAndCodes))
+            if (!string.IsNullOrEmpty(r.IcmpTypesAndCodes))
             {
                 System.Diagnostics.Debug.Assert(!r.IcmpTypesAndCodes.Equals("*"));
                 foreach (var e in r.IcmpTypesAndCodes.AsSpan().Split(',', SpanSplitOptions.RemoveEmptyEntries))
                 {
-                    using var tc = e.Split(':');
+                    using var tc = ReadOnlySpanExtension.Split(e, ':');
                     tc.MoveNext(); var icmpType = tc.Current;
 
                     if (LayerIsIcmpError(layer))
@@ -766,9 +766,9 @@ namespace SimpleDeFence
                 try
                 {
                     using var conditions = new FilterConditionList();
-                    if (!Utils.IsNullOrEmpty(subj.Application))
+                    if (!string.IsNullOrEmpty(subj.Application))
                         conditions.Add(new AppIdFilterCondition(subj.Application, false, true));
-                    if (!Utils.IsNullOrEmpty(subj.ServiceName))
+                    if (!string.IsNullOrEmpty(subj.ServiceName))
                         conditions.Add(new ServiceNameFilterCondition(subj.ServiceName));
                     if (conditions.Count == 0)
                         continue;
@@ -1827,7 +1827,7 @@ namespace SimpleDeFence
                 LocalIp = data.localAddr?.ToString()
             };
 
-            if (!Utils.IsNullOrEmpty(data.appId))
+            if (!string.IsNullOrEmpty(data.appId))
                 entry.AppPath = PathMapper.Instance.ConvertPathIgnoreErrors(data.appId, PathFormat.Win32);
             else
                 entry.AppPath = "System";
@@ -1867,7 +1867,7 @@ namespace SimpleDeFence
             }
 
             // Certain things we don't want to whitelist
-            if (Utils.IsNullOrEmpty(entry.AppPath)
+            if (string.IsNullOrEmpty(entry.AppPath)
                 || string.Equals(entry.AppPath, "System", StringComparison.InvariantCultureIgnoreCase)
                 || string.Equals(entry.AppPath, "svchost.exe", StringComparison.InvariantCultureIgnoreCase)
                 )

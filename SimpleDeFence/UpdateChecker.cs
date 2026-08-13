@@ -31,7 +31,7 @@ namespace SimpleDeFence
             var descriptor = new UpdateDescriptor();
             updater.State = UpdaterState.GettingDescriptor;
 
-            var TDialog = new TaskDialog
+            var TDialog = new Microsoft.Samples.TaskDialog.TaskDialog
             {
                 CustomMainIcon = Resources.Icons.firewall,
                 WindowTitle = Resources.Messages.SimpleDeFence,
@@ -70,7 +70,7 @@ namespace SimpleDeFence
                     updater.CheckAppVersion(descriptor);
                     break;
                 case (int)DialogResult.Abort:
-                    Utils.ShowMessageBox(updater.ErrorMsg, Resources.Messages.SimpleDeFence, TaskDialogCommonButtons.Ok, TaskDialogIcon.Error);
+                    Utils.ShowMessageBox(updater.ErrorMsg, Resources.Messages.SimpleDeFence, TaskDialogCommonButtons.Ok, Microsoft.Samples.TaskDialog.TaskDialogIcon.Error);
                     break;
             }
         }
@@ -88,20 +88,20 @@ namespace SimpleDeFence
             if (WindowsNew_AnyTwUpdate || WindowsOld_TwMinorFixOnly)
             {
                 string prompt = string.Format(CultureInfo.CurrentCulture, Resources.Messages.UpdateAvailable, UpdateModule.ComponentVersion);
-                if (Utils.ShowMessageBox(prompt, Resources.Messages.TinyWallUpdater, TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No, TaskDialogIcon.Warning) == DialogResult.Yes)
+                if (Utils.ShowMessageBox(prompt, Resources.Messages.TinyWallUpdater, TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No, Microsoft.Samples.TaskDialog.TaskDialogIcon.Warning) == DialogResult.Yes)
                     DownloadUpdate(UpdateModule);
             }
             else
             {
                 string prompt = Resources.Messages.NoUpdateAvailable;
-                Utils.ShowMessageBox(prompt, Resources.Messages.TinyWallUpdater, TaskDialogCommonButtons.Ok, TaskDialogIcon.Information);
+                Utils.ShowMessageBox(prompt, Resources.Messages.TinyWallUpdater, TaskDialogCommonButtons.Ok, Microsoft.Samples.TaskDialog.TaskDialogIcon.Information);
             }
         }
 
         private void DownloadUpdate(UpdateModule mainModule)
         {
             ErrorMsg = string.Empty;
-            var TDialog = new TaskDialog
+            var TDialog = new Microsoft.Samples.TaskDialog.TaskDialog
             {
                 CustomMainIcon = Resources.Icons.firewall,
                 WindowTitle = Resources.Messages.SimpleDeFence,
@@ -134,7 +134,7 @@ namespace SimpleDeFence
                     InstallUpdate(tmpFile);
                     break;
                 case (int)DialogResult.Abort:
-                    Utils.ShowMessageBox(ErrorMsg, Resources.Messages.SimpleDeFence, TaskDialogCommonButtons.Ok, TaskDialogIcon.Error);
+                    Utils.ShowMessageBox(ErrorMsg, Resources.Messages.SimpleDeFence, TaskDialogCommonButtons.Ok, Microsoft.Samples.TaskDialog.TaskDialogIcon.Error);
                     break;
             }
         }

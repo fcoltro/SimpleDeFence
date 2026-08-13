@@ -312,7 +312,7 @@ namespace SimpleDeFence
         /// <returns>The long path. Null or empty if the input is null or empty. Returns the input path in case of error.</returns>
         internal static string GetLongPathName(string? shortPath)
         {
-            if (Utils.IsNullOrEmpty(shortPath))
+            if (string.IsNullOrEmpty(shortPath))
                 return string.Empty;
 
             var builder = new StringBuilder(255);
@@ -602,11 +602,11 @@ namespace SimpleDeFence
             }
         }
 
-        internal static DialogResult ShowMessageBox(string msg, string title, TaskDialogCommonButtons buttons, TaskDialogIcon icon, IWin32Window? parent = null)
+        internal static DialogResult ShowMessageBox(string msg, string title, TaskDialogCommonButtons buttons, Microsoft.Samples.TaskDialog.TaskDialogIcon icon, IWin32Window? parent = null)
         {
             Utils.SplitFirstLine(msg, out string firstLine, out string contentLines);
 
-            var taskDialog = new TaskDialog
+            var taskDialog = new Microsoft.Samples.TaskDialog.TaskDialog
             {
                 WindowTitle = title,
                 MainInstruction = firstLine,

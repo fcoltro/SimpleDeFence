@@ -1277,7 +1277,7 @@ namespace SimpleDeFence
 
             Utils.SplitFirstLine(Resources.Messages.YouAreAboutToEnterLearningMode, out string firstLine, out string contentLines);
 
-            var dialog = new TaskDialog
+            var dialog = new Microsoft.Samples.TaskDialog.TaskDialog
             {
                 CustomMainIcon = Resources.Icons.firewall,
                 WindowTitle = Resources.Messages.SimpleDeFence,

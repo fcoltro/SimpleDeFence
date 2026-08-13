@@ -328,7 +328,7 @@ namespace SimpleDeFence
                         Resources.Messages.PortListInvalid,
                         Resources.Messages.SimpleDeFence,
                         TaskDialogCommonButtons.Ok,
-                        TaskDialogIcon.Warning,
+                        Microsoft.Samples.TaskDialog.TaskDialogIcon.Warning,
                         this);
 
                     return;
