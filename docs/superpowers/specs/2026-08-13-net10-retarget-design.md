@@ -1,0 +1,68 @@
+# net10 retarget of SimpleDeFence.csproj — design
+
+Date: 2026-08-13
+Status: approved design, not yet implemented
+Applies to: `SimpleDeFence` (WinForms exe), `SimpleDeFence.Windows.Services`, `MsiSetup`
+
+## Problem
+
+`SimpleDeFence.csproj` — the WinForms exe that hosts both the Windows service and the controller GUI — is still net48. ROADMAP.md names this the prerequisite blocker for merging the WinUI 3 GUI into one executable (decided 2026-08-08, in favor of widening the app's own anti-tampering check): the service refuses to talk to any executable other than itself, so a separate `SimpleDeFence.UI.exe` can never pass `AuthAsServer`, and folding the GUI in means folding it into *this* project.
+
+Three sub-blockers, per the roadmap: `System.Configuration.Install` (used for service install/uninstall) has no .NET 5+ equivalent; several framework references (`System.Management`, `System.ServiceProcess`, WinRT `Windows.*`) need retargeting; and MSI packaging needs a self-contained-vs-framework-dependent decision. All three turn out smaller than the roadmap's phrasing suggests, once traced through the actual code (see Decisions).
+
+This design covers only the retarget itself. Folding `SimpleDeFence.UI` into this executable, building a WinUI tray icon, and flipping the default GUI are a separate design, brainstormed after this one ships — matching how Connections, Rules, and Settings were each their own plan.
+
+## Decisions
+
+1. **Scope stops at the retarget.** The GUI merge, tray icon, and default-GUI flip are out of scope here (see Out of scope). This plan's own success criterion is narrow and testable: the app still does exactly what it does today — WinForms controller, tray icon, hosts-file management, DevelTool, service install/uninstall/start/stop — just running on net10 instead of net48.
+2. **Hard cutover, not dual-targeting.** `SimpleDeFence.csproj` moves straight to `<TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>`, replacing `net48` outright. There is no shipped install base to protect (no release has been cut since the fork), and every project this one glob-compiles from — `SimpleDeFence.Core`, `.Utilities`, `.Windows`, `.Windows.Services` — already multi-targets net48/net10 cleanly. Dual-targeting the exe itself would double the build/test matrix for a rollback path nothing currently needs.
+3. **Install/uninstall moves onto `ServiceControlManager`, not a like-for-like `System.Configuration.Install` replacement.** Tracing `SimpleDeFenceDoctor.EnsureServiceInstalledAndRunning`/`.Uninstall()` shows they only ever call `ManagedInstallerClass.InstallHelper(["/i", ...])` / `(["/u", ...])`, which reflection-discovers `Installer/SimpleDeFenceInstaller.cs` → `SimpleDeFenceServiceInstaller.cs`. That class's entire job is: register the service (LocalSystem account, `SimpleDeFenceService.SERVICE_NAME`/`SERVICE_DISPLAY_NAME`/`ServiceDependencies`, auto-start) and set its load-order group to `NetworkProvider`. `ServiceControlManager` (`SimpleDeFence.Windows.Services`, already net48/net10 dual-target, pure P/Invoke) already has `SetLoadOrderGroup` and the `SC_MANAGER_CREATE_SERVICE`/`SERVICE_ALL_ACCESS`/`DELETE` access-right values it needs — it's only missing the `CreateService`/`DeleteService` wrapper methods themselves. Adding those two methods (following the existing `OpenService`/`ChangeServiceConfig` P/Invoke pattern already in `NativeMethods.cs`) fully replaces `ManagedInstallerClass`, and the entire `Installer/` folder plus the `System.Configuration.Install` reference are deleted, not conditionally kept.
+   - `CreateService` marshals `SimpleDeFenceService.ServiceDependencies` (a `string[]`) into the double-null-terminated multi-string `lpDependencies` format `CreateServiceW` expects — the one genuinely new piece of marshaling work here, everything else is a mechanical translation of what `SimpleDeFenceServiceInstaller` already declares.
+   - Two access-right gaps, caught in this design's own self-review rather than left for the implementation plan to trip over: `ServiceControlManager`'s constructor currently opens the SCM handle with `SC_MANAGER_CONNECT` only, so `CreateService` would fail access-denied through it even though the `SC_MANAGER_CREATE_SERVICE` value already exists in `ServiceControlAccessRights` — the constructor needs to request `SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE` (it's `[Flags]`) instead. And `ServiceAccessRights` has no `DELETE` value at all yet (the standard Win32 `0x00010000`) — needed to open the target service handle for `DeleteService`. Both are one-line additions, same style as the existing enum members, and every current caller of `new ServiceControlManager()` is already admin-gated (`EnsureServiceInstalledAndRunning` checks `RunningAsAdmin()` before touching any of this), so broadening the constructor's requested rights changes no caller's actual privilege level.
+   - Both new methods preserve today's error behavior exactly: they throw on Win32 failure (including `ERROR_SERVICE_EXISTS` on a re-install, `ERROR_SERVICE_DOES_NOT_EXIST` on a redundant uninstall), the same as `ManagedInstallerClass.InstallHelper` does today. `SimpleDeFenceDoctor`'s existing try/catch/log around both call sites is unchanged and continues to swallow those cases exactly as it does now — this is a substitution of mechanism, not a change in tolerance.
+4. **`ServiceBase.cs`'s `[InstallerType(...)]` attribute is dropped, not conditionally compiled.** It references `System.ServiceProcess.ServiceProcessInstaller` (itself `System.Configuration.Install`-derived, so unavailable on net10) — which is why `SimpleDeFence.Windows.Services.csproj` currently excludes the whole file from its net10 leg. Nothing in this hand-rolled `ServiceBase` implementation reads the attribute at runtime; it's leftover metadata from the file's original design. Removing it lets `ServiceBase.cs` compile on net10 (it already has no other net10-incompatible code — the actual service-hosting loop is self-contained P/Invoke), and the `<Compile Remove="ServiceBase.cs">` net10 guard comes out of `SimpleDeFence.Windows.Services.csproj`.
+5. **Framework references retarget mechanically**, each following a pattern this repo has already proven works:
+   - `System.Management` → NuGet package `System.Management`, net10-conditional (the `ManagementEventWatcher`/`Win32_ProcessStartTrace` call in `SimpleDeFenceService.cs` needs no source change — same namespace, same API on both).
+   - `System.ServiceProcess` → NuGet package `System.ServiceProcess.ServiceController`, net10-conditional — the exact swap `SimpleDeFence.Windows.Services.csproj` already made for its own net10 leg.
+   - `Windows.Management`, `Windows.ApplicationModel`, `Microsoft.CSharp` → dropped outright for net10 (already commented in the current `.csproj` as net48-only compat shims, part of the shared framework on .NET 5+).
+   - `System.Configuration.Install` → removed (decision 3).
+6. **MSI packaging: self-contained.** `SelfContained=true` + `RuntimeIdentifier=win-x64`, matching the settings already on `SimpleDeFence.UI.csproj` (`SelfContained=true`, `WindowsAppSDKSelfContained=true`). A firewall needs to work immediately after install, not block on a missing .NET 10 Desktop Runtime prerequisite that doesn't ship with Windows today. Larger MSI (~150MB+), accepted as a non-issue — no evidence disk space is a real constraint for this app's users.
+
+## Architecture
+
+**`SimpleDeFence.Windows.Services`:**
+- `NativeMethods.cs` gains `CreateServiceW`/`DeleteService` `[DllImport]` declarations, following the file's existing style (see `OpenService`/`ChangeServiceConfig` for the pattern: `SafeServiceHandle` return/params, explicit marshaling attributes).
+- `ServiceControlManager.cs` gains `CreateService(string serviceName, string displayName, string binaryPath, string[] dependencies)` and `DeleteService(string serviceName)`, using the access rights already defined in `NativeStructs.cs` (`SC_MANAGER_CREATE_SERVICE` for open, `DELETE` for the delete-service open). `CreateService` calls `SetLoadOrderGroup(serviceName, "NetworkProvider")` immediately after creation, matching `SimpleDeFenceServiceInstaller.Install()`'s current sequencing.
+- `ServiceBase.cs` loses the `[InstallerType(...)]` attribute (decision 4); no other changes.
+- `SimpleDeFence.Windows.Services.csproj` loses the net10 `<Compile Remove="ServiceBase.cs">` guard.
+
+**`SimpleDeFence` (the exe):**
+- `SimpleDeFenceDoctor.EnsureServiceInstalledAndRunning`: the `ManagedInstallerClass.InstallHelper(["/i", ...])` call becomes `using var scm = new ServiceControlManager(); scm.CreateService(SimpleDeFenceService.SERVICE_NAME, SimpleDeFenceService.SERVICE_DISPLAY_NAME, Utils.ExecutablePath, SimpleDeFenceService.ServiceDependencies);` inside the existing try/catch.
+- `SimpleDeFenceDoctor.Uninstall`: the `ManagedInstallerClass.InstallHelper(["/u", ...])` call becomes `scm.DeleteService(SimpleDeFenceService.SERVICE_NAME)`, same treatment.
+- `Installer/SimpleDeFenceInstaller.cs`, `Installer/SimpleDeFenceServiceInstaller.cs` deleted.
+- `SimpleDeFence.csproj`: `TargetFramework` → `net10.0-windows10.0.19041.0`; `<Reference Include="System.Configuration.Install" />` removed; `System.Management`/`System.ServiceProcess` GAC references replaced with the NuGet packages named in decision 5; `Windows.Management`/`Windows.ApplicationModel`/`Microsoft.CSharp` references removed; `SelfContained`/`RuntimeIdentifier` added (decision 6). `UseWindowsForms`, all `.resx`/Designer wiring, and every glob-compiled include (`SimpleDeFence.Windows.WFP/*.cs` among them) are untouched — WinForms itself and the WFP interop layer are not blockers; nothing found in either that depends on removed APIs.
+
+**`MsiSetup`:** the `.wxs` file harvest needs updating for the self-contained publish output's actual file set (a self-contained net10 publish produces a materially different file list than the current framework-dependent net48 build — the native AOT-adjacent runtime files, `.deps.json`, etc.). The exact diff isn't knowable until a real `dotnet publish` is run against the retargeted project, so the implementation plan's corresponding task does the publish first and updates the harvest from its actual output, rather than guessing the file list up front.
+
+## Cross-cutting
+
+- No behavior changes anywhere in this design — every decision is either a mechanism substitution that preserves existing error handling/logging exactly (install/uninstall), or a reference-only retarget with no source change expected (System.Management/ServiceProcess/WinRT refs). If any retargeted reference turns out to need a real source change beyond a `using`, that's a signal this design's assumption was wrong for that piece and worth flagging back rather than pushing through silently.
+- `AuthAsServer`'s executable-path check (`#if !DEBUG`) is unaffected — it compares against the running exe's own path regardless of which .NET it's built for.
+- Nothing about the IPC protocol, WFP rule construction, or the service's actual firewall behavior changes. This is a toolchain migration, not a functional one.
+
+## Error handling
+
+Unchanged from today, by design (see Cross-cutting). `CreateService`/`DeleteService` throw `Win32Exception` on failure, exactly like the P/Invoke-wrapping methods already in `ServiceControlManager`; the existing try/catch/log wrappers in `SimpleDeFenceDoctor` are the only error-handling layer here and are not touched.
+
+## Testing
+
+- **What's newly testable in this environment**: once `SimpleDeFence.csproj` targets net10, `dotnet build`/`dotnet test` should work on it directly — today neither Framework MSBuild (missing an SDK resolver component on this machine) nor plain `dotnet build` (a `.resx`/`GenerateResourceUsePreserializedResources` issue, net48-specific) can build this project in this environment. This plan is expected to fix that as a side effect, not just retarget the framework.
+- **What still needs a real Windows session with admin rights**: the actual install → start → stop → uninstall service lifecycle. `ServiceControlManager`'s existing methods (`SetStartupMode`, `SetRestartOnFailure`, etc.) have no unit-test coverage today for the same reason — they need a real SCM database, not something meaningful to mock. `CreateService`/`DeleteService` inherit that same, already-accepted gap; the implementation plan will verify them via a real install (VM or admin machine), matching the verification standard every prior phase of this migration has used, and will say so plainly rather than claim a test that can't run here.
+- **Regression surface**: the full existing `SimpleDeFence.Tests` suite must stay green throughout — none of it currently touches install/uninstall directly, so a green suite plus a successful net10 build is necessary but not sufficient; the real-machine install verification above is what actually proves this design.
+
+## Out of scope
+
+- **Merging `SimpleDeFence.UI` into this executable** — a separate design, to be brainstormed after this one ships.
+- **The WinUI tray icon** (recommended approach when that design is written: `H.NotifyIcon.WinUI`, the actively-maintained community package, rather than a hand-rolled `Shell_NotifyIcon` wrapper — WinUI 3/Windows App SDK still has no first-party tray-icon support as of 2026).
+- **Porting hosts-file management or the DevelTool to WinUI** — both stay WinForms-only, reachable exactly as they are today.
+- **Flipping the default GUI, or retiring any part of WinForms** — nothing is removed from the WinForms app by this design, matching every prior phase of this migration.
