@@ -264,6 +264,19 @@
         "title": "Could not unlock the configuration",
         "detail": "The password was not accepted."
       }
+    },
+    "updates": {
+      "autoCheck": "Automatically check for updates",
+      "autoCheckDescription": "SimpleDeFence periodically checks for new versions."
+    },
+    "about": {
+      "version": "Version {0}",
+      "homepage": "GitHub / homepage",
+      "license": "License",
+      "attributions": "Attributions",
+      "linkFailed": {
+        "title": "Could not open"
+      }
     }
   }
 }

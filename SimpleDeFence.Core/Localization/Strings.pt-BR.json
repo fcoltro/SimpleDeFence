@@ -264,6 +264,19 @@
         "title": "Não foi possível desbloquear a configuração",
         "detail": "A senha não foi aceita."
       }
+    },
+    "updates": {
+      "autoCheck": "Verificar atualizações automaticamente",
+      "autoCheckDescription": "O SimpleDeFence verifica periodicamente se há novas versões."
+    },
+    "about": {
+      "version": "Versão {0}",
+      "homepage": "GitHub / site",
+      "license": "Licença",
+      "attributions": "Atribuições",
+      "linkFailed": {
+        "title": "Não foi possível abrir"
+      }
     }
   }
 }

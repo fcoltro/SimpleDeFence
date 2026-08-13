@@ -221,6 +221,15 @@ namespace SimpleDeFence.Localization
             public const string SecurityUnlock = "settings.security.unlock";
             public const string SecurityUnlockFailedTitle = "settings.security.unlockFailed.title";
             public const string SecurityUnlockFailedDetail = "settings.security.unlockFailed.detail";
+
+            public const string UpdatesAutoCheck = "settings.updates.autoCheck";
+            public const string UpdatesAutoCheckDescription = "settings.updates.autoCheckDescription";
+
+            public const string AboutVersion = "settings.about.version";
+            public const string AboutHomepage = "settings.about.homepage";
+            public const string AboutLicense = "settings.about.license";
+            public const string AboutAttributions = "settings.about.attributions";
+            public const string AboutLinkFailedTitle = "settings.about.linkFailed.title";
         }
 
         public static class Policy

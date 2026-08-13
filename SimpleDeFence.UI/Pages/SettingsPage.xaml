@@ -116,7 +116,31 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
-                <!-- Updates, Maintenance, and About groups are added here by Tasks 7-8. -->
+                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.updates}" IsExpanded="True">
+                    <controls:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE895;"/>
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.updates.autoCheck}"
+                                                Description="{loc:Loc Key=settings.updates.autoCheckDescription}">
+                            <ToggleSwitch x:Name="AutoUpdateCheckToggle" Toggled="AutoUpdateCheckToggle_Toggled"/>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+
+                <!-- Maintenance group is added here by Task 8. -->
+
+                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.about}" IsExpanded="True">
+                    <controls:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE946;"/>
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard x:Name="AboutVersionCard" IsClickEnabled="False"/>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.about.homepage}" IsClickEnabled="True" Click="AboutHomepage_Click"/>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.about.license}" IsClickEnabled="True" Click="AboutLicense_Click"/>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.about.attributions}" IsClickEnabled="True" Click="AboutAttributions_Click"/>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
 
             </StackPanel>
         </ScrollViewer>

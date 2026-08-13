@@ -102,6 +102,11 @@ namespace SimpleDeFence.UI.Pages
             // keeps the UI from offering an action that would silently do nothing.
             LockNowButton.IsEnabled = hasPassword && !locked && !_committing;
             UnlockPanel.Visibility = locked ? Visibility.Visible : Visibility.Collapsed;
+
+            AutoUpdateCheckToggle.IsOn = config.AutoUpdateCheck;
+
+            AboutVersionCard.Header = Loc.T(LocKeys.Settings.AboutVersion,
+                System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0");
         }
 
         /// <summary>Hosts/Ports blocklist toggles are only meaningful while the master toggle is
@@ -182,6 +187,13 @@ namespace SimpleDeFence.UI.Pages
             if (_seeding || _committing) return;
             var value = LockHostsFileToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.LockHostsFile = value));
+        }
+
+        private void AutoUpdateCheckToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding || _committing) return;
+            var value = AutoUpdateCheckToggle.IsOn;
+            DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.AutoUpdateCheck = value));
         }
 
         /// <summary>Shared by every immediate-commit toggle in this page (Protection, Blocklists,
@@ -342,6 +354,42 @@ namespace SimpleDeFence.UI.Pages
             {
                 _committing = false;
                 UpdateControlsEnabled();
+            }
+        }
+
+        private void AboutHomepage_Click(object sender, RoutedEventArgs e)
+            => OpenUrl("https://github.com/fcoltro/SimpleDeFence");
+
+        private void AboutLicense_Click(object sender, RoutedEventArgs e)
+            => OpenLocalDoc("License.rtf");
+
+        private void AboutAttributions_Click(object sender, RoutedEventArgs e)
+            => OpenLocalDoc("Attributions.txt");
+
+        private void OpenUrl(string url)
+        {
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true };
+                System.Diagnostics.Process.Start(psi)?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Settings.AboutLinkFailedTitle), ex.Message);
+            }
+        }
+
+        private void OpenLocalDoc(string fileName)
+        {
+            try
+            {
+                var dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)!;
+                var psi = new System.Diagnostics.ProcessStartInfo(System.IO.Path.Combine(dir, fileName)) { UseShellExecute = true };
+                System.Diagnostics.Process.Start(psi)?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Settings.AboutLinkFailedTitle), ex.Message);
             }
         }
 
