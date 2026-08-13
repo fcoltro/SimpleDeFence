@@ -19,6 +19,7 @@ namespace SimpleDeFence.Localization
         public static class Nav
         {
             public const string Rules = "nav.rules";
+            public const string Settings = "nav.settings";
             public const string ModeChip = "nav.modeChip";
         }
 
@@ -162,6 +163,86 @@ namespace SimpleDeFence.Localization
             public const string DetailApplyFailedLockedDetail = "rules.detail.applyFailed.lockedDetail";
             public const string DetailApplyFailedStaleDetail = "rules.detail.applyFailed.staleDetail";
             public const string DetailApplyFailedGenericDetail = "rules.detail.applyFailed.genericDetail";
+        }
+
+        public static class Settings
+        {
+            public const string Title = "settings.title";
+            public const string SectionGeneral = "settings.section.general";
+            public const string SectionProtection = "settings.section.protection";
+            public const string SectionBlocklists = "settings.section.blocklists";
+            public const string SectionSecurity = "settings.section.security";
+            public const string SectionUpdates = "settings.section.updates";
+            public const string SectionMaintenance = "settings.section.maintenance";
+            public const string SectionAbout = "settings.section.about";
+
+            public const string CommitFailedTitle = "settings.commitFailed.title";
+            public const string CommitFailedLockedDetail = "settings.commitFailed.lockedDetail";
+            public const string CommitFailedStaleDetail = "settings.commitFailed.staleDetail";
+            public const string CommitFailedGenericDetail = "settings.commitFailed.genericDetail";
+
+            public const string GeneralTheme = "settings.general.theme";
+            public const string GeneralThemeDescription = "settings.general.themeDescription";
+            public const string GeneralThemeAuto = "settings.general.themeAuto";
+            public const string GeneralThemeLight = "settings.general.themeLight";
+            public const string GeneralThemeDark = "settings.general.themeDark";
+
+            public const string ProtectionAllowLocalSubnet = "settings.protection.allowLocalSubnet";
+            public const string ProtectionAllowLocalSubnetDescription = "settings.protection.allowLocalSubnetDescription";
+            public const string ProtectionDisplayOffBlock = "settings.protection.displayOffBlock";
+            public const string ProtectionDisplayOffBlockDescription = "settings.protection.displayOffBlockDescription";
+
+            public const string BlocklistsEnable = "settings.blocklists.enable";
+            public const string BlocklistsEnableDescription = "settings.blocklists.enableDescription";
+            public const string BlocklistsHosts = "settings.blocklists.hosts";
+            public const string BlocklistsPorts = "settings.blocklists.ports";
+
+            public const string SecurityLockHostsFile = "settings.security.lockHostsFile";
+            public const string SecurityLockHostsFileDescription = "settings.security.lockHostsFileDescription";
+
+            public const string SecurityPasswordSet = "settings.security.passwordSet";
+            public const string SecurityPasswordNotSet = "settings.security.passwordNotSet";
+            public const string SecurityNewPassword = "settings.security.newPassword";
+            public const string SecurityConfirmPassword = "settings.security.confirmPassword";
+            public const string SecuritySetPassword = "settings.security.setPassword";
+            public const string SecurityRemovePassword = "settings.security.removePassword";
+            public const string SecurityPasswordMismatchTitle = "settings.security.passwordMismatch.title";
+            public const string SecurityPasswordMismatchDetail = "settings.security.passwordMismatch.detail";
+            public const string SecurityPasswordUpdatedTitle = "settings.security.passwordUpdated.title";
+            public const string SecurityPasswordUpdatedBody = "settings.security.passwordUpdated.body";
+            public const string SecurityPasswordRemovedBody = "settings.security.passwordRemoved.body";
+            public const string SecurityPasswordUpdateFailedTitle = "settings.security.passwordUpdateFailed.title";
+
+            public const string SecurityLockedStatus = "settings.security.lockedStatus";
+            public const string SecurityUnlockedStatus = "settings.security.unlockedStatus";
+            public const string SecurityLockNow = "settings.security.lockNow";
+            public const string SecurityLockFailedTitle = "settings.security.lockFailed.title";
+            public const string SecurityUnlockPasswordPlaceholder = "settings.security.unlockPasswordPlaceholder";
+            public const string SecurityUnlock = "settings.security.unlock";
+            public const string SecurityUnlockFailedTitle = "settings.security.unlockFailed.title";
+            public const string SecurityUnlockFailedDetail = "settings.security.unlockFailed.detail";
+
+            public const string UpdatesAutoCheck = "settings.updates.autoCheck";
+            public const string UpdatesAutoCheckDescription = "settings.updates.autoCheckDescription";
+
+            public const string MaintenanceImport = "settings.maintenance.import";
+            public const string MaintenanceExport = "settings.maintenance.export";
+            public const string MaintenanceFilePickerName = "settings.maintenance.filePickerName";
+            public const string MaintenanceImportConfirmTitle = "settings.maintenance.importConfirm.title";
+            public const string MaintenanceImportConfirmBody = "settings.maintenance.importConfirm.body";
+            public const string MaintenanceImportConfirmConfirm = "settings.maintenance.importConfirm.confirm";
+            public const string MaintenanceImportSuccessTitle = "settings.maintenance.importSuccess.title";
+            public const string MaintenanceImportSuccessBody = "settings.maintenance.importSuccess.body";
+            public const string MaintenanceImportFailedTitle = "settings.maintenance.importFailed.title";
+            public const string MaintenanceExportSuccessTitle = "settings.maintenance.exportSuccess.title";
+            public const string MaintenanceExportSuccessBody = "settings.maintenance.exportSuccess.body";
+            public const string MaintenanceExportFailedTitle = "settings.maintenance.exportFailed.title";
+
+            public const string AboutVersion = "settings.about.version";
+            public const string AboutHomepage = "settings.about.homepage";
+            public const string AboutLicense = "settings.about.license";
+            public const string AboutAttributions = "settings.about.attributions";
+            public const string AboutLinkFailedTitle = "settings.about.linkFailed.title";
         }
 
         public static class Policy

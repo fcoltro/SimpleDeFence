@@ -854,7 +854,7 @@ namespace SimpleDeFence.UI.Pages
             UpdateApplyButtonEnabled();
             try
             {
-                return await App.Firewall.CommitProfileChangesAsync(mutate);
+                return await App.Firewall.CommitConfigChangesAsync(config => mutate(config.ActiveProfile));
             }
             catch (Exception ex)
             {

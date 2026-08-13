@@ -77,6 +77,15 @@ namespace SimpleDeFence.UI.Services
         public Task<MessageType> SwitchModeAsync(FirewallMode mode)
             => Task.Run(() => _controller.SwitchFirewallMode(mode));
 
+        public Task<MessageType> LockAsync()
+            => Task.Run(() => _controller.LockServer());
+
+        public Task<MessageType> UnlockAsync(string password)
+            => Task.Run(() => _controller.TryUnlockServer(password));
+
+        public Task<MessageType> SetPasswordAsync(string password)
+            => Task.Run(() => _controller.SetPassphrase(password));
+
         public Task<ConnectionsSnapshot> GetConnectionsAsync()
         {
             return Task.Run(() =>
@@ -109,10 +118,10 @@ namespace SimpleDeFence.UI.Services
         }
 
         public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy)
-            => CommitProfileChangesAsync(profile =>
-                profile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
+            => CommitConfigChangesAsync(config =>
+                config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
 
-        public Task<MessageType> CommitProfileChangesAsync(Action<ServerProfileConfiguration> mutate)
+        public Task<MessageType> CommitConfigChangesAsync(Action<ServerConfiguration> mutate)
         {
             return Task.Run(() =>
             {
@@ -123,7 +132,7 @@ namespace SimpleDeFence.UI.Services
                 // successful PUT replaces the cached config.
                 var clone = SerializationHelper.Deserialize<ServerConfiguration>(
                     SerializationHelper.Serialize(Config), new ServerConfiguration());
-                mutate(clone.ActiveProfile);
+                mutate(clone);
 
                 var resp = _controller.SetServerConfig(clone, _changeset);
                 if (resp is TwMessagePutSettings putResp && resp.Type == MessageType.PUT_SETTINGS)

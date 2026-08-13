@@ -51,6 +51,8 @@ namespace SimpleDeFence
     [JsonSerializable(typeof(RuleListPolicy))]
     [JsonSerializable(typeof(FirewallExceptionV3))]
     [JsonSerializable(typeof(ServerConfiguration))]
+    [JsonSerializable(typeof(ClientSettings))]
+    [JsonSerializable(typeof(ConfigExport))]
     [JsonSerializable(typeof(UpdateDescriptor))]
     [JsonSerializable(typeof(ServerState))]
     [JsonSerializable(typeof(DatabaseClasses.AppDatabase))]

@@ -43,12 +43,11 @@ namespace SimpleDeFence.UI
             if (args.SelectedItem is not NavigationViewItem item)
                 return;
 
-            // Settings arrives in its own plan; until then Connections and Rules are the only
-            // two destinations.
             var targetType = (string)item.Tag switch
             {
                 "connections" => typeof(ConnectionsPage),
                 "rules" => typeof(RulesPage),
+                "settings" => typeof(SettingsPage),
                 _ => typeof(ConnectionsPage),
             };
 

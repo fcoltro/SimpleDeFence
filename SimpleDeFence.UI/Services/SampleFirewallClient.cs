@@ -11,14 +11,21 @@ namespace SimpleDeFence.UI.Services
     /// </summary>
     internal sealed class SampleFirewallClient : IFirewallClient
     {
-        private readonly bool _locked;
+        private bool _locked;
+        private bool _hasPassword;
 
         /// <param name="locked">
         /// Simulates a locked service, which refuses mode changes. Without this the sample client
         /// could only ever succeed, leaving the GUI's failure handling unreachable and therefore
-        /// unverifiable until the real client becomes usable.
+        /// unverifiable until the real client becomes usable. Implies a password is set, mirroring
+        /// PasswordLock.Locked's real getter (locked && HasPassword) - you cannot be locked
+        /// without a password.
         /// </param>
-        public SampleFirewallClient(bool locked = false) => _locked = locked;
+        public SampleFirewallClient(bool locked = false)
+        {
+            _locked = locked;
+            _hasPassword = locked;
+        }
 
         public ServerConfiguration? Config { get; private set; }
         public ServerState? State { get; private set; }
@@ -30,12 +37,14 @@ namespace SimpleDeFence.UI.Services
         public Task RefreshAsync()
         {
             Config ??= BuildConfig();
-            State ??= new ServerState
-            {
-                Mode = FirewallMode.Normal,
-                Locked = _locked,
-                HasPassword = _locked,
-            };
+            State ??= new ServerState { Mode = FirewallMode.Normal };
+            // Re-synced every refresh, not just on first creation, so LockAsync/UnlockAsync/
+            // SetPasswordAsync (which mutate the fields, not the State object directly) are
+            // reflected the next time a page calls RefreshAsync() - the same "refresh after a
+            // commit to see the new truth" convention every other mutation in this app already
+            // follows.
+            State.Locked = _locked;
+            State.HasPassword = _hasPassword;
 
             Connected = true;
             LastError = null;
@@ -58,6 +67,48 @@ namespace SimpleDeFence.UI.Services
             State.Mode = mode;
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.MODE_SWITCH);
+        }
+
+        public Task<MessageType> LockAsync()
+        {
+            // LOCK is a privileged command (MessageType > 2047), so it's rejected while locked,
+            // matching the real service's behavior in SimpleDeFenceService.cs:1895-1899.
+            if (_locked)
+                return Task.FromResult(MessageType.RESPONSE_LOCKED);
+
+            // Mirrors the real service: PasswordLock.Locked's setter is a no-op without a
+            // password, but the response is still MessageType.LOCK either way - it is the
+            // UI's job to disable "Lock now" when State.HasPassword is false, not this method's.
+            if (_hasPassword)
+                _locked = true;
+            return Task.FromResult(MessageType.LOCK);
+        }
+
+        public Task<MessageType> UnlockAsync(string password)
+        {
+            // Sample data has no real password hash to check against - any input unlocks. This
+            // still exercises the GUI's success/failure branches faithfully because the *lock*
+            // state, not the password check, is what SampleFirewallClient(locked: true) exists to
+            // simulate; a wrong-password failure path has no sample-data seam, same limitation
+            // GetAppDatabaseAsync's missing-file case already has for other data.
+            _locked = false;
+            return Task.FromResult(MessageType.UNLOCK);
+        }
+
+        public Task<MessageType> SetPasswordAsync(string password)
+        {
+            // SET_PASSPHRASE is a privileged command (MessageType > 2047), so it's rejected while
+            // locked, matching the real service's behavior in SimpleDeFenceService.cs:1895-1899.
+            if (_locked)
+                return Task.FromResult(MessageType.RESPONSE_LOCKED);
+
+            _hasPassword = !string.IsNullOrEmpty(password);
+            if (!_hasPassword)
+                // Clearing the password also clears any lock, mirroring PasswordLock.Locked's
+                // real getter (locked && HasPassword) - a lock cannot survive its password
+                // being removed.
+                _locked = false;
+            return Task.FromResult(MessageType.SET_PASSPHRASE);
         }
 
         public Task<ConnectionsSnapshot> GetConnectionsAsync()
@@ -114,10 +165,10 @@ namespace SimpleDeFence.UI.Services
         }
 
         public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy)
-            => CommitProfileChangesAsync(profile =>
-                profile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
+            => CommitConfigChangesAsync(config =>
+                config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
 
-        public Task<MessageType> CommitProfileChangesAsync(Action<ServerProfileConfiguration> mutate)
+        public Task<MessageType> CommitConfigChangesAsync(Action<ServerConfiguration> mutate)
         {
             if (_locked)
                 return Task.FromResult(MessageType.RESPONSE_LOCKED);
@@ -125,7 +176,7 @@ namespace SimpleDeFence.UI.Services
             if (Config is null)
                 return Task.FromResult(MessageType.RESPONSE_ERROR);
 
-            mutate(Config.ActiveProfile);
+            mutate(Config);
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.PUT_SETTINGS);
         }

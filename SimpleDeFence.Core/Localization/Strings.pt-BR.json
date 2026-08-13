@@ -5,6 +5,7 @@
 
   "nav": {
     "rules": "Regras",
+    "settings": "Configurações",
     "modeChip": "Modo do firewall"
   },
 
@@ -189,6 +190,116 @@
         "lockedDetail": "Desbloqueie a configuração antes de alterar esta regra.",
         "staleDetail": "A configuração foi alterada em outro lugar agora há pouco; a política não foi alterada. Tente novamente.",
         "genericDetail": "O serviço retornou {0}. A política não foi alterada."
+      }
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "section": {
+      "general": "Geral",
+      "protection": "Proteção",
+      "blocklists": "Listas de bloqueio",
+      "security": "Segurança",
+      "updates": "Atualizações",
+      "maintenance": "Manutenção",
+      "about": "Sobre"
+    },
+    "commitFailed": {
+      "title": "Não foi possível salvar a configuração",
+      "lockedDetail": "Desbloqueie a configuração antes de alterar as configurações.",
+      "staleDetail": "A configuração foi alterada em outro lugar agora há pouco; a configuração não foi alterada. Tente novamente.",
+      "genericDetail": "O serviço retornou {0}. A configuração não foi alterada."
+    },
+    "general": {
+      "theme": "Tema do aplicativo",
+      "themeDescription": "Aplica-se imediatamente.",
+      "themeAuto": "Usar configuração do sistema",
+      "themeLight": "Claro",
+      "themeDark": "Escuro"
+    },
+    "protection": {
+      "allowLocalSubnet": "Permitir rede local",
+      "allowLocalSubnetDescription": "Sempre permitir tráfego de e para outros dispositivos na sua rede local.",
+      "displayOffBlock": "Bloquear rede quando a tela estiver desligada",
+      "displayOffBlockDescription": "Bloqueia todo o tráfego de rede enquanto a tela estiver desligada."
+    },
+    "blocklists": {
+      "enable": "Ativar listas de bloqueio",
+      "enableDescription": "Bloqueia tráfego para hosts e portas conhecidos como maliciosos.",
+      "hosts": "Bloquear hosts maliciosos",
+      "ports": "Bloquear portas maliciosas"
+    },
+    "security": {
+      "lockHostsFile": "Bloquear o arquivo hosts",
+      "lockHostsFileDescription": "Impede que outros programas modifiquem o arquivo hosts.",
+      "passwordSet": "Uma senha está definida.",
+      "passwordNotSet": "Nenhuma senha está definida.",
+      "newPassword": "Nova senha",
+      "confirmPassword": "Confirmar senha",
+      "setPassword": "Definir senha",
+      "removePassword": "Remover senha",
+      "passwordMismatch": {
+        "title": "As senhas não coincidem",
+        "detail": "Digite a mesma senha nos dois campos."
+      },
+      "passwordUpdated": {
+        "title": "Senha atualizada",
+        "body": "A senha da configuração foi alterada."
+      },
+      "passwordRemoved": {
+        "body": "A senha da configuração foi removida."
+      },
+      "passwordUpdateFailed": {
+        "title": "Não foi possível atualizar a senha"
+      },
+      "lockedStatus": "A configuração está bloqueada.",
+      "unlockedStatus": "A configuração não está bloqueada.",
+      "lockNow": "Bloquear agora",
+      "lockFailed": {
+        "title": "Não foi possível bloquear a configuração"
+      },
+      "unlockPasswordPlaceholder": "Senha",
+      "unlock": "Desbloquear",
+      "unlockFailed": {
+        "title": "Não foi possível desbloquear a configuração",
+        "detail": "A senha não foi aceita."
+      }
+    },
+    "updates": {
+      "autoCheck": "Verificar atualizações automaticamente",
+      "autoCheckDescription": "O SimpleDeFence verifica periodicamente se há novas versões."
+    },
+    "maintenance": {
+      "import": "Importar configuração...",
+      "export": "Exportar configuração...",
+      "filePickerName": "Configurações do SimpleDeFence",
+      "importConfirm": {
+        "title": "Importar configuração?",
+        "body": "Isso substitui todas as regras e configurações da configuração atual. Essa ação não pode ser desfeita.",
+        "confirm": "Importar"
+      },
+      "importSuccess": {
+        "title": "Configuração importada",
+        "body": "{0} foi importado."
+      },
+      "importFailed": {
+        "title": "Não foi possível importar a configuração"
+      },
+      "exportSuccess": {
+        "title": "Configuração exportada",
+        "body": "Salvo em {0}."
+      },
+      "exportFailed": {
+        "title": "Não foi possível exportar a configuração"
+      }
+    },
+    "about": {
+      "version": "Versão {0}",
+      "homepage": "GitHub / site",
+      "license": "Licença",
+      "attributions": "Atribuições",
+      "linkFailed": {
+        "title": "Não foi possível abrir"
       }
     }
   }
