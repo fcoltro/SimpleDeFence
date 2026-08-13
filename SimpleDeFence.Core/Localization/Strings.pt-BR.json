@@ -273,6 +273,11 @@
       "import": "Importar configuração...",
       "export": "Exportar configuração...",
       "filePickerName": "Configurações do SimpleDeFence",
+      "importConfirm": {
+        "title": "Importar configuração?",
+        "body": "Isso substitui todas as regras e configurações da configuração atual. Essa ação não pode ser desfeita.",
+        "confirm": "Importar"
+      },
       "importSuccess": {
         "title": "Configuração importada",
         "body": "{0} foi importado."

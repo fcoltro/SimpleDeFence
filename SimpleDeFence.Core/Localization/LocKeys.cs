@@ -228,6 +228,9 @@ namespace SimpleDeFence.Localization
             public const string MaintenanceImport = "settings.maintenance.import";
             public const string MaintenanceExport = "settings.maintenance.export";
             public const string MaintenanceFilePickerName = "settings.maintenance.filePickerName";
+            public const string MaintenanceImportConfirmTitle = "settings.maintenance.importConfirm.title";
+            public const string MaintenanceImportConfirmBody = "settings.maintenance.importConfirm.body";
+            public const string MaintenanceImportConfirmConfirm = "settings.maintenance.importConfirm.confirm";
             public const string MaintenanceImportSuccessTitle = "settings.maintenance.importSuccess.title";
             public const string MaintenanceImportSuccessBody = "settings.maintenance.importSuccess.body";
             public const string MaintenanceImportFailedTitle = "settings.maintenance.importFailed.title";

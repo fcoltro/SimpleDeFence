@@ -273,6 +273,11 @@
       "import": "Import configuration...",
       "export": "Export configuration...",
       "filePickerName": "SimpleDeFence settings",
+      "importConfirm": {
+        "title": "Import configuration?",
+        "body": "This replaces every rule and setting in the current configuration. This cannot be undone.",
+        "confirm": "Import"
+      },
       "importSuccess": {
         "title": "Configuration imported",
         "body": "{0} was imported."

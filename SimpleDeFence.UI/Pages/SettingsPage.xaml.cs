@@ -96,14 +96,14 @@ namespace SimpleDeFence.UI.Pages
             var locked = App.Firewall.State?.Locked ?? false;
 
             PasswordStatusText.Text = Loc.T(hasPassword ? LocKeys.Settings.SecurityPasswordSet : LocKeys.Settings.SecurityPasswordNotSet);
-            RemovePasswordButton.IsEnabled = hasPassword && !_committing;
-
             LockStatusText.Text = Loc.T(locked ? LocKeys.Settings.SecurityLockedStatus : LocKeys.Settings.SecurityUnlockedStatus);
-            // Locking without a password is a server-side no-op (PasswordLock.Locked's setter is
-            // gated on HasPassword) - disabling the button when there is nothing to lock with
-            // keeps the UI from offering an action that would silently do nothing.
-            LockNowButton.IsEnabled = hasPassword && !locked && !_committing;
             UnlockPanel.Visibility = locked ? Visibility.Visible : Visibility.Collapsed;
+
+            // RemovePasswordButton/LockNowButton's enabled state is derived from the same
+            // hasPassword/locked/_committing inputs UpdateControlsEnabled() already computes for
+            // every other button in this group - calling it here instead of re-deriving those two
+            // booleans a second time keeps that derivation in exactly one place.
+            UpdateControlsEnabled();
 
             AutoUpdateCheckToggle.IsOn = config.AutoUpdateCheck;
 
@@ -239,6 +239,28 @@ namespace SimpleDeFence.UI.Pages
                 return;
             }
 
+            // Import replaces every rule and setting in the current configuration - far more
+            // destructive than Rules' single-rule remove, which already confirms. Same
+            // TryShowDialogAsync/XamlRoot/CloseButtonText/PrimaryButtonText wiring as
+            // RulesPage.RemoveButton_Click's confirm dialog.
+            var confirmTitle = Loc.T(LocKeys.Settings.MaintenanceImportConfirmTitle);
+            var confirmBody = Loc.T(LocKeys.Settings.MaintenanceImportConfirmBody);
+            var confirm = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                Title = confirmTitle,
+                Content = confirmBody,
+                PrimaryButtonText = Loc.T(LocKeys.Settings.MaintenanceImportConfirmConfirm),
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                DefaultButton = ContentDialogButton.Close,
+            };
+            // If another dialog is already up (single-dialog-per-XamlRoot), the fallback InfoBar
+            // shows the same confirm text this dialog would have, and ContentDialogResult.None
+            // (never Primary) means Import safely does not proceed without an actual confirmation -
+            // treated exactly like a cancelled file picker: no error dialog, no commit.
+            if (await TryShowDialogAsync(confirm, confirmTitle, confirmBody) != ContentDialogResult.Primary)
+                return;
+
             // Replace the whole server config - import means "become this document", not a
             // targeted mutation. Profiles is assigned before ActiveProfileName so the ActiveProfile
             // cache invalidation that setter triggers finds the new profile list, not the old one.
@@ -325,6 +347,14 @@ namespace SimpleDeFence.UI.Pages
         /// RulesPage.ToggleSpecialAsync uses for the identical reason.</summary>
         private async Task CommitToggleAsync(Action<ServerConfiguration> mutate)
         {
+            // Serializes with other toggles: each Toggled handler's own _committing check happens
+            // before the DispatcherQueue.TryEnqueue hop, so two toggles flipped within the same
+            // dispatcher pump iteration could both pass that check and both reach here before
+            // either commit starts - the same guard RulesPage.ToggleSpecialAsync places inside
+            // itself, for the identical reason, rather than relying solely on the caller's check.
+            if (_committing)
+                return;
+
             var resp = await CommitAsync(mutate);
             await RefreshAsync();
 
@@ -342,7 +372,7 @@ namespace SimpleDeFence.UI.Pages
         {
             if (_committing) return;
 
-            var password = NewPasswordBox.Text;
+            var password = NewPasswordBox.Password;
             if (password != NewPasswordConfirmBox.Password)
             {
                 await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityPasswordMismatchTitle),
@@ -370,14 +400,16 @@ namespace SimpleDeFence.UI.Pages
             }
             catch (Exception ex)
             {
-                _committing = false;
-                UpdateControlsEnabled();
                 await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityPasswordUpdateFailedTitle), ex.Message);
                 return;
             }
-            _committing = false;
+            finally
+            {
+                _committing = false;
+                UpdateControlsEnabled();
+            }
 
-            NewPasswordBox.Text = string.Empty;
+            NewPasswordBox.Password = string.Empty;
             NewPasswordConfirmBox.Password = string.Empty;
 
             if (resp == MessageType.SET_PASSPHRASE)
@@ -407,12 +439,14 @@ namespace SimpleDeFence.UI.Pages
             }
             catch (Exception ex)
             {
-                _committing = false;
-                UpdateControlsEnabled();
                 await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityLockFailedTitle), ex.Message);
                 return;
             }
-            _committing = false;
+            finally
+            {
+                _committing = false;
+                UpdateControlsEnabled();
+            }
 
             await RefreshAsync();
             if (resp != MessageType.LOCK)
@@ -437,12 +471,14 @@ namespace SimpleDeFence.UI.Pages
             }
             catch (Exception ex)
             {
-                _committing = false;
-                UpdateControlsEnabled();
                 await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityUnlockFailedTitle), ex.Message);
                 return;
             }
-            _committing = false;
+            finally
+            {
+                _committing = false;
+                UpdateControlsEnabled();
+            }
 
             UnlockPasswordBox.Password = string.Empty;
             await RefreshAsync();
@@ -525,6 +561,9 @@ namespace SimpleDeFence.UI.Pages
             var hasPassword = App.Firewall.State?.HasPassword ?? false;
             var locked = App.Firewall.State?.Locked ?? false;
             RemovePasswordButton.IsEnabled = hasPassword && !_committing;
+            // Locking without a password is a server-side no-op (PasswordLock.Locked's setter is
+            // gated on HasPassword) - disabling the button when there is nothing to lock with
+            // keeps the UI from offering an action that would silently do nothing.
             LockNowButton.IsEnabled = hasPassword && !locked && !_committing;
             UnlockButton.IsEnabled = !_committing;
             ImportButton.IsEnabled = !_committing;
