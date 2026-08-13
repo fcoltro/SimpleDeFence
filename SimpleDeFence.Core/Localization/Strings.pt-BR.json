@@ -269,6 +269,25 @@
       "autoCheck": "Verificar atualizações automaticamente",
       "autoCheckDescription": "O SimpleDeFence verifica periodicamente se há novas versões."
     },
+    "maintenance": {
+      "import": "Importar configuração...",
+      "export": "Exportar configuração...",
+      "filePickerName": "Configurações do SimpleDeFence",
+      "importSuccess": {
+        "title": "Configuração importada",
+        "body": "{0} foi importado."
+      },
+      "importFailed": {
+        "title": "Não foi possível importar a configuração"
+      },
+      "exportSuccess": {
+        "title": "Configuração exportada",
+        "body": "Salvo em {0}."
+      },
+      "exportFailed": {
+        "title": "Não foi possível exportar a configuração"
+      }
+    },
     "about": {
       "version": "Versão {0}",
       "homepage": "GitHub / site",

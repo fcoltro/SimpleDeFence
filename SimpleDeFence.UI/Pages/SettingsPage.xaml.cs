@@ -3,6 +3,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SimpleDeFence.Localization;
 using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 
 namespace SimpleDeFence.UI.Pages
@@ -194,6 +196,126 @@ namespace SimpleDeFence.UI.Pages
             if (_seeding || _committing) return;
             var value = AutoUpdateCheckToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.AutoUpdateCheck = value));
+        }
+
+        /// <summary>Same safe shape as RulesPage's Add pickers: MenuFlyoutItem/Button.Click is a
+        /// plain top-level handler, so committing and showing a result dialog directly from here
+        /// is fine per the reentrancy rule.</summary>
+        private async void ImportButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing) return;
+
+            var picker = new global::Windows.Storage.Pickers.FileOpenPicker();
+            picker.FileTypeFilter.Add(".tws");
+
+            if (App.MainWindow is null)
+                return;
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            global::Windows.Storage.StorageFile? file;
+            try
+            {
+                file = await picker.PickSingleFileAsync();
+            }
+            catch (Exception ex)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Settings.MaintenanceImportFailedTitle), ex.Message);
+                return;
+            }
+
+            if (file is null)
+                return; // Cancelled - not an error, no dialog, no notice.
+
+            ConfigExport imported;
+            try
+            {
+                var buffer = await global::Windows.Storage.FileIO.ReadBufferAsync(file);
+                imported = SerializationHelper.Deserialize(buffer.ToArray(), new ConfigExport());
+            }
+            catch (Exception ex)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Settings.MaintenanceImportFailedTitle), ex.Message);
+                return;
+            }
+
+            // Replace the whole server config - import means "become this document", not a
+            // targeted mutation. Profiles is assigned before ActiveProfileName so the ActiveProfile
+            // cache invalidation that setter triggers finds the new profile list, not the old one.
+            var resp = await CommitAsync(config =>
+            {
+                config.LockHostsFile = imported.Service.LockHostsFile;
+                config.AutoUpdateCheck = imported.Service.AutoUpdateCheck;
+                config.Blocklists = imported.Service.Blocklists;
+                config.Profiles = imported.Service.Profiles;
+                config.ActiveProfileName = imported.Service.ActiveProfileName;
+            });
+
+            if (resp == MessageType.PUT_SETTINGS)
+            {
+                // The imported Controller (theme) is local-only and applies regardless of the
+                // server commit's outcome having already succeeded - saving it after a successful
+                // commit keeps the two in step, matching "import means become this document" for
+                // the client-local half too.
+                imported.Controller.Save();
+                App.ApplyTheme(imported.Controller.UiTheme);
+
+                await RefreshAsync();
+                await ShowResultAsync(Loc.T(LocKeys.Settings.MaintenanceImportSuccessTitle),
+                    Loc.T(LocKeys.Settings.MaintenanceImportSuccessBody, file.Name));
+            }
+            else
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Settings.MaintenanceImportFailedTitle), FailureDetail(resp,
+                    LocKeys.Settings.CommitFailedLockedDetail, LocKeys.Settings.CommitFailedStaleDetail,
+                    LocKeys.Settings.CommitFailedGenericDetail));
+            }
+        }
+
+        private async void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing) return;
+
+            var picker = new global::Windows.Storage.Pickers.FileSavePicker();
+            picker.FileTypeChoices.Add(Loc.T(LocKeys.Settings.MaintenanceFilePickerName), new List<string> { ".tws" });
+            picker.SuggestedFileName = "SimpleDeFence";
+
+            if (App.MainWindow is null)
+                return;
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            global::Windows.Storage.StorageFile? file;
+            try
+            {
+                file = await picker.PickSaveFileAsync();
+            }
+            catch (Exception ex)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Settings.MaintenanceExportFailedTitle), ex.Message);
+                return;
+            }
+
+            if (file is null)
+                return; // Cancelled - not an error, no dialog, no notice.
+
+            try
+            {
+                var export = new ConfigExport
+                {
+                    Service = App.Firewall.Config ?? new ServerConfiguration(),
+                    Controller = ClientSettings.Load(),
+                };
+                var bytes = SerializationHelper.Serialize(export);
+                await global::Windows.Storage.FileIO.WriteBytesAsync(file, bytes);
+
+                await ShowResultAsync(Loc.T(LocKeys.Settings.MaintenanceExportSuccessTitle),
+                    Loc.T(LocKeys.Settings.MaintenanceExportSuccessBody, file.Path));
+            }
+            catch (Exception ex)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Settings.MaintenanceExportFailedTitle), ex.Message);
+            }
         }
 
         /// <summary>Shared by every immediate-commit toggle in this page (Protection, Blocklists,
@@ -404,6 +526,8 @@ namespace SimpleDeFence.UI.Pages
             RemovePasswordButton.IsEnabled = hasPassword && !_committing;
             LockNowButton.IsEnabled = hasPassword && !locked && !_committing;
             UnlockButton.IsEnabled = !_committing;
+            ImportButton.IsEnabled = !_committing;
+            ExportButton.IsEnabled = !_committing;
         }
 
         private static string FailureDetail(MessageType resp, string lockedKey, string staleKey, string genericKey) => resp switch

@@ -225,6 +225,16 @@ namespace SimpleDeFence.Localization
             public const string UpdatesAutoCheck = "settings.updates.autoCheck";
             public const string UpdatesAutoCheckDescription = "settings.updates.autoCheckDescription";
 
+            public const string MaintenanceImport = "settings.maintenance.import";
+            public const string MaintenanceExport = "settings.maintenance.export";
+            public const string MaintenanceFilePickerName = "settings.maintenance.filePickerName";
+            public const string MaintenanceImportSuccessTitle = "settings.maintenance.importSuccess.title";
+            public const string MaintenanceImportSuccessBody = "settings.maintenance.importSuccess.body";
+            public const string MaintenanceImportFailedTitle = "settings.maintenance.importFailed.title";
+            public const string MaintenanceExportSuccessTitle = "settings.maintenance.exportSuccess.title";
+            public const string MaintenanceExportSuccessBody = "settings.maintenance.exportSuccess.body";
+            public const string MaintenanceExportFailedTitle = "settings.maintenance.exportFailed.title";
+
             public const string AboutVersion = "settings.about.version";
             public const string AboutHomepage = "settings.about.homepage";
             public const string AboutLicense = "settings.about.license";
