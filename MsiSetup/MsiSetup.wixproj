@@ -2,7 +2,11 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <!-- x64, not x86: the payload is a win-x64 self-contained publish. An x86 build still
+         succeeds, but silently produces a wrong-shaped package - Win64="no" components, install
+         into 32-bit ProgramFilesFolder, WOW6432Node registry redirection - wrapping an x64-only
+         runtime. A default that builds clean and ships broken is the worst of the options. -->
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProductVersion>3.5</ProductVersion>
     <ProjectGuid>{e864e1f9-3383-454f-bb6f-d89ee97c518b}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>

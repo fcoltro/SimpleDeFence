@@ -22,7 +22,14 @@
 
      -cg PublishedDependencies  names the generated ComponentGroup; Product.wxs's <Feature>
                                 references exactly this Id.
-     -gg                        generate stable component GUIDs into the file (it is committed).
+     -gg                        write concrete component GUIDs into the generated file. Note these
+                                are fresh GUIDs on every harvest, NOT stable ones - re-harvesting
+                                re-identifies every component. That is safe here only because
+                                Product.wxs schedules RemoveExistingProducts After='InstallValidate'
+                                (an early major upgrade), so an upgrade uninstalls the old component
+                                set wholesale before laying down the new one. `-ag` (author
+                                Guid="*", resolved at compile time) is the more usual choice and
+                                describes the same behaviour more honestly; either works.
      -scom -sreg                do not harvest COM/registry data; nothing here self-registers.
      -srd                       do not emit a wrapper <Directory> for the publish root, because
                                 -dr INSTALLDIR already nests the harvest under Product.wxs's
@@ -66,10 +73,25 @@
   </xsl:template>
 
   <!-- Index, by component Id, every Component holding the apphost. Keying by @Id lets the same
-       lookup match the ComponentRef that Component's ComponentGroup entry generated. The Source
-       value below is exactly what `-var var.PublishDir` emits for a file in the publish root. -->
+       lookup match the ComponentRef that Component's ComponentGroup entry generated.
+
+       The predicate matches on the trailing path segment rather than on one assumed spelling of
+       @Source. That matters: depending on heat version and options, the harvested Source can come
+       out as "$(var.PublishDir)\SimpleDeFence.exe", as "SourceDir\SimpleDeFence.exe", or as an
+       absolute path. An exact-string match against any single one of those shapes silently
+       no-ops against the others - and a no-op here is not a benign failure, it reinstates the
+       duplicate-file ICE30 collision this file exists to prevent.
+
+       translate() normalises any forward slashes to backslashes before the suffix comparison
+       (it is length-preserving, so string-length(@Source) is still the right basis). The second
+       clause covers a bare, directory-less Source. Requiring the separator is what keeps this
+       from over-matching: "SimpleDeFence.exe.config" and a hypothetical "XSimpleDeFence.exe"
+       both fail the test. SimpleDeFence.exe is in any case the only name across all 293 files in
+       the real publish tree that contains that substring at all. -->
   <xsl:key name="MainExeComponents"
-           match="wix:Component[wix:File[@Source = '$(var.PublishDir)\SimpleDeFence.exe']]"
+           match="wix:Component[wix:File[
+                    substring(translate(@Source, '/', '\'), string-length(@Source) - 17) = '\SimpleDeFence.exe'
+                    or @Source = 'SimpleDeFence.exe']]"
            use="@Id" />
 
   <!-- Drop the component itself... -->
