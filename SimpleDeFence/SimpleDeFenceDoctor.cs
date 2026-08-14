@@ -58,7 +58,9 @@ namespace SimpleDeFence
                 // Run installers
                 try
                 {
-                    using var scm = new ServiceControlManager();
+                    // The only place that needs SC_MANAGER_CREATE_SERVICE. It is denied to
+                    // non-elevated processes, but we are inside the RunningAsAdmin() branch here.
+                    using var scm = new ServiceControlManager(ServiceControlAccessRights.SC_MANAGER_CREATE_SERVICE);
                     scm.CreateService(SimpleDeFenceService.SERVICE_NAME, SimpleDeFenceService.SERVICE_DISPLAY_NAME, Utils.ExecutablePath, SimpleDeFenceService.ServiceDependencies);
                 }
                 catch(Exception e)

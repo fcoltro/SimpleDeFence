@@ -128,7 +128,13 @@ namespace SimpleDeFence
 
         private static readonly Random _rng = new ();
 
-        public static string ExecutablePath { get; } = System.Reflection.Assembly.GetEntryAssembly().Location;
+        // Must be the path of the running *apphost* (SimpleDeFence.exe), not of the managed
+        // assembly. Under net48 those were the same file, but a self-contained net10 publish
+        // splits them: Assembly.GetEntryAssembly().Location returns SimpleDeFence.dll, which is
+        // not launchable as a service binary, as an elevated relaunch target or as a scheduled
+        // task action. ProcessManager.ExecutablePath asks the OS (QueryFullProcessImageName, with
+        // a MainModule.FileName fallback) and so is correct on both frameworks.
+        public static string ExecutablePath { get; } = ProcessManager.ExecutablePath;
 
         public static string HexEncode(byte[] binstr)
         {

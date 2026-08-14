@@ -27,13 +27,25 @@ namespace SimpleDeFence.Windows.Services
             return service;
         }
 
-        public ServiceControlManager()
+        /// <summary>
+        /// Opens the service control manager with SC_MANAGER_CONNECT, plus any additional rights
+        /// requested through <paramref name="extraRights"/>.
+        /// </summary>
+        /// <param name="extraRights">
+        /// Extra SCM-level access rights. Keep this at the default unless the operation really
+        /// needs more: SC_MANAGER_CONNECT alone is granted to non-elevated processes, while asking
+        /// for anything beyond it (SC_MANAGER_CREATE_SERVICE in particular) makes OpenSCManager
+        /// fail with ERROR_ACCESS_DENIED when the process is not elevated. Operations that act on
+        /// a single service (DeleteService, SetStartupMode, GetServicePid, ...) go through
+        /// OpenService and carry their own per-service rights, so they do not need anything here.
+        /// </param>
+        public ServiceControlManager(ServiceControlAccessRights extraRights = default)
         {
             // Open the service control manager
             SCManager = NativeMethods.OpenSCManager(
                 null,
                 null,
-                ServiceControlAccessRights.SC_MANAGER_CONNECT | ServiceControlAccessRights.SC_MANAGER_CREATE_SERVICE);
+                ServiceControlAccessRights.SC_MANAGER_CONNECT | extraRights);
 
             // Verify if the SC is opened
             if (SCManager.IsInvalid)
@@ -228,6 +240,12 @@ namespace SimpleDeFence.Windows.Services
                 ? null
                 : string.Join("\0", dependencies) + "\0";
 
+            // Quote the image path. The default install directory ("C:\Program Files\SimpleDeFence")
+            // contains a space, and an unquoted ImagePath on a LocalSystem service is the classic
+            // "unquoted service path" weakness (CWE-428). ServiceInstaller.Install(), which this
+            // replaced, quoted it too. No caller ever passes an already-quoted path.
+            string quotedBinaryPath = "\"" + binaryPath + "\"";
+
             using var service = NativeMethods.CreateService(
                 SCManager,
                 serviceName,
@@ -236,7 +254,7 @@ namespace SimpleDeFence.Windows.Services
                 ServiceType.SERVICE_TYPE_WIN32_OWN_PROCESS,
                 SERVICE_AUTO_START,
                 SERVICE_ERROR_NORMAL,
-                binaryPath,
+                quotedBinaryPath,
                 null,
                 IntPtr.Zero,
                 dependenciesMultiString,
