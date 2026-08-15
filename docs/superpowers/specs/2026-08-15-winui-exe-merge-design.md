@@ -94,6 +94,15 @@ already on record in the net10-retarget design doc). Full parity surface, traced
 - The tray's "Lock" action needs a password-unlock prompt. Rather than build this twice, it shares
   a single new WinUI unlock-dialog component with `SimpleDeFenceDoctor.Uninstall()`'s own unlock
   flow (currently `PasswordForm` — see Cross-cutting) — one component, two call sites.
+- The three "whitelist by X" quick-add flows are also reachable via global hotkeys today
+  (`SimpleDeFence.Windows/Hotkey.cs`, gated by `EnableGlobalHotkeys`) and, when adding a single
+  exception, respect `AskForExceptionDetails` (edit dialog vs. silent default). `Hotkey.cs` relies on
+  WinForms' `Application.AddMessageFilter`/`IMessageFilter` to intercept `WM_HOTKEY` — a mechanism
+  WinUI's dispatcher model doesn't have — so this isn't a copy-paste port. It's rebuilt as a small
+  native-message-hook component in `SimpleDeFence.UI` that subclasses the WinUI window's WndProc to
+  catch `WM_HOTKEY`, calling the same `RegisterHotKey`/`UnregisterHotKey` Win32 APIs `Hotkey.cs`
+  already does. Both settings move to `ClientSettings` (Decision 7) with real Settings-page toggles,
+  not just inert schema fields.
 
 ### 4. Port the "Add folder" bulk-exception flow to Rules
 
@@ -167,6 +176,14 @@ geometry — `Language`, `AskForExceptionDetails`, `EnableGlobalHotkeys` — and
 plus `ConfigContainer.Controller` are deleted outright alongside the WinForms code that used them.
 `PasswordLock` (`Settings.cs`) is unaffected — it's already pure file-based hash storage with no
 WinForms dependency.
+
+Each field needs real UI, not just storage, or it's a silent regression: `AskForExceptionDetails`
+and `EnableGlobalHotkeys` get functioning toggles because Decision 3 (tray port) already wires their
+behavior — the tray's quick-add flows and the rebuilt hotkey component read them directly.
+`Language` is WinUI's own General-settings gap: `SimpleDeFence.UI.App` already has a working
+per-launch mechanism (`Loc.SetCulture`/`Loc.UseSystemCulture`, currently only reachable via a
+`--lang` command-line arg) — this decision adds a `SettingsPage` picker in the General group that
+persists the choice to `ClientSettings.Language` and applies it the same way `--lang` already does.
 
 ## Architecture
 
