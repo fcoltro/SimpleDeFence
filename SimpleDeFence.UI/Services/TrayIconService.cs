@@ -208,17 +208,22 @@ namespace SimpleDeFence.UI.Services
             if (mode == _shownMode)
                 return;
 
-            var (iconFile, labelKey) = mode switch
+            // Normal uses the app's own icon (Assets/AppIcon.ico), not WinForms' Resources.Icons.firewall -
+            // that legacy asset is an unrelated red/blue "house" glyph that doesn't match this app's actual
+            // branding (a blue shield), a mismatch that was faithfully ported from WinForms before anyone
+            // could see it rendered live. The other four modes' colored shields already share AppIcon's
+            // shield silhouette, so only the default/most-seen state needed the swap.
+            var (iconUri, labelKey) = mode switch
             {
-                FirewallMode.Normal => ("firewall.ico", LocKeys.Tray.ModeNormal),
-                FirewallMode.AllowOutgoing => ("shield_red_small.ico", LocKeys.Tray.ModeAllowOutgoing),
-                FirewallMode.BlockAll => ("shield_yellow_small.ico", LocKeys.Tray.ModeBlockAll),
-                FirewallMode.Disabled => ("shield_grey_small.ico", LocKeys.Tray.ModeDisabled),
-                FirewallMode.Learning => ("shield_blue_small.ico", LocKeys.Tray.ModeLearning),
-                _ => ("shield_grey_small.ico", LocKeys.Common.Unknown),
+                FirewallMode.Normal => ("ms-appx:///Assets/AppIcon.ico", LocKeys.Tray.ModeNormal),
+                FirewallMode.AllowOutgoing => ("ms-appx:///Assets/TrayIcons/shield_red_small.ico", LocKeys.Tray.ModeAllowOutgoing),
+                FirewallMode.BlockAll => ("ms-appx:///Assets/TrayIcons/shield_yellow_small.ico", LocKeys.Tray.ModeBlockAll),
+                FirewallMode.Disabled => ("ms-appx:///Assets/TrayIcons/shield_grey_small.ico", LocKeys.Tray.ModeDisabled),
+                FirewallMode.Learning => ("ms-appx:///Assets/TrayIcons/shield_blue_small.ico", LocKeys.Tray.ModeLearning),
+                _ => ("ms-appx:///Assets/TrayIcons/shield_grey_small.ico", LocKeys.Common.Unknown),
             };
 
-            _icon.IconSource = new BitmapImage(new Uri($"ms-appx:///Assets/TrayIcons/{iconFile}"));
+            _icon.IconSource = new BitmapImage(new Uri(iconUri));
             // Same two-line shape as WinForms' Tray.Text: the product name, then which mode it is
             // in - the whole point of a per-mode icon is knowing the mode without opening anything.
             _icon.ToolTipText = $"SimpleDeFence\n{Loc.T(LocKeys.Nav.ModeChip)}: {Loc.T(labelKey)}";
