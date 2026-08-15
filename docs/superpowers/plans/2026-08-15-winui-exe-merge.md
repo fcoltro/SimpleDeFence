@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - **End state: WinUI becomes the only GUI.** No transitional fallback flag. WinForms is deleted once real-machine verification confirms parity (Task 8), not left in the tree as dead code.
-- **No behavior change beyond the explicitly-decided ones.** Every port preserves existing behavior exactly, except two named, deliberate fixes bundled into rewrites that already touch those lines: `Thread.Abort()` → proper `CancellationToken` cancellation (Task 6), and the two settings that only ride along with UI ports (Task 7) rather than getting new functionality of their own.
+- **No behavior change beyond the explicitly-decided ones.** Every port preserves existing behavior exactly, except two named, deliberate fixes bundled into rewrites that already touch those lines: `Thread.Abort()` → proper `CancellationToken` cancellation (Task 6), and the two settings that only ride along with UI ports (Task 7) rather than getting new functionality of their own. One more exception, structural rather than a port: `StartController` is shared code between `Controller` and `SelfHosted` launch modes (`Program.cs`), so Task 1's rewrite switches both to WinUI together — not a separate decision, since `SelfHosted` was always going to end up on WinUI once WinForms is deleted (Task 8).
 - **`AuthAsServer` is never touched.** It keeps comparing the running exe's own path to itself; nothing in this plan changes what exe SimpleDeFence ships as.
 - **Every WinRT picker uses the existing pattern**: `WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow)` + `WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd)`, matching `RulesPage.xaml.cs`'s `AddPickExecutable_Click`.
 - **Every `ContentDialog.ShowAsync()` call routes through a "only one dialog per `XamlRoot`" guard**, matching `RulesPage.xaml.cs`'s `TryShowDialogAsync`/`ShowResultAsync` pattern — copy that pattern into any new page that shows dialogs, don't call `ShowAsync()` directly.
@@ -119,7 +119,9 @@ with:
         }
 ```
 
-Note: `opts` becomes unused by this method's new body. Leave the parameter in place (its call sites and signature are shared with `SelfHosted` mode, untouched by this task) — an unused-parameter warning here is expected and fine; do not suppress it by deleting the parameter, since that would break `SelfHosted`'s call site.
+Note: `opts` becomes unused by this method's new body. Leave the parameter in place — an unused-parameter warning here is expected and fine; do not suppress it by deleting the parameter, since `StartUpMode.SelfHosted`'s case block also calls `StartController(opts)`.
+
+**`SelfHosted` mode's runtime behavior changes too, intentionally.** `StartController` is the single method both `Controller` and `SelfHosted` modes call — `SelfHosted` starts an in-process service (`StartService(srv)`) and then calls `StartController(opts)` to give it a GUI, purely for local dev/test convenience (no separately-installed service needed). Once this step lands, `/selfhosted` launches the WinUI shell instead of the WinForms controller too — the same "known, intentional gap until later tasks" (no tray icon yet, etc.) applies there as well. This isn't an oversight: this plan's own end state deletes the WinForms controller outright (Task 8), so `SelfHosted` was always going to end up on WinUI eventually — this step is simply where that happens, as an unavoidable side effect of `StartController` being shared code, not a separate decision. It's also a net gain for this environment specifically: `/selfhosted` is the first way to manually verify the WinUI shell against a real, live, in-process service without a VM (Controller mode alone, launched directly, has no service to connect to here).
 
 - [ ] **Step 4: Build**
 
