@@ -46,7 +46,7 @@ args)`) that does what its currently-generated `Main` does today: set up a
 `DispatcherQueueSynchronizationContext` and call `Microsoft.UI.Xaml.Application.Start(...)`,
 constructing `App` from inside the callback. `SimpleDeFence/Program.cs`'s `StartController` calls
 this method instead of `Application.Run(new SimpleDeFenceController(opts))`. `StartDevelTool`
-similarly calls a new WinUI DevelTool bootstrap (see Decision 3).
+similarly calls a new WinUI DevelTool bootstrap (see Decision 5).
 
 Only one GUI framework's message loop ever runs per process launch — never both concurrently — so
 there is no STA/threading conflict to resolve; Main's thread is STA either way, and whichever branch
@@ -95,7 +95,31 @@ already on record in the net10-retarget design doc). Full parity surface, traced
   a single new WinUI unlock-dialog component with `SimpleDeFenceDoctor.Uninstall()`'s own unlock
   flow (currently `PasswordForm` — see Cross-cutting) — one component, two call sites.
 
-### 4. DevelTool port
+### 4. Port the "Add folder" bulk-exception flow to Rules
+
+`SettingsForm.cs`'s `btnAppAddFolder_Click` — pick a folder via `FolderBrowserDialog`, recursively
+collect every `.exe`/`.dll` under it, and add each as an exception using the app database's default
+recommendation (`AppDatabase.GetExceptionsForApp(subject, false, out _)`, deliberately no per-file
+prompt since a folder can match dozens of files, e.g. a full game install directory) — has no WinUI
+equivalent yet. Rules' own original port already flagged this as a known, deferred gap in
+ROADMAP.md, alongside "disk auto-detect" and "drag-and-drop." Unlike those two, this design brings
+it into scope now: `SettingsForm.cs` is the only place this logic lives, and it's already on this
+design's own deletion list (Cross-cutting) — deleting it without porting this flow first would be a
+real, silent feature loss for anyone who currently uses it (a folder-picker instead of adding
+executables one at a time), not just a UI relocation.
+
+Ported to WinUI's Rules page as a new option on its existing "Add" split button, alongside the four
+pickers it already has (executable file, running process, window, UWP package). Uses a WinRT
+`FolderPicker` (the same picker pattern DevelTool/Settings already use) in place of
+`FolderBrowserDialog`; the recursive-collect helper (`CollectExeAndDllFiles` — pure file-system
+recursion, no WinForms dependency today despite living in `SettingsForm.cs`) and the
+`GetExceptionsForApp` call carry over unchanged.
+
+**Still explicitly out of scope:** "disk auto-detect" and "drag-and-drop" — the other two flows
+ROADMAP already deferred. This design only pulls in what it would otherwise delete out from under
+users; it doesn't use this as an excuse to finish Rules' whole deferred list.
+
+### 5. DevelTool port
 
 Mechanical, not a redesign. `DevelToolForm.cs` is an internal, never-user-facing batch/build tool
 (file-association DB builder, app-collection compiler, an update-package builder that hashes/signs
@@ -108,7 +132,7 @@ untouched. It becomes a WinUI window — a `Pivot` or similar tabbed layout mirr
 `FolderPicker`, the same WinRT picker pattern Settings' Import/Export already proved working
 end-to-end on a real desktop (2026-08-13).
 
-### 5. Updater / update-checking port
+### 6. Updater / update-checking port
 
 `SimpleDeFence/UpdateChecker.cs` splits along its existing internal seam:
 
@@ -127,7 +151,7 @@ end-to-end on a real desktop (2026-08-13).
   bug and modernizing the transport in the same change, since the rewrite touches every line anyway.
   This is wired to the WinUI Settings page's still-missing "Check for updates now" action.
 
-### 6. `ControllerSettings` / `ClientSettings` reconciliation
+### 7. `ControllerSettings` / `ClientSettings` reconciliation
 
 Simpler than the ROADMAP wording implies. `ClientSettings` (`SimpleDeFence.Core/ClientSettings.cs`)
 already documents this exact deferral in its own header comment. Inspecting `ControllerSettings`
@@ -151,14 +175,16 @@ WinForms dependency.
 - New tray-icon component (`H.NotifyIcon.WinUI`-based) wired into `App`/`MainWindow`'s lifecycle,
   replacing what `SimpleDeFenceController`'s `Tray`/`TrayMenu` fields do today (Decision 3).
 - New DevelTool window/pages under `Pages/` (or a dedicated folder), reusing existing backend classes
-  unchanged (Decision 4).
+  unchanged (Decision 5).
+- `RulesPage`'s existing "Add" split button gains a folder-based bulk-add option, reusing
+  `CollectExeAndDllFiles`/`AppDatabase.GetExceptionsForApp` unchanged (Decision 4).
 - New shared password-unlock `ContentDialog` component, used by both the tray's "Lock" action and
   `SimpleDeFenceDoctor.Uninstall()`'s unlock-before-stop flow (Decision 3 note, Cross-cutting below).
-- `SettingsPage` gains the "Check for updates now" action, calling the new WinUI `Updater` (Decision 5).
+- `SettingsPage` gains the "Check for updates now" action, calling the new WinUI `Updater` (Decision 6).
 
 **`SimpleDeFence.Core`:**
-- Gains the descriptor-fetching half of `UpdateChecker` (Decision 5).
-- `ClientSettings` gains `Language`, `AskForExceptionDetails`, `EnableGlobalHotkeys` (Decision 6).
+- Gains the descriptor-fetching half of `UpdateChecker` (Decision 6).
+- `ClientSettings` gains `Language`, `AskForExceptionDetails`, `EnableGlobalHotkeys` (Decision 7).
 
 **`SimpleDeFence` (the exe):**
 - `Program.cs`: `StartController`/`StartDevelTool` call the new `SimpleDeFence.UI` bootstrap methods
@@ -171,7 +197,7 @@ WinForms dependency.
 
 Confirmed by cross-reference (`grep` for `new <Form>(` across `SimpleDeFence/`): every one of the
 following is only ever instantiated from `SimpleDeFenceController`, `SettingsForm`,
-`SimpleDeFenceDoctor`, or each other. Once the three parents are replaced (Decisions 1, 3, 4, 5),
+`SimpleDeFenceDoctor`, or each other. Once the three parents are replaced (Decisions 1, 3, 4, 5, 6),
 all of the following become genuinely unreachable and are deleted in the same implementation pass,
 together with their `.Designer.cs`/`.resx` families:
 
