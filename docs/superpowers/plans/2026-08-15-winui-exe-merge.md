@@ -155,7 +155,7 @@ git commit -m "Wire SimpleDeFence.exe's Controller mode to launch the WinUI 3 sh
 
 **Interfaces:**
 - Consumes: `App.MainWindow` (existing, `App.xaml.cs`)
-- Produces: `WindowHotkeys` class — `RegisterHotkey(int id, Windows.System.VirtualKey key, uint modifiers, Action callback)`, `UnregisterHotkey(int id)`, `IDisposable`. Task 3 (tray) consumes both methods for the three whitelist-by-X shortcuts.
+- Produces: `WindowHotkeys` class — `RegisterHotkey(int id, uint virtualKey, uint modifiers, Action callback)`, `UnregisterHotkey(int id)`, `IDisposable`. Task 3 (tray) consumes both methods for the three whitelist-by-X shortcuts, passing raw Win32 VK codes (not `Windows.System.VirtualKey`) — matches Task 3's own code, which already uses raw `uint` constants like `VK_E = 0x45`.
 - Produces: `ClientSettings.Language` (`string`), `.AskForExceptionDetails` (`bool`), `.EnableGlobalHotkeys` (`bool`). Task 3 reads both booleans immediately (its tray menu/hotkey wiring needs them to exist even before Task 7 gives them a settings UI); Task 7 adds the UI to change them and `App.xaml.cs`'s language-on-launch wiring.
 
 Why: `SimpleDeFence.Windows/Hotkey.cs` relies on `System.Windows.Forms.Application.AddMessageFilter`/`IMessageFilter` to intercept `WM_HOTKEY` — a mechanism specific to WinForms' message loop, with no WinUI equivalent. WinUI's `Microsoft.UI.Xaml.Window` exposes a real Win32 `HWND` (via `WinRT.Interop.WindowNative.GetWindowHandle`), so the same effect is achieved by subclassing that window's `WndProc` directly. The `ClientSettings` fields land here rather than in Task 7 because Task 3's tray code reads them directly — putting the fields in Task 7 (after Task 3) would make Task 3 reference class members that don't exist yet.
