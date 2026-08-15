@@ -121,8 +121,19 @@ Ported to WinUI's Rules page as a new option on its existing "Add" split button,
 pickers it already has (executable file, running process, window, UWP package). Uses a WinRT
 `FolderPicker` (the same picker pattern DevelTool/Settings already use) in place of
 `FolderBrowserDialog`; the recursive-collect helper (`CollectExeAndDllFiles` — pure file-system
-recursion, no WinForms dependency today despite living in `SettingsForm.cs`) and the
-`GetExceptionsForApp` call carry over unchanged.
+recursion, no WinForms dependency today despite living in `SettingsForm.cs`) carries over unchanged.
+
+**Correction from this design's first draft:** `GetExceptionsForApp` is not actually reachable from
+`SimpleDeFence.UI` today — it's `internal` in `SimpleDeFence/DatabaseClasses/AppDatabase.cs`, a
+partial the Rules-screen plan deliberately kept WinForms-only, because its `guiPrompt=true` path uses
+`Microsoft.Samples.TaskDialog`. Its `guiPrompt=false` path (the only one folder-add ever needs — same
+as WinForms' own folder-add call) has no such dependency, so it moves to the shared Core partial
+(`SimpleDeFence.Core/Database/AppDatabase.cs`) as `GetExceptionsForApp(ExceptionSubject, out
+Application?)`, alongside its `TryGetApp` helper. The WinForms-only partial keeps a thin wrapper —
+same signature as today, calling the new Core method and layering the `TaskDialog` prompt-and-filter
+behavior on top only when `guiPrompt` is true — so every existing WinForms call site (including
+`SimpleDeFenceService.cs`, which already calls it with `guiPrompt: false`) keeps working unchanged
+until the Cross-cutting deletion removes it.
 
 **Still explicitly out of scope:** "disk auto-detect" and "drag-and-drop" — the other two flows
 ROADMAP already deferred. This design only pulls in what it would otherwise delete out from under
