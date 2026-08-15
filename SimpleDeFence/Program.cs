@@ -46,14 +46,11 @@ namespace SimpleDeFence
 
         private static int StartController(CmdLineArgs opts)
         {
-            // Start controller application
-            System.Windows.Forms.Application.EnableVisualStyles();
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-            do
-            {
-                RestartOnQuit = false;
-                System.Windows.Forms.Application.Run(new SimpleDeFenceController(opts));
-            } while (RestartOnQuit);
+            // WinUI 3 controller shell (see docs/superpowers/specs/2026-08-15-winui-exe-merge-design.md).
+            // opts/RestartOnQuit are WinForms-controller-only concepts - App.xaml.cs reads its own
+            // command-line args directly (Environment.GetCommandLineArgs()), and WinUI has no
+            // equivalent "restart the whole shell" action yet.
+            SimpleDeFence.UI.HostBootstrap.RunAsControllerGui(Environment.GetCommandLineArgs());
             return 0;
         }
 

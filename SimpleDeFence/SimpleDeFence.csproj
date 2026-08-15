@@ -16,6 +16,27 @@
 
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+
+    <!-- SimpleDeFence.UI.csproj's own ProjectReference graph (Core/Windows.Services/Windows/
+         Utilities) would otherwise flow up transitively and become compile-time references here
+         too - but this project already compiles those same libraries' .cs files directly via
+         <Compile Include> below (a legacy pattern predating the WinUI merge), so the transitive
+         DLL references collide with the source-included types (CS0121 ambiguous call). Disabling
+         transitive project references keeps only the direct reference to SimpleDeFence.UI.dll at
+         compile time; SimpleDeFence.UI.dll's own dependencies still get copied to the output
+         directory at runtime; see Task 1 of the net10-winui-exe-merge design doc. -->
+    <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+
+    <!-- Required for Application.Start(...) (WinUI's Microsoft.UI.Xaml.Application) to activate at
+         runtime from this exe: WindowsAppSDKSelfContained (which SimpleDeFence.UI.csproj already
+         sets) is what makes Microsoft.WindowsAppSDK.SelfContained.targets merge every WinRT
+         activatableClass registration the Windows App SDK needs (Microsoft.UI.Xaml.Application
+         included) into this exe's own embedded manifest via mt.exe, at
+         obj\...\Manifests\WindowsAppSDK.manifest. Without it, SimpleDeFence.exe's manifest never
+         gets those entries, and regfree-WinRT activation of Microsoft.UI.Xaml.Application fails
+         with REGDB_E_CLASSNOTREG (0x80040154), crashing the process instantly - discovered by
+         actually launching the merged exe per Task 1's Step 5, not by the build. -->
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
   <PropertyGroup>
     <Product>SimpleDeFence</Product>
@@ -34,6 +55,10 @@
   <ItemGroup>
     <PackageReference Include="System.Management" Version="10.0.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.10" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleDeFence.UI\SimpleDeFence.UI.csproj" />
   </ItemGroup>
   <ItemGroup>
 
