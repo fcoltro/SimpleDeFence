@@ -20,6 +20,15 @@ namespace SimpleDeFence
         [DataMember(EmitDefaultValue = false)]
         public string UiTheme { get; set; } = "auto";
 
+        [DataMember(EmitDefaultValue = false)]
+        public string Language { get; set; } = "auto";
+
+        [DataMember(EmitDefaultValue = false)]
+        public bool AskForExceptionDetails { get; set; } = false;
+
+        [DataMember(EmitDefaultValue = false)]
+        public bool EnableGlobalHotkeys { get; set; } = true;
+
         private static string FilePath
         {
             get
