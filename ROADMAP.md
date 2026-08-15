@@ -155,15 +155,28 @@ the core stays C#/.NET and untouched throughout this phase either way.
           `InteractiveToken`. This is believed to be Task Scheduler normalising, since setting
           `Principal.GroupId` makes it a group principal, but it has not been A/B tested against a
           build using the old generated interop.
-    - [ ] **Rewrite the service install/uninstall path.** `System.Configuration.Install` does not
-          exist on .NET 5+, which rules out `ManagedInstallerClass.InstallHelper` in
-          `SimpleDeFenceDoctor.cs` and both `Installer/` classes. The repo already has
-          `SimpleDeFence.Windows.Services/ServiceControlManager.cs` wrapping the Win32 service
-          APIs, so this is likely a port onto existing code rather than new work.
-    - [ ] Re-target remaining framework references: `System.Management` and `System.ServiceProcess`
-          become NuGet packages; the `Windows.*` WinRT references are unnecessary on .NET 5+.
-    - [ ] Decide MSI packaging: self-contained (large MSI, no runtime prerequisite) versus
-          framework-dependent (small MSI, requires the .NET 10 runtime on target machines).
+    - [x] **Rewrite the service install/uninstall path** — done 2026-08-13/15 (`net10-retarget`
+          branch, merged to `main` at `831d7e3`). `ServiceControlManager`
+          (`SimpleDeFence.Windows.Services`) gained `CreateService`/`DeleteService`, direct Win32
+          P/Invoke wrappers mirroring what `ManagedInstallerClass.InstallHelper` used to do
+          (LocalSystem, automatic start, then `SetLoadOrderGroup("NetworkProvider")`); both
+          `Installer/` classes and the `System.Configuration.Install` reference are gone.
+          `SimpleDeFence.csproj` now hard-cuts to `net10.0-windows10.0.19041.0` (no dual-targeting)
+          and builds clean with all 53 tests passing on this machine.
+    - [x] Re-target remaining framework references — done in the same branch: `System.Management`
+          and `System.ServiceProcess` are now `PackageReference`s
+          (`System.Management`/`System.ServiceProcess.ServiceController`); `Microsoft.CSharp`,
+          `System.Security`, `Windows.Management`, `Windows.ApplicationModel`, and `System.Runtime`
+          dropped outright (net10 BCL/shared framework already covers them); `System.Windows.Forms`
+          dropped in favor of the existing `<UseWindowsForms>true</UseWindowsForms>`.
+    - [x] Decide MSI packaging — decided and implemented: self-contained, win-x64 only. The ~9
+          hand-authored net48 dependency `<Component>`s in `Product.wxs` were replaced with
+          `heat.exe`-harvested components (`MsiSetup/Dependencies.wxs`, `HarvestPublishDir.xslt`)
+          off the real publish output, and the .NET Framework 4.8 prerequisite check was removed.
+          **Not build-verified** — the WiX Toolset (`heat.exe`/`candle.exe`/`light.exe`) is not
+          installed on this development machine. Needs a real `msbuild MsiSetup.wixproj
+          /p:Configuration=Release /p:Platform=x64` pass, plus an installer smoke test, on a
+          machine that has WiX before this is fully trusted.
     - [ ] Only then add the WinUI 3 GUI into the same executable, and port screens.
 - [ ] Investigate VS 2026's Copilot-assisted "Modernize" tooling for the WinForms → WinUI 3 migration
       itself, since Microsoft built it for exactly this transition.
