@@ -28,6 +28,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+    <!-- Tray icon. WinUI 3 has no NotifyIcon of its own (the WinForms GUI's System.Windows.Forms.
+         NotifyIcon has no counterpart), so TrayIconService is built on this. -->
+    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleDeFence.Core\SimpleDeFence.Core.csproj" />

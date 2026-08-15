@@ -302,5 +302,39 @@
         "title": "Não foi possível abrir"
       }
     }
+  },
+
+  "tray": {
+    "mode": {
+      "normal": "Normal",
+      "blockAll": "Bloquear tudo",
+      "allowOutgoing": "Permitir saída",
+      "disabled": "Desativado",
+      "learning": "Aprendizado"
+    },
+    "manage": "Gerenciar...",
+    "connections": "Conexões...",
+    "lock": "Bloquear",
+    "elevate": "Executar como administrador",
+    "allowLocalSubnet": "Permitir rede local",
+    "enableHostsBlocklist": "Ativar listas de bloqueio",
+    "whitelistByExecutable": "Permitir arquivo executável...",
+    "whitelistByProcess": "Permitir processo em execução...",
+    "whitelistByWindow": "Permitir por janela...",
+    "quit": "Sair",
+    "unlock": {
+      "title": "Desbloquear o SimpleDeFence",
+      "passwordPlaceholder": "Senha",
+      "button": "Desbloquear",
+      "failedTitle": "Senha incorreta"
+    },
+    "quickAdd": {
+      "confirmTitle": "Adicionar exceção?",
+      "confirmBody": "Permitir \"{0}\" no firewall?",
+      "confirmAdd": "Adicionar"
+    },
+    "elevateFailed": {
+      "title": "Não foi possível reiniciar com privilégios de administrador"
+    }
   }
 }

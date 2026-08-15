@@ -245,6 +245,34 @@ namespace SimpleDeFence.Localization
             public const string AboutLinkFailedTitle = "settings.about.linkFailed.title";
         }
 
+        public static class Tray
+        {
+            public const string ModeNormal = "tray.mode.normal";
+            public const string ModeBlockAll = "tray.mode.blockAll";
+            public const string ModeAllowOutgoing = "tray.mode.allowOutgoing";
+            public const string ModeDisabled = "tray.mode.disabled";
+            public const string ModeLearning = "tray.mode.learning";
+            public const string Manage = "tray.manage";
+            public const string Connections = "tray.connections";
+            public const string Lock = "tray.lock";
+            public const string Elevate = "tray.elevate";
+            public const string AllowLocalSubnet = "tray.allowLocalSubnet";
+            public const string EnableHostsBlocklist = "tray.enableHostsBlocklist";
+            public const string WhitelistByExecutable = "tray.whitelistByExecutable";
+            public const string WhitelistByProcess = "tray.whitelistByProcess";
+            public const string WhitelistByWindow = "tray.whitelistByWindow";
+            public const string Quit = "tray.quit";
+            public const string UnlockTitle = "tray.unlock.title";
+            public const string UnlockPasswordPlaceholder = "tray.unlock.passwordPlaceholder";
+            public const string UnlockButton = "tray.unlock.button";
+            public const string UnlockFailedTitle = "tray.unlock.failedTitle";
+
+            public const string QuickAddConfirmTitle = "tray.quickAdd.confirmTitle";
+            public const string QuickAddConfirmBody = "tray.quickAdd.confirmBody";
+            public const string QuickAddConfirmAdd = "tray.quickAdd.confirmAdd";
+            public const string ElevateFailedTitle = "tray.elevateFailed.title";
+        }
+
         public static class Policy
         {
             public const string Blocked = "policy.blocked";

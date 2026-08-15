@@ -302,5 +302,39 @@
         "title": "Could not open"
       }
     }
+  },
+
+  "tray": {
+    "mode": {
+      "normal": "Normal",
+      "blockAll": "Block All",
+      "allowOutgoing": "Allow Outgoing",
+      "disabled": "Disabled",
+      "learning": "Learning"
+    },
+    "manage": "Manage...",
+    "connections": "Connections...",
+    "lock": "Lock",
+    "elevate": "Run as Administrator",
+    "allowLocalSubnet": "Allow Local Subnet",
+    "enableHostsBlocklist": "Enable Hosts Blocklist",
+    "whitelistByExecutable": "Whitelist executable...",
+    "whitelistByProcess": "Whitelist running process...",
+    "whitelistByWindow": "Whitelist by window...",
+    "quit": "Quit",
+    "unlock": {
+      "title": "Unlock SimpleDeFence",
+      "passwordPlaceholder": "Password",
+      "button": "Unlock",
+      "failedTitle": "Incorrect password"
+    },
+    "quickAdd": {
+      "confirmTitle": "Add exception?",
+      "confirmBody": "Allow \"{0}\" through the firewall?",
+      "confirmAdd": "Add"
+    },
+    "elevateFailed": {
+      "title": "Could not restart with administrator privileges"
+    }
   }
 }

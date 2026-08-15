@@ -38,6 +38,16 @@ namespace SimpleDeFence.UI
         internal Brush ModeStateToBrush(string modeStateKey)
             => (Brush)s_modeStateToBrush.Convert(modeStateKey, typeof(Brush), null!, null!);
 
+        /// <summary>The window's one page-navigation entry point, shared by the nav pane and the
+        /// tray menu's Manage/Connections items (TrayIconService.ShowAndNavigate). Re-navigating to
+        /// the page already showing is skipped so the entrance transition does not replay - and so a
+        /// NavigationCacheMode.Enabled page is not needlessly re-created, losing its filter state.</summary>
+        public void NavigateTo(Type pageType)
+        {
+            if (ContentFrame.CurrentSourcePageType != pageType)
+                ContentFrame.Navigate(pageType, null, new EntranceNavigationTransitionInfo());
+        }
+
         private void Nav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             if (args.SelectedItem is not NavigationViewItem item)
@@ -51,8 +61,7 @@ namespace SimpleDeFence.UI
                 _ => typeof(ConnectionsPage),
             };
 
-            if (ContentFrame.CurrentSourcePageType != targetType)
-                ContentFrame.Navigate(targetType, null, new EntranceNavigationTransitionInfo());
+            NavigateTo(targetType);
         }
 
         private async void ModeChip_Click(object sender, RoutedEventArgs e)

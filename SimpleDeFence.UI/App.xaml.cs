@@ -19,6 +19,11 @@ namespace SimpleDeFence.UI
         // WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow).
         internal static Window? MainWindow { get; private set; }
 
+        // Held for the process's lifetime: nothing else references the tray icon, and letting it be
+        // collected would take the notification-area icon with it. Task 7's "Enable global hotkeys"
+        // toggle calls into it (ApplyHotkeySetting), which is the other reason it is kept.
+        private static TrayIconService? _tray;
+
         /// <summary>Applies a persisted "auto"/"light"/"dark" theme string to the window's root
         /// element. Called at launch (this file) and immediately on change from the Settings page
         /// (Task 4's General group), so both share one mapping from the stored string to
@@ -62,6 +67,11 @@ namespace SimpleDeFence.UI
             MainWindow = m_window;
             ApplyTheme(ClientSettings.Load().UiTheme);
             m_window.Activate();
+
+            // After Activate(): the tray icon subclasses the window's WndProc (for WM_HOTKEY) and
+            // hangs its dialogs off the window's XamlRoot, so the window has to exist and be shown
+            // first.
+            _tray = new TrayIconService();
         }
 
         private static bool HasSwitch(string name)

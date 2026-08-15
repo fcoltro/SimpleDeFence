@@ -66,6 +66,14 @@ namespace SimpleDeFence.UI.Pages
         /// once.</summary>
         private bool _addBusy;
 
+        /// <summary>What _addBusy is for the page's own Add split button, this is for the tray
+        /// menu's three "Whitelist ..." items and their Ctrl+Alt+E/P/W hotkeys (see QuickAddAsync
+        /// below). Deliberately a separate, static flag rather than a reuse of _addBusy/_committing:
+        /// the tray can fire a quick-add with no RulesPage instance in existence at all, so there is
+        /// no instance field to guard with and no Add button to grey out - only the "do not open two
+        /// picker dialogs on one XamlRoot" part of _addBusy's job carries over.</summary>
+        private static bool _quickAddBusy;
+
         /// <summary>The single selected application row the detail pane is currently editing, or
         /// null when zero/multiple rows are selected (the pane is collapsed in that case).</summary>
         private RuleListItem? _selectedDetailItem;
@@ -550,12 +558,14 @@ namespace SimpleDeFence.UI.Pages
             var processes = await App.Firewall.GetRunningProcessesAsync();
 
             var picked = await PickFromListAsync(
+                Content.XamlRoot,
                 Loc.T(LocKeys.Rules.PickProcessTitle),
                 processes,
                 (process, term) =>
                     process.Name.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0
                     || process.Path.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0,
-                process => (process.Name, process.Path));
+                process => (process.Name, process.Path),
+                ShowDialogBlockedNotice);
 
             if (picked is { } process)
                 await CommitAddAsync(new ExecutableSubject(process.Path), process.Name);
@@ -569,12 +579,14 @@ namespace SimpleDeFence.UI.Pages
             var windows = await App.Firewall.GetTopLevelWindowsAsync();
 
             var picked = await PickFromListAsync(
+                Content.XamlRoot,
                 Loc.T(LocKeys.Rules.PickWindowTitle),
                 windows,
                 (window, term) =>
                     window.Title.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0
                     || window.ProcessName.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0,
-                window => (window.Title, window.ProcessName));
+                window => (window.Title, window.ProcessName),
+                ShowDialogBlockedNotice);
 
             if (picked is { } window)
                 await CommitAddAsync(new ExecutableSubject(window.ProcessPath), window.Title);
@@ -593,9 +605,17 @@ namespace SimpleDeFence.UI.Pages
         /// ItemClick only records the pick and calls Hide() - never commits - because ItemClick fires
         /// as its own separate, un-awaited dispatcher continuation. The caller commits after this
         /// method returns, still inside its own await chain, so whichever *_Click handler set
-        /// _addBusy keeps it true for the full pick-then-commit operation.</summary>
-        private async Task<T?> PickFromListAsync<T>(string title, IReadOnlyList<T> items,
-            Func<T, string, bool> matches, Func<T, (string Primary, string Secondary)> toRow)
+        /// _addBusy keeps it true for the full pick-then-commit operation.
+        ///
+        /// Static, with the XamlRoot and the "another dialog is already open" reporter passed in,
+        /// because the tray's quick-add (QuickAddProcessAsync/QuickAddWindowAsync below) shows the
+        /// very same pickers with no RulesPage instance in existence - so there is no
+        /// Content.XamlRoot and no Notice InfoBar to reach for. The page's own two call sites pass
+        /// both and keep their previous behaviour exactly; the tray passes null for the reporter,
+        /// where a blocked dialog simply means nothing was picked and nothing is added.</summary>
+        private static async Task<T?> PickFromListAsync<T>(XamlRoot xamlRoot, string title,
+            IReadOnlyList<T> items, Func<T, string, bool> matches,
+            Func<T, (string Primary, string Secondary)> toRow, Action<string, string>? onDialogBlocked)
             where T : class
         {
             var listView = new ListView
@@ -645,7 +665,7 @@ namespace SimpleDeFence.UI.Pages
 
             var dialog = new ContentDialog
             {
-                XamlRoot = Content.XamlRoot,
+                XamlRoot = xamlRoot,
                 Title = title,
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
                 Content = panel,
@@ -659,7 +679,9 @@ namespace SimpleDeFence.UI.Pages
                 dialog.Hide();
             };
 
-            await TryShowDialogAsync(dialog, title, Loc.T(LocKeys.Common.AnotherDialogOpenDetail));
+            if (await ShowDialogOrNullAsync(dialog) is null)
+                onDialogBlocked?.Invoke(title, Loc.T(LocKeys.Common.AnotherDialogOpenDetail));
+
             return picked;
         }
 
@@ -687,6 +709,183 @@ namespace SimpleDeFence.UI.Pages
                     LocKeys.Connections.AllowFailedLockedDetail, LocKeys.Connections.AllowFailedStaleDetail,
                     LocKeys.Connections.AllowFailedGenericDetail));
             }
+        }
+
+        /// <summary>Tray menu "Whitelist executable..." (and its Ctrl+Alt+E hotkey). Shows the same
+        /// .exe picker AddPickExecutable_Click does, then commits.</summary>
+        internal static Task QuickAddExecutableAsync(bool askForDetails)
+            => QuickAddAsync(askForDetails, QuickPickExecutableAsync);
+
+        /// <summary>Tray menu "Whitelist running process..." (Ctrl+Alt+P).</summary>
+        internal static Task QuickAddProcessAsync(bool askForDetails)
+            => QuickAddAsync(askForDetails, QuickPickProcessAsync);
+
+        /// <summary>Tray menu "Whitelist by window..." (Ctrl+Alt+W).</summary>
+        internal static Task QuickAddWindowAsync(bool askForDetails)
+            => QuickAddAsync(askForDetails, QuickPickWindowAsync);
+
+        /// <summary>
+        /// Shared pick-then-commit path for the three tray/hotkey quick-adds above - the same
+        /// operation CommitAddAsync performs for the page's own Add pickers, and it builds the very
+        /// same ExecutableSubject + TcpUdpPolicy(true) exception, but deliberately NOT routed
+        /// through the page: there may be no RulesPage instance on screen at all when the tray fires
+        /// one of these, so there is no _committing flag to serialize with, no button to grey out,
+        /// and above all nothing to RefreshAsync() afterwards. A quick-add that lands while the page
+        /// IS open therefore shows up on it at the next refresh, not instantly.
+        ///
+        /// Committing outside the page's _committing guard means a quick-add can collide with a
+        /// commit the open page started. That collision is safe rather than silent: the service
+        /// detects the stale changeset and applies nothing, which CommitConfigChangesAsync reports
+        /// as RESPONSE_STALE_CHANGESET and the result dialog below shows as a failure.
+        ///
+        /// The whole body is wrapped because every entry point into it is fire-and-forget - a
+        /// MenuFlyoutItem.Click lambda or, for the hotkeys, WindowHotkeys' WndProc callback. An
+        /// escaping exception there is either an unobserved Task or a throw inside a native window
+        /// procedure, neither of which reaches a user as anything but a crash or a silence.
+        /// </summary>
+        private static async Task QuickAddAsync(bool askForDetails,
+            Func<XamlRoot, Task<(ExceptionSubject Subject, string DisplayName)?>> pick)
+        {
+            if (_quickAddBusy)
+                return;
+
+            // Before the window's content is loaded there is no XamlRoot to host the picker or the
+            // result dialog, so there is no honest way to run this at all.
+            var xamlRoot = App.MainWindow?.Content?.XamlRoot;
+            if (xamlRoot is null)
+                return;
+
+            _quickAddBusy = true;
+            try
+            {
+                if (await pick(xamlRoot) is not { } picked)
+                    return; // Cancelled or blocked - not an error, no dialog.
+
+                var (subject, displayName) = picked;
+
+                // askForDetails is ClientSettings.AskForExceptionDetails. WinForms opens a full
+                // policy editor here; this is deliberately just a confirmation naming what was
+                // resolved, since the policy it would edit is the same unrestricted-TCP/UDP one the
+                // page's own Add pickers commit without asking.
+                if (askForDetails && !await ConfirmQuickAddAsync(xamlRoot, displayName))
+                    return;
+
+                var resp = await App.Firewall.CommitConfigChangesAsync(config =>
+                    config.ActiveProfile.AddExceptions(
+                        new List<FirewallExceptionV3> { new(subject, new TcpUdpPolicy(true)) }));
+
+                if (resp == MessageType.PUT_SETTINGS)
+                {
+                    await ShowQuickAddResultAsync(xamlRoot, Loc.T(LocKeys.Connections.AllowSuccessTitle),
+                        Loc.T(LocKeys.Connections.AllowSuccessBody, displayName));
+                }
+                else
+                {
+                    await ShowQuickAddResultAsync(xamlRoot, Loc.T(LocKeys.Connections.AllowFailedTitle),
+                        FailureDetail(resp, LocKeys.Connections.AllowFailedLockedDetail,
+                            LocKeys.Connections.AllowFailedStaleDetail,
+                            LocKeys.Connections.AllowFailedGenericDetail));
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowQuickAddResultAsync(xamlRoot, Loc.T(LocKeys.Connections.AllowFailedTitle), ex.Message);
+            }
+            finally
+            {
+                _quickAddBusy = false;
+            }
+        }
+
+        /// <summary>Quick-add's executable picker - the same FileOpenPicker wiring
+        /// AddPickExecutable_Click uses, including the global:: qualification and the owner-HWND
+        /// initialization a picker needs (a XamlRoot is not enough), which is why this one ignores
+        /// the XamlRoot the shared delegate shape hands it.</summary>
+        private static async Task<(ExceptionSubject Subject, string DisplayName)?> QuickPickExecutableAsync(XamlRoot xamlRoot)
+        {
+            if (App.MainWindow is null)
+                return null;
+
+            var picker = new global::Windows.Storage.Pickers.FileOpenPicker();
+            picker.FileTypeFilter.Add(".exe");
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var file = await picker.PickSingleFileAsync();
+            return file is null ? null : (new ExecutableSubject(file.Path), file.Name);
+        }
+
+        /// <summary>Quick-add's running-process picker - the same list, filter and row shape
+        /// PickProcessAsync shows, through the same shared PickFromListAsync helper.</summary>
+        private static async Task<(ExceptionSubject Subject, string DisplayName)?> QuickPickProcessAsync(XamlRoot xamlRoot)
+        {
+            var processes = await App.Firewall.GetRunningProcessesAsync();
+
+            var picked = await PickFromListAsync(
+                xamlRoot,
+                Loc.T(LocKeys.Rules.PickProcessTitle),
+                processes,
+                (process, term) =>
+                    process.Name.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0
+                    || process.Path.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0,
+                process => (process.Name, process.Path),
+                onDialogBlocked: null);
+
+            return picked is null ? null : (new ExecutableSubject(picked.Path), picked.Name);
+        }
+
+        /// <summary>Quick-add's top-level-window picker - same as PickWindowAsync, including using
+        /// the window's title (not its process name) as the display name, since that is the
+        /// identifying detail the user actually picked from the list.</summary>
+        private static async Task<(ExceptionSubject Subject, string DisplayName)?> QuickPickWindowAsync(XamlRoot xamlRoot)
+        {
+            var windows = await App.Firewall.GetTopLevelWindowsAsync();
+
+            var picked = await PickFromListAsync(
+                xamlRoot,
+                Loc.T(LocKeys.Rules.PickWindowTitle),
+                windows,
+                (window, term) =>
+                    window.Title.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0
+                    || window.ProcessName.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) >= 0,
+                window => (window.Title, window.ProcessName),
+                onDialogBlocked: null);
+
+            return picked is null ? null : (new ExecutableSubject(picked.ProcessPath), picked.Title);
+        }
+
+        /// <summary>The "ask for exception details" confirmation. A blocked dialog is never a
+        /// confirmation, so the add safely does not happen - the same refuse-by-default choice
+        /// RemoveButton_Click's confirm makes.</summary>
+        private static async Task<bool> ConfirmQuickAddAsync(XamlRoot xamlRoot, string displayName)
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = xamlRoot,
+                Title = Loc.T(LocKeys.Tray.QuickAddConfirmTitle),
+                Content = Loc.T(LocKeys.Tray.QuickAddConfirmBody, displayName),
+                PrimaryButtonText = Loc.T(LocKeys.Tray.QuickAddConfirmAdd),
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                DefaultButton = ContentDialogButton.Close,
+            };
+
+            return await ShowDialogOrNullAsync(dialog) == ContentDialogResult.Primary;
+        }
+
+        /// <summary>ShowResultAsync's counterpart for the quick-add path: same dialog, attached to
+        /// the window's XamlRoot instead of a page's, and with no InfoBar to degrade to.</summary>
+        private static async Task ShowQuickAddResultAsync(XamlRoot xamlRoot, string title, string body)
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = xamlRoot,
+                Title = title,
+                Content = body,
+                CloseButtonText = Loc.T(LocKeys.Common.Ok),
+            };
+
+            await ShowDialogOrNullAsync(dialog);
         }
 
         private async void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -889,15 +1088,17 @@ namespace SimpleDeFence.UI.Pages
             return TryShowDialogAsync(dialog, title, body);
         }
 
-        /// <summary>Every ContentDialog.ShowAsync() call site in this page routes through here: WinUI
-        /// allows only one open ContentDialog per XamlRoot at a time, and a second ShowAsync() while
-        /// one is already open throws InvalidOperationException instead of queuing or showing
-        /// anything. This page has no process-wide UnhandledException handler backstopping its
-        /// async void entry points (deliberately - see the final-review fix wave), so an unguarded
-        /// throw here is a hard crash, not a swallowed error. The InfoBar fallback (same
-        /// Informational-severity pattern ShowResultAsync originated) is a degraded but still honest
-        /// way for the outcome to reach the user instead of nothing happening at all.</summary>
-        private async Task<ContentDialogResult> TryShowDialogAsync(ContentDialog dialog, string fallbackTitle, string fallbackMessage)
+        /// <summary>The single ContentDialog.ShowAsync() call in this file: WinUI allows only one
+        /// open ContentDialog per XamlRoot at a time, and a second ShowAsync() while one is already
+        /// open throws InvalidOperationException instead of queuing or showing anything. Nothing
+        /// here has a process-wide UnhandledException handler backstopping its async void entry
+        /// points (deliberately - see the final-review fix wave), so an unguarded throw is a hard
+        /// crash, not a swallowed error.
+        ///
+        /// Returns null - never a ContentDialogResult - when the dialog could not be shown at all,
+        /// so a caller can tell that apart from a genuine None (the user pressed Close). Both
+        /// wrappers below refuse-by-default on null: no confirmation, no pick, no commit.</summary>
+        private static async Task<ContentDialogResult?> ShowDialogOrNullAsync(ContentDialog dialog)
         {
             try
             {
@@ -905,10 +1106,30 @@ namespace SimpleDeFence.UI.Pages
             }
             catch (InvalidOperationException)
             {
+                return null;
+            }
+        }
+
+        /// <summary>The page-instance wrapper around ShowDialogOrNullAsync: adds the InfoBar
+        /// fallback (same Informational-severity pattern ShowResultAsync originated), a degraded but
+        /// still honest way for the outcome to reach the user instead of nothing happening at
+        /// all.</summary>
+        private async Task<ContentDialogResult> TryShowDialogAsync(ContentDialog dialog, string fallbackTitle, string fallbackMessage)
+        {
+            var result = await ShowDialogOrNullAsync(dialog);
+            if (result is null)
+            {
                 ShowNotice(InfoBarSeverity.Informational, fallbackTitle, fallbackMessage);
                 return ContentDialogResult.None;
             }
+
+            return result.Value;
         }
+
+        /// <summary>Passed as PickFromListAsync's onDialogBlocked when this page shows the picker
+        /// itself, so the static helper can still reach this instance's InfoBar.</summary>
+        private void ShowDialogBlockedNotice(string title, string message)
+            => ShowNotice(InfoBarSeverity.Informational, title, message);
 
         private void SetBusy(bool busy)
         {
