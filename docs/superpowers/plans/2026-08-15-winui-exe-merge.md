@@ -1241,7 +1241,22 @@ namespace SimpleDeFence.UI
         private async System.Threading.Tasks.Task ShowMessageAsync(string title, string message)
         {
             var dialog = new ContentDialog { XamlRoot = Content.XamlRoot, Title = title, Content = message, CloseButtonText = "OK" };
-            await dialog.ShowAsync();
+            await TryShowDialogAsync(dialog);
+        }
+
+        /// <summary>Per this plan's Global Constraints: WinUI allows only one open ContentDialog per
+        /// XamlRoot at a time; a second ShowAsync() while one is already open throws
+        /// InvalidOperationException. Matches RulesPage.xaml.cs's TryShowDialogAsync pattern.</summary>
+        private async System.Threading.Tasks.Task<ContentDialogResult> TryShowDialogAsync(ContentDialog dialog)
+        {
+            try
+            {
+                return await dialog.ShowAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                return ContentDialogResult.None;
+            }
         }
 
         private async void AssocBrowse_Click(object sender, RoutedEventArgs e)
@@ -1759,7 +1774,7 @@ namespace SimpleDeFence.UI.Services
             UpdateDescriptor descriptor;
             var checkTask = UpdateChecker.GetDescriptorAsync(cts.Token);
 
-            var dialogResult = progressDialog.ShowAsync();
+            _ = TryShowDialogAsync(progressDialog);
             var completed = await Task.WhenAny(checkTask, WaitForCloseAsync(progressDialog));
             if (completed != checkTask)
             {
@@ -1809,7 +1824,7 @@ namespace SimpleDeFence.UI.Services
                 PrimaryButtonText = Loc.T(LocKeys.Common.Ok),
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
             };
-            if (await confirm.ShowAsync() != ContentDialogResult.Primary)
+            if (await TryShowDialogAsync(confirm) != ContentDialogResult.Primary)
                 return;
 
             await DownloadAndInstallAsync(xamlRoot, updateModule);
@@ -1830,7 +1845,7 @@ namespace SimpleDeFence.UI.Services
             };
 
             var downloadTask = DownloadFileAsync(httpClient, mainModule.UpdateURL, tmpFile, cts.Token);
-            _ = progressDialog.ShowAsync();
+            _ = TryShowDialogAsync(progressDialog);
             var completed = await Task.WhenAny(downloadTask, WaitForCloseAsync(progressDialog));
             if (completed != downloadTask)
             {
@@ -1865,7 +1880,22 @@ namespace SimpleDeFence.UI.Services
         private static async Task ShowMessageAsync(XamlRoot xamlRoot, string title, string message)
         {
             var dialog = new ContentDialog { XamlRoot = xamlRoot, Title = title, Content = message, CloseButtonText = Loc.T(LocKeys.Common.Ok) };
-            await dialog.ShowAsync();
+            await TryShowDialogAsync(dialog);
+        }
+
+        /// <summary>Per this plan's Global Constraints: WinUI allows only one open ContentDialog per
+        /// XamlRoot at a time; a second ShowAsync() while one is already open throws
+        /// InvalidOperationException. Matches RulesPage.xaml.cs's TryShowDialogAsync pattern.</summary>
+        private static async Task<ContentDialogResult> TryShowDialogAsync(ContentDialog dialog)
+        {
+            try
+            {
+                return await dialog.ShowAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                return ContentDialogResult.None;
+            }
         }
     }
 }
