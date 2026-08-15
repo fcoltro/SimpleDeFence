@@ -72,6 +72,14 @@ namespace SimpleDeFence.UI
             // hangs its dialogs off the window's XamlRoot, so the window has to exist and be shown
             // first.
             _tray = new TrayIconService();
+
+            // Closing the main window (title-bar X, Alt+F4) ends the process the same way Quit
+            // does - WinUI's default behavior when the last window closes - but unlike Quit, that
+            // path never touched the tray icon on its own. Without this, closing the window this
+            // way leaves a ghost icon in the notification area until Explorer notices.
+            // TrayIconService.Dispose() is idempotent (guarded by _disposed), so this is harmless
+            // even when Quit or ElevateSelfAsync already disposed it first.
+            m_window.Closed += (_, _) => _tray?.Dispose();
         }
 
         private static bool HasSwitch(string name)

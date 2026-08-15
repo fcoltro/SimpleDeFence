@@ -343,23 +343,10 @@ namespace SimpleDeFence.UI.Pages
             UpdateAddButtonEnabled();
             try
             {
-                // "Windows" is ambiguous inside SimpleDeFence.UI.Pages - it resolves to the sibling
-                // SimpleDeFence.Windows project/namespace before the platform namespace, so the
-                // picker type needs the same global:: qualification RuleListItem.RowBackground
-                // already uses for the same reason.
-                var picker = new global::Windows.Storage.Pickers.FileOpenPicker();
-                picker.FileTypeFilter.Add(".exe");
-
-                if (App.MainWindow is null)
-                    return;
-
-                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
                 global::Windows.Storage.StorageFile? file;
                 try
                 {
-                    file = await picker.PickSingleFileAsync();
+                    file = await PickExecutableFileAsync();
                 }
                 catch (Exception ex)
                 {
@@ -371,7 +358,7 @@ namespace SimpleDeFence.UI.Pages
                 }
 
                 if (file is null)
-                    return; // Cancelled - not an error, no dialog, no notice.
+                    return; // Cancelled (or no MainWindow yet) - not an error, no dialog, no notice.
 
                 await CommitAddAsync(new ExecutableSubject(file.Path), file.Name);
             }
@@ -380,6 +367,34 @@ namespace SimpleDeFence.UI.Pages
                 _addBusy = false;
                 UpdateAddButtonEnabled();
             }
+        }
+
+        /// <summary>Shared FileOpenPicker construction and invocation for both this page's own
+        /// "Executable file..." picker (above) and the tray/hotkey quick-add's executable picker
+        /// (QuickPickExecutableAsync below) - one .exe-filtered picker, wired once, instead of the
+        /// two independent copies this task originally shipped with (brief's Step 5 called out
+        /// exactly this merge as part of the task, the same way Process/Window's pickers already
+        /// share PickFromListAsync).
+        ///
+        /// "Windows" is ambiguous inside SimpleDeFence.UI.Pages - it resolves to the sibling
+        /// SimpleDeFence.Windows project/namespace before the platform namespace, so the picker type
+        /// needs the same global:: qualification RuleListItem.RowBackground already uses for the
+        /// same reason. Callers, not this method, decide how to report a PickSingleFileAsync
+        /// exception - the page's own Click handler shows an InfoBar-backed result dialog, the
+        /// tray/hotkey path already has QuickAddAsync's own outer try/catch - so this method lets
+        /// that exception propagate rather than swallowing it.</summary>
+        private static async Task<global::Windows.Storage.StorageFile?> PickExecutableFileAsync()
+        {
+            if (App.MainWindow is null)
+                return null;
+
+            var picker = new global::Windows.Storage.Pickers.FileOpenPicker();
+            picker.FileTypeFilter.Add(".exe");
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            return await picker.PickSingleFileAsync();
         }
 
         /// <summary>Same safe shape as AddPickExecutable_Click above.</summary>
@@ -797,22 +812,14 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
-        /// <summary>Quick-add's executable picker - the same FileOpenPicker wiring
-        /// AddPickExecutable_Click uses, including the global:: qualification and the owner-HWND
-        /// initialization a picker needs (a XamlRoot is not enough), which is why this one ignores
-        /// the XamlRoot the shared delegate shape hands it.</summary>
+        /// <summary>Quick-add's executable picker - goes through the same PickExecutableFileAsync
+        /// helper AddPickExecutable_Click uses, so there is exactly one FileOpenPicker wiring in
+        /// this file, not two. Ignores the XamlRoot the shared delegate shape hands it: a picker
+        /// needs the owner HWND PickExecutableFileAsync already looks up from App.MainWindow, not a
+        /// XamlRoot.</summary>
         private static async Task<(ExceptionSubject Subject, string DisplayName)?> QuickPickExecutableAsync(XamlRoot xamlRoot)
         {
-            if (App.MainWindow is null)
-                return null;
-
-            var picker = new global::Windows.Storage.Pickers.FileOpenPicker();
-            picker.FileTypeFilter.Add(".exe");
-
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            var file = await picker.PickSingleFileAsync();
+            var file = await PickExecutableFileAsync();
             return file is null ? null : (new ExecutableSubject(file.Path), file.Name);
         }
 

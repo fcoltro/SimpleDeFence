@@ -245,8 +245,13 @@ namespace SimpleDeFence.UI.Services
         /// with the "runas" verb, then quit so the elevated instance takes over. That call site goes
         /// through Utils.StartProcess, which lives in the WinForms project this one does not
         /// reference, so the two settings it applies for asAdmin are inlined here.
-        /// ProcessManager.ExecutablePath (not Assembly.Location) is the real exe path.</summary>
-        private static async Task ElevateSelfAsync()
+        /// ProcessManager.ExecutablePath (not Assembly.Location) is the real exe path.
+        ///
+        /// Instance method, not static: the success path needs to Dispose() this TrayIconService
+        /// before exiting, the same reason the Quit handler does - process teardown is not
+        /// guaranteed to run TaskbarIcon's finalizer, and relaunching elevated is at least as common
+        /// an exit path as Quit, so it must not risk a ghost icon either.</summary>
+        private async Task ElevateSelfAsync()
         {
             var path = SimpleDeFence.Windows.ProcessManager.ExecutablePath;
             try
@@ -267,6 +272,10 @@ namespace SimpleDeFence.UI.Services
                 return;
             }
 
+            // Same order the Quit handler uses: dispose the tray icon, then exit. Dispose() is
+            // idempotent (guarded by _disposed), so this is safe even if MainWindow's own Closed
+            // handler (App.xaml.cs) also fires and disposes again as Exit() tears the window down.
+            Dispose();
             Microsoft.UI.Xaml.Application.Current.Exit();
         }
 
