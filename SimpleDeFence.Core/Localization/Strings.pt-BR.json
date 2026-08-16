@@ -167,6 +167,7 @@
     "addPickProcess": "Processo em execução...",
     "addPickWindow": "Janela...",
     "addPickUwp": "Aplicativo UWP...",
+    "addPickFolder": "Escolher pasta...",
     "pickUwpTitle": "Escolher um aplicativo UWP",
     "pickProcessTitle": "Escolher um processo em execução",
     "pickWindowTitle": "Escolher uma janela",

@@ -141,6 +141,7 @@ namespace SimpleDeFence.Localization
             public const string AddPickProcess = "rules.addPickProcess";
             public const string AddPickWindow = "rules.addPickWindow";
             public const string AddPickUwp = "rules.addPickUwp";
+            public const string AddPickFolder = "rules.addPickFolder";
             public const string PickUwpTitle = "rules.pickUwpTitle";
             public const string PickProcessTitle = "rules.pickProcessTitle";
             public const string PickWindowTitle = "rules.pickWindowTitle";

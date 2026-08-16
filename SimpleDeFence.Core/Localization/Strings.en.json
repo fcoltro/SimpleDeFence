@@ -167,6 +167,7 @@
     "addPickProcess": "Running process...",
     "addPickWindow": "Window...",
     "addPickUwp": "UWP app...",
+    "addPickFolder": "Pick folder...",
     "pickUwpTitle": "Choose a UWP app",
     "pickProcessTitle": "Choose a running process",
     "pickWindowTitle": "Choose a window",

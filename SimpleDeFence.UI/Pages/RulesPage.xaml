@@ -34,6 +34,7 @@
                         <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickProcess}" Click="AddPickProcess_Click"/>
                         <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickWindow}" Click="AddPickWindow_Click"/>
                         <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickUwp}" Click="AddPickUwp_Click"/>
+                        <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickFolder}" Click="AddPickFolder_Click"/>
                     </MenuFlyout>
                 </SplitButton.Flyout>
             </SplitButton>

@@ -17,62 +17,12 @@ namespace SimpleDeFence.DatabaseClasses
             return Load(DBPath);
         }
 
-        internal Application? TryGetApp(ExecutableSubject fromSubject, out FirewallExceptionV3? fwex, bool matchSpecial)
-        {
-            foreach (var app in KnownApplications)
-            {
-                if (!matchSpecial && app.HasFlag("TWUI:Special"))
-                    continue;
-
-                foreach (var id in app.Components)
-                {
-                    if (id.DoesExecutableSatisfy(fromSubject))
-                    {
-                        fwex = id.InstantiateException(fromSubject);
-                        return app;
-                    }
-                }
-            }
-
-            fwex = null;
-            return null;
-        }
-
         internal List<FirewallExceptionV3> GetExceptionsForApp(ExceptionSubject fromSubject, bool guiPrompt, out Application? app)
         {
-            app = null;
-            var exceptions = new List<FirewallExceptionV3>();
+            var exceptions = GetExceptionsForApp(fromSubject, out app);
 
-            if (fromSubject is AppContainerSubject)
+            if ((exceptions.Count > 1) && guiPrompt && app is not null && fromSubject is ExecutableSubject exeSubject)
             {
-                exceptions.Add(new FirewallExceptionV3(fromSubject, new TcpUdpPolicy(true)));
-                return exceptions;
-            }
-            else if (fromSubject is ExecutableSubject exeSubject)
-            {
-                app = TryGetApp(exeSubject, out FirewallExceptionV3? _, false);
-                if (app == null)
-                {
-                    exceptions.Add(new FirewallExceptionV3(exeSubject, new TcpUdpPolicy(true)));
-                    return exceptions;
-                }
-
-                string pathHint = System.IO.Path.GetDirectoryName(exeSubject.ExecutablePath);
-                foreach (SubjectIdentity id in app.Components)
-                {
-                    List<ExceptionSubject> foundSubjects = id.SearchForFile(pathHint);
-                    foreach (ExceptionSubject subject in foundSubjects)
-                    {
-                        var tmp = id.InstantiateException(subject);
-                        if (fromSubject.Equals(subject))
-                            exceptions.Insert(0, tmp);
-                        else
-                            exceptions.Add(tmp);
-                    }
-                }
-
-                if ((exceptions.Count > 1) && guiPrompt)
-                {
 string localizedAppName = Resources.Exceptions.ResourceManager.GetString(app.Name);
                     localizedAppName = string.IsNullOrEmpty(localizedAppName) ? app.Name : localizedAppName;
 
@@ -129,11 +79,6 @@ string localizedAppName = Resources.Exceptions.ResourceManager.GetString(app.Nam
                             break;
                     }
                 }
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
 
             return exceptions;
         }

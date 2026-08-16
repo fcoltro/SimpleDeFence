@@ -360,6 +360,9 @@ namespace SimpleDeFence.UI.Pages
                 if (file is null)
                     return; // Cancelled (or no MainWindow yet) - not an error, no dialog, no notice.
 
+                if (ClientSettings.Load().AskForExceptionDetails && !await ConfirmQuickAddAsync(Content.XamlRoot, file.Name))
+                    return;
+
                 await CommitAddAsync(new ExecutableSubject(file.Path), file.Name);
             }
             finally
@@ -451,6 +454,103 @@ namespace SimpleDeFence.UI.Pages
             {
                 _addBusy = false;
                 UpdateAddButtonEnabled();
+            }
+        }
+
+        /// <summary>Same safe shape as AddPickExecutable_Click. Recursively collects every
+        /// .exe/.dll under the picked folder and adds each as an exception using the app
+        /// database's default recommendation - deliberately no per-file prompt, matching WinForms'
+        /// SettingsForm.btnAppAddFolder_Click, since a folder can match dozens of files (e.g. a game
+        /// install directory).</summary>
+        private async void AddPickFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (_addBusy)
+                return;
+
+            _addBusy = true;
+            UpdateAddButtonEnabled();
+            try
+            {
+                var picker = new global::Windows.Storage.Pickers.FolderPicker();
+                picker.FileTypeFilter.Add("*");
+
+                if (App.MainWindow is null)
+                    return;
+
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+                global::Windows.Storage.StorageFolder? folder;
+                try
+                {
+                    folder = await picker.PickSingleFolderAsync();
+                }
+                catch (Exception ex)
+                {
+                    await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), ex.Message);
+                    return;
+                }
+
+                if (folder is null)
+                    return; // Cancelled.
+
+                var files = new List<string>();
+                CollectExeAndDllFiles(folder.Path, files);
+                if (files.Count == 0)
+                    return;
+
+                var db = await App.Firewall.GetAppDatabaseAsync();
+                var toAdd = new List<FirewallExceptionV3>();
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        toAdd.AddRange((db ?? new AppDatabase()).GetExceptionsForApp(new ExecutableSubject(file), out _));
+                    }
+                    catch { } // Matches WinForms' own per-file catch-and-skip in btnAppAddFolder_Click.
+                }
+
+                if (toAdd.Count == 0)
+                    return;
+
+                var resp = await CommitAsync(profile => profile.AddExceptions(toAdd));
+                if (resp == MessageType.PUT_SETTINGS)
+                {
+                    await ShowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle),
+                        Loc.T(LocKeys.Connections.AllowSuccessBody, folder.Name));
+                    await RefreshAsync();
+                }
+                else
+                {
+                    await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), FailureDetail(resp,
+                        LocKeys.Connections.AllowFailedLockedDetail, LocKeys.Connections.AllowFailedStaleDetail,
+                        LocKeys.Connections.AllowFailedGenericDetail));
+                }
+            }
+            finally
+            {
+                _addBusy = false;
+                UpdateAddButtonEnabled();
+            }
+        }
+
+        /// <summary>Pure file-system recursion, ported unchanged from WinForms'
+        /// SettingsForm.CollectExeAndDllFiles - it never had a WinForms dependency, only a WinForms
+        /// home.</summary>
+        private static void CollectExeAndDllFiles(string path, List<string> results)
+        {
+            try
+            {
+                results.AddRange(System.IO.Directory.GetFiles(path, "*.exe", System.IO.SearchOption.TopDirectoryOnly));
+                results.AddRange(System.IO.Directory.GetFiles(path, "*.dll", System.IO.SearchOption.TopDirectoryOnly));
+
+                foreach (string dir in System.IO.Directory.GetDirectories(path))
+                    CollectExeAndDllFiles(dir, results);
+            }
+            catch
+            {
+                // Matches WinForms' own behavior: an inaccessible subdirectory is skipped, not fatal
+                // to the whole scan.
             }
         }
 
@@ -583,7 +683,12 @@ namespace SimpleDeFence.UI.Pages
                 ShowDialogBlockedNotice);
 
             if (picked is { } process)
+            {
+                if (ClientSettings.Load().AskForExceptionDetails && !await ConfirmQuickAddAsync(Content.XamlRoot, process.Name))
+                    return;
+
                 await CommitAddAsync(new ExecutableSubject(process.Path), process.Name);
+            }
         }
 
         /// <summary>Same shape as PickProcessAsync above, for visible top-level windows. The window's
@@ -604,7 +709,12 @@ namespace SimpleDeFence.UI.Pages
                 ShowDialogBlockedNotice);
 
             if (picked is { } window)
+            {
+                if (ClientSettings.Load().AskForExceptionDetails && !await ConfirmQuickAddAsync(Content.XamlRoot, window.Title))
+                    return;
+
                 await CommitAddAsync(new ExecutableSubject(window.ProcessPath), window.Title);
+            }
         }
 
         /// <summary>Shared filterable-list-in-a-dialog shape for the process and window pickers
