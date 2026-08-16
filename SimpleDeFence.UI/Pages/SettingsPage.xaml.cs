@@ -198,6 +198,14 @@ namespace SimpleDeFence.UI.Pages
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.AutoUpdateCheck = value));
         }
 
+        /// <summary>Runs the whole interactive check/confirm/download flow via
+        /// Services.Updater - see that class for the ContentDialog/HttpClient port of
+        /// SimpleDeFence/UpdateChecker.cs's Updater.</summary>
+        private async void CheckForUpdatesNow_Click(object sender, RoutedEventArgs e)
+        {
+            await Services.Updater.CheckForUpdatesAsync(Content.XamlRoot);
+        }
+
         /// <summary>Same safe shape as RulesPage's Add pickers: MenuFlyoutItem/Button.Click is a
         /// plain top-level handler, so committing and showing a result dialog directly from here
         /// is fine per the reentrancy rule.</summary>

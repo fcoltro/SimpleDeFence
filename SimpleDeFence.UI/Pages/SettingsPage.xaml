@@ -125,6 +125,12 @@
                                                 Description="{loc:Loc Key=settings.updates.autoCheckDescription}">
                             <ToggleSwitch x:Name="AutoUpdateCheckToggle" Toggled="AutoUpdateCheckToggle_Toggled"/>
                         </controls:SettingsCard>
+
+                        <controls:SettingsCard IsClickEnabled="False">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="CheckForUpdatesNowButton" Content="{loc:Loc Key=settings.updates.checkNow}" Click="CheckForUpdatesNow_Click"/>
+                            </StackPanel>
+                        </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 

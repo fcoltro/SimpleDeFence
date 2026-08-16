@@ -27,6 +27,9 @@
     <Reference Include="Windows.Management" />
     <Reference Include="Windows.ApplicationModel" />
     <Reference Include="System.Runtime" />
+    <!-- UpdateDescriptorFetcher.cs uses HttpClient; on net10 it resolves implicitly, but net48 SDK
+         projects don't implicitly reference System.Net.Http the way they do System/System.Core. -->
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='net48'">
     <TargetPlatformVersion>8.0</TargetPlatformVersion>

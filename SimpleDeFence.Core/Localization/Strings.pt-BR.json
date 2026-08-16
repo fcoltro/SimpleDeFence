@@ -268,7 +268,13 @@
     },
     "updates": {
       "autoCheck": "Verificar atualizações automaticamente",
-      "autoCheckDescription": "O SimpleDeFence verifica periodicamente se há novas versões."
+      "autoCheckDescription": "O SimpleDeFence verifica periodicamente se há novas versões.",
+      "checkNow": "Verificar atualizações agora",
+      "checkingTitle": "Verificando atualizações...",
+      "checkFailedTitle": "Falha ao verificar atualizações",
+      "noneAvailable": "Você já está usando a versão mais recente.",
+      "available": "A versão {0} está disponível. Baixar e instalar agora?",
+      "downloading": "Baixando atualização..."
     },
     "maintenance": {
       "import": "Importar configuração...",

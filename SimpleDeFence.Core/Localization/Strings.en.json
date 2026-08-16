@@ -268,7 +268,13 @@
     },
     "updates": {
       "autoCheck": "Automatically check for updates",
-      "autoCheckDescription": "SimpleDeFence periodically checks for new versions."
+      "autoCheckDescription": "SimpleDeFence periodically checks for new versions.",
+      "checkNow": "Check for updates now",
+      "checkingTitle": "Checking for updates...",
+      "checkFailedTitle": "Update check failed",
+      "noneAvailable": "You're running the latest version.",
+      "available": "Version {0} is available. Download and install it now?",
+      "downloading": "Downloading update..."
     },
     "maintenance": {
       "import": "Import configuration...",

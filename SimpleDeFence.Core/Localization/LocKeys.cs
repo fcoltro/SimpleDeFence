@@ -225,6 +225,12 @@ namespace SimpleDeFence.Localization
 
             public const string UpdatesAutoCheck = "settings.updates.autoCheck";
             public const string UpdatesAutoCheckDescription = "settings.updates.autoCheckDescription";
+            public const string UpdatesCheckNow = "settings.updates.checkNow";
+            public const string UpdatesCheckingTitle = "settings.updates.checkingTitle";
+            public const string UpdatesCheckFailedTitle = "settings.updates.checkFailedTitle";
+            public const string UpdatesNoneAvailable = "settings.updates.noneAvailable";
+            public const string UpdatesAvailable = "settings.updates.available";
+            public const string UpdatesDownloading = "settings.updates.downloading";
 
             public const string MaintenanceImport = "settings.maintenance.import";
             public const string MaintenanceExport = "settings.maintenance.export";
