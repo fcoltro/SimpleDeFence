@@ -59,7 +59,7 @@ namespace SimpleDeFence.UI
                 Content = "This tool is not meant for end-users. Only use this tool when instructed to do so by the application developer.",
                 CloseButtonText = "OK",
             };
-            await dialog.ShowAsync();
+            await TryShowDialogAsync(dialog);
         }
 
         private async System.Threading.Tasks.Task<string?> PickFileAsync(string extensionFilter = "*")
