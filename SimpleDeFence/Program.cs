@@ -13,9 +13,7 @@ namespace SimpleDeFence
 
         private static int StartDevelTool()
         {
-            System.Windows.Forms.Application.EnableVisualStyles();
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-            System.Windows.Forms.Application.Run(new DevelToolForm());
+            SimpleDeFence.UI.HostBootstrap.RunAsDevelTool(Environment.GetCommandLineArgs());
             return 0;
         }
         
