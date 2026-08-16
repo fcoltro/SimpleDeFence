@@ -142,15 +142,11 @@ namespace SimpleDeFence
                     // Unlock server
                     while (twController.IsServerLocked)
                     {
-                        using var pf = new PasswordForm();
-                        pf.BringToFront();
-                        pf.Activate();
-                        if (pf.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                        {
-                            twController.TryUnlockServer(pf.PassHash);
-                        }
-                        else
+                        string? password = SimpleDeFence.UI.HostBootstrap.PromptForPassword();
+                        if (password is null)
                             return -1;
+
+                        twController.TryUnlockServer(password);
                     }
 
                     // Stop server

@@ -245,16 +245,6 @@ namespace SimpleDeFence
             }
         }
 
-        internal static bool IsDarkModeActive(ControllerSettings settings)
-        {
-            if (string.Equals(settings.UiTheme, "dark", StringComparison.InvariantCultureIgnoreCase))
-                return true;
-            else if (string.Equals(settings.UiTheme, "light", StringComparison.InvariantCultureIgnoreCase))
-                return false;
-            else
-                return !AppsUseLightTheme();
-        }
-
         internal static void CompressDeflate(string inputFile, string outputFile)
         {
             using var inFile = new FileStream(inputFile, FileMode.Open, FileAccess.Read);

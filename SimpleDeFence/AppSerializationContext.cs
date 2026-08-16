@@ -15,7 +15,6 @@ namespace SimpleDeFence
         PropertyNamingPolicy = JsonKnownNamingPolicy.Unspecified,
         WriteIndented = true
         )]
-    [JsonSerializable(typeof(ControllerSettings))]
     [JsonSerializable(typeof(ConfigContainer))]
     internal partial class AppSourceGenerationContext : JsonSerializerContext
     {
