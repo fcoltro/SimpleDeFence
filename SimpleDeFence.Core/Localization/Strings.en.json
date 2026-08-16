@@ -216,7 +216,14 @@
       "themeDescription": "Applies immediately.",
       "themeAuto": "Use system setting",
       "themeLight": "Light",
-      "themeDark": "Dark"
+      "themeDark": "Dark",
+      "language": "Language",
+      "languageDescription": "Overrides the system language for SimpleDeFence's own UI.",
+      "languageAuto": "Use system setting",
+      "askForExceptionDetails": "Ask for details when adding a single exception",
+      "askForExceptionDetailsDescription": "Show an editable confirmation before adding one exception via the tray's quick-add shortcuts. Bulk adds (e.g. a whole folder) never prompt.",
+      "enableHotkeys": "Enable global keyboard shortcuts",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere."
     },
     "protection": {
       "allowLocalSubnet": "Allow local network",

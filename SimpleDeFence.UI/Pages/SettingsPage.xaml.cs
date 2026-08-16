@@ -81,6 +81,17 @@ namespace SimpleDeFence.UI.Pages
                 _ => 0,
             };
 
+            foreach (ComboBoxItem item in LanguageCombo.Items)
+            {
+                if ((string)item.Tag == _clientSettings.Language)
+                {
+                    LanguageCombo.SelectedItem = item;
+                    break;
+                }
+            }
+            AskForExceptionDetailsToggle.IsOn = _clientSettings.AskForExceptionDetails;
+            EnableHotkeysToggle.IsOn = _clientSettings.EnableGlobalHotkeys;
+
             var config = App.Firewall.Config!;
             AllowLocalSubnetToggle.IsOn = config.ActiveProfile.AllowLocalSubnet;
             DisplayOffBlockToggle.IsOn = config.ActiveProfile.DisplayOffBlock;
@@ -138,6 +149,45 @@ namespace SimpleDeFence.UI.Pages
             _clientSettings.UiTheme = theme;
             _clientSettings.Save();
             App.ApplyTheme(theme);
+        }
+
+        /// <summary>Same local-only, no-server-IPC shape as ThemeCombo_SelectionChanged. Persists
+        /// the choice and re-resolves Loc's active culture immediately - but per this task's scope
+        /// (see the WinUI exe-merge plan's Task 7 notes), that only takes effect for code-behind
+        /// labels that call Loc.T() on their next refresh (e.g. PasswordStatusText/LockStatusText/
+        /// AboutVersionCard here). Static XAML {loc:Loc} bindings resolve once at
+        /// InitializeComponent() time and only pick up a new culture on the next app launch, which
+        /// is what Step 3 (App.xaml.cs's persisted-language startup check) provides.</summary>
+        private void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_seeding || LanguageCombo.SelectedItem is not ComboBoxItem item)
+                return;
+
+            var language = (string)item.Tag;
+            _clientSettings.Language = language;
+            _clientSettings.Save();
+
+            if (language == "auto")
+                Loc.UseSystemCulture();
+            else
+                Loc.SetCulture(language);
+        }
+
+        private void AskForExceptionDetailsToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding)
+                return;
+            _clientSettings.AskForExceptionDetails = AskForExceptionDetailsToggle.IsOn;
+            _clientSettings.Save();
+        }
+
+        private void EnableHotkeysToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding)
+                return;
+            _clientSettings.EnableGlobalHotkeys = EnableHotkeysToggle.IsOn;
+            _clientSettings.Save();
+            (Application.Current as App)?.NotifyHotkeySettingChanged(_clientSettings.EnableGlobalHotkeys);
         }
 
         /// <summary>ToggleSwitch fires Toggled synchronously from inside its own event dispatch -

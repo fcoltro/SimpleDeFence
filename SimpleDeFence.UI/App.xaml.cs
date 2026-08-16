@@ -55,7 +55,13 @@ namespace SimpleDeFence.UI
             if (langOverride is not null)
                 Loc.SetCulture(langOverride);
             else
-                Loc.UseSystemCulture();
+            {
+                var savedLanguage = ClientSettings.Load().Language;
+                if (savedLanguage != "auto")
+                    Loc.SetCulture(savedLanguage);
+                else
+                    Loc.UseSystemCulture();
+            }
 
             // --sample-locked also implies sample data; it simulates a locked service so the
             // GUI's refusal handling can be exercised.
@@ -81,6 +87,12 @@ namespace SimpleDeFence.UI
             // even when Quit or ElevateSelfAsync already disposed it first.
             m_window.Closed += (_, _) => _tray?.Dispose();
         }
+
+        /// <summary>Called by the Settings page's "Enable global keyboard shortcuts" toggle
+        /// (Task 7) after it persists the new value, so the already-running tray icon's
+        /// RegisterHotKey/UnregisterHotKey state changes immediately rather than only on next
+        /// launch.</summary>
+        internal void NotifyHotkeySettingChanged(bool enabled) => _tray?.ApplyHotkeySetting(enabled);
 
         private static bool HasSwitch(string name)
         {

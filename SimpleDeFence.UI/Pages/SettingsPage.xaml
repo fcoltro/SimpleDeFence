@@ -44,6 +44,22 @@
                                 <ComboBoxItem Content="{loc:Loc Key=settings.general.themeDark}" Tag="dark"/>
                             </ComboBox>
                         </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.general.language}"
+                                                Description="{loc:Loc Key=settings.general.languageDescription}">
+                            <ComboBox x:Name="LanguageCombo" SelectionChanged="LanguageCombo_SelectionChanged" MinWidth="160">
+                                <ComboBoxItem Content="{loc:Loc Key=settings.general.languageAuto}" Tag="auto"/>
+                                <ComboBoxItem Content="English" Tag="en"/>
+                                <ComboBoxItem Content="Português (Brasil)" Tag="pt-BR"/>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.general.askForExceptionDetails}"
+                                                Description="{loc:Loc Key=settings.general.askForExceptionDetailsDescription}">
+                            <ToggleSwitch x:Name="AskForExceptionDetailsToggle" Toggled="AskForExceptionDetailsToggle_Toggled"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.general.enableHotkeys}"
+                                                Description="{loc:Loc Key=settings.general.enableHotkeysDescription}">
+                            <ToggleSwitch x:Name="EnableHotkeysToggle" Toggled="EnableHotkeysToggle_Toggled"/>
+                        </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 

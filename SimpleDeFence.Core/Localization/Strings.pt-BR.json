@@ -216,7 +216,14 @@
       "themeDescription": "Aplica-se imediatamente.",
       "themeAuto": "Usar configuração do sistema",
       "themeLight": "Claro",
-      "themeDark": "Escuro"
+      "themeDark": "Escuro",
+      "language": "Idioma",
+      "languageDescription": "Substitui o idioma do sistema apenas para a interface do SimpleDeFence.",
+      "languageAuto": "Usar configuração do sistema",
+      "askForExceptionDetails": "Pedir detalhes ao adicionar uma única exceção",
+      "askForExceptionDetailsDescription": "Mostra uma confirmação editável antes de adicionar uma exceção pelos atalhos de adição rápida da bandeja. Adições em lote (como uma pasta inteira) nunca pedem confirmação.",
+      "enableHotkeys": "Ativar atalhos de teclado globais",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permitem instantaneamente um executável, processo ou janela a partir de qualquer lugar."
     },
     "protection": {
       "allowLocalSubnet": "Permitir rede local",

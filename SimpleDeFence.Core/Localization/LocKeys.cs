@@ -187,6 +187,13 @@ namespace SimpleDeFence.Localization
             public const string GeneralThemeAuto = "settings.general.themeAuto";
             public const string GeneralThemeLight = "settings.general.themeLight";
             public const string GeneralThemeDark = "settings.general.themeDark";
+            public const string GeneralLanguage = "settings.general.language";
+            public const string GeneralLanguageDescription = "settings.general.languageDescription";
+            public const string GeneralLanguageAuto = "settings.general.languageAuto";
+            public const string GeneralAskForExceptionDetails = "settings.general.askForExceptionDetails";
+            public const string GeneralAskForExceptionDetailsDescription = "settings.general.askForExceptionDetailsDescription";
+            public const string GeneralEnableHotkeys = "settings.general.enableHotkeys";
+            public const string GeneralEnableHotkeysDescription = "settings.general.enableHotkeysDescription";
 
             public const string ProtectionAllowLocalSubnet = "settings.protection.allowLocalSubnet";
             public const string ProtectionAllowLocalSubnetDescription = "settings.protection.allowLocalSubnetDescription";
