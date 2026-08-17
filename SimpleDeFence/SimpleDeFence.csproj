@@ -47,7 +47,15 @@
     <Version>3.5.1</Version>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\img\firewall.ico</ApplicationIcon>
+    <!-- Must match SimpleDeFence.UI's own ApplicationIcon (TrayIconService's "Normal" mode icon too -
+         see its UpdateModeIcon comment). SimpleDeFence.exe is the only executable produced by the
+         merge, and an unpackaged WinUI 3 app's window/taskbar/Explorer icon comes from the exe's
+         embedded Win32 icon resource (nothing overrides it at runtime) - so this project's own
+         ApplicationIcon, not SimpleDeFence.UI.csproj's, is what actually ships. Left pointing at the
+         pre-merge WinForms icon (Resources\img\firewall.ico, still used as-is by UpdateChecker.cs's
+         and AppDatabase.cs's native TaskDialogs) until spotted live on a real deployment - the window
+         icon was still the old shield while the tray icon already showed the new one. -->
+    <ApplicationIcon>..\SimpleDeFence.UI\Assets\AppIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
