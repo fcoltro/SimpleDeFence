@@ -126,4 +126,35 @@
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <!-- `dotnet publish` for this project's self-contained win-x64 output does not include the
+       XAML-compiler-generated content from the referenced SimpleDeFence.UI project (compiled
+       .xbf pages, the .pri resource index, and the Assets/Pages/Resources/Themes folders) - even
+       though `dotnet build`'s own $(OutDir) has all of them, confirmed by direct comparison of the
+       two output trees. Without these, App.xaml's InitializeComponent() has nothing to load and
+       every WinUI window construction crashes instantly and silently (native STATUS_STOWED_EXCEPTION,
+       0xc000027b, deep inside Microsoft.UI.Xaml.dll) - reproduced identically on two independent
+       machines (a Hyper-V VM and the host), ruling out an environment/graphics-driver cause.
+       $(OutDir) already has everything correctly (build's own copy-local mechanism isn't affected),
+       so copy from there into $(PublishDir) once publish's own file list has been computed. -->
+  <Target Name="CopyMissingXamlResourcesToPublishDir" AfterTargets="Publish" Condition="'$(PublishDir)' != ''">
+    <PropertyGroup>
+      <_FullOutDir>$([System.IO.Path]::GetFullPath('$(OutDir)'))</_FullOutDir>
+      <_FullPublishDir>$([System.IO.Path]::GetFullPath('$(PublishDir)'))</_FullPublishDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_XamlResourceToCopy Include="$(_FullOutDir)**\*.xbf" />
+      <_XamlResourceToCopy Include="$(_FullOutDir)**\*.pri" />
+      <_XamlResourceToCopy Include="$(_FullOutDir)Assets\**\*.*" />
+      <_XamlResourceToCopy Include="$(_FullOutDir)Themes\**\*.*" />
+    </ItemGroup>
+    <ItemGroup>
+      <_XamlResourceToCopy>
+        <DestinationPath>$(_FullPublishDir)$([MSBuild]::MakeRelative($(_FullOutDir), %(Identity)))</DestinationPath>
+      </_XamlResourceToCopy>
+    </ItemGroup>
+    <Copy SourceFiles="@(_XamlResourceToCopy)"
+          DestinationFiles="@(_XamlResourceToCopy->'%(DestinationPath)')"
+          SkipUnchangedFiles="true" />
+  </Target>
 </Project>
