@@ -86,9 +86,20 @@
                         <StackPanel>
                             <TextBlock Text="{x:Bind Shell.ModeLabel, Mode=OneWay}"
                                        Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <!-- StatusLine can be an arbitrary-length exception message (see
+                                 FirewallClient.LastError), not just short mode descriptions - the
+                                 full text is already shown in each page's own InfoBar, so this
+                                 compact footer chip only needs to hint at it. TextWrapping+MaxWidth
+                                 without a line cap measured wrong at certain widths and silently
+                                 dropped whole words instead of wrapping them (e.g. "Is it" vanishing
+                                 from ".service. Is it installed..." at Width=150); MaxLines+
+                                 TextTrimming avoids that whole class of bug by using WinUI's own
+                                 tested truncation path instead of guessing a width that wraps
+                                 every possible message correctly. -->
                             <TextBlock Text="{x:Bind Shell.StatusLine, Mode=OneWay}"
                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                       Opacity="0.7" TextWrapping="Wrap" MaxWidth="150"/>
+                                       Opacity="0.7" TextWrapping="Wrap" MaxLines="2"
+                                       TextTrimming="CharacterEllipsis" Width="150"/>
                         </StackPanel>
                     </StackPanel>
                 </Button>
