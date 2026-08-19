@@ -1,4 +1,4 @@
-using H.NotifyIcon;
+﻿using H.NotifyIcon;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -105,9 +105,21 @@ namespace SimpleDeFence.UI.Services
             }
         }
 
+        /// <summary>Floor for the tray menu's width. The very first right-click on the tray icon
+        /// opened a visibly too-narrow menu with every label clipped, and every open after that was
+        /// correct: the presenter's first measure happens before the flyout has a XamlRoot with real
+        /// DPI/font metrics to measure against, so it lays out against nothing and the popup is
+        /// already on screen by the time the correct size is known. A MinWidth is not a fix for that
+        /// measure pass, but it does mean the first open is at least as wide as the longest label
+        /// this menu actually has, which is what made the clipping visible.</summary>
+        private const double TrayMenuMinWidth = 300;
+
         private MenuFlyout BuildMenu()
         {
-            var menu = new MenuFlyout();
+            var menu = new MenuFlyout
+            {
+                MenuFlyoutPresenterStyle = BuildPresenterStyle(),
+            };
 
             var modeNormal = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeNormal) };
             modeNormal.Click += (_, _) => _ = SwitchModeAsync(FirewallMode.Normal);
@@ -185,6 +197,14 @@ namespace SimpleDeFence.UI.Services
             menu.Items.Add(quit);
 
             return menu;
+        }
+
+        private static Microsoft.UI.Xaml.Style BuildPresenterStyle()
+        {
+            var style = new Microsoft.UI.Xaml.Style(typeof(MenuFlyoutPresenter));
+            style.Setters.Add(new Microsoft.UI.Xaml.Setter(
+                Microsoft.UI.Xaml.FrameworkElement.MinWidthProperty, TrayMenuMinWidth));
+            return style;
         }
 
         /// <summary>IFirewallClient.Changed can complete on whatever thread its refresh ran on, and

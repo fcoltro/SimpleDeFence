@@ -114,14 +114,21 @@ namespace SimpleDeFence.UI.ViewModels
 
         // Segoe Fluent Icons glyphs. Paired with a colour AND a word everywhere they are used,
         // so status never depends on colour alone.
+        //
+        // Normal is the shield, not the padlock it used to be: this app has a second, unrelated
+        // lock concept (IsLocked - the server locked behind a password, shown with E72E on the
+        // Settings page), and spending the padlock on a mode made the two read as the same thing.
+        // BlockAll was worse than vague - it was E785, the *open* padlock, i.e. the exact opposite
+        // of what that mode does. Learning was E9CE, a question mark, which is the glyph for "no
+        // idea" rather than "the firewall is learning".
         private static string GlyphFor(FirewallMode mode) => mode switch
         {
-            FirewallMode.Normal => "",          // Lock (protected)
-            FirewallMode.BlockAll => "",        // BlockContact (locked down)
-            FirewallMode.AllowOutgoing => "",   // Forward (relaxed)
-            FirewallMode.Disabled => "",        // Warning (inactive)
-            FirewallMode.Learning => "",        // Info (transient)
-            _ => "",
+            FirewallMode.Normal => "",          // Shield - protected, as recommended
+            FirewallMode.BlockAll => "",        // Circle-slash - nothing gets through
+            FirewallMode.AllowOutgoing => "",   // Arrow leaving a box - outbound allowed
+            FirewallMode.Disabled => "",        // Warning triangle - not protecting anything
+            FirewallMode.Learning => "",        // Lightbulb - learning what to allow
+            _ => "",                            // Exclamation in a circle - unknown state
         };
 
         private static string StateKeyFor(FirewallMode mode) => mode switch

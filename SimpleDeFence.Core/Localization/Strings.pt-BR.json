@@ -2,13 +2,11 @@
   "app": {
     "name": "SimpleDeFence"
   },
-
   "nav": {
     "rules": "Regras",
     "settings": "Configurações",
     "modeChip": "Modo do firewall"
   },
-
   "common": {
     "ok": "OK",
     "cancel": "Cancelar",
@@ -18,7 +16,6 @@
     "unknown": "Desconhecido",
     "anotherDialogOpenDetail": "Outra janela já está aberta. Tente novamente."
   },
-
   "status": {
     "notConnected": "Sem conexão",
     "notConnectedDetail": "Não foi possível acessar o serviço do SimpleDeFence. Ele está instalado e em execução?",
@@ -26,7 +23,6 @@
     "lockedDetail": "Desbloqueie a configuração antes de alterar o modo.",
     "connected": "Conectado"
   },
-
   "mode": {
     "normal": {
       "label": "Normal",
@@ -62,7 +58,6 @@
       "confirm": "Entrar no modo de aprendizado"
     }
   },
-
   "applications": {
     "title": "Aplicativos",
     "filterPlaceholder": "Filtrar por nome ou caminho",
@@ -70,7 +65,6 @@
     "summaryOne": "1 exceção no perfil \"{0}\"",
     "empty": "Nenhuma exceção de aplicativo ainda."
   },
-
   "connections": {
     "title": "Conexões",
     "section": {
@@ -103,7 +97,6 @@
       "title": "Não foi possível ler os dados de conexão"
     }
   },
-
   "subject": {
     "executable": "Executável",
     "service": "Serviço",
@@ -111,7 +104,6 @@
     "global": "Global",
     "allApplications": "Todos os aplicativos"
   },
-
   "policy": {
     "blocked": "Bloqueado",
     "unrestricted": "Sem restrições",
@@ -203,7 +195,8 @@
       "security": "Segurança",
       "updates": "Atualizações",
       "maintenance": "Manutenção",
-      "about": "Sobre"
+      "about": "Sobre",
+      "logging": "Registro"
     },
     "commitFailed": {
       "title": "Não foi possível salvar a configuração",
@@ -223,7 +216,9 @@
       "askForExceptionDetails": "Pedir detalhes ao adicionar uma única exceção",
       "askForExceptionDetailsDescription": "Mostra uma confirmação editável antes de adicionar uma exceção pelos atalhos de adição rápida da bandeja. Adições em lote (como uma pasta inteira) nunca pedem confirmação.",
       "enableHotkeys": "Ativar atalhos de teclado globais",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permitem instantaneamente um executável, processo ou janela a partir de qualquer lugar."
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permitem instantaneamente um executável, processo ou janela a partir de qualquer lugar.",
+      "autoRefreshInterval": "Intervalo de atualização automática",
+      "autoRefreshIntervalDescription": "Com que frequência a página Conexões verifica novamente enquanto a opção Atualização automática está ligada. Nada envia alterações para ela, então este é um intervalo de consulta; valores menores são mais atuais e custam mais."
     },
     "protection": {
       "allowLocalSubnet": "Permitir rede local",
@@ -315,9 +310,21 @@
       "linkFailed": {
         "title": "Não foi possível abrir"
       }
+    },
+    "logging": {
+      "enabled": "Salvar um registro de conexões",
+      "enabledDescription": "Registra tentativas bloqueadas e conexões estabelecidas em um arquivo CSV, incluindo qual programa as fez. Desligado por padrão.",
+      "path": "Arquivo de registro",
+      "pathDescription": "Deixe vazio para usar o local padrão nos dados locais do aplicativo.",
+      "pathPlaceholder": "Local padrão",
+      "interval": "Intervalo de verificação do registro",
+      "intervalDescription": "Com que frequência o registro é atualizado. O registro é feito por consulta, então algo mais curto que um intervalo pode passar despercebido.",
+      "maxSize": "Tamanho máximo do registro",
+      "maxSizeDescription": "Em megabytes. Quando o registro atinge este tamanho, ele é renomeado para .1 e um novo é iniciado; apenas o arquivo anterior é mantido.",
+      "openFolder": "Abrir pasta do registro",
+      "writeFailedTitle": "Não foi possível gravar o registro de conexões"
     }
   },
-
   "tray": {
     "mode": {
       "normal": "Normal",

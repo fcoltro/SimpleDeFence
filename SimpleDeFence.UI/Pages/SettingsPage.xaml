@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="SimpleDeFence.UI.Pages.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -28,8 +28,16 @@
             <ProgressRing Grid.Column="2" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
         </Grid>
 
-        <ScrollViewer Grid.Row="3">
-            <StackPanel Spacing="12" MaxWidth="720" HorizontalAlignment="Stretch">
+        <!-- HorizontalScrollMode/BarVisibility disabled: a ScrollViewer measures its content with
+             infinite width by default, so any card wider than the viewport (the Maintenance and
+             Updates rows put two full-width buttons side by side) silently grew the scrollable
+             extent instead of being constrained. Scrolling down far enough then let the whole page
+             drift sideways and the About section's cards ran off the right edge with their content
+             cut off. Disabling the horizontal axis pins the content to the viewport width, which is
+             what MaxWidth below was already assuming. -->
+        <ScrollViewer Grid.Row="3"
+                      HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="12" MaxWidth="720" HorizontalAlignment="Left">
 
                 <controls:SettingsExpander Header="{loc:Loc Key=settings.section.general}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
@@ -56,6 +64,14 @@
                                                 Description="{loc:Loc Key=settings.general.askForExceptionDetailsDescription}">
                             <ToggleSwitch x:Name="AskForExceptionDetailsToggle" Toggled="AskForExceptionDetailsToggle_Toggled"/>
                         </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.general.autoRefreshInterval}"
+                                                Description="{loc:Loc Key=settings.general.autoRefreshIntervalDescription}">
+                            <NumberBox x:Name="AutoRefreshIntervalBox" Minimum="1" Maximum="300"
+                                       SmallChange="1" LargeChange="5" MinWidth="120"
+                                       SpinButtonPlacementMode="Compact"
+                                       ValueChanged="AutoRefreshIntervalBox_ValueChanged"/>
+                        </controls:SettingsCard>
+
                         <controls:SettingsCard Header="{loc:Loc Key=settings.general.enableHotkeys}"
                                                 Description="{loc:Loc Key=settings.general.enableHotkeysDescription}">
                             <ToggleSwitch x:Name="EnableHotkeysToggle" Toggled="EnableHotkeysToggle_Toggled"/>
@@ -65,7 +81,7 @@
 
                 <controls:SettingsExpander Header="{loc:Loc Key=settings.section.protection}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xE72E;"/>
+                        <FontIcon Glyph="&#xEA18;"/>
                     </controls:SettingsExpander.HeaderIcon>
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard Header="{loc:Loc Key=settings.protection.allowLocalSubnet}"
@@ -81,7 +97,7 @@
 
                 <controls:SettingsExpander Header="{loc:Loc Key=settings.section.blocklists}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xE783;"/>
+                        <FontIcon Glyph="&#xE71C;"/>
                     </controls:SettingsExpander.HeaderIcon>
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard Header="{loc:Loc Key=settings.blocklists.enable}"
@@ -107,27 +123,50 @@
                             <ToggleSwitch x:Name="LockHostsFileToggle" Toggled="LockHostsFileToggle_Toggled"/>
                         </controls:SettingsCard>
 
+                        <!-- The form goes in the card's Header slot, not its Content slot, and not
+                             via ContentAlignment="Vertical" either. A SettingsCard puts Content in
+                             the narrow right-hand column beside the header - right for one switch
+                             or one combo box, wrong for a form, and it left the password boxes
+                             jammed against the card's right edge with the status line floating over
+                             them, which is what looked misplaced. ContentAlignment="Vertical" is
+                             the documented way to get a full-width row instead, but it has no
+                             effect on a card sitting inside SettingsExpander.Items - the expander
+                             restyles its child cards and the setting is lost (verified live: the
+                             form stayed right-aligned). Header is laid out left-aligned across the
+                             card's main column regardless, so the form is placed there and carries
+                             its own heading. -->
                         <controls:SettingsCard IsClickEnabled="False">
-                            <StackPanel Spacing="8" HorizontalAlignment="Stretch">
-                                <TextBlock x:Name="PasswordStatusText" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                <PasswordBox x:Name="NewPasswordBox" PlaceholderText="{loc:Loc Key=settings.security.newPassword}"/>
-                                <PasswordBox x:Name="NewPasswordConfirmBox" PlaceholderText="{loc:Loc Key=settings.security.confirmPassword}"/>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Button x:Name="SetPasswordButton" Content="{loc:Loc Key=settings.security.setPassword}" Click="SetPasswordButton_Click"/>
-                                    <Button x:Name="RemovePasswordButton" Content="{loc:Loc Key=settings.security.removePassword}" Click="RemovePasswordButton_Click"/>
+                            <controls:SettingsCard.Header>
+                                <StackPanel Spacing="8" HorizontalAlignment="Left" MinWidth="300" Margin="0,4">
+                                    <TextBlock Text="{loc:Loc Key=settings.security.setPassword}"
+                                               Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="PasswordStatusText" Opacity="0.8"
+                                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <PasswordBox x:Name="NewPasswordBox" PlaceholderText="{loc:Loc Key=settings.security.newPassword}" HorizontalAlignment="Stretch"/>
+                                    <PasswordBox x:Name="NewPasswordConfirmBox" PlaceholderText="{loc:Loc Key=settings.security.confirmPassword}" HorizontalAlignment="Stretch"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Button x:Name="SetPasswordButton" Content="{loc:Loc Key=settings.security.setPassword}" Click="SetPasswordButton_Click"/>
+                                        <Button x:Name="RemovePasswordButton" Content="{loc:Loc Key=settings.security.removePassword}" Click="RemovePasswordButton_Click"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
+                            </controls:SettingsCard.Header>
                         </controls:SettingsCard>
 
                         <controls:SettingsCard IsClickEnabled="False">
-                            <StackPanel Spacing="8" HorizontalAlignment="Stretch">
-                                <TextBlock x:Name="LockStatusText" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                <Button x:Name="LockNowButton" Content="{loc:Loc Key=settings.security.lockNow}" Click="LockNowButton_Click"/>
-                                <StackPanel x:Name="UnlockPanel" Orientation="Horizontal" Spacing="8" Visibility="Collapsed">
-                                    <PasswordBox x:Name="UnlockPasswordBox" PlaceholderText="{loc:Loc Key=settings.security.unlockPasswordPlaceholder}"/>
-                                    <Button x:Name="UnlockButton" Content="{loc:Loc Key=settings.security.unlock}" Click="UnlockButton_Click"/>
+                            <controls:SettingsCard.Header>
+                                <StackPanel Spacing="8" HorizontalAlignment="Left" MinWidth="300" Margin="0,4">
+                                    <TextBlock Text="{loc:Loc Key=settings.security.lockNow}"
+                                               Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="LockStatusText" Opacity="0.8"
+                                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <Button x:Name="LockNowButton" Content="{loc:Loc Key=settings.security.lockNow}"
+                                            HorizontalAlignment="Left" Click="LockNowButton_Click"/>
+                                    <StackPanel x:Name="UnlockPanel" Orientation="Horizontal" Spacing="8" Visibility="Collapsed">
+                                        <PasswordBox x:Name="UnlockPasswordBox" PlaceholderText="{loc:Loc Key=settings.security.unlockPasswordPlaceholder}" MinWidth="200"/>
+                                        <Button x:Name="UnlockButton" Content="{loc:Loc Key=settings.security.unlock}" Click="UnlockButton_Click"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
+                            </controls:SettingsCard.Header>
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
@@ -150,9 +189,54 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
+                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.logging}" IsExpanded="True">
+                    <controls:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE9D9;"/>
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.logging.enabled}"
+                                                Description="{loc:Loc Key=settings.logging.enabledDescription}">
+                            <ToggleSwitch x:Name="ConnectionLogToggle" Toggled="ConnectionLogToggle_Toggled"/>
+                        </controls:SettingsCard>
+
+                        <!-- A plain text box, not a file picker. The WinRT FileSavePicker is the
+                             obvious control here, but the pickers on this page's sibling screen have
+                             a documented history of failing outright in unpackaged builds on some
+                             machines (RulesPage's executable/folder pickers), and a log path the
+                             user cannot type in when the picker fails is a dead end. The path is
+                             validated on commit instead, and left empty means the default. -->
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.logging.path}"
+                                                Description="{loc:Loc Key=settings.logging.pathDescription}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBox x:Name="ConnectionLogPathBox" MinWidth="260"
+                                         PlaceholderText="{loc:Loc Key=settings.logging.pathPlaceholder}"
+                                         LostFocus="ConnectionLogPathBox_LostFocus"/>
+                                <Button x:Name="OpenLogFolderButton" Content="{loc:Loc Key=settings.logging.openFolder}"
+                                        Click="OpenLogFolderButton_Click"/>
+                            </StackPanel>
+                        </controls:SettingsCard>
+
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.logging.interval}"
+                                                Description="{loc:Loc Key=settings.logging.intervalDescription}">
+                            <NumberBox x:Name="ConnectionLogIntervalBox" Minimum="1" Maximum="3600"
+                                       SmallChange="1" LargeChange="10" MinWidth="120"
+                                       SpinButtonPlacementMode="Compact"
+                                       ValueChanged="ConnectionLogIntervalBox_ValueChanged"/>
+                        </controls:SettingsCard>
+
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.logging.maxSize}"
+                                                Description="{loc:Loc Key=settings.logging.maxSizeDescription}">
+                            <NumberBox x:Name="ConnectionLogMaxSizeBox" Minimum="1" Maximum="1024"
+                                       SmallChange="1" LargeChange="5" MinWidth="120"
+                                       SpinButtonPlacementMode="Compact"
+                                       ValueChanged="ConnectionLogMaxSizeBox_ValueChanged"/>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+
                 <controls:SettingsExpander Header="{loc:Loc Key=settings.section.maintenance}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xE74E;"/>
+                        <FontIcon Glyph="&#xEC7A;"/>
                     </controls:SettingsExpander.HeaderIcon>
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard IsClickEnabled="False">

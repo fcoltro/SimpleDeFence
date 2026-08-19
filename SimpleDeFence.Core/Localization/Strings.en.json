@@ -2,13 +2,11 @@
   "app": {
     "name": "SimpleDeFence"
   },
-
   "nav": {
     "rules": "Rules",
     "settings": "Settings",
     "modeChip": "Firewall mode"
   },
-
   "common": {
     "ok": "OK",
     "cancel": "Cancel",
@@ -18,7 +16,6 @@
     "unknown": "Unknown",
     "anotherDialogOpenDetail": "Another dialog is already open. Please try again."
   },
-
   "status": {
     "notConnected": "Not connected",
     "notConnectedDetail": "Could not reach the SimpleDeFence service. Is it installed and running?",
@@ -26,7 +23,6 @@
     "lockedDetail": "Unlock the configuration before changing the mode.",
     "connected": "Connected"
   },
-
   "mode": {
     "normal": {
       "label": "Normal",
@@ -62,7 +58,6 @@
       "confirm": "Enter learning mode"
     }
   },
-
   "applications": {
     "title": "Applications",
     "filterPlaceholder": "Filter by name or path",
@@ -70,7 +65,6 @@
     "summaryOne": "1 exception in profile \"{0}\"",
     "empty": "No application exceptions yet."
   },
-
   "connections": {
     "title": "Connections",
     "section": {
@@ -103,7 +97,6 @@
       "title": "Could not read connection data"
     }
   },
-
   "subject": {
     "executable": "Executable",
     "service": "Service",
@@ -111,7 +104,6 @@
     "global": "Global",
     "allApplications": "All applications"
   },
-
   "policy": {
     "blocked": "Blocked",
     "unrestricted": "Unrestricted",
@@ -203,7 +195,8 @@
       "security": "Security",
       "updates": "Updates",
       "maintenance": "Maintenance",
-      "about": "About"
+      "about": "About",
+      "logging": "Logging"
     },
     "commitFailed": {
       "title": "Could not save the setting",
@@ -223,7 +216,9 @@
       "askForExceptionDetails": "Ask for details when adding a single exception",
       "askForExceptionDetailsDescription": "Show an editable confirmation before adding one exception via the tray's quick-add shortcuts. Bulk adds (e.g. a whole folder) never prompt.",
       "enableHotkeys": "Enable global keyboard shortcuts",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere."
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere.",
+      "autoRefreshInterval": "Auto-refresh interval",
+      "autoRefreshIntervalDescription": "How often the Connections page re-checks while its Auto-refresh switch is on. Nothing pushes changes to it, so this is a polling interval; lower is fresher and costs more."
     },
     "protection": {
       "allowLocalSubnet": "Allow local network",
@@ -315,9 +310,21 @@
       "linkFailed": {
         "title": "Could not open"
       }
+    },
+    "logging": {
+      "enabled": "Save a connection log",
+      "enabledDescription": "Records blocked attempts and established connections to a CSV file, including which program made them. Off by default.",
+      "path": "Log file",
+      "pathDescription": "Leave empty to use the default location under your local app data.",
+      "pathPlaceholder": "Default location",
+      "interval": "Log check interval",
+      "intervalDescription": "How often the log is updated. Logging polls, so anything shorter-lived than one interval can be missed.",
+      "maxSize": "Maximum log size",
+      "maxSizeDescription": "In megabytes. When the log reaches this size it is renamed to .1 and a fresh one is started; only the one previous file is kept.",
+      "openFolder": "Open log folder",
+      "writeFailedTitle": "The connection log could not be written"
     }
   },
-
   "tray": {
     "mode": {
       "normal": "Normal",

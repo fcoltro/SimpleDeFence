@@ -1,4 +1,4 @@
-namespace SimpleDeFence.Localization
+﻿namespace SimpleDeFence.Localization
 {
     /// <summary>
     /// Typed names for every key in Strings.en.json.
@@ -176,6 +176,7 @@ namespace SimpleDeFence.Localization
             public const string SectionUpdates = "settings.section.updates";
             public const string SectionMaintenance = "settings.section.maintenance";
             public const string SectionAbout = "settings.section.about";
+            public const string SectionLogging = "settings.section.logging";
 
             public const string CommitFailedTitle = "settings.commitFailed.title";
             public const string CommitFailedLockedDetail = "settings.commitFailed.lockedDetail";
@@ -194,6 +195,20 @@ namespace SimpleDeFence.Localization
             public const string GeneralAskForExceptionDetailsDescription = "settings.general.askForExceptionDetailsDescription";
             public const string GeneralEnableHotkeys = "settings.general.enableHotkeys";
             public const string GeneralEnableHotkeysDescription = "settings.general.enableHotkeysDescription";
+            public const string GeneralAutoRefreshInterval = "settings.general.autoRefreshInterval";
+            public const string GeneralAutoRefreshIntervalDescription = "settings.general.autoRefreshIntervalDescription";
+
+            public const string LoggingEnabled = "settings.logging.enabled";
+            public const string LoggingEnabledDescription = "settings.logging.enabledDescription";
+            public const string LoggingPath = "settings.logging.path";
+            public const string LoggingPathDescription = "settings.logging.pathDescription";
+            public const string LoggingPathPlaceholder = "settings.logging.pathPlaceholder";
+            public const string LoggingInterval = "settings.logging.interval";
+            public const string LoggingIntervalDescription = "settings.logging.intervalDescription";
+            public const string LoggingMaxSize = "settings.logging.maxSize";
+            public const string LoggingMaxSizeDescription = "settings.logging.maxSizeDescription";
+            public const string LoggingOpenFolder = "settings.logging.openFolder";
+            public const string LoggingWriteFailedTitle = "settings.logging.writeFailedTitle";
 
             public const string ProtectionAllowLocalSubnet = "settings.protection.allowLocalSubnet";
             public const string ProtectionAllowLocalSubnetDescription = "settings.protection.allowLocalSubnetDescription";

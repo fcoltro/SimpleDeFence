@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SimpleDeFence;
@@ -42,7 +42,12 @@ namespace SimpleDeFence.UI.Pages
         private readonly ObservableCollection<ConnectionListItem> _connected = new();
         private readonly ObservableCollection<ConnectionListItem> _open = new();
         private readonly ObservableCollection<BlockedListItem> _blocked = new();
-        private readonly DispatcherTimer _autoRefreshTimer = new() { Interval = TimeSpan.FromSeconds(5) };
+        // Interval comes from ClientSettings, not a constant: this page polls - nothing pushes
+        // connection changes to it - so how stale the list is allowed to get is the user's call.
+        // Re-read in ConnectionsPage_Loaded as well as here, because this page is cached
+        // (NavigationCacheMode.Enabled) and so its constructor does not run again after the user
+        // changes the value on the Settings page and navigates back.
+        private readonly DispatcherTimer _autoRefreshTimer = new();
         private bool _busy;
         private bool _allowBusy;
 
@@ -57,6 +62,7 @@ namespace SimpleDeFence.UI.Pages
             ConnectedList.ItemsSource = _connected;
             OpenList.ItemsSource = _open;
             Loaded += ConnectionsPage_Loaded;
+            _autoRefreshTimer.Interval = ClientSettings.Load().ConnectionsAutoRefreshInterval;
             _autoRefreshTimer.Tick += async (_, _) => await RefreshAsync();
             Unloaded += (_, _) => _autoRefreshTimer.Stop();
         }
@@ -85,6 +91,8 @@ namespace SimpleDeFence.UI.Pages
             // so its instance lives on after Unloaded stops the timer. Without restarting here a user
             // who turned auto-refresh on, visited Rules, and came back would find the toggle still
             // flipped on but nothing ticking - a silent lie.
+            _autoRefreshTimer.Interval = ClientSettings.Load().ConnectionsAutoRefreshInterval;
+
             if (AutoRefreshToggle.IsOn)
                 _autoRefreshTimer.Start();
 

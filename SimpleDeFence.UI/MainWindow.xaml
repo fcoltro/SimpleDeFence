@@ -1,4 +1,4 @@
-<Window
+﻿<Window
     x:Class="SimpleDeFence.UI.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -44,17 +44,20 @@
                         ExpandedModeThresholdWidth="641"
                         IsPaneToggleButtonVisible="True"
                         OpenPaneLength="220"
-                        SelectionChanged="Nav_SelectionChanged">
+                        SelectionChanged="Nav_SelectionChanged"
+                        DisplayModeChanged="Nav_DisplayModeChanged"
+                        PaneOpened="Nav_PaneOpened"
+                        PaneClosed="Nav_PaneClosed">
 
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="{loc:Loc Key=connections.title}" Tag="connections" IsSelected="True">
                     <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE774;"/>
+                        <FontIcon Glyph="&#xE9D9;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem Content="{loc:Loc Key=nav.rules}" Tag="rules">
                     <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE71D;"/>
+                        <FontIcon Glyph="&#xE9D5;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem Content="{loc:Loc Key=nav.settings}" Tag="settings">
@@ -65,43 +68,90 @@
             </NavigationView.MenuItems>
 
             <!-- Mode chip: status is ambient, not a destination. Colour + icon + word, never
-                 colour alone. -->
+                 colour alone. Whenever the pane is closed - by the toggle button at any width, or
+                 by the window being below ExpandedModeThresholdWidth - NavigationView renders it
+                 as a 48px icon rail, and this footer is a plain Button we authored ourselves, so
+                 it does not get the compact treatment NavigationViewItem gets for free: left
+                 alone it clips its full-width content down to an empty rounded-rectangle husk
+                 (measured: 24px wide by 69px tall, the whole text stack still laid out inside).
+                 MainWindow.xaml.cs's UpdateChipLayout drops the text and squares the button off
+                 on IsPaneOpen so the rail shows a centred, legible indicator instead.
+
+                 The colour lives in ChipAccent, a 4px bar down the leading edge, rather than in
+                 a dot beside the glyph. On the rail a dot plus a glyph is two competing marks in
+                 44px of usable width and sat visibly off-centre; an edge bar is not competing for
+                 that space at all, reads at a glance in both layouts, and lets the compact chip be
+                 an actual centred square. Padding therefore lives on ChipBody, not on the Button -
+                 the accent has to meet the Button's own edge, and its left corner radius matches
+                 the default 4px control radius so it follows the rounding instead of poking
+                 through it. -->
             <NavigationView.PaneFooter>
-                <Button x:Name="ModeChip" Margin="12,8,12,16" Padding="12,8"
-                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                <!-- VerticalContentAlignment="Stretch": Button centres its content by default, so
+                     ChipContent was only as tall as the glyph and ChipAccent - which stretches
+                     within it - stopped short of the button's own top and bottom edges instead of
+                     running the full height of the chip. -->
+                <Button x:Name="ModeChip" Margin="12,8,12,16" Padding="0"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch"
                         Background="{ThemeResource LayerFillColorDefaultBrush}"
                         Click="ModeChip_Click"
                         AutomationProperties.Name="{loc:Loc Key=nav.modeChip}">
-                    <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Grid x:Name="ChipContent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
                         <!-- Not "Converter={StaticResource ModeStateToBrush}": on this WinAppSDK
                              version, an x:Bind converter lookup at a <Window> root fails to build
                              (CS1503 in generated code - SetConverterLookupRoot needs a
                              FrameworkElement, which Window is not). Calling the same converter as
                              a bound function keeps it compiled x:Bind and reuses the converter and
                              its brushes without hitting that codegen path. -->
-                        <Ellipse Width="10" Height="10" VerticalAlignment="Center"
-                                 Fill="{x:Bind ModeStateToBrush(Shell.ModeStateKey), Mode=OneWay}"/>
-                        <FontIcon FontSize="14" VerticalAlignment="Center"
-                                  Glyph="{x:Bind Shell.ModeGlyph, Mode=OneWay}"/>
-                        <StackPanel>
-                            <TextBlock Text="{x:Bind Shell.ModeLabel, Mode=OneWay}"
-                                       Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <!-- StatusLine can be an arbitrary-length exception message (see
-                                 FirewallClient.LastError), not just short mode descriptions - the
-                                 full text is already shown in each page's own InfoBar, so this
-                                 compact footer chip only needs to hint at it. TextWrapping+MaxWidth
-                                 without a line cap measured wrong at certain widths and silently
-                                 dropped whole words instead of wrapping them (e.g. "Is it" vanishing
-                                 from ".service. Is it installed..." at Width=150); MaxLines+
-                                 TextTrimming avoids that whole class of bug by using WinUI's own
-                                 tested truncation path instead of guessing a width that wraps
-                                 every possible message correctly. -->
-                            <TextBlock Text="{x:Bind Shell.StatusLine, Mode=OneWay}"
-                                       Style="{StaticResource CaptionTextBlockStyle}"
-                                       Opacity="0.7" TextWrapping="Wrap" MaxLines="2"
-                                       TextTrimming="CharacterEllipsis" Width="150"/>
-                        </StackPanel>
-                    </StackPanel>
+                        <Border x:Name="ChipAccent" Grid.Column="0" Width="4"
+                                CornerRadius="4,0,0,4"
+                                Background="{x:Bind ModeStateToBrush(Shell.ModeStateKey), Mode=OneWay}"/>
+
+                        <!-- Grid, not the horizontal StackPanel this used to be: a horizontal
+                             StackPanel measures its children with infinite available width, so the
+                             status TextBlock below never got a width to wrap against and every
+                             attempt to give it one by hand (MaxWidth=150, then Width=150) was a
+                             guess that disagreed with the width it was actually painted into -
+                             which is what dropped whole words at the wrap boundary. A "*" column is
+                             a real, layout-derived constraint: the text wraps against whatever the
+                             pane actually leaves it, at any OpenPaneLength, in any language. -->
+                        <Grid x:Name="ChipBody" Grid.Column="1" Padding="12,8" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon x:Name="ChipGlyph" Grid.Column="0" FontSize="14"
+                                      VerticalAlignment="Center"
+                                      Glyph="{x:Bind Shell.ModeGlyph, Mode=OneWay}"/>
+                            <StackPanel x:Name="ChipTextStack" Grid.Column="1">
+                                <TextBlock Text="{x:Bind Shell.ModeLabel, Mode=OneWay}"
+                                           Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <!-- StatusLine can be an arbitrary-length exception message (see
+                                     FirewallClient.LastError), not just short mode descriptions -
+                                     the full text is already shown in each page's own InfoBar, so
+                                     this compact footer chip only needs to hint at it. No explicit
+                                     Width, deliberately: any hard width here measured wrong and
+                                     silently dropped whole words instead of wrapping them ("Is it"
+                                     vanished from "...service. Is it installed..." at MaxWidth=150;
+                                     "as" vanished from "The firewall is operating as recommended."
+                                     at Width=150), verified both times against a UIA dump showing
+                                     the bound Text itself complete and correct. Three lines, not
+                                     two: the chip sizes to its content and the footer has the room,
+                                     and a two-line cap was truncating the stock mode descriptions
+                                     themselves. Genuinely long text still elides, which is what the
+                                     cap is for. -->
+                                <TextBlock Text="{x:Bind Shell.StatusLine, Mode=OneWay}"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Opacity="0.7" TextWrapping="Wrap" MaxLines="3"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
                 </Button>
             </NavigationView.PaneFooter>
 

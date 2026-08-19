@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -28,6 +28,70 @@ namespace SimpleDeFence
 
         [DataMember(EmitDefaultValue = false)]
         public bool EnableGlobalHotkeys { get; set; } = true;
+
+        /// <summary>How often the Connections page re-polls while its auto-refresh toggle is on.
+        /// The page polls on a timer - nothing pushes connection changes to it - so this is a real
+        /// trade-off between freshness and the cost of a full snapshot, and belongs to the user.
+        /// Read through <see cref="ConnectionsAutoRefreshInterval"/>, which clamps it: a persisted
+        /// 0 (or a hand-edited negative) would otherwise mean a timer that fires continuously.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public int ConnectionsAutoRefreshSeconds { get; set; } = DefaultAutoRefreshSeconds;
+
+        public const int DefaultAutoRefreshSeconds = 5;
+        public const int MinAutoRefreshSeconds = 1;
+        public const int MaxAutoRefreshSeconds = 300;
+
+        /// <summary>Off by default. A firewall quietly writing a record of every program that
+        /// touches the network is not something to opt users into.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public bool ConnectionLogEnabled { get; set; } = false;
+
+        /// <summary>Empty means "use the default under the user's local app data" - see
+        /// <see cref="ResolvedConnectionLogPath"/>. Stored rather than always-derived so a user can
+        /// point it at a folder they actually watch.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string ConnectionLogPath { get; set; } = string.Empty;
+
+        [DataMember(EmitDefaultValue = false)]
+        public int ConnectionLogIntervalSeconds { get; set; } = DefaultLogIntervalSeconds;
+
+        [DataMember(EmitDefaultValue = false)]
+        public int ConnectionLogMaxFileSizeMb { get; set; } = DefaultLogMaxFileSizeMb;
+
+        public const int DefaultLogIntervalSeconds = 10;
+        public const int MinLogIntervalSeconds = 1;
+        public const int MaxLogIntervalSeconds = 3600;
+        public const int DefaultLogMaxFileSizeMb = 5;
+        public const int MinLogMaxFileSizeMb = 1;
+        public const int MaxLogMaxFileSizeMb = 1024;
+
+        public TimeSpan ConnectionLogInterval =>
+            TimeSpan.FromSeconds(Math.Clamp(
+                ConnectionLogIntervalSeconds == 0 ? DefaultLogIntervalSeconds : ConnectionLogIntervalSeconds,
+                MinLogIntervalSeconds,
+                MaxLogIntervalSeconds));
+
+        /// <summary>The configured path, or the default one under LocalApplicationData. Never
+        /// returns empty, so callers cannot end up writing to the process's working directory -
+        /// which for an installed build is Program Files.</summary>
+        public string ResolvedConnectionLogPath
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(ConnectionLogPath))
+                    return ConnectionLogPath;
+
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "SimpleDeFence", "logs", "connections.csv");
+            }
+        }
+
+        public TimeSpan ConnectionsAutoRefreshInterval =>
+            TimeSpan.FromSeconds(Math.Clamp(
+                ConnectionsAutoRefreshSeconds == 0 ? DefaultAutoRefreshSeconds : ConnectionsAutoRefreshSeconds,
+                MinAutoRefreshSeconds,
+                MaxAutoRefreshSeconds));
 
         private static string FilePath
         {

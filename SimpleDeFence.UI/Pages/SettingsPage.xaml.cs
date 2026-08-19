@@ -1,8 +1,9 @@
-using Microsoft.UI.Dispatching;
+﻿using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SimpleDeFence.Localization;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -91,6 +92,22 @@ namespace SimpleDeFence.UI.Pages
             }
             AskForExceptionDetailsToggle.IsOn = _clientSettings.AskForExceptionDetails;
             EnableHotkeysToggle.IsOn = _clientSettings.EnableGlobalHotkeys;
+            // Through the clamping property, so a hand-edited or legacy 0 shows as the default
+            // rather than as a NumberBox pinned to its minimum.
+            AutoRefreshIntervalBox.Value = _clientSettings.ConnectionsAutoRefreshInterval.TotalSeconds;
+
+            ConnectionLogToggle.IsOn = _clientSettings.ConnectionLogEnabled;
+            ConnectionLogPathBox.Text = _clientSettings.ConnectionLogPath;
+            ConnectionLogIntervalBox.Value = _clientSettings.ConnectionLogInterval.TotalSeconds;
+            ConnectionLogMaxSizeBox.Value = _clientSettings.ConnectionLogMaxFileSizeMb == 0
+                ? ClientSettings.DefaultLogMaxFileSizeMb
+                : _clientSettings.ConnectionLogMaxFileSizeMb;
+
+            // A log that silently stopped writing is worse than no log, so the last write failure
+            // is surfaced here rather than only living on the service.
+            var logError = App.ConnectionLogError;
+            if (_clientSettings.ConnectionLogEnabled && logError is not null)
+                ShowNotice(InfoBarSeverity.Warning, Loc.T(LocKeys.Settings.LoggingWriteFailedTitle), logError);
 
             var config = App.Firewall.Config!;
             AllowLocalSubnetToggle.IsOn = config.ActiveProfile.AllowLocalSubnet;
@@ -179,6 +196,126 @@ namespace SimpleDeFence.UI.Pages
                 return;
             _clientSettings.AskForExceptionDetails = AskForExceptionDetailsToggle.IsOn;
             _clientSettings.Save();
+        }
+
+        /// <summary>NumberBox raises ValueChanged while the page is still being populated, and an
+        /// empty box reports NaN - both would otherwise write nonsense over a good setting. The
+        /// running Connections page is not poked directly: it re-reads the interval on Loaded, and
+        /// reaching it from here would mean this page holding a reference to another page.</summary>
+        private void AutoRefreshIntervalBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+        {
+            if (_seeding || double.IsNaN(args.NewValue))
+                return;
+
+            var seconds = (int)Math.Clamp(args.NewValue,
+                ClientSettings.MinAutoRefreshSeconds, ClientSettings.MaxAutoRefreshSeconds);
+            if (seconds == _clientSettings.ConnectionsAutoRefreshSeconds)
+                return;
+
+            _clientSettings.ConnectionsAutoRefreshSeconds = seconds;
+            _clientSettings.Save();
+        }
+
+        private void ConnectionLogToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding)
+                return;
+
+            _clientSettings.ConnectionLogEnabled = ConnectionLogToggle.IsOn;
+            _clientSettings.Save();
+            App.NotifyConnectionLogSettingsChanged(_clientSettings);
+        }
+
+        /// <summary>Committed on LostFocus rather than TextChanged: this is a filesystem path, and
+        /// reconfiguring the writer on every keystroke would have it chasing every half-typed
+        /// directory the user passes through on the way to the real one.</summary>
+        private void ConnectionLogPathBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_seeding)
+                return;
+
+            var text = ConnectionLogPathBox.Text?.Trim() ?? string.Empty;
+            if (text == _clientSettings.ConnectionLogPath)
+                return;
+
+            // Anything unusable is refused here rather than at write time, where the only place to
+            // report it would be a timer tick with no UI. Empty is always valid - it means default.
+            if (text.Length > 0)
+            {
+                string? failure = null;
+                try
+                {
+                    if (!Path.IsPathFullyQualified(text))
+                        failure = text;
+                    else
+                        _ = Path.GetFullPath(text);
+                }
+                catch (Exception ex)
+                {
+                    failure = ex.Message;
+                }
+
+                if (failure is not null)
+                {
+                    ShowNotice(InfoBarSeverity.Warning, Loc.T(LocKeys.Settings.LoggingWriteFailedTitle), failure);
+                    ConnectionLogPathBox.Text = _clientSettings.ConnectionLogPath;
+                    return;
+                }
+            }
+
+            _clientSettings.ConnectionLogPath = text;
+            _clientSettings.Save();
+            App.NotifyConnectionLogSettingsChanged(_clientSettings);
+        }
+
+        private void ConnectionLogIntervalBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+        {
+            if (_seeding || double.IsNaN(args.NewValue))
+                return;
+
+            var seconds = (int)Math.Clamp(args.NewValue,
+                ClientSettings.MinLogIntervalSeconds, ClientSettings.MaxLogIntervalSeconds);
+            if (seconds == _clientSettings.ConnectionLogIntervalSeconds)
+                return;
+
+            _clientSettings.ConnectionLogIntervalSeconds = seconds;
+            _clientSettings.Save();
+            App.NotifyConnectionLogSettingsChanged(_clientSettings);
+        }
+
+        private void ConnectionLogMaxSizeBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+        {
+            if (_seeding || double.IsNaN(args.NewValue))
+                return;
+
+            var megabytes = (int)Math.Clamp(args.NewValue,
+                ClientSettings.MinLogMaxFileSizeMb, ClientSettings.MaxLogMaxFileSizeMb);
+            if (megabytes == _clientSettings.ConnectionLogMaxFileSizeMb)
+                return;
+
+            _clientSettings.ConnectionLogMaxFileSizeMb = megabytes;
+            _clientSettings.Save();
+            App.NotifyConnectionLogSettingsChanged(_clientSettings);
+        }
+
+        /// <summary>Opens the folder the log lives in, creating it first: pointing Explorer at a
+        /// directory that does not exist yet just fails, and it will not exist until logging has
+        /// been on long enough to write something.</summary>
+        private async void OpenLogFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var folder = Path.GetDirectoryName(_clientSettings.ResolvedConnectionLogPath);
+                if (string.IsNullOrEmpty(folder))
+                    return;
+
+                Directory.CreateDirectory(folder);
+                await global::Windows.System.Launcher.LaunchFolderPathAsync(folder);
+            }
+            catch (Exception ex)
+            {
+                ShowNotice(InfoBarSeverity.Warning, Loc.T(LocKeys.Settings.LoggingWriteFailedTitle), ex.Message);
+            }
         }
 
         private void EnableHotkeysToggle_Toggled(object sender, RoutedEventArgs e)

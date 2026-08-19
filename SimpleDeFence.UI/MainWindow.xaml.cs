@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -33,7 +33,69 @@ namespace SimpleDeFence.UI
 
             ContentFrame.Navigate(typeof(ConnectionsPage));
             _ = Shell.RefreshAsync();
+
+            // NavigationView starts in whatever DisplayMode its initial width lands on, but
+            // DisplayModeChanged only fires on a subsequent change - without this call the chip
+            // still shows its full text on a window that opens narrow until the user resizes it.
+            UpdateChipLayout();
         }
+
+        /// <summary>Mirrors what NavigationViewItem does automatically for the menu items above the
+        /// chip: when the pane is closed, drop the text and centre what is left, so the footer
+        /// degrades to a compact indicator instead of an empty husk (ChipTextStack's comment in
+        /// MainWindow.xaml has the full story). DisplayModeChanged alone is not enough - the pane
+        /// toggle button collapses the pane to the 48px rail without changing DisplayMode at all -
+        /// so PaneOpened/PaneClosed are handled too.</summary>
+        private void Nav_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
+            => UpdateChipLayout();
+
+        private void Nav_PaneOpened(NavigationView sender, object args) => UpdateChipLayout();
+
+        private void Nav_PaneClosed(NavigationView sender, object args) => UpdateChipLayout();
+
+        private void UpdateChipLayout()
+        {
+            // IsPaneOpen alone, deliberately not "DisplayMode == Expanded || IsPaneOpen": at any
+            // width at or above ExpandedModeThresholdWidth the pane toggle button collapses the
+            // pane to the 48px icon rail while DisplayMode *stays* Expanded, so that extra clause
+            // forced the expanded branch in exactly the state this method exists to handle -
+            // measured live at a 900px-wide window with the pane toggled closed, ModeChip came out
+            // 24x69: the full text stack still laid out inside a 24px-wide clip, i.e. the empty
+            // husk, unchanged. IsPaneOpen is true in every state where the pane is actually wide
+            // enough for the text (Expanded open, and the Minimal overlay, which opens at
+            // OpenPaneLength) and false in every state where it is not.
+            var expanded = Nav.IsPaneOpen;
+            ChipTextStack.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
+
+            // On the rail the chip stops being a full-width bar and becomes a square centred in the
+            // rail, on the same vertical centre line as the NavigationViewItems above it (they
+            // centre themselves the same way: 40px wide inside the 48px rail). Width/Height are
+            // cleared back to Auto (double.NaN) when the pane reopens, or the square would survive
+            // into the expanded layout and clip the text.
+            //
+            // The centring is done with an explicit left inset, NOT HorizontalAlignment.Center:
+            // NavigationView's pane-footer presenter anchors its content to the rail's left edge
+            // and sizes to it, so a Center alignment there is simply ignored - measured live, the
+            // chip came back at exactly PaneRoot.X with Center set. Deriving the inset from
+            // CompactPaneLength keeps it correct if that ever changes.
+            var inset = Math.Max(0, (Nav.CompactPaneLength - CompactSize) / 2);
+            ModeChip.HorizontalAlignment = expanded ? HorizontalAlignment.Stretch : HorizontalAlignment.Left;
+            ModeChip.Width = expanded ? double.NaN : CompactSize;
+            ModeChip.Height = expanded ? double.NaN : CompactSize;
+            ModeChip.Margin = expanded ? new Thickness(12, 8, 12, 16) : new Thickness(inset, 8, inset, 16);
+
+            // Padding sits on ChipBody rather than the Button so ChipAccent can meet the Button's
+            // own edge. Collapsed, the glyph is all ChipBody still holds, so it drops its padding
+            // entirely and centres in whatever the accent bar leaves.
+            ChipBody.Padding = expanded ? new Thickness(12, 8, 12, 8) : new Thickness(0);
+            ChipBody.ColumnSpacing = expanded ? 10 : 0;
+            ChipBody.HorizontalAlignment = expanded ? HorizontalAlignment.Stretch : HorizontalAlignment.Center;
+        }
+
+        /// <summary>Side of the square the chip collapses to on the icon rail. The rail is 48px
+        /// wide; 32 leaves 8px either side, matching the inset NavigationViewItem's own icon
+        /// column uses.</summary>
+        private const double CompactSize = 32;
 
         internal Brush ModeStateToBrush(string modeStateKey)
             => (Brush)s_modeStateToBrush.Convert(modeStateKey, typeof(Brush), null!, null!);

@@ -46,3 +46,7 @@
 /MsiSetup/obj/
 /MsiSetup/bin/
 /MsiSetup/Sources/ProgramFiles/
+
+# Self-contained publish output (~270 MB); produced by
+# dotnet publish SimpleDeFence/SimpleDeFence.csproj -c Release -r win-x64 --self-contained true -o publish-out
+/publish-out/
