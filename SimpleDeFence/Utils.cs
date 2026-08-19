@@ -371,7 +371,7 @@ namespace SimpleDeFence
         /*
         internal static void EncryptToStream(byte[] data, string key, string IV, Stream stream)
         {
-            using (AesCryptoServiceProvider symmetricKey = new AesCryptoServiceProvider())
+            using (Aes symmetricKey = Aes.Create())
             {
 
                 // It is reasonable to set encryption mode to Cipher Block Chaining
@@ -395,7 +395,7 @@ namespace SimpleDeFence
         internal static byte[] DecryptFromStream(int nBytes, Stream stream, string key, string IV)
         {
             byte[] data = new byte[nBytes];
-            using (AesCryptoServiceProvider symmetricKey = new AesCryptoServiceProvider())
+            using (Aes symmetricKey = Aes.Create())
             {
 
                 // It is reasonable to set encryption mode to Cipher Block Chaining

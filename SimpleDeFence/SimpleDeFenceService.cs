@@ -1467,6 +1467,31 @@ namespace SimpleDeFence
                         bool success = PasswordLock.Unlock(args.Password);
                         if (success)
                         {
+                            // Migrate a password still stored under the old PBKDF2-HMAC-SHA1 scheme
+                            // now that we have both the plaintext and a verified match. The write
+                            // has to be bracketed by the FileLocker the same way SET_PASSPHRASE
+                            // does it - this service keeps the password file open for reading, so
+                            // an unbracketed write just throws and the upgrade silently never
+                            // happens (which is exactly what it did before this bracket existed).
+                            if (PasswordLock.StoredHashNeedsUpgrade)
+                            {
+                                FileLocker.Unlock(PasswordLock.PasswordFilePath);
+                                try
+                                {
+                                    PasswordLock.UpgradeStoredHash(args.Password);
+                                }
+                                catch (Exception e)
+                                {
+                                    // A failed rewrite must not turn a valid unlock into a refusal;
+                                    // the existing record still verifies.
+                                    Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                                }
+                                finally
+                                {
+                                    FileLocker.Lock(PasswordLock.PasswordFilePath, FileAccess.Read, FileShare.Read);
+                                }
+                            }
+
                             // Same reason as MODE_SWITCH above: GET_SETTINGS recomputes
                             // VisibleState.Locked from PasswordLock, but only actually sends it
                             // when the changeset moved.

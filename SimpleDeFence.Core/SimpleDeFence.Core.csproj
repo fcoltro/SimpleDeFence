@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net48;net10.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>

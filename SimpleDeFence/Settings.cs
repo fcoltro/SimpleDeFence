@@ -35,11 +35,11 @@ namespace SimpleDeFence
                 File.Delete(SettingsFile);
             else
             {
-                using var fileUpdater = new AtomicFileUpdater(PasswordFilePath);
-                string salt = Utils.RandomString(8);
-                string hash = Pbkdf2.GetHashForStorage(password, salt, 150000, 16);
-                File.WriteAllText(fileUpdater.TemporaryFilePath, hash, Encoding.UTF8);
-                fileUpdater.Commit();
+                // Salt and parameters come from Pbkdf2 now. The salt used to be
+                // Utils.RandomString(8), which draws on System.Random - a clock-seeded,
+                // non-cryptographic PRNG - so the salt guarding this password was reproducible by
+                // anyone who could guess within a window when it was set.
+                WriteHash(Pbkdf2.GetHashForStorage(password));
             }
         }
 
@@ -52,10 +52,33 @@ namespace SimpleDeFence
             {
                 string storedHash = System.IO.File.ReadAllText(PasswordFilePath, System.Text.Encoding.UTF8);
                 _Locked = !Pbkdf2.CompareHash(storedHash, password);
+                StoredHashNeedsUpgrade = !_Locked && Pbkdf2.NeedsUpgrade(storedHash);
             }
             catch { }
 
             return !_Locked;
+        }
+
+        /// <summary>Set by <see cref="Unlock"/> when the password just verified against a record
+        /// written by an older hashing scheme. Rewriting it is not done here: the service holds the
+        /// password file open through its FileLocker, so the write has to be sequenced by the
+        /// caller that owns that lock - exactly as SET_PASSPHRASE already does.</summary>
+        internal static bool StoredHashNeedsUpgrade { get; private set; }
+
+        /// <summary>Rewrites the stored record under the current scheme. Only meaningful straight
+        /// after a successful <see cref="Unlock"/>, which is the one moment the plaintext exists to
+        /// rehash with.</summary>
+        internal static void UpgradeStoredHash(string password)
+        {
+            WriteHash(Pbkdf2.GetHashForStorage(password));
+            StoredHashNeedsUpgrade = false;
+        }
+
+        private static void WriteHash(string hash)
+        {
+            using var fileUpdater = new AtomicFileUpdater(PasswordFilePath);
+            File.WriteAllText(fileUpdater.TemporaryFilePath, hash, Encoding.UTF8);
+            fileUpdater.Commit();
         }
 
         internal static bool HasPassword

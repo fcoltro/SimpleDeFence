@@ -1,6 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <!-- Explicit on net10. This is Microsoft's vendored TaskDialog sample and it uses
+         System.Windows.Forms; on net48 that came in with the default reference set, so nothing
+         here had to ask for it. -->
+    <UseWindowsForms>true</UseWindowsForms>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
