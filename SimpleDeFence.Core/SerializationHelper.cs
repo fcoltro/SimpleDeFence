@@ -163,46 +163,81 @@ namespace SimpleDeFence
             fileUpdater.Commit();
         }
 
+        /// <summary>Reads a config written under the current AES-GCM scheme, falling back through
+        /// the two older formats and rewriting whatever it finds under the current one. The
+        /// fallbacks exist so that upgrading cannot cost a user their firewall rules; each is tried
+        /// only when the one before it says "this is not my format".</summary>
         public static T DeserializeFromEncryptedFile<T>(string filepath, string key, string iv, T defInst) where T : ISerializable<T>
         {
+            byte[] fileBytes;
             try
             {
-                // Construct encryptor
+                fileBytes = File.ReadAllBytes(filepath);
+            }
+            catch
+            {
+                return defInst;
+            }
+
+            // Current format.
+            byte[] plaintext;
+            if (ConfigProtection.TryUnprotect(fileBytes, filepath, out plaintext))
+            {
+                using var plainStream = new MemoryStream(plaintext, false);
+                return Deserialize<T>(plainStream, defInst);
+            }
+
+            // A file that carries the current marker but failed to authenticate is not a format we
+            // should keep guessing about: it was altered, truncated, or written under a different
+            // key. Falling through to the legacy readers would be pointless, and rewriting it would
+            // destroy whatever is actually there, so leave it alone and start from defaults.
+            if (ConfigProtection.HasMagic(fileBytes))
+                return defInst;
+
+            T ret;
+            try
+            {
+                // Legacy AES-CBC under the old build's compile-time key.
                 using var symmetricKey = Aes.Create();
                 symmetricKey.Mode = CipherMode.CBC;
                 symmetricKey.Key = Encoding.ASCII.GetBytes(key);
                 symmetricKey.IV = Encoding.ASCII.GetBytes(iv);
 
-                // Decrypt
-                using var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+                using var fs = new MemoryStream(fileBytes, false);
                 using var cryptoStream = new CryptoStream(fs, symmetricKey.CreateDecryptor(), CryptoStreamMode.Read);
-                return Deserialize<T>(cryptoStream, defInst);
+                ret = Deserialize<T>(cryptoStream, defInst);
             }
             catch
             {
-                // Try loading from old serialization format, and save in new format if allowed
+                // Older still: the pre-3.0 XML shape.
                 var xmlPath = filepath.EndsWith(".json") ? Path.ChangeExtension(filepath, ".xml") : filepath;
-                var ret = LoadFromEncryptedXMLFile<T>(xmlPath, key, iv);
-                SerializeToEncryptedFile(ret, filepath, key, iv);
-                return ret;
+                ret = LoadFromEncryptedXMLFile<T>(xmlPath, key, iv);
             }
+
+            // Re-save so the next read takes the authenticated path. Best-effort: a read must still
+            // succeed on a read-only volume.
+            try { SerializeToEncryptedFile(ret, filepath, key, iv); }
+            catch { }
+
+            return ret;
         }
 
+        /// <summary>Always writes the current AES-GCM format. The key/iv parameters are retained
+        /// for the reader's legacy path and deliberately unused here - nothing should be written
+        /// under the old compile-time key again.</summary>
         public static void SerializeToEncryptedFile<T>(T obj, string filePath, string key, string iv) where T : ISerializable<T>
         {
-            // Construct encryptor
-            using var symmetricKey = Aes.Create();
-            symmetricKey.Mode = CipherMode.CBC;
-            symmetricKey.Key = Encoding.ASCII.GetBytes(key);
-            symmetricKey.IV = Encoding.ASCII.GetBytes(iv);
-
-            // Encrypt
-            using var fileUpdater = new AtomicFileUpdater(filePath);
-            using (var fs = new FileStream(fileUpdater.TemporaryFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            byte[] plaintext;
+            using (var buffer = new MemoryStream())
             {
-                using var cryptoStream = new CryptoStream(fs, symmetricKey.CreateEncryptor(), CryptoStreamMode.Write);
-                Serialize(cryptoStream, obj);
+                Serialize(buffer, obj);
+                plaintext = buffer.ToArray();
             }
+
+            var protectedBytes = ConfigProtection.Protect(plaintext, filePath);
+
+            using var fileUpdater = new AtomicFileUpdater(filePath);
+            File.WriteAllBytes(fileUpdater.TemporaryFilePath, protectedBytes);
             fileUpdater.Commit();
         }
 

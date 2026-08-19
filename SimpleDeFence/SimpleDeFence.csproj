@@ -165,4 +165,10 @@
           DestinationFiles="@(_XamlResourceToCopy->'%(DestinationPath)')"
           SkipUnchangedFiles="true" />
   </Target>
+  <ItemGroup>
+    <!-- DPAPI. Not in the shared framework on .NET (unlike .NET Framework), so it comes from this
+         package; ConfigProtection uses it to wrap the per-installation config key. -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
+  </ItemGroup>
+
 </Project>
