@@ -124,6 +124,7 @@
             public const string EmptySpecial = "rules.empty.special";
             public const string EmptyFiltered = "rules.empty.filtered";
             public const string Remove = "rules.remove";
+            public const string MultiSelectHint = "rules.multiSelectHint";
             public const string RemoveConfirmTitle = "rules.removeConfirm.title";
             public const string RemoveConfirmBody = "rules.removeConfirm.body";
             public const string RemoveSuccessTitle = "rules.removeSuccess.title";

@@ -184,7 +184,8 @@
         "staleDetail": "A configuração foi alterada em outro lugar agora há pouco; a política não foi alterada. Tente novamente.",
         "genericDetail": "O serviço retornou {0}. A política não foi alterada."
       }
-    }
+    },
+    "multiSelectHint": "{0} regras selecionadas. Remover exclui todas elas; selecione uma única regra para editá-la."
   },
   "settings": {
     "title": "Configurações",

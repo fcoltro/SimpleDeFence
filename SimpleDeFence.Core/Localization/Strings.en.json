@@ -184,7 +184,8 @@
         "staleDetail": "The configuration changed elsewhere just now; the policy was not changed. Please try again.",
         "genericDetail": "The service returned {0}. The policy was not changed."
       }
-    }
+    },
+    "multiSelectHint": "{0} rules selected. Remove deletes all of them; select a single rule to edit it."
   },
   "settings": {
     "title": "Settings",

@@ -105,6 +105,19 @@
                             </ListView>
                         </StackPanel>
 
+                        <!-- Occupies the same column as DetailPane and is shown in its place when
+                             more than one rule is checked. Checking several rows does do something
+                             - Remove deletes them all in one commit - but nothing said so, and the
+                             detail pane simply vanishing on the second check reads as the selection
+                             having broken rather than having switched to a bulk action. -->
+                        <Border x:Name="MultiSelectHint" Grid.Column="1" Visibility="Collapsed" MinWidth="320"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                CornerRadius="4" Padding="16" VerticalAlignment="Top">
+                            <TextBlock x:Name="MultiSelectHintText" TextWrapping="Wrap"
+                                       Style="{StaticResource BodyTextBlockStyle}" Opacity="0.8"/>
+                        </Border>
+
                         <Border x:Name="DetailPane" Grid.Column="1" Visibility="Collapsed" MinWidth="320"
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
                                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"

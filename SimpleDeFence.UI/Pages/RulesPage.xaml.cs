@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SimpleDeFence;
 using SimpleDeFence.DatabaseClasses;
@@ -215,9 +215,22 @@ namespace SimpleDeFence.UI.Pages
             {
                 _selectedDetailItem = null;
                 DetailPane.Visibility = Visibility.Collapsed;
+
+                // Only for a real multi-selection, not for zero: with nothing checked there is no
+                // bulk action to explain, and the empty column is the page's resting state.
+                if (selected.Count > 1)
+                {
+                    MultiSelectHintText.Text = Loc.T(LocKeys.Rules.MultiSelectHint, selected.Count);
+                    MultiSelectHint.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    MultiSelectHint.Visibility = Visibility.Collapsed;
+                }
                 return;
             }
 
+            MultiSelectHint.Visibility = Visibility.Collapsed;
             _selectedDetailItem = selected[0];
             DetailPane.Visibility = Visibility.Visible;
             SeedDetailPane(_selectedDetailItem);
