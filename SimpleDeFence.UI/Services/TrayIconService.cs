@@ -53,8 +53,8 @@ namespace SimpleDeFence.UI.Services
                 ContextMenuMode = ContextMenuMode.SecondWindow,
             };
 
-            _allowLocalSubnetItem = new ToggleMenuFlyoutItem { Text = Loc.T(LocKeys.Tray.AllowLocalSubnet) };
-            _hostsBlocklistItem = new ToggleMenuFlyoutItem { Text = Loc.T(LocKeys.Tray.EnableHostsBlocklist) };
+            _allowLocalSubnetItem = new ToggleMenuFlyoutItem { Text = Loc.T(LocKeys.Tray.AllowLocalSubnet), MinWidth = TrayMenuItemMinWidth };
+            _hostsBlocklistItem = new ToggleMenuFlyoutItem { Text = Loc.T(LocKeys.Tray.EnableHostsBlocklist), MinWidth = TrayMenuItemMinWidth };
 
             _icon.ContextFlyout = BuildMenu();
             // Nothing puts a TaskbarIcon into the visual tree here (it is created in code, not
@@ -105,33 +105,37 @@ namespace SimpleDeFence.UI.Services
             }
         }
 
-        /// <summary>Floor for the tray menu's width. The very first right-click on the tray icon
-        /// opened a visibly too-narrow menu with every label clipped, and every open after that was
-        /// correct: the presenter's first measure happens before the flyout has a XamlRoot with real
-        /// DPI/font metrics to measure against, so it lays out against nothing and the popup is
-        /// already on screen by the time the correct size is known. A MinWidth is not a fix for that
-        /// measure pass, but it does mean the first open is at least as wide as the longest label
-        /// this menu actually has, which is what made the clipping visible.</summary>
-        private const double TrayMenuMinWidth = 300;
+        /// <summary>Width floor for the tray menu's items. The very first right-click on the tray
+        /// icon opens a visibly too-narrow menu with every label clipped; every open after that is
+        /// correct. Measured on the VM: first open, the presenter is 96px wide with 86px items and
+        /// the labels' own text measures 36px; second open, 228px with 218px items. The first
+        /// measure runs before the flyout has real font metrics, so the text contributes almost
+        /// nothing to the desired width and the popup is on screen at that size before the correct
+        /// one is known.
+        ///
+        /// The floor is set on the items rather than through MenuFlyoutPresenterStyle, which is
+        /// where this started: a Style carrying MinWidth had no observable effect at all - neither
+        /// open came anywhere near it. An explicit MinWidth on each item is a layout constraint
+        /// that does not depend on measuring text, which is precisely the thing that is broken on
+        /// that first pass. Above the 218px the English labels settle at, so there is headroom for
+        /// longer translations; it is only a floor, so anything longer still grows past it.</summary>
+        private const double TrayMenuItemMinWidth = 260;
 
         private MenuFlyout BuildMenu()
         {
-            var menu = new MenuFlyout
-            {
-                MenuFlyoutPresenterStyle = BuildPresenterStyle(),
-            };
+            var menu = new MenuFlyout();
 
-            var modeNormal = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeNormal) };
+            var modeNormal = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeNormal), MinWidth = TrayMenuItemMinWidth };
             modeNormal.Click += (_, _) => _ = SwitchModeAsync(FirewallMode.Normal);
-            var modeBlockAll = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeBlockAll) };
+            var modeBlockAll = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeBlockAll), MinWidth = TrayMenuItemMinWidth };
             modeBlockAll.Click += (_, _) => _ = SwitchModeAsync(FirewallMode.BlockAll);
-            var modeAllowOutgoing = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeAllowOutgoing) };
+            var modeAllowOutgoing = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeAllowOutgoing), MinWidth = TrayMenuItemMinWidth };
             modeAllowOutgoing.Click += (_, _) => _ = SwitchModeAsync(FirewallMode.AllowOutgoing);
-            var modeDisabled = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeDisabled) };
+            var modeDisabled = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeDisabled), MinWidth = TrayMenuItemMinWidth };
             modeDisabled.Click += (_, _) => _ = SwitchModeAsync(FirewallMode.Disabled);
-            var modeLearning = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeLearning) };
+            var modeLearning = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeLearning), MinWidth = TrayMenuItemMinWidth };
             modeLearning.Click += (_, _) => _ = SwitchModeAsync(FirewallMode.Learning);
-            var modeSub = new MenuFlyoutSubItem { Text = Loc.T(LocKeys.Nav.ModeChip) };
+            var modeSub = new MenuFlyoutSubItem { Text = Loc.T(LocKeys.Nav.ModeChip), MinWidth = TrayMenuItemMinWidth };
             modeSub.Items.Add(modeNormal);
             modeSub.Items.Add(modeBlockAll);
             modeSub.Items.Add(modeAllowOutgoing);
@@ -139,21 +143,21 @@ namespace SimpleDeFence.UI.Services
             modeSub.Items.Add(modeLearning);
             menu.Items.Add(modeSub);
 
-            var manage = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Manage) };
+            var manage = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Manage), MinWidth = TrayMenuItemMinWidth };
             manage.Click += (_, _) => ShowAndNavigate(typeof(Pages.RulesPage));
             menu.Items.Add(manage);
 
-            var connections = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Connections) };
+            var connections = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Connections), MinWidth = TrayMenuItemMinWidth };
             connections.Click += (_, _) => ShowAndNavigate(typeof(Pages.ConnectionsPage));
             menu.Items.Add(connections);
 
             menu.Items.Add(new MenuFlyoutSeparator());
 
-            var lockItem = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Lock) };
+            var lockItem = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Lock), MinWidth = TrayMenuItemMinWidth };
             lockItem.Click += (_, _) => _ = LockAsync();
             menu.Items.Add(lockItem);
 
-            var elevate = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Elevate) };
+            var elevate = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Elevate), MinWidth = TrayMenuItemMinWidth };
             elevate.Click += (_, _) => _ = ElevateSelfAsync();
             menu.Items.Add(elevate);
 
@@ -170,21 +174,21 @@ namespace SimpleDeFence.UI.Services
 
             menu.Items.Add(new MenuFlyoutSeparator());
 
-            var whitelistExe = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.WhitelistByExecutable) };
+            var whitelistExe = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.WhitelistByExecutable), MinWidth = TrayMenuItemMinWidth };
             whitelistExe.Click += (_, _) => _ = WhitelistByExecutableAsync();
             menu.Items.Add(whitelistExe);
 
-            var whitelistProc = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.WhitelistByProcess) };
+            var whitelistProc = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.WhitelistByProcess), MinWidth = TrayMenuItemMinWidth };
             whitelistProc.Click += (_, _) => _ = WhitelistByProcessAsync();
             menu.Items.Add(whitelistProc);
 
-            var whitelistWin = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.WhitelistByWindow) };
+            var whitelistWin = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.WhitelistByWindow), MinWidth = TrayMenuItemMinWidth };
             whitelistWin.Click += (_, _) => _ = WhitelistByWindowAsync();
             menu.Items.Add(whitelistWin);
 
             menu.Items.Add(new MenuFlyoutSeparator());
 
-            var quit = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Quit) };
+            var quit = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Quit), MinWidth = TrayMenuItemMinWidth };
             // Dispose before Exit, the same order mnuQuit_Click uses (Tray.Visible = false, then
             // ExitThread): process teardown is not guaranteed to run TaskbarIcon's finalizer, and an
             // icon left in the notification area after the app is gone is a ghost the user has to
@@ -197,14 +201,6 @@ namespace SimpleDeFence.UI.Services
             menu.Items.Add(quit);
 
             return menu;
-        }
-
-        private static Microsoft.UI.Xaml.Style BuildPresenterStyle()
-        {
-            var style = new Microsoft.UI.Xaml.Style(typeof(MenuFlyoutPresenter));
-            style.Setters.Add(new Microsoft.UI.Xaml.Setter(
-                Microsoft.UI.Xaml.FrameworkElement.MinWidthProperty, TrayMenuMinWidth));
-            return style;
         }
 
         /// <summary>IFirewallClient.Changed can complete on whatever thread its refresh ran on, and
