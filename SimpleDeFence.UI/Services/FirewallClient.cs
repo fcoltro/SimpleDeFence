@@ -1,4 +1,4 @@
-using SimpleDeFence.Windows.NetStat;
+﻿using SimpleDeFence.Windows.NetStat;
 using SimpleDeFence.Windows.Services;
 using SimpleDeFence.DatabaseClasses;
 using System;
@@ -74,17 +74,41 @@ namespace SimpleDeFence.UI.Services
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
+        // Every command below re-reads server state before returning. State is only ever assigned
+        // in RefreshAsync, so without this the cached State still describes the server as it was
+        // *before* the command: switching mode from the chip left ShellViewModel.Update()
+        // recomputing the label from the old Mode, and the chip went on showing the previous mode
+        // while the service had genuinely switched (confirmed on the VM - a freshly launched GUI
+        // read the new mode immediately). The same staleness applied to Locked/HasPassword after
+        // Lock/Unlock/SetPassword.
+        //
+        // This never showed up against SampleFirewallClient, which mutates its own State object in
+        // place and raises Changed itself, so the sample data path was strictly more forgiving than
+        // the real one - the same trap as the changeset-conflict path it also cannot reach.
+        //
+        // Refreshed unconditionally rather than only on the success response: a command that
+        // failed part-way can still have moved server state, and re-reading is the only way to
+        // find out. The refresh also raises Changed, which is what repaints the tray icon and
+        // tooltip - callers reaching IFirewallClient directly (TrayIconService's mode submenu) get
+        // that for free instead of each having to remember to refresh.
+        private async Task<MessageType> CommandAsync(Func<MessageType> command)
+        {
+            var response = await Task.Run(command).ConfigureAwait(true);
+            await RefreshAsync().ConfigureAwait(true);
+            return response;
+        }
+
         public Task<MessageType> SwitchModeAsync(FirewallMode mode)
-            => Task.Run(() => _controller.SwitchFirewallMode(mode));
+            => CommandAsync(() => _controller.SwitchFirewallMode(mode));
 
         public Task<MessageType> LockAsync()
-            => Task.Run(() => _controller.LockServer());
+            => CommandAsync(() => _controller.LockServer());
 
         public Task<MessageType> UnlockAsync(string password)
-            => Task.Run(() => _controller.TryUnlockServer(password));
+            => CommandAsync(() => _controller.TryUnlockServer(password));
 
         public Task<MessageType> SetPasswordAsync(string password)
-            => Task.Run(() => _controller.SetPassphrase(password));
+            => CommandAsync(() => _controller.SetPassphrase(password));
 
         public Task<ConnectionsSnapshot> GetConnectionsAsync()
         {

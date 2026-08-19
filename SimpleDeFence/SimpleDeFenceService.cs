@@ -1366,6 +1366,16 @@ namespace SimpleDeFence
 
                         bool save_needed = CommitLearnedRules();
                         VisibleState.Mode = newMode;
+
+                        // GET_SETTINGS only sends VisibleState back when the client's changeset
+                        // differs from ours, so mutating VisibleState without moving the changeset
+                        // makes the new mode invisible to every client that is already connected:
+                        // it asks, we answer "nothing changed", and it keeps showing the old mode
+                        // until it is restarted. Reproduced on the VM - switching mode from the
+                        // chip really did switch the service, while the running GUI went on
+                        // displaying the previous mode indefinitely and a freshly launched GUI
+                        // (changeset Guid.Empty, so always different) showed the new one at once.
+                        GlobalInstances.ServerChangeset = Guid.NewGuid();
                         if ((ActiveConfig.Service.StartupMode != VisibleState.Mode) &&
                             (VisibleState.Mode != FirewallMode.Disabled) &&
                             (VisibleState.Mode != FirewallMode.Learning) )
@@ -1456,7 +1466,13 @@ namespace SimpleDeFence
                         var args = (TwMessageUnlock)req;
                         bool success = PasswordLock.Unlock(args.Password);
                         if (success)
+                        {
+                            // Same reason as MODE_SWITCH above: GET_SETTINGS recomputes
+                            // VisibleState.Locked from PasswordLock, but only actually sends it
+                            // when the changeset moved.
+                            GlobalInstances.ServerChangeset = Guid.NewGuid();
                             return args.CreateResponse();
+                        }
                         else
                             return TwMessageError.Instance;
                     }
@@ -1464,6 +1480,12 @@ namespace SimpleDeFence
                     {
                         var args = (TwMessageSimple)req;
                         PasswordLock.Locked = true;
+                        // Unconditional, even though PasswordLock's setter is inert without a
+                        // password: the cost of moving the changeset when nothing changed is one
+                        // redundant settings response, whereas not moving it when something did
+                        // leaves every connected client showing an unlocked firewall as locked,
+                        // or the reverse.
+                        GlobalInstances.ServerChangeset = Guid.NewGuid();
                         return args.CreateResponse();
                     }
                 case MessageType.GET_PROCESS_PATH:
