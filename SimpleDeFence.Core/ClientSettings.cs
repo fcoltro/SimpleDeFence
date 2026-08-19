@@ -66,7 +66,7 @@ namespace SimpleDeFence
         public const int MaxLogMaxFileSizeMb = 1024;
 
         public TimeSpan ConnectionLogInterval =>
-            TimeSpan.FromSeconds(Math.Clamp(
+            TimeSpan.FromSeconds(Clamp(
                 ConnectionLogIntervalSeconds == 0 ? DefaultLogIntervalSeconds : ConnectionLogIntervalSeconds,
                 MinLogIntervalSeconds,
                 MaxLogIntervalSeconds));
@@ -88,10 +88,17 @@ namespace SimpleDeFence
         }
 
         public TimeSpan ConnectionsAutoRefreshInterval =>
-            TimeSpan.FromSeconds(Math.Clamp(
+            TimeSpan.FromSeconds(Clamp(
                 ConnectionsAutoRefreshSeconds == 0 ? DefaultAutoRefreshSeconds : ConnectionsAutoRefreshSeconds,
                 MinAutoRefreshSeconds,
                 MaxAutoRefreshSeconds));
+
+        /// <summary>Math.Clamp does not exist on .NET Framework, and this project multi-targets
+        /// net48 as well as net10 - so using it here compiled for one target and broke the other.
+        /// Kept local rather than pulled from a polyfill package: it is three tokens of arithmetic
+        /// and the two callers above are its only users.</summary>
+        private static int Clamp(int value, int min, int max)
+            => value < min ? min : (value > max ? max : value);
 
         private static string FilePath
         {
