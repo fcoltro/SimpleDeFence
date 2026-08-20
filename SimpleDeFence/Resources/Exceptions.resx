@@ -17,15 +17,6 @@
     <resheader name="version">2.0</resheader>
     <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
     <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
                 
     There are any number of "resheader" rows that contain simple 
     name/value pairs.
@@ -117,47 +108,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="File_and_Printer_Sharing" xml:space="preserve">
-    <value>File and Printer Sharing</value>
-  </data>
-  <data name="Filtered_ICMP_Traffic" xml:space="preserve">
-    <value>Filtered ICMP Traffic</value>
-  </data>
-  <data name="Pingable_local_machine" xml:space="preserve">
-    <value>Pingable local machine</value>
-  </data>
   <data name="SimpleDeFence" xml:space="preserve">
     <value>SimpleDeFence</value>
-  </data>
-  <data name="VPN_L2TP_IPSec" xml:space="preserve">
-    <value>VPN L2TP/IPSec</value>
-  </data>
-  <data name="VPN_PPTP" xml:space="preserve">
-    <value>VPN PPTP</value>
-  </data>
-  <data name="Windows_Defender" xml:space="preserve">
-    <value>Windows Defender</value>
-  </data>
-  <data name="Windows_DHCP_Client" xml:space="preserve">
-    <value>Windows DHCP Client</value>
-  </data>
-  <data name="Windows_DNS_Client" xml:space="preserve">
-    <value>Windows DNS Client</value>
-  </data>
-  <data name="Windows_Network_Discovery" xml:space="preserve">
-    <value>Windows Network Discovery</value>
-  </data>
-  <data name="Windows_Remote_Assistance" xml:space="preserve">
-    <value>Windows Remote Assistance</value>
-  </data>
-  <data name="Windows_Remote_Desktop" xml:space="preserve">
-    <value>Windows Remote Desktop</value>
-  </data>
-  <data name="Windows_Store_Update" xml:space="preserve">
-    <value>Windows Store Update</value>
-  </data>
-  <data name="Windows_Time_Sync" xml:space="preserve">
-    <value>Windows Time Sync</value>
   </data>
   <data name="Windows_Update" xml:space="preserve">
     <value>Windows Update</value>

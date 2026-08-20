@@ -63,16 +63,6 @@ namespace SimpleDeFence.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _lock {
-            get {
-                object obj = ResourceManager.GetObject("_lock", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap accept {
             get {
                 object obj = ResourceManager.GetObject("accept", resourceCulture);
@@ -86,16 +76,6 @@ namespace SimpleDeFence.Resources {
         internal static System.Drawing.Bitmap add {
             get {
                 object obj = ResourceManager.GetObject("add", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap blue_banner {
-            get {
-                object obj = ResourceManager.GetObject("blue_banner", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -126,16 +106,6 @@ namespace SimpleDeFence.Resources {
         internal static System.Drawing.Bitmap delete {
             get {
                 object obj = ResourceManager.GetObject("delete", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap donate {
-            get {
-                object obj = ResourceManager.GetObject("donate", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -183,26 +153,6 @@ namespace SimpleDeFence.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap github_mark {
-            get {
-                object obj = ResourceManager.GetObject("github_mark", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap green_banner {
-            get {
-                object obj = ResourceManager.GetObject("green_banner", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap import {
             get {
                 object obj = ResourceManager.GetObject("import", resourceCulture);
@@ -216,16 +166,6 @@ namespace SimpleDeFence.Resources {
         internal static System.Drawing.Bitmap info {
             get {
                 object obj = ResourceManager.GetObject("info", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap lock_small {
-            get {
-                object obj = ResourceManager.GetObject("lock_small", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -253,29 +193,9 @@ namespace SimpleDeFence.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap network_drive_small {
-            get {
-                object obj = ResourceManager.GetObject("network_drive_small", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap process {
             get {
                 object obj = ResourceManager.GetObject("process", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap red_banner {
-            get {
-                object obj = ResourceManager.GetObject("red_banner", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -306,16 +226,6 @@ namespace SimpleDeFence.Resources {
         internal static System.Drawing.Icon shield_blue_small {
             get {
                 object obj = ResourceManager.GetObject("shield_blue_small", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon shield_green_small {
-            get {
-                object obj = ResourceManager.GetObject("shield_green_small", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -393,16 +303,6 @@ namespace SimpleDeFence.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap w7uacshield {
-            get {
-                object obj = ResourceManager.GetObject("w7uacshield", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap web {
             get {
                 object obj = ResourceManager.GetObject("web", resourceCulture);
@@ -420,14 +320,6 @@ namespace SimpleDeFence.Resources {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap windows_small {
-            get {
-                object obj = ResourceManager.GetObject("windows_small", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
+
     }
 }

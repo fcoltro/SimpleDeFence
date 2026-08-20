@@ -50,3 +50,6 @@
 # Self-contained publish output (~270 MB); produced by
 # dotnet publish SimpleDeFence/SimpleDeFence.csproj -c Release -r win-x64 --self-contained true -o publish-out
 /publish-out/
+
+# Per-developer Visual Studio state; not shared.
+*.user
