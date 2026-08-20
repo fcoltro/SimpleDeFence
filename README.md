@@ -1,4 +1,4 @@
-<br />
+﻿<br />
 <div align="center">
   <h3 align="center">SimpleDeFence</h3>
 
@@ -58,7 +58,6 @@ Feel free to open issues, feature- or pull-requests.
 |---------------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
 | Microsoft.Samples\TaskDialog\   | KevinGre     | [link](https://www.codeproject.com/Articles/17026/TaskDialog-for-WinForms)  ([archive.org](https://web.archive.org/web/20250211033156/https://www.codeproject.com/Articles/17026/TaskDialog-for-WinForms))                                                          | Public Domain            |
 | Microsoft.Samples\Privilege.cs  | Mark Novak   | [link](https://learn.microsoft.com/en-us/archive/msdn-magazine/2005/march/using-net-making-privileges-reliable-secure-and-efficient)  | see Privilege.cs.LICENSE |
-| DarkModeCS.cs                   | BlueMystic   | [link](https://github.com/BlueMystical/Dark-Mode-Forms)                                                                               | MIT                      |
 | Everything else                 | Károly Pados | [this repo](https://github.com/pylorak/TinyWall)                                                                                      | GPLv3                    |
 
 ## Contact

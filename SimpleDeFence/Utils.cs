@@ -74,41 +74,6 @@ namespace SimpleDeFence
                 int cchBuffer
             );
 
-            #region IsMetroActive
-            [ComImport, Guid("2246EA2D-CAEA-4444-A3C4-6DE827E44313"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-            internal interface IAppVisibility
-            {
-                HRESULT GetAppVisibilityOnMonitor([In] IntPtr hMonitor, [Out] out MONITOR_APP_VISIBILITY pMode);
-                HRESULT IsLauncherVisible([Out] out bool pfVisible);
-                HRESULT Advise([In] IAppVisibilityEvents pCallback, [Out] out int pdwCookie);
-                HRESULT Unadvise([In] int dwCookie);
-            }
-            //...
-            internal enum HRESULT : long
-            {
-                S_FALSE = 0x0001,
-                S_OK = 0x0000,
-                E_INVALIDARG = 0x80070057,
-                E_OUTOFMEMORY = 0x8007000E
-            }
-            internal enum MONITOR_APP_VISIBILITY
-            {
-                MAV_UNKNOWN = 0,         // The mode for the monitor is unknown
-                MAV_NO_APP_VISIBLE = 1,
-                MAV_APP_VISIBLE = 2
-            }
-            [ComImport, Guid("6584CE6B-7D82-49C2-89C9-C6BC02BA8C38"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-            internal interface IAppVisibilityEvents
-            {
-                HRESULT AppVisibilityOnMonitorChanged(
-                    [In] IntPtr hMonitor,
-                    [In] MONITOR_APP_VISIBILITY previousMode,
-                    [In] MONITOR_APP_VISIBILITY currentMode);
-
-                HRESULT LauncherVisibilityChange([In] bool currentVisibleState);
-            }
-            #endregion
-
             #region DoMouseRightClick
             [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
             public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, IntPtr dwExtraInfo);
@@ -344,77 +309,7 @@ namespace SimpleDeFence
             return new string(buffer);
         }
 
-        /*
-        private static void PadToMultipleOf(ref byte[] src, int pad)
-        {
-            int len = (src.Length + pad - 1) / pad * pad;
-            Array.Resize(ref src, len);
-        }
 
-        internal static byte[] ProtectString(string s)
-        {
-            byte[] rawString = Encoding.UTF8.GetBytes(s);
-            PadToMultipleOf(ref rawString, 16);
-            ProtectedMemory.Protect(rawString, MemoryProtectionScope.SameProcess);
-            return rawString;
-        }
-
-        internal static string UnprotectString(byte[] raw)
-        {
-            byte[] copy = new byte[raw.Length];
-            Array.Copy(raw, copy, raw.Length);
-            ProtectedMemory.Unprotect(copy, MemoryProtectionScope.SameProcess);
-            return Encoding.UTF8.GetString(copy);
-        }
-        */
-
-        /*
-        internal static void EncryptToStream(byte[] data, string key, string IV, Stream stream)
-        {
-            using (Aes symmetricKey = Aes.Create())
-            {
-
-                // It is reasonable to set encryption mode to Cipher Block Chaining
-                // (CBC). Use default options for other symmetric key parameters.
-                symmetricKey.Mode = CipherMode.CBC;
-                symmetricKey.Key = Encoding.ASCII.GetBytes(key);
-                symmetricKey.IV = Encoding.ASCII.GetBytes(IV);
-
-                // Define cryptographic stream (always use Write mode for encryption).
-                using (CryptoStream cryptoStream = new CryptoStream(stream, symmetricKey.CreateEncryptor(), CryptoStreamMode.Write))
-                {
-                    // Start encrypting.
-                    cryptoStream.Write(data, 0, data.Length);
-
-                    // Finish encrypting.
-                    cryptoStream.FlushFinalBlock();
-                }
-            }
-        }
-
-        internal static byte[] DecryptFromStream(int nBytes, Stream stream, string key, string IV)
-        {
-            byte[] data = new byte[nBytes];
-            using (Aes symmetricKey = Aes.Create())
-            {
-
-                // It is reasonable to set encryption mode to Cipher Block Chaining
-                // (CBC). Use default options for other symmetric key parameters.
-                symmetricKey.Mode = CipherMode.CBC;
-                symmetricKey.Key = Encoding.ASCII.GetBytes(key);
-                symmetricKey.IV = Encoding.ASCII.GetBytes(IV);
-
-                // Define cryptographic stream (always use Write mode for encryption).
-                using (CryptoStream cryptoStream = new CryptoStream(stream, symmetricKey.CreateDecryptor(), CryptoStreamMode.Read))
-                {
-                    // Start encrypting.
-                    cryptoStream.Read(data, 0, data.Length);
-                }
-
-                return data;
-            }
-        }
-        */
 
         internal static T DeepClone<T>(T obj) where T : ISerializable<T>
         {

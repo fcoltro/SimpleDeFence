@@ -52,66 +52,6 @@ namespace SimpleDeFence.Windows.Services
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        /*
-        /// <summary>
-        /// Dertermines whether the nominated service is set to restart on failure.
-        /// </summary>
-        /// <exception cref="ComponentModel.Win32Exception">"Unable to query the Service configuration."</exception>
-        internal bool HasRestartOnFailure(string serviceName)
-        {
-            const int bufferSize = 1024 * 8;
-
-            IntPtr service = IntPtr.Zero;
-            IntPtr bufferPtr = IntPtr.Zero;
-            bool result = false;
-
-            try
-            {
-                // Open the service
-                service = OpenService(serviceName, ServiceAccessRights.SERVICE_QUERY_CONFIG);
-
-                int dwBytesNeeded = 0;
-
-                // Allocate memory for struct
-                bufferPtr = Marshal.AllocHGlobal(bufferSize);
-                int queryResult = NativeMethods.QueryServiceConfig2(
-                    service,
-                    ServiceConfig2InfoLevel.SERVICE_CONFIG_FAILURE_ACTIONS,
-                    bufferPtr,
-                    bufferSize,
-                    out dwBytesNeeded);
-
-                if (queryResult == 0)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-
-                // Cast the buffer to a QUERY_SERVICE_CONFIG struct
-                SERVICE_FAILURE_ACTIONS config =
-                    (SERVICE_FAILURE_ACTIONS)Marshal.PtrToStructure(bufferPtr, typeof(SERVICE_FAILURE_ACTIONS));
-
-                // Determine whether the service is set to auto restart
-                if (config.cActions != 0)
-                {
-                    SC_ACTION action = (SC_ACTION)Marshal.PtrToStructure(config.lpsaActions, typeof(SC_ACTION));
-                    result = (action.Type == SC_ACTION_TYPE.SC_ACTION_RESTART);
-                }                
-
-                return result;
-            }
-            finally
-            {
-                // Clean up
-                if (bufferPtr != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(bufferPtr);
-                }
-
-                if (service != IntPtr.Zero)
-                {
-                    NativeMethods.CloseServiceHandle(service);
-                }
-            }
-        }
-        */
 
         /// <summary>
         /// Sets the nominated service to restart on failure.

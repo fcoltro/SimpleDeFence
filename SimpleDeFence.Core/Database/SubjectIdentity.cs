@@ -152,16 +152,6 @@ namespace SimpleDeFence.DatabaseClasses
                         return false;
                 }
 
-                /* For now we don't want to match service names, otherwise enable this block
-                ServiceSubject referenceSrv = reference as ServiceSubject;
-                ServiceSubject testeeSrv = testee as ServiceSubject;
-                if ((testeeSrv != null) && (referenceSrv != null))
-                {
-                    // Service name must match
-                    if (string.Compare(testeeSrv.ServiceName, referenceSrv.ServiceName, StringComparison.OrdinalIgnoreCase) != 0)
-                        return false;
-                }
-                */
 
                 // Do we have an SHA1 match? Either one of the listed hashes in this instance is sufficient.
                 if ((this.AllowedSha1 != null) && (this.AllowedSha1.Count > 0))

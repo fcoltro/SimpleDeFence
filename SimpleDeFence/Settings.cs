@@ -128,27 +128,4 @@ namespace SimpleDeFence
 }
 
 
-/*
-private static bool GetRegistryValueBool(string path, string value, bool standard)
-{
-    try
-    {
-        using (RegistryKey key = Registry.LocalMachine.CreateSubKey(path, RegistryKeyPermissionCheck.ReadSubTree))
-        {
-            return ((int)key.GetValue(value, standard ? 1 : 0)) != 0;
-        }
-    }
-    catch
-    {
-        return standard;
-    }
-}
-
-private void SaveRegistryValueBool(string path, string valueName, bool value)
-{
-    using (RegistryKey key = Registry.LocalMachine.CreateSubKey(path, RegistryKeyPermissionCheck.ReadWriteSubTree))
-    {
-        key.SetValue(valueName, value ? 1 : 0);
-    }
-}*/
 
