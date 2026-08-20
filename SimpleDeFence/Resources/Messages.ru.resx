@@ -108,27 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TinyWallUpdater" xml:space="preserve">
-    <value>Обновление SimpleDeFence </value>
-  </data>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>Не могу соединиться с сервером обновлений. Сервер может быть недоступен. Пожалйста убедитесь, что SimpleDeFence имеет доступ к интернету, а потом попробуйте обновиться снова.  </value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>Новая версия {0} SimpleDeFence доступна для загрузки и установки. Вы хотите обновить программу прямо сейчас?</value>
-  </data>
-  <data name="DownloadingUpdate" xml:space="preserve">
-    <value>Загрузка обновлений...</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>У вас самая новая версия SimpleDeFence. Обновление не нужно.</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>Загрузка прервана.</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>Пожалуйста подождите, пока SimpleDeFence проверит доступность обновлений.</value>
-  </data>
   <data name="Mode" xml:space="preserve">
     <value>Режим</value>
   </data>
@@ -152,21 +131,6 @@
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>Удалить SimpleDeFence?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>Отмена добавления в белый список</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>Обнаружены файлы, связанные с исполняемым, который является частью {0}. Для уверенности, что это приложение может использоваться без ограничений, рекоменуется разблокировать некоторые другие файлы.</value>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>Показать/Спрятать файлы связанные с исполняемым файлы</value>
-  </data>
-  <data name="UnblockAppUnblockAllRecommended" xml:space="preserve">
-    <value>Разблокировать все рекомендуемые файлы</value>
-  </data>
-  <data name="UnblockAppUnblockOnlySelected" xml:space="preserve">
-    <value>Разблокировать только выделенные файлы</value>
   </data>
   <data name="AllApplications" xml:space="preserve">
     <value>все приложения</value>

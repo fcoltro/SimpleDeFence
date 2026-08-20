@@ -108,28 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TinyWallUpdater" xml:space="preserve">
-    <value>עדכון SimpleDeFence</value>
-  </data>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>לא ניתן לגשת לשרת-העדכונים של SimpleDeFence.
-כדאי לוודא שליישום SimpleDeFence יש רשות לגשת לאינטרנט, שהאינטרנט מחובר, ולנסות שוב.</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>גרסה חדשה זמינה ({0}), האם לעדכן את SimpleDeFence?</value>
-  </data>
-  <data name="DownloadingUpdate" xml:space="preserve">
-    <value>מוריד עדכון חדש...</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>SimpleDeFence מעודכן לגרסה החדשה ביותר.</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>ההורדה הופסקה...</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>יש להמתין, SimpleDeFence בודק האם קיימים עדכונים זמינים.</value>
-  </data>
   <data name="Mode" xml:space="preserve">
     <value>מצב</value>
     <comment>Tray text</comment>
@@ -156,18 +134,6 @@
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>הפעלת עדכון/הסרה של SimpleDeFence?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>ביטול רשימת היישומים-המותרים</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>קבצי ההרצה שנבחרו יכולים להיות חלק מ {0}, 
-וייתכן שחשובים לפעילותו התקינה של היישום.
-לפי שיקול דעתך, ניתן לבטל גם את חסימתם של קבצים אלו..</value>
-    <comment>First line is dialog main text. Rest are further information in smaller letters. Param0 is name of the app.</comment>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>הצגה/הסתרה של קבצי-הרצה הקשורים ליישום</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>ברירת-מחדל</value>

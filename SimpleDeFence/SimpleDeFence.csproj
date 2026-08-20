@@ -53,14 +53,10 @@
     <Version>3.5.1</Version>
   </PropertyGroup>
   <PropertyGroup>
-    <!-- Must match SimpleDeFence.UI's own ApplicationIcon (TrayIconService's "Normal" mode icon too -
-         see its UpdateModeIcon comment). SimpleDeFence.exe is the only executable produced by the
-         merge, and an unpackaged WinUI 3 app's window/taskbar/Explorer icon comes from the exe's
-         embedded Win32 icon resource (nothing overrides it at runtime) - so this project's own
-         ApplicationIcon, not SimpleDeFence.UI.csproj's, is what actually ships. Left pointing at the
-         pre-merge WinForms icon (Resources\img\firewall.ico, still used as-is by UpdateChecker.cs's
-         and AppDatabase.cs's native TaskDialogs) until spotted live on a real deployment - the window
-         icon was still the old shield while the tray icon already showed the new one. -->
+    <!-- The window, taskbar and Explorer icon. An unpackaged WinUI 3 app takes it from the exe's
+         embedded Win32 icon resource and nothing overrides it at runtime, so this project's
+         ApplicationIcon - not SimpleDeFence.UI.csproj's - is what actually ships. It points at the
+         same AppIcon.ico the tray uses for Normal mode, so the two cannot drift apart. -->
     <ApplicationIcon>..\SimpleDeFence.UI\Assets\AppIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
@@ -109,11 +105,6 @@
       <LastGenOutput>Exceptions.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Icons.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Icons.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Messages.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
@@ -124,11 +115,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Exceptions.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Resources\Icons.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Icons.resx</DependentUpon>
     </Compile>
     <Compile Update="Resources\Messages.Designer.cs">
       <AutoGen>True</AutoGen>

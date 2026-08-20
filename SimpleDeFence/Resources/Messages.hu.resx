@@ -108,27 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TinyWallUpdater" xml:space="preserve">
-    <value>SimpleDeFence Frissítés</value>
-  </data>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>A frissítő szerver nem elérhető. Győződj meg róla, hogy a SimpleDeFence rendelkezik-e engedélyezett internetkapcsolattal és próbáld meg újra.</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>A SimpleDeFence egy újabb verziója {0} elérhető. Szeretnéd most frissíteni?</value>
-  </data>
-  <data name="DownloadingUpdate" xml:space="preserve">
-    <value>Frissítés letöltése...</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>A legújabb verziót használod. A frissítés nem szükséges.</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>A letöltés megszakadt.</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>A SimpleDeFence frissítéseket keres...</value>
-  </data>
   <data name="Mode" xml:space="preserve">
     <value>Mód</value>
     <comment>Tray text</comment>
@@ -155,23 +134,6 @@
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>Te kezdeményezted a SimpleDeFence eltávolítását vagy frissítését?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>Kizáró-listázás megszakítása</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>Kapcsolódó fájlok találhatóak
-A kiválasztott fájl a következő része lehet: {0}. Ahhoz hogy az alkalmazás korlátozások nélkül működhessen, ajánlott a többi fájlt is feloldani.</value>
-    <comment>First line is dialog main text. Rest are further information in smaller letters. Param0 is name of the app.</comment>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>Kapcsolódó fájlok mutatása/rejtése</value>
-  </data>
-  <data name="UnblockAppUnblockAllRecommended" xml:space="preserve">
-    <value>Minden javasolt fájl feloldása</value>
-  </data>
-  <data name="UnblockAppUnblockOnlySelected" xml:space="preserve">
-    <value>Csak a kiválasztott fájlok feloldása</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>Alapértelmezett</value>

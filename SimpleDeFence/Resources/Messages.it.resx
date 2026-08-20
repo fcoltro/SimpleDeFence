@@ -108,29 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TinyWallUpdater" xml:space="preserve">
-    <value>Aggiornamento di SimpleDeFence</value>
-  </data>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>Non è possibile accedere al server di aggiornamento.
-Il server potrebbe essere assente o assicurarsi che a SimpleDeFence sia stato concesso l'accesso a internet, quindi riprovare.
-</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>La versione aggiornata {0} di SimpleDeFence è disponibile, vuoi aggiornare adesso ?</value>
-  </data>
-  <data name="DownloadingUpdate" xml:space="preserve">
-    <value>Scaricamento dell'aggiornamento...</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>Ultima versione in uso, nessun aggiornamento disponibile.</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>Download interrotto.</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>Verifica degli aggiornamenti in corso...</value>
-  </data>
   <data name="Mode" xml:space="preserve">
     <value>Modo</value>
   </data>
@@ -151,24 +128,6 @@ Il server potrebbe essere assente o assicurarsi che a SimpleDeFence sia stato co
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>E' stata avviata la procedura di disinstallazione ?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>Cancella Whitelist</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>File correlati trovati.
-L'eseguibile selezionato potrebbe essere parte di {0}. Per garantire che questa applicazione può essere utilizzata senza limitazioni, è consigliabile sbloccare anche altri file.
-
- </value>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>Mostra/nascondi processi correlati</value>
-  </data>
-  <data name="UnblockAppUnblockAllRecommended" xml:space="preserve">
-    <value>Sblocca tutti i file raccomandati</value>
-  </data>
-  <data name="UnblockAppUnblockOnlySelected" xml:space="preserve">
-    <value>Sblocca solo i file selezionati</value>
   </data>
   <data name="AllApplications" xml:space="preserve">
     <value>Tutte le applicazioni</value>

@@ -108,28 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TinyWallUpdater" xml:space="preserve">
-    <value>SimpleDeFence Aktualizátor</value>
-  </data>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>Nemohu se spojit s aktualizačním serverem.
-Server může být vypnutý, ale prosím ujistěte se, že SimpleDeFence má přístup k internetu a akci zkuste znovu.</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>Novější verze {0} aplikace SimpleDeFence je dostupná. Chcete nyní aktualizovat?</value>
-  </data>
-  <data name="DownloadingUpdate" xml:space="preserve">
-    <value>Stahuji aktualizaci...</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>Máte nejnovější verzi aplikace SimpleDeFence. Žádná aktualizace není dostupná.</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>Stahování přerušeno.</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>Prosím vyčkejte zatímco SimpleDeFence vyhledává aktualizace.</value>
-  </data>
   <data name="Mode" xml:space="preserve">
     <value>Mód</value>
   </data>
@@ -147,21 +125,5 @@ Server může být vypnutý, ale prosím ujistěte se, že SimpleDeFence má př
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>Vyvolal jste odinstalaci/aktualizaci aplikace SimpleDeFence?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>Zrušit přidání do whitelistu</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>Související soubory nalezeny
-Zvolený spustitelný soubor by mohl být součástí {0}. Pro zajištění bezchybné činnosti aplikace je doporučeno odblokovat některé další soubory.</value>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>Zobrazit/skrýt příbuzné spustitelné soubory.</value>
-  </data>
-  <data name="UnblockAppUnblockAllRecommended" xml:space="preserve">
-    <value>Odblokovat všechny doporučené programy.</value>
-  </data>
-  <data name="UnblockAppUnblockOnlySelected" xml:space="preserve">
-    <value>Odblokovat pouze zvolený soubor</value>
   </data>
 </root>

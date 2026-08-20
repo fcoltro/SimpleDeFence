@@ -108,27 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TinyWallUpdater" xml:space="preserve">
-    <value>Atualizador do SimpleDeFence</value>
-  </data>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>Não foi possível acessar o servidor de atualização. O servidor pode estar fora do ar ou talvez o SimpleDeFence não tem permissão de acesso à Internet. Favor verificar e tentar de novo.</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>Saiu uma nova versão do SimpleDeFence {0}. Gostaria de atualizá-lo agora?</value>
-  </data>
-  <data name="DownloadingUpdate" xml:space="preserve">
-    <value>Baixando atualização...</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>Você tem a última versão do SimpleDeFence. Nenhuma atualização necessária.</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>Download interrompido.</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>Aguarde enquanto o SimpleDeFence verifica se há atualização.</value>
-  </data>
   <data name="Mode" xml:space="preserve">
     <value>Modo</value>
     <comment>Tray text</comment>
@@ -155,23 +134,6 @@
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>Foi você mesmo quem iniciou a desinstalação do SimpleDeFence?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>Cancelar criação de lista branca</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>Arquivos correlatos achados.
-O executável selecionado é parte de {0}. Para que este aplicativo possa ser usado sem limitações, é recomendável desbloquear outros arquivos também.</value>
-    <comment>First line is dialog main text. Rest are further information in smaller letters. Param0 is name of the app.</comment>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>Exibe/oculta os executáveis correlatos</value>
-  </data>
-  <data name="UnblockAppUnblockAllRecommended" xml:space="preserve">
-    <value>Desbloquear todos os arquivos recomendados</value>
-  </data>
-  <data name="UnblockAppUnblockOnlySelected" xml:space="preserve">
-    <value>Desbloquear apenas o arquivo selecionado</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>Padrão</value>

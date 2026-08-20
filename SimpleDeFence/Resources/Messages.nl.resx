@@ -108,22 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>Geen toegang tot update server.
-de server kan momenteel onberijkbaar zijn, of SimpleDeFence heeft zelf geen toegang tot het internet. Sta SimpleDeFence internettoegang toe en probeer opnieuw.</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>Een nieuwere versie {0} van SimpleDeFence os beschikbaar. Wil u nu bijwerken?</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>U heeft de laatste versie van SimpleDeFence. Geen update nodig.</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>Download onderbroken.</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>Even geduld. SimpleDeFence kijkt na op updates.</value>
-  </data>
   <data name="Unlock" xml:space="preserve">
     <value>Vrij geven</value>
     <comment>Tray menu text</comment>
@@ -133,22 +117,5 @@ de server kan momenteel onberijkbaar zijn, of SimpleDeFence heeft zelf geen toeg
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>Heeft u de desinstallatie van SimpleDeFence opgestart?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>Annuleer whitelisting</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>Verwante bestanden gevonden
-Het gekozen programma is deel van {0}. Om zeker te zijn dat dit programma zonder beperkingen kan gebruikt worden, is het eveneens aangeraden om sommige bijkomende bestanden te deblokkeren.</value>
-    <comment>First line is dialog main text. Rest are further information in smaller letters. Param0 is name of the app.</comment>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>Toon/verberg verwante programma's</value>
-  </data>
-  <data name="UnblockAppUnblockAllRecommended" xml:space="preserve">
-    <value>deblokkeer alle aanbevolen bestanden</value>
-  </data>
-  <data name="UnblockAppUnblockOnlySelected" xml:space="preserve">
-    <value>Deblokker enkel de geselecteerde bestanden</value>
   </data>
 </root>

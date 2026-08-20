@@ -88,34 +88,6 @@ namespace SimpleDeFence.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Downloading update....
-        /// </summary>
-        internal static string DownloadingUpdate {
-            get {
-                return ResourceManager.GetString("DownloadingUpdate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Download interrupted..
-        /// </summary>
-        internal static string DownloadInterrupted {
-            get {
-                return ResourceManager.GetString("DownloadInterrupted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot access the update server.
-        ///The server might be down, or please make sure that SimpleDeFence has been granted internet access, then try again..
-        /// </summary>
-        internal static string ErrorCheckingForUpdates {
-            get {
-                return ResourceManager.GetString("ErrorCheckingForUpdates", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Lock.
         /// </summary>
         internal static string Lock {
@@ -134,29 +106,11 @@ namespace SimpleDeFence.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You have the newest version of SimpleDeFence. No update necessary..
-        /// </summary>
-        internal static string NoUpdateAvailable {
-            get {
-                return ResourceManager.GetString("NoUpdateAvailable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Permanent.
         /// </summary>
         internal static string Permanent {
             get {
                 return ResourceManager.GetString("Permanent", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please wait while SimpleDeFence checks for available updates..
-        /// </summary>
-        internal static string PleaseWaitWhileTinyWallChecksForUpdates {
-            get {
-                return ResourceManager.GetString("PleaseWaitWhileTinyWallChecksForUpdates", resourceCulture);
             }
         }
         
@@ -197,61 +151,6 @@ namespace SimpleDeFence.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SimpleDeFence Updater.
-        /// </summary>
-        internal static string TinyWallUpdater {
-            get {
-                return ResourceManager.GetString("TinyWallUpdater", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Related files found
-        ///The selected executable could be part of {0}. To ensure that this application can be used without limitations, it is recommended to also unblock some other files..
-        /// </summary>
-        internal static string UnblockApp {
-            get {
-                return ResourceManager.GetString("UnblockApp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cancel whitelisting.
-        /// </summary>
-        internal static string UnblockAppCancel {
-            get {
-                return ResourceManager.GetString("UnblockAppCancel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Show/hide related executables.
-        /// </summary>
-        internal static string UnblockAppShowRelated {
-            get {
-                return ResourceManager.GetString("UnblockAppShowRelated", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unblock all recommended files.
-        /// </summary>
-        internal static string UnblockAppUnblockAllRecommended {
-            get {
-                return ResourceManager.GetString("UnblockAppUnblockAllRecommended", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unblock only selected file.
-        /// </summary>
-        internal static string UnblockAppUnblockOnlySelected {
-            get {
-                return ResourceManager.GetString("UnblockAppUnblockOnlySelected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Unlock.
         /// </summary>
         internal static string Unlock {
@@ -260,14 +159,7 @@ namespace SimpleDeFence.Resources {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to A newer version {0} of SimpleDeFence is available. Do you want to update now?.
-        /// </summary>
-        internal static string UpdateAvailable {
-            get {
-                return ResourceManager.GetString("UpdateAvailable", resourceCulture);
-            }
-        }
+
         
 
     }

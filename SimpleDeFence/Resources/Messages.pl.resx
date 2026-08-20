@@ -108,28 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TinyWallUpdater" xml:space="preserve">
-    <value>Aktualizacja SimpleDeFence</value>
-  </data>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>Nie można uzyskać dostępu do serwera aktualizacji.
-Serwer może być wyłączony bądź upewnij się, że SimpleDeFence posiada dostęp do Internetu, a następnie spróbuj ponownie.</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>Nowsza wersja {0} SimpleDeFence jest dostępna. Czy chcesz zaktualizować teraz?</value>
-  </data>
-  <data name="DownloadingUpdate" xml:space="preserve">
-    <value>Pobieranie aktualizacji…</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>Masz najnowszą wersję SimpleDeFence. Aktualizacja nie jest potrzebna.</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>Pobieranie przerwane.</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>Proszę czekać… SimpleDeFence sprawdza dostępne aktualizacje…</value>
-  </data>
   <data name="Mode" xml:space="preserve">
     <value>Tryb</value>
   </data>
@@ -153,21 +131,5 @@ Serwer może być wyłączony bądź upewnij się, że SimpleDeFence posiada dos
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>Czy rozpocząć dezinstalację/aktualizację SimpleDeFence?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>Anulowanie białej listy</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>Znaleziono pliki powiązane
-Wybrany plik wykonywalny może być częścią {0}. Aby upewnić się, że ten program może być stosowany bez ograniczeń, zaleca się, aby również odblokować kilka innych plików.</value>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>Pokaż/ukryj powiązane pliki</value>
-  </data>
-  <data name="UnblockAppUnblockAllRecommended" xml:space="preserve">
-    <value>Odblokuj wszystkie zalecane pliki</value>
-  </data>
-  <data name="UnblockAppUnblockOnlySelected" xml:space="preserve">
-    <value>Odblokuj tylko zaznaczone pliki</value>
   </data>
 </root>

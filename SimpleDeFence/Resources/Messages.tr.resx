@@ -108,28 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TinyWallUpdater" xml:space="preserve">
-    <value>SimpleDeFence Güncelleyici</value>
-  </data>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>Güncelleme sunucusuna erişilemedi.
-Sunucu kapalı olabilir yada SimpleDeFence'ın kendine internet erişimi verdiğinden emin olun, sonra tekrar deneyin.</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>SimpleDeFence'ın {0} sürümü çıktı. Şimdi güncellemek istiyormusunuz ?</value>
-  </data>
-  <data name="DownloadingUpdate" xml:space="preserve">
-    <value>Güncelleme indiriliyor...</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>SimpleDeFence'ın en son sürümüne sahipsiniz. Şu an güncelleştirme yok.</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>İndirme koptu.</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>SimpleDeFence güncelleme varmı diye kontrol ederken lütfen bekleyin.</value>
-  </data>
   <data name="Mode" xml:space="preserve">
     <value>Kip</value>
   </data>
@@ -153,21 +131,5 @@ Sunucu kapalı olabilir yada SimpleDeFence'ın kendine internet erişimi verdiğ
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>SimpleDeFence'ın kaldırılıp güncellenmesi başlasın mı?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>Beyazlistelemeyi iptal et</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>İlgili dosyalar bulundu
-Seçili uygulama dosyası {0} nın parçası olabilir. İşi sağlama almak için bu uygulama sınırlama olmaksızın kullanılabilir.</value>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>İlgili uygulama dosyalarını Göster/Gizle</value>
-  </data>
-  <data name="UnblockAppUnblockAllRecommended" xml:space="preserve">
-    <value>Bütün tavsiye edilen dosyaların engelini kaldır</value>
-  </data>
-  <data name="UnblockAppUnblockOnlySelected" xml:space="preserve">
-    <value>Sadece seçili dosyanın engelini kaldır</value>
   </data>
 </root>

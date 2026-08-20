@@ -108,28 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TinyWallUpdater" xml:space="preserve">
-    <value>Mise à jour SimpleDeFence</value>
-  </data>
-  <data name="ErrorCheckingForUpdates" xml:space="preserve">
-    <value>Impossible d'accéder au serveur de mise à jour.
-Le serveur ne répond pas, veuillez vérifier que SimpleDeFence peut accéder à internet et réessayez</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>Une nouvelle version {0} de SimpleDeFence est disponible. Voulez-vous l'installer ?</value>
-  </data>
-  <data name="DownloadingUpdate" xml:space="preserve">
-    <value>Téléchargement de la mise à jour...</value>
-  </data>
-  <data name="NoUpdateAvailable" xml:space="preserve">
-    <value>Aucune mise à jour nécessaire, vous avez la dernière version de SimpleDeFence</value>
-  </data>
-  <data name="DownloadInterrupted" xml:space="preserve">
-    <value>Téléchargement interrompu</value>
-  </data>
-  <data name="PleaseWaitWhileTinyWallChecksForUpdates" xml:space="preserve">
-    <value>SVP veuillez patienter pendant que SimpleDeFence recherche les mises à jour.</value>
-  </data>
   <data name="Unlock" xml:space="preserve">
     <value>Déverrouiller</value>
     <comment>Tray menu text</comment>
@@ -149,23 +127,6 @@ Le serveur ne répond pas, veuillez vérifier que SimpleDeFence peut accéder à
   </data>
   <data name="DidYouInitiateTheUninstall" xml:space="preserve">
     <value>Souhaitez-vous désinstaller SimpleDeFence ?</value>
-  </data>
-  <data name="UnblockAppCancel" xml:space="preserve">
-    <value>Annuler la liste blanche</value>
-  </data>
-  <data name="UnblockApp" xml:space="preserve">
-    <value>Fichiers connexes trouvés.
-L'exécutable trouvé est une partie de {0}. Afin d'être sûr que cette application peut être utilisée sans limitations il est recommandé de débloquer aussi d'autres fichiers.</value>
-    <comment>First line is dialog main text. Rest are further information in smaller letters. Param0 is name of the app.</comment>
-  </data>
-  <data name="UnblockAppShowRelated" xml:space="preserve">
-    <value>Afficher/Masquer les exécutables liés</value>
-  </data>
-  <data name="UnblockAppUnblockAllRecommended" xml:space="preserve">
-    <value>Déverrouiller tous les fichiers recommandés</value>
-  </data>
-  <data name="UnblockAppUnblockOnlySelected" xml:space="preserve">
-    <value>Déverrouiller seulement les fichiers sélectionnés</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>Défaut</value>
