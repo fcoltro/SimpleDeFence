@@ -82,12 +82,13 @@ namespace SimpleDeFence
             }
             catch { }
 
-            // Setup TLS 1.2 & 1.3 support, if supported
-            if (ServicePointManager.SecurityProtocol != 0)
-            {
-                try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch { }
-                try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls13; } catch { }
-            }
+            // No TLS protocol setup here any more. This used to raise
+            // ServicePointManager.SecurityProtocol to include TLS 1.2/1.3, which mattered on .NET
+            // Framework where the default was older. On .NET it does nothing at all: the property
+            // is obsolete (SYSLIB0014) and, more to the point, no longer influences SslStream or
+            // HttpClient - protocol selection is left to the OS, which is the modern default and
+            // the better one. The block was inert ceremony that read as though it were securing
+            // something.
 
             // Parse comman-line options
             var opts = new CmdLineArgs();

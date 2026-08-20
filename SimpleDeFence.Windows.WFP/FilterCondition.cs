@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Runtime.ConstrainedExecution;
 using System.Security;
 using System.Security.AccessControl;
 using System.Diagnostics;
@@ -372,7 +371,6 @@ namespace SimpleDeFence.Windows.WFP
         internal static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmGetAppIdFromFileName0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern uint FwpmGetAppIdFromFileName0(
                 [MarshalAs(UnmanagedType.LPWStr), In]  string fileName,
                 [Out] out FwpmMemorySafeHandle appId);

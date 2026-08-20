@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
-using System.Runtime.ConstrainedExecution;
 using System.Security;
 
 namespace SimpleDeFence.Windows.WFP
@@ -13,7 +11,6 @@ namespace SimpleDeFence.Windows.WFP
         internal static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmSessionCreateEnumHandle0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern uint FwpmSessionCreateEnumHandle0(
                 [In] FwpmEngineSafeHandle engineHandle,
                 [In] IntPtr enumTemplate,
@@ -33,7 +30,6 @@ namespace SimpleDeFence.Windows.WFP
         {
             FwpmSessionEnumSafeHandle? enumSafeHandle = null;
 
-            RuntimeHelpers.PrepareConstrainedRegions();
             try
             {
                 var err = NativeMethods.FwpmSessionCreateEnumHandle0(engine.NativePtr, IntPtr.Zero, out IntPtr outHndl);

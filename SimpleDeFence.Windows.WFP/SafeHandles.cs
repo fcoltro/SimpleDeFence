@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Runtime.ConstrainedExecution;
 using System.Security;
 using Microsoft.Win32.SafeHandles;
 
@@ -12,7 +11,6 @@ namespace SimpleDeFence.Windows.WFP
         internal static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmEngineClose0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern uint FwpmEngineClose0(
                 [In] IntPtr engineHandle);
         }
@@ -22,8 +20,6 @@ namespace SimpleDeFence.Windows.WFP
         {
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             return (0 == NativeMethods.FwpmEngineClose0(handle));
@@ -36,7 +32,6 @@ namespace SimpleDeFence.Windows.WFP
         internal static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmFreeMemory0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern void FwpmFreeMemory0(
                 [In] ref IntPtr p);
         }
@@ -46,8 +41,6 @@ namespace SimpleDeFence.Windows.WFP
         {
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             NativeMethods.FwpmFreeMemory0(ref handle);
@@ -61,7 +54,6 @@ namespace SimpleDeFence.Windows.WFP
         private static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmFilterUnsubscribeChanges0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern uint FwpmFilterUnsubscribeChanges0(
                 [In] FwpmEngineSafeHandle engineHandle,
                 [In] IntPtr changeHandle);
@@ -83,8 +75,6 @@ namespace SimpleDeFence.Windows.WFP
             SetHandle(wrappedHndl);
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             if (0 == NativeMethods.FwpmFilterUnsubscribeChanges0(_safeEngineHandle, handle))
@@ -102,7 +92,6 @@ namespace SimpleDeFence.Windows.WFP
         private static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmNetEventUnsubscribe0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern uint FwpmNetEventUnsubscribe0(
                 [In] FwpmEngineSafeHandle engineHandle,
                 [In] IntPtr changeHandle);
@@ -124,8 +113,6 @@ namespace SimpleDeFence.Windows.WFP
             SetHandle(wrappedHndl);
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             if (0 == NativeMethods.FwpmNetEventUnsubscribe0(_safeEngineHandle, handle))
@@ -143,7 +130,6 @@ namespace SimpleDeFence.Windows.WFP
         private static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmFilterDestroyEnumHandle0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern uint FwpmFilterDestroyEnumHandle0(
                 [In] FwpmEngineSafeHandle engineHandle,
                 [In] IntPtr enumHandle);
@@ -165,8 +151,6 @@ namespace SimpleDeFence.Windows.WFP
             SetHandle(wrappedHndl);
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             if (0 == NativeMethods.FwpmFilterDestroyEnumHandle0(_safeEngineHandle, handle))
@@ -184,7 +168,6 @@ namespace SimpleDeFence.Windows.WFP
         private static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmProviderDestroyEnumHandle0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern uint FwpmProviderDestroyEnumHandle0(
                 [In] FwpmEngineSafeHandle engineHandle,
                 [In] IntPtr enumHandle);
@@ -206,8 +189,6 @@ namespace SimpleDeFence.Windows.WFP
             SetHandle(wrappedHndl);
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             if (0 == NativeMethods.FwpmProviderDestroyEnumHandle0(_safeEngineHandle, handle))
@@ -225,7 +206,6 @@ namespace SimpleDeFence.Windows.WFP
         private static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmSessionDestroyEnumHandle0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern uint FwpmSessionDestroyEnumHandle0(
                 [In] FwpmEngineSafeHandle engineHandle,
                 [In] IntPtr enumHandle);
@@ -247,8 +227,6 @@ namespace SimpleDeFence.Windows.WFP
             SetHandle(wrappedHndl);
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             if (0 == NativeMethods.FwpmSessionDestroyEnumHandle0(_safeEngineHandle, handle))
@@ -266,7 +244,6 @@ namespace SimpleDeFence.Windows.WFP
         private static class NativeMethods
         {
             [DllImport("FWPUClnt.dll", EntryPoint = "FwpmSubLayerDestroyEnumHandle0")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern uint FwpmSubLayerDestroyEnumHandle0(
                 [In] FwpmEngineSafeHandle engineHandle,
                 [In] IntPtr enumHandle);
@@ -288,8 +265,6 @@ namespace SimpleDeFence.Windows.WFP
             SetHandle(wrappedHndl);
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             if (0 == NativeMethods.FwpmSubLayerDestroyEnumHandle0(_safeEngineHandle, handle))
@@ -442,7 +417,6 @@ namespace SimpleDeFence.Windows.WFP
             internal static extern IntPtr LocalAlloc(uint uFlags, UIntPtr dwBytes);
 
             [DllImport("kernel32.dll")]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             internal static extern IntPtr LocalFree(IntPtr hMem);
         }
 
@@ -464,8 +438,6 @@ namespace SimpleDeFence.Windows.WFP
             this.handle = IntPtr.Zero;
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             return (IntPtr.Zero == NativeMethods.LocalFree(handle));
@@ -493,8 +465,6 @@ namespace SimpleDeFence.Windows.WFP
             this.handle = IntPtr.Zero;
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [PrePrepareMethod]
         protected override bool ReleaseHandle()
         {
             return (IntPtr.Zero == NativeMethods.FreeSid(handle));
