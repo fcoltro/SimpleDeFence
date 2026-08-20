@@ -17,15 +17,6 @@
     <resheader name="version">2.0</resheader>
     <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
     <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
                 
     There are any number of "resheader" rows that contain simple 
     name/value pairs.
@@ -117,33 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="File_and_Printer_Sharing" xml:space="preserve">
-    <value>파일 및 프린터 공유</value>
-  </data>
-  <data name="Filtered_ICMP_Traffic" xml:space="preserve">
-    <value>필터링된 ICMP 트래픽</value>
-  </data>
-  <data name="Pingable_local_machine" xml:space="preserve">
-    <value>핑 가능한 로컬 머신</value>
-  </data>
-  <data name="Windows_DHCP_Client" xml:space="preserve">
-    <value>Windows DHCP 클라이언트</value>
-  </data>
-  <data name="Windows_DNS_Client" xml:space="preserve">
-    <value>Windows DNS 클라이언트</value>
-  </data>
-  <data name="Windows_Network_Discovery" xml:space="preserve">
-    <value>Windows 네트워크 검색</value>
-  </data>
-  <data name="Windows_Remote_Assistance" xml:space="preserve">
-    <value>Windows 원격 지원</value>
-  </data>
-  <data name="Windows_Remote_Desktop" xml:space="preserve">
-    <value>Windows 원격 데스크톱</value>
-  </data>
-  <data name="Windows_Time_Sync" xml:space="preserve">
-    <value>Windows 시간 동기화</value>
-  </data>
   <data name="Windows_Update" xml:space="preserve">
     <value>Windows 업데이트</value>
   </data>

@@ -17,15 +17,6 @@
     <resheader name="version">2.0</resheader>
     <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
     <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
                 
     There are any number of "resheader" rows that contain simple 
     name/value pairs.
@@ -117,33 +108,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="File_and_Printer_Sharing" xml:space="preserve">
-    <value>文件和打印机共享</value>
-  </data>
-  <data name="Filtered_ICMP_Traffic" xml:space="preserve">
-    <value>经过滤的ICMP流量</value>
-  </data>
-  <data name="Pingable_local_machine" xml:space="preserve">
-    <value>可ping通的本地机器</value>
-  </data>
-  <data name="Windows_DHCP_Client" xml:space="preserve">
-    <value>Windows DHCP客户端</value>
-  </data>
-  <data name="Windows_DNS_Client" xml:space="preserve">
-    <value>Windows DNS客户端</value>
-  </data>
-  <data name="Windows_Network_Discovery" xml:space="preserve">
-    <value>Windows网络发现</value>
-  </data>
-  <data name="Windows_Remote_Assistance" xml:space="preserve">
-    <value>Windows远程辅助</value>
-  </data>
-  <data name="Windows_Remote_Desktop" xml:space="preserve">
-    <value>Windows远程桌面</value>
-  </data>
-  <data name="Windows_Time_Sync" xml:space="preserve">
-    <value>Windows时间同步</value>
-  </data>
   <data name="Windows_Update" xml:space="preserve">
     <value>Windows更新</value>
   </data>
