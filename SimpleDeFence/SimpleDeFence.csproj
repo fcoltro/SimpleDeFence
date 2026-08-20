@@ -94,8 +94,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Memory" Version="4.5.4" />
-    <PackageReference Include="System.Text.Json" Version="6.0.11" />
 
     <!-- The NetFwTypeLib and TaskScheduler COMReferences were removed in favour of late-bound
          COM (see WindowsFirewallInterop.cs). ResolveComReference only runs under .NET Framework
@@ -168,7 +166,6 @@
   <ItemGroup>
     <!-- DPAPI. Not in the shared framework on .NET (unlike .NET Framework), so it comes from this
          package; ConfigProtection uses it to wrap the per-installation config key. -->
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
   </ItemGroup>
 
 </Project>

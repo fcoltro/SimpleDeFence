@@ -22,7 +22,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Memory" Version="4.5.4" />
     <!-- Used for WinRT access (UwpPackageList) in .Net 4.8, not needed with .NET 5+ -->
     <Reference Include="Windows.Management" />
     <Reference Include="Windows.ApplicationModel" />
@@ -35,7 +34,6 @@
     <TargetPlatformVersion>8.0</TargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="6.0.11" />
   </ItemGroup>
   <ItemGroup>
     <!-- One file per language holds every string in the app. Embedded rather than shipped loose so
@@ -59,7 +57,6 @@
   <ItemGroup>
     <!-- DPAPI. Not in the shared framework on .NET (unlike .NET Framework), so it comes from this
          package; ConfigProtection uses it to wrap the per-installation config key. -->
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
   </ItemGroup>
 
 </Project>
