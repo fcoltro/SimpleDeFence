@@ -2,8 +2,14 @@
   <PropertyGroup>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <OutputType>WinExe</OutputType>
+    <!-- Retained, though no code in this project uses WinForms any more. It is here for
+         SimpleDeFence.UI's DevelToolWindow, whose .resx round-trip needs ResXResourceReader/Writer
+         and ResXDataNode - those live in the System.Windows.Forms assembly and have no
+         in-framework equivalent. The UI project cannot declare it itself: WinUI plus
+         UseWindowsForms pulls in the WPF targets and fails the build (MC6000), so it flows from
+         here transitively as it always did. -->
     <UseWindowsForms>true</UseWindowsForms>
     <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
@@ -164,6 +170,14 @@
   <ItemGroup>
     <!-- DPAPI. Not in the shared framework on .NET (unlike .NET Framework), so it comes from this
          package; ConfigProtection uses it to wrap the per-installation config key. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- DPAPI, used by ConfigProtection to wrap the per-installation config key. Not in the shared
+         framework on .NET. It briefly looked unnecessary - the SDK flagged it NU1510 - but that was
+         only true while UseWindowsForms dragged it in transitively; with WinForms gone the build
+         fails without it. -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
   </ItemGroup>
 
 </Project>

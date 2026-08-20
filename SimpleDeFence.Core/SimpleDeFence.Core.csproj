@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -57,6 +57,14 @@
   <ItemGroup>
     <!-- DPAPI. Not in the shared framework on .NET (unlike .NET Framework), so it comes from this
          package; ConfigProtection uses it to wrap the per-installation config key. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- DPAPI, used by ConfigProtection to wrap the per-installation config key. Not in the shared
+         framework on .NET. It briefly looked unnecessary - the SDK flagged it NU1510 - but that was
+         only true while UseWindowsForms dragged it in transitively; with WinForms gone the build
+         fails without it. -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
   </ItemGroup>
 
 </Project>

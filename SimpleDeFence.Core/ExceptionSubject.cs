@@ -220,7 +220,17 @@ namespace SimpleDeFence
                 {
                     try
                     {
+#pragma warning disable SYSLIB0057 // no managed replacement covers Authenticode extraction
+                        // Kept deliberately. SYSLIB0057 points at X509CertificateLoader, but that
+                        // loads a *certificate file*; this needs the signer certificate embedded in
+                        // a signed *executable*, which the loader cannot do. Swapping it produced a
+                        // silently empty CertSubject - caught by ExceptionSubjectCertTests, not by
+                        // the build, because the catch below swallows the failure and
+                        // certificate-based rules would simply have stopped matching. The managed
+                        // alternative is CryptQueryObject interop, which is more attack surface in
+                        // security-sensitive code for no behavioural gain.
                         X509Certificate cert = X509Certificate.CreateFromSignedFile(this.ExecutablePath);
+#pragma warning restore SYSLIB0057
                         _CertSubject = cert.Subject;
                     }
                     catch { }

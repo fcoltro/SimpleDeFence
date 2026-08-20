@@ -2,12 +2,18 @@
   <PropertyGroup>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <RootNamespace>SimpleDeFence.Windows</RootNamespace>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <!-- Retained, though no code in this project uses WinForms any more. It is here for
+         SimpleDeFence.UI's DevelToolWindow, whose .resx round-trip needs ResXResourceReader/Writer
+         and ResXDataNode - those live in the System.Windows.Forms assembly and have no
+         in-framework equivalent. The UI project cannot declare it itself: WinUI plus
+         UseWindowsForms pulls in the WPF targets and fails the build (MC6000), so it flows from
+         here transitively as it always did. -->
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup>

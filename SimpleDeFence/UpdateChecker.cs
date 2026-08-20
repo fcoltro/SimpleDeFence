@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Net;
-using System.Windows.Forms;
+using System.Reflection;
+using SimpleDeFence.Utilities;
 
 namespace SimpleDeFence
 {
@@ -20,6 +20,14 @@ namespace SimpleDeFence
     internal static class UpdateChecker
     {
         private const int UPDATER_VERSION = 7;
+
+        /// <summary>Read from the assembly rather than WinForms' Application.ProductVersion, which
+        /// was the last thing pulling System.Windows.Forms into this file. Same value: both report
+        /// the informational version the build stamps in.</summary>
+        private static string ProductVersion =>
+            Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString()
+            ?? "unknown";
         private const string URL_UPDATE_DESCRIPTOR = @"https://raw.githubusercontent.com/fcoltro/SimpleDeFence/refs/heads/main/updates/UpdVer{0}/update.json";
 
         internal static UpdateDescriptor GetDescriptor()
@@ -29,11 +37,7 @@ namespace SimpleDeFence
 
             try
             {
-                using (var HTTPClient = new WebClient())
-                {
-                    HTTPClient.Headers.Add("TW-Version", Application.ProductVersion);
-                    HTTPClient.DownloadFile(url, tmpFile);
-                }
+                HttpFileDownloader.DownloadFile(url, tmpFile, "TW-Version", ProductVersion);
 
                 var descriptor = SerializationHelper.DeserializeFromFile(tmpFile, new UpdateDescriptor());
                 if (descriptor.MagicWord != "SimpleDeFence Update Descriptor")

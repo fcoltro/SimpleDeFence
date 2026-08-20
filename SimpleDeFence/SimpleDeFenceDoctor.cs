@@ -108,29 +108,28 @@ namespace SimpleDeFence
 
         internal static int Uninstall()
         {
-            using (var frm = new System.Windows.Forms.Form())
-            {
-                // See http://www.codeproject.com/Articles/18612/TopMost-MessageBox
-                // for an explanation as for why this is needed.
-                frm.Size = new System.Drawing.Size(1, 1);
-                frm.ShowInTaskbar = false;
-                frm.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-                System.Drawing.Rectangle rect = System.Windows.Forms.SystemInformation.VirtualScreen;
-                frm.Location = new System.Drawing.Point(rect.Bottom + 10, rect.Right + 10);
-                frm.Show();
-                frm.Focus();
-                frm.BringToFront(); 
-                frm.TopMost = true;
+            // MessageBoxW directly rather than WinForms. This prompt runs under /uninstall, where
+            // there is no WinUI window to parent a ContentDialog to and no message loop, so a
+            // native modal is the right shape - and it was the only thing left pulling
+            // System.Windows.Forms into this executable.
+            //
+            // The invisible owner Form this used to create existed purely to make the box topmost
+            // (per the CodeProject article it cited); MB_TOPMOST and MB_SETFOREGROUND say that
+            // directly, which is what the whole dance was emulating.
+            const uint MB_YESNO = 0x00000004;
+            const uint MB_ICONEXCLAMATION = 0x00000030;
+            const uint MB_SETFOREGROUND = 0x00010000;
+            const uint MB_TOPMOST = 0x00040000;
+            const int IDYES = 6;
 
-                if (System.Windows.Forms.MessageBox.Show(frm,
-                    Resources.Messages.DidYouInitiateTheUninstall,
-                    Resources.Messages.SimpleDeFence,
-                    System.Windows.Forms.MessageBoxButtons.YesNo,
-                    System.Windows.Forms.MessageBoxIcon.Exclamation) != System.Windows.Forms.DialogResult.Yes)
-                {
-                    return -1;
-                }
-            }
+            int answer = Utils.SafeNativeMethods.MessageBoxW(
+                IntPtr.Zero,
+                Resources.Messages.DidYouInitiateTheUninstall,
+                Resources.Messages.SimpleDeFence,
+                MB_YESNO | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+
+            if (answer != IDYES)
+                return -1;
 
             // Stop service
             try

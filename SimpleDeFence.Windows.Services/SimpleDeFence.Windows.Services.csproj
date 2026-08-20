@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
 		<PlatformTarget>AnyCPU</PlatformTarget>
-		<LangVersion>9.0</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>

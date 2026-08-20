@@ -13,7 +13,6 @@ using System.Security;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace SimpleDeFence
 {
@@ -31,6 +30,11 @@ namespace SimpleDeFence
         [SuppressUnmanagedCodeSecurity]
         internal static class SafeNativeMethods
         {
+            /// <summary>Used by the /uninstall confirmation, which has no message loop and no
+            /// window to parent a managed dialog to.</summary>
+            [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            internal static extern int MessageBoxW(IntPtr hWnd, string lpText, string lpCaption, uint uType);
+
             [DllImport("user32.dll")]
             internal static extern IntPtr WindowFromPoint(Point pt);
 
@@ -72,22 +76,6 @@ namespace SimpleDeFence
                 [MarshalAs(UnmanagedType.U4)]
                 int cchBuffer
             );
-
-            #region DoMouseRightClick
-            [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-            public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, IntPtr dwExtraInfo);
-            //private const uint MOUSEEVENTF_LEFTDOWN = 0x02;
-            //private const uint MOUSEEVENTF_LEFTUP = 0x04;
-            private const uint MOUSEEVENTF_RIGHTDOWN = 0x08;
-            private const uint MOUSEEVENTF_RIGHTUP = 0x10;
-            internal static void DoMouseRightClick()
-            {
-                //Call the imported function with the cursor's current position
-                uint X = (uint)System.Windows.Forms.Cursor.Position.X;
-                uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
-                mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, IntPtr.Zero);
-            }
-            #endregion
         }
 
         private static readonly Random _rng = new ();
@@ -168,12 +156,6 @@ namespace SimpleDeFence
             {
                 return path;
             }
-        }
-
-        internal static void SetRightToLeft(Control ctrl)
-        {
-            RightToLeft rtl = System.Windows.Forms.Application.CurrentCulture.TextInfo.IsRightToLeft ? RightToLeft.Yes : RightToLeft.No;
-            ctrl.RightToLeft = rtl;
         }
 
         internal static bool IsSystemShuttingDown()
@@ -347,134 +329,9 @@ namespace SimpleDeFence
             return wp.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
-        internal static Bitmap ScaleImage(Bitmap originalImage, float scaleX, float scaleY)
-        {
-            int newWidth = (int)Math.Round(originalImage.Width * scaleX);
-            int newHeight = (int)Math.Round(originalImage.Height * scaleY);
-
-            var newImage = new Bitmap(originalImage, newWidth, newHeight);
-            try
-            {
-                using (Graphics g = Graphics.FromImage(newImage))
-                {
-                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    g.DrawImage(originalImage, 0, 0, newImage.Width, newImage.Height);
-                }
-
-                return newImage;
-            }
-            catch
-            {
-                newImage.Dispose();
-                throw;
-            }
-        }
-
-        internal static Bitmap ResizeImage(Bitmap originalImage, int maxWidth, int maxHeight)
-        {
-            int newWidth = originalImage.Width;
-            int newHeight = originalImage.Height;
-            double aspectRatio = (double)originalImage.Width / (double)originalImage.Height;
-
-            if (aspectRatio <= 1 && originalImage.Width > maxWidth)
-            {
-                newWidth = maxWidth;
-                newHeight = (int)Math.Round(newWidth / aspectRatio);
-            }
-            else if (aspectRatio > 1 && originalImage.Height > maxHeight)
-            {
-                newHeight = maxHeight;
-                newWidth = (int)Math.Round(newHeight * aspectRatio);
-            }
-
-            var newImage = new Bitmap(originalImage, newWidth, newHeight);
-            try
-            {
-                using (Graphics g = Graphics.FromImage(newImage))
-                {
-                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    g.DrawImage(originalImage, 0, 0, newImage.Width, newImage.Height);
-                }
-
-                return newImage;
-            }
-            catch
-            {
-                newImage.Dispose();
-                throw;
-            }
-        }
-
-        internal static Bitmap GetIconContained(string filePath, int targetWidth, int targetHeight)
-        {
-            IconTools.ShellIconSize icnSize = IconTools.ShellIconSize.LargeIcon;
-            if ((targetHeight == 16) && (targetWidth == 16))
-                icnSize = IconTools.ShellIconSize.SmallIcon;
-
-            using var icon = IconTools.GetIconForExtension(filePath, icnSize);
-            if ((icon.Width == targetWidth) && (icon.Height == targetHeight))
-            {
-                return icon.ToBitmap();
-            }
-            if ((icon.Height > targetHeight) || (icon.Width > targetWidth))
-            {
-                using var bmp = icon.ToBitmap();
-                return Utils.ResizeImage(bmp, targetWidth, targetHeight);
-            }
-            else
-            {
-                using var bmp = icon.ToBitmap();
-                float scale = Math.Min((float)targetWidth / icon.Width, (float)targetHeight / icon.Height);
-                return Utils.ScaleImage(bmp, (int)Math.Round(scale * icon.Width), (int)Math.Round(scale * icon.Height));
-            }
-        }
-
-        private static float? _DpiScalingFactor;
-        internal static float DpiScalingFactor
-        {
-            get
-            {
-                if (!_DpiScalingFactor.HasValue)
-                {
-                    using System.Drawing.Graphics graphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero);
-                    float dpiX = graphics.DpiX;
-                    float dpiY = graphics.DpiY;
-                    _DpiScalingFactor = dpiX / 96.0f;
-                }
-
-                return _DpiScalingFactor.Value;
-            }
-        }
-
-        internal static void CenterControlInParent(Control control)
-        {
-            Control parent = control.Parent;
-
-            control.Location = new Point(
-                parent.Width / 2 - control.Width / 2,
-                parent.Height / 2 - control.Height / 2
-                );
-        }
-
-        internal static void FixupFormPosition(Form form)
-        {
-            // Place window to top-left corner of working area if window is too much off-screen
-            Rectangle formVisibleArea = Rectangle.Intersect(SystemInformation.VirtualScreen, form.Bounds);
-            if ((formVisibleArea.Width < 100) || (formVisibleArea.Height < 100))
-                form.Location = Screen.PrimaryScreen.WorkingArea.Location;
-        }
-
         internal static void Invoke(SynchronizationContext syncCtx, SendOrPostCallback method)
         {
             syncCtx?.Send(method, null);
-        }
-
-        internal static void Invoke(Control ctrl, MethodInvoker method)
-        {
-            if (ctrl.InvokeRequired)
-                ctrl.BeginInvoke(method);
-            else
-                method.Invoke();
         }
 
         internal static void SplitFirstLine(string str, out string firstLine, out string restLines)
@@ -569,16 +426,6 @@ namespace SimpleDeFence
             {
                 // Ignore exceptions - logging should not itself cause new problems
             }
-        }
-
-        internal static void SetDoubleBuffering(Control control, bool enable)
-        {
-            try
-            {
-                var doubleBufferPropertyInfo = control.GetType().GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                doubleBufferPropertyInfo.SetValue(control, enable, null);
-            }
-            catch { }
         }
 
         internal static void FlushDnsCache()

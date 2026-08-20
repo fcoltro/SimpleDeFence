@@ -1192,10 +1192,7 @@ namespace SimpleDeFence
             string tmpFile = Path.GetTempFileName();
             try
             {
-                using (var downloader = new WebClient())
-                {
-                    downloader.DownloadFile(module.UpdateURL, tmpCompressedPath);
-                }
+                HttpFileDownloader.DownloadFile(module.UpdateURL, tmpCompressedPath);
                 Utils.DecompressDeflate(tmpCompressedPath, tmpFile);
 
                 if (Hasher.HashFile(tmpFile).Equals(module.DownloadHash, StringComparison.OrdinalIgnoreCase))
