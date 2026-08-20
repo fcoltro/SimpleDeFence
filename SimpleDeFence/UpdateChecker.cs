@@ -1,192 +1,22 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Net;
-using System.Threading;
 using System.Windows.Forms;
-using Microsoft.Samples.TaskDialog;
-using SimpleDeFence.Windows;
 
 namespace SimpleDeFence
 {
-
-    internal class Updater
-    {
-        private enum UpdaterState
-        {
-            GettingDescriptor,
-            DescriptorReady,
-            DownloadingUpdate,
-            UpdateDownloadReady
-        }
-
-        private UpdaterState State;
-        private string ErrorMsg = string.Empty;
-        private volatile int DownloadProgress;
-
-        internal static void StartUpdate()
-        {
-            var updater = new Updater();
-            var descriptor = new UpdateDescriptor();
-            updater.State = UpdaterState.GettingDescriptor;
-
-            var TDialog = new Microsoft.Samples.TaskDialog.TaskDialog
-            {
-                CustomMainIcon = Resources.Icons.firewall,
-                WindowTitle = Resources.Messages.SimpleDeFence,
-                MainInstruction = Resources.Messages.TinyWallUpdater,
-                Content = Resources.Messages.PleaseWaitWhileTinyWallChecksForUpdates,
-                AllowDialogCancellation = false,
-                CommonButtons = TaskDialogCommonButtons.Cancel,
-                ShowMarqueeProgressBar = true,
-                Callback = updater.DownloadTickCallback,
-                CallbackData = updater,
-                CallbackTimer = true
-            };
-
-            var UpdateThread = new Thread( () =>
-            {
-                try
-                {
-                    descriptor = UpdateChecker.GetDescriptor();
-                    updater.State = UpdaterState.DescriptorReady;
-                }
-                catch
-                {
-                    updater.ErrorMsg = Resources.Messages.ErrorCheckingForUpdates;
-                }
-            });
-            UpdateThread.Start();
-
-            switch (TDialog.Show())
-            {
-                case (int)DialogResult.Cancel:
-                    UpdateThread.Interrupt();
-                    if (!UpdateThread.Join(500))
-                        UpdateThread.Abort();
-                    break;
-                case (int)DialogResult.OK:
-                    updater.CheckAppVersion(descriptor);
-                    break;
-                case (int)DialogResult.Abort:
-                    Utils.ShowMessageBox(updater.ErrorMsg, Resources.Messages.SimpleDeFence, TaskDialogCommonButtons.Ok, Microsoft.Samples.TaskDialog.TaskDialogIcon.Error);
-                    break;
-            }
-        }
-
-        private void CheckAppVersion(UpdateDescriptor descriptor)
-        {
-            var UpdateModule = descriptor.GetModule(UpdateDescriptor.MODULE_NAME_MAINBIN);
-            var oldVersion = new Version(Application.ProductVersion);
-            var newVersion = new Version(UpdateModule?.ComponentVersion ?? Application.ProductVersion);
-
-            bool win10v1903 = VersionInfo.Win10OrNewer && (Environment.OSVersion.Version.Build >= 18362);
-            bool WindowsNew_AnyTwUpdate = win10v1903 && (newVersion > oldVersion);
-            bool WindowsOld_TwMinorFixOnly = (newVersion > oldVersion) && (newVersion.Major == oldVersion.Major) && (newVersion.Minor == oldVersion.Minor);
-
-            if (WindowsNew_AnyTwUpdate || WindowsOld_TwMinorFixOnly)
-            {
-                string prompt = string.Format(CultureInfo.CurrentCulture, Resources.Messages.UpdateAvailable, UpdateModule.ComponentVersion);
-                if (Utils.ShowMessageBox(prompt, Resources.Messages.TinyWallUpdater, TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No, Microsoft.Samples.TaskDialog.TaskDialogIcon.Warning) == DialogResult.Yes)
-                    DownloadUpdate(UpdateModule);
-            }
-            else
-            {
-                string prompt = Resources.Messages.NoUpdateAvailable;
-                Utils.ShowMessageBox(prompt, Resources.Messages.TinyWallUpdater, TaskDialogCommonButtons.Ok, Microsoft.Samples.TaskDialog.TaskDialogIcon.Information);
-            }
-        }
-
-        private void DownloadUpdate(UpdateModule mainModule)
-        {
-            ErrorMsg = string.Empty;
-            var TDialog = new Microsoft.Samples.TaskDialog.TaskDialog
-            {
-                CustomMainIcon = Resources.Icons.firewall,
-                WindowTitle = Resources.Messages.SimpleDeFence,
-                MainInstruction = Resources.Messages.TinyWallUpdater,
-                Content = Resources.Messages.DownloadingUpdate,
-                AllowDialogCancellation = false,
-                CommonButtons = TaskDialogCommonButtons.Cancel,
-                ShowProgressBar = true,
-                Callback = DownloadTickCallback,
-                CallbackData = this,
-                CallbackTimer = true,
-                EnableHyperlinks = true
-            };
-
-            State = UpdaterState.DownloadingUpdate;
-
-            var tmpFile = Path.GetTempFileName() + ".msi";
-            var UpdateURL = new Uri(mainModule.UpdateURL);
-            using var HTTPClient = new WebClient();
-            HTTPClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Updater_DownloadFinished);
-            HTTPClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(Updater_DownloadProgressChanged);
-            HTTPClient.DownloadFileAsync(UpdateURL, tmpFile, tmpFile);
-
-            switch (TDialog.Show())
-            {
-                case (int)DialogResult.Cancel:
-                    HTTPClient.CancelAsync();
-                    break;
-                case (int)DialogResult.OK:
-                    InstallUpdate(tmpFile);
-                    break;
-                case (int)DialogResult.Abort:
-                    Utils.ShowMessageBox(ErrorMsg, Resources.Messages.SimpleDeFence, TaskDialogCommonButtons.Ok, Microsoft.Samples.TaskDialog.TaskDialogIcon.Error);
-                    break;
-            }
-        }
-
-        private static void InstallUpdate(string localFilePath)
-        {
-            Utils.StartProcess(localFilePath, string.Empty, false, false);
-        }
-
-        private void Updater_DownloadFinished(object sender, AsyncCompletedEventArgs e)
-        {
-            if (e.Cancelled || (e.Error != null))
-            {
-                ErrorMsg = Resources.Messages.DownloadInterrupted;
-                return;
-            }
-
-            State = UpdaterState.UpdateDownloadReady;
-        }
-
-        private void Updater_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            DownloadProgress = e.ProgressPercentage;
-        }
-
-        private bool DownloadTickCallback(ActiveTaskDialog taskDialog, TaskDialogNotificationArgs args, object? callbackData)
-        {
-            switch (args.Notification)
-            {
-                case TaskDialogNotification.Created:
-                    if (State == UpdaterState.GettingDescriptor)
-                        taskDialog.SetProgressBarMarquee(true, 25);
-                    break;
-                case TaskDialogNotification.Timer:
-                    if (!string.IsNullOrEmpty(ErrorMsg))
-                        taskDialog.ClickButton((int)DialogResult.Abort);
-                    switch (State)
-                    {
-                        case UpdaterState.DescriptorReady:
-                        case UpdaterState.UpdateDownloadReady:
-                            taskDialog.ClickButton((int)DialogResult.OK);
-                            break;
-                        case UpdaterState.DownloadingUpdate:
-                        taskDialog.SetProgressBarPosition(DownloadProgress);
-                            break;
-                    }
-                    break;
-            }
-            return false;
-        }
-    }
-
+    /// <summary>
+    /// Fetches the update descriptor. Called by the service's periodic auto-update check
+    /// (SimpleDeFenceService) and by the GUI's Services.Updater, which owns the user-facing half
+    /// of updating - progress, prompts and installation - as WinUI ContentDialogs.
+    ///
+    /// This file used to also carry an <c>Updater</c> class that drove the same flow through
+    /// native TaskDialogs. It was superseded by SimpleDeFence.UI/Services/Updater.cs during the
+    /// WinUI migration and left behind unreferenced - nothing ever called its StartUpdate entry
+    /// point - so it has been removed along with the Microsoft.Samples TaskDialog wrapper it was
+    /// the last consumer of.
+    /// </summary>
     internal static class UpdateChecker
     {
         private const int UPDATER_VERSION = 7;

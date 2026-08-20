@@ -23,8 +23,7 @@ work on this project.
 
 | Contents in                     | Copyright / origin | Source                                                                                                                                | License                  |
 |----------------------------------|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
-| `Microsoft.Samples/TaskDialog/`  | KevinGre     | [CodeProject article](https://www.codeproject.com/Articles/17026/TaskDialog-for-WinForms)                                               | Public Domain             |
-| `Microsoft.Samples/Privilege.cs` | Mark Novak   | [MSDN Magazine](https://learn.microsoft.com/en-us/archive/msdn-magazine/2005/march/using-net-making-privileges-reliable-secure-and-efficient) | see `Privilege.cs.LICENSE` |
+| `SimpleDeFence.Windows/Privilege.cs` | Mark Novak   | [MSDN Magazine](https://learn.microsoft.com/en-us/archive/msdn-magazine/2005/march/using-net-making-privileges-reliable-secure-and-efficient) | see `Privilege.cs.LICENSE` |
 | Original code base               | Károly Pados | [pylorak/TinyWall](https://github.com/pylorak/TinyWall)                                                                                  | GPLv3                     |
 | Changes made in this fork        | fcoltro      | [fcoltro/SimpleDeFence](https://github.com/fcoltro/SimpleDeFence)                                        | GPLv3                     |
 

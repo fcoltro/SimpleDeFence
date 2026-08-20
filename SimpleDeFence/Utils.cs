@@ -1,5 +1,4 @@
-﻿using Microsoft.Samples.TaskDialog;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using SimpleDeFence.Windows;
 using System;
 using System.Collections.Generic;
@@ -491,24 +490,6 @@ namespace SimpleDeFence
                 for (int i = 2; i < lines.Length; ++i)
                     restLines += Environment.NewLine + lines[i];
             }
-        }
-
-        internal static DialogResult ShowMessageBox(string msg, string title, TaskDialogCommonButtons buttons, Microsoft.Samples.TaskDialog.TaskDialogIcon icon, IWin32Window? parent = null)
-        {
-            Utils.SplitFirstLine(msg, out string firstLine, out string contentLines);
-
-            var taskDialog = new Microsoft.Samples.TaskDialog.TaskDialog
-            {
-                WindowTitle = title,
-                MainInstruction = firstLine,
-                CommonButtons = buttons,
-                MainIcon = icon,
-                Content = contentLines
-            };
-            if (parent is null)
-                return (DialogResult)taskDialog.Show();
-            else
-                return (DialogResult)taskDialog.Show(parent);
         }
 
         internal static int GetRandomNumber()
