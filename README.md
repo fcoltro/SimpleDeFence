@@ -5,7 +5,7 @@
   <p align="center">
     A free, lightweight and non-intrusive firewall
     <br />
-    Fork of <a href="https://tinywall.pados.hu">TinyWall</a>, being modernized with a WinUI 3 GUI over the existing C# core.
+    Built on <a href="https://github.com/pylorak/TinyWall">TinyWall</a> as its original code base.
   </p>
 </div>
 
@@ -13,7 +13,9 @@
 
 SimpleDeFence is a free, lightweight, and non-intrusive, secure by default firewall for Windows. Built to just simply sit in your system tray, quietly blocking any application you did not explicitly allow network access. It installs no kernel drivers, so it cannot negatively influence system stability. It also respects your privacy and collects absolutely no data about the user or their computer.
 
-This project is a fork of [TinyWall](https://github.com/pylorak/TinyWall) by Károly Pados, currently a straight rebuild of the original C#/.NET codebase under a new name. See [NOTICE.md](NOTICE.md) for attribution details and [ROADMAP.md](ROADMAP.md) for where the project is headed, including a planned WinUI 3 GUI that talks to the existing C# service.
+SimpleDeFence began as a fork of [TinyWall](https://github.com/pylorak/TinyWall), written by Károly Pados, and that code base is its origin. It has since diverged: the WinForms interface has been replaced by a WinUI 3 one, the projects target .NET 10, and the configuration and password protection have been reworked. See [NOTICE.md](NOTICE.md) for attribution and licensing, and [ROADMAP.md](ROADMAP.md) for where it is going.
+
+TinyWall and its authors are the origin of this code, not participants in this project — please do not report SimpleDeFence issues to them.
 
 ## How to build
 
@@ -54,14 +56,19 @@ Feel free to open issues, feature- or pull-requests.
 
 ## License
 
-| Contents in                     | Maintainer   | Origin                                                                                                                                | License                  |
-|---------------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+SimpleDeFence is licensed under the GPLv3; see [LICENSE.txt](LICENSE.txt). The table below records
+where the code came from and under what terms — it is a statement of origin and copyright, not a
+list of people who work on this project.
+
+| Contents in                     | Copyright / origin | Source                                                                                                                                | License                  |
+|---------------------------------|--------------------|---------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
 | Microsoft.Samples\TaskDialog\   | KevinGre     | [link](https://www.codeproject.com/Articles/17026/TaskDialog-for-WinForms)  ([archive.org](https://web.archive.org/web/20250211033156/https://www.codeproject.com/Articles/17026/TaskDialog-for-WinForms))                                                          | Public Domain            |
 | Microsoft.Samples\Privilege.cs  | Mark Novak   | [link](https://learn.microsoft.com/en-us/archive/msdn-magazine/2005/march/using-net-making-privileges-reliable-secure-and-efficient)  | see Privilege.cs.LICENSE |
-| Everything else                 | Károly Pados | [this repo](https://github.com/pylorak/TinyWall)                                                                                      | GPLv3                    |
+| Original code base              | Károly Pados | [pylorak/TinyWall](https://github.com/pylorak/TinyWall)                                                                               | GPLv3                    |
+| Changes made in this fork       | fcoltro      | [fcoltro/SimpleDeFence](https://github.com/fcoltro/SimpleDeFence)                                                                     | GPLv3                    |
 
 ## Contact
 
 GitHub: <https://github.com/fcoltro/SimpleDeFence>
 
-Upstream project (TinyWall) by Károly Pados: <https://github.com/pylorak/TinyWall>
+Original code base — TinyWall by Károly Pados: <https://github.com/pylorak/TinyWall>

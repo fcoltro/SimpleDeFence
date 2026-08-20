@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
@@ -8,7 +8,9 @@
   <?define Manufacturer="fcoltro" ?>
   <?define Description="A non-intrusive firewall solution. Fork of TinyWall." ?>
   <?define ProductURL="https://github.com/fcoltro/SimpleDeFence" ?>
-  <?define ReleaseNotesURL="https://raw.githubusercontent.com/fcoltro/SimpleDeFence/refs/heads/main/Changelog.txt" ?>
+  <!-- Releases page rather than a Changelog.txt in the tree: the file this used to point at was
+       upstream TinyWall's changelog, describing releases of a different project. -->
+  <?define ReleaseNotesURL="https://github.com/fcoltro/SimpleDeFence/releases" ?>
   <?define ProductVersion="!(bind.fileVersion.TinyWallEXE)" ?>
   <?define OldestUpgradeableVersion="3.0.0.0" ?>
 

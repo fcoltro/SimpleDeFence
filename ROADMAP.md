@@ -1,4 +1,4 @@
-# Roadmap
+﻿# Roadmap
 
 SimpleDeFence is a fork of [TinyWall](https://github.com/pylorak/TinyWall). See [NOTICE.md](NOTICE.md) for
 attribution. This document tracks where the project is headed.
@@ -28,13 +28,14 @@ attribution. This document tracks where the project is headed.
       `TinyWallSettingsFileFilter`, etc.) were deliberately left alone again** — same reasoning as
       above, now compounded by touching all 18 language files' matching keys plus the generated
       `.Designer.cs`, which is a materially larger and riskier change than a class rename. Attribution
-      untouched throughout: `NOTICE.md`, `LICENSE.txt`, `Changelog.txt`, the GPL-required copyright
+      untouched throughout: `NOTICE.md`, `LICENSE.txt`, the GPL-required copyright
       lines, and the accurate "fork of TinyWall" description in `SimpleDeFence.csproj` all still
       correctly name the upstream project.
 
 ## Phase 1 — Code structure review & incremental features (C#/.NET, current stack)
 
-- [x] Code structure review of the existing C#/.NET codebase — see [ARCHITECTURE.md](ARCHITECTURE.md).
+- [x] Code structure review of the existing C#/.NET codebase. (The write-up described the
+      pre-WinUI, .NET Framework 4.8 shape of the code and was removed once neither remained.)
 - [x] "Add folder" exception: recursively scan a folder for `.exe`/`.dll` and add them all as
       application exceptions in one action.
 - [x] Investigate isolating Windows Update traffic as a distinct, controllable exception. **Finding:**
@@ -90,11 +91,11 @@ controls inside an existing WinForms app) plus AI-assisted migration tooling in 
 for the strangler-fig approach this phase already needs.
 
 The core (WFP rule construction, IPC, service lifecycle) still has zero test coverage today (see
-[ARCHITECTURE.md](ARCHITECTURE.md)) — rewriting the least-tested, highest-consequence part of a
+the since-removed architecture review) — rewriting the least-tested, highest-consequence part of a
 firewall into a new language first is the wrong order of operations regardless of GUI framework, so
 the core stays C#/.NET and untouched throughout this phase either way.
 
-- [x] Extract `SimpleDeFence.Core` — the protocol/IPC/config-model classes ARCHITECTURE.md identified
+- [x] Extract `SimpleDeFence.Core` — the protocol/IPC/config-model classes the architecture review identified
       as the core-vs-GUI seam, moved out of `SimpleDeFence/` into their own project. It multi-targets
       `net48;net10.0-windows` so the existing WinForms app and the new WinUI 3 app can both consume
       it (`SimpleDeFence.Utilities` and `SimpleDeFence.Windows` were multi-targeted to match). The
@@ -227,5 +228,7 @@ the core stays C#/.NET and untouched throughout this phase either way.
 
 ## Backlog inherited from upstream
 
-TinyWall's own maintainer kept a backlog in `future-ideas.txt`. Items not already listed above are
-fair game to pull into a future phase.
+Upstream kept a wish-list of its own, which was carried in this repo as `future-ideas.txt` until
+the items worth having had been folded into the phases above (dark theme, the WinUI 3 GUI, the
+Connections auto-refresh control) or judged out of scope. The file has been removed; anything from
+it that still matters belongs in a phase above, not in a separate list.
