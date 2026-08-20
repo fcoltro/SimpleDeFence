@@ -5,7 +5,16 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Win32.SafeHandles;
 
-namespace Microsoft.Samples
+/// <summary>
+/// Privilege adjustment (enable a privilege for the duration of a callback, then restore it).
+///
+/// Originally published by Mark Novak in MSDN Magazine, March 2005, "Using .NET: Making Privileges
+/// Reliable, Secure and Efficient", and carried in this codebase since the fork. It lives in this
+/// project's own namespace rather than Microsoft.Samples because that namespace suggested a
+/// Microsoft-shipped package rather than sample code we maintain; the attribution is stated here
+/// and in Privilege.cs.LICENSE beside it, which is where it belongs.
+/// </summary>
+namespace SimpleDeFence.Windows
 {
     using Win32Exception = System.ComponentModel.Win32Exception;
     using PrivilegeNotHeldException = System.Security.AccessControl.PrivilegeNotHeldException;

@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
+using SimpleDeFence.Utilities;
 using System.Linq;
 using System.Resources;
 using System.Text;
@@ -351,65 +351,52 @@ namespace SimpleDeFence.UI
             _resXInputs.Clear();
         }
 
-        private static Dictionary<string, ResXDataNode> ReadResXFile(string filePath)
-        {
-            var resxContents = new Dictionary<string, ResXDataNode>();
-            using var resxReader = new ResXResourceReader(filePath);
-            resxReader.UseResXDataNodes = true;
-            var dict = resxReader.GetEnumerator();
-            while (dict.MoveNext())
-            {
-                var node = (ResXDataNode)dict.Value!;
-                resxContents.Add(node.Name, node);
-            }
-            return resxContents;
-        }
 
+        /// <summary>Strips from each satellite .resx the entries that add nothing: those whose
+        /// translation is identical to the primary, and the designer-generated property keys that
+        /// are not localizable text.
+        ///
+        /// Reads and writes through ResxFile (plain XML) rather than ResXResourceReader/Writer.
+        /// Those were the last use of System.Windows.Forms anywhere in this project. Two things
+        /// went with them: ITypeResolutionService, which was only ever passed as null, and a
+        /// string-replace that rewrote ", Version=2.0.0.0," to "4.0.0.0" in each satellite before
+        /// reading it - a workaround for the reader refusing type names from the .NET 2.0-era
+        /// assembly, which cannot arise when the entries are read as XML.</summary>
         private void Optimize_Click(object sender, RoutedEventArgs e)
         {
-            ITypeResolutionService? trs = null;
-
             foreach (var pair in _resXInputs)
             {
-                var primary = ReadResXFile(pair.Key);
+                var primary = ResxFile.Read(pair.Key);
 
                 foreach (var satellitePath in pair.Value)
                 {
-                    string primaryText;
-                    using (var sr = new StreamReader(satellitePath, Encoding.UTF8))
-                        primaryText = sr.ReadToEnd();
-                    primaryText = primaryText.Replace(", Version=2.0.0.0,", ", Version=4.0.0.0,");
-                    using (var sw = new StreamWriter(satellitePath, false, Encoding.UTF8))
-                        sw.Write(primaryText);
-
-                    var satellite = ReadResXFile(satellitePath);
-                    var newSatellite = new Dictionary<string, ResXDataNode>();
+                    var satellite = ResxFile.Read(satellitePath);
+                    var kept = new List<KeyValuePair<string, string>>();
 
                     foreach (var primaryEntry in primary)
                     {
-                        if (!satellite.TryGetValue(primaryEntry.Key, out var satelliteItem))
+                        if (!satellite.TryGetValue(primaryEntry.Key, out var satelliteValue))
                             continue;
+                        if (satelliteValue is null)
+                            continue; // not a plain string - left alone rather than rewritten
 
-                        if (satelliteItem.Name.Contains('.'))
+                        if (primaryEntry.Key.Contains('.'))
                         {
-                            if (!satelliteItem.Name.EndsWith(".Text") &&
-                                !satelliteItem.Name.EndsWith(".Title") &&
-                                !satelliteItem.Name.EndsWith(".Filter") &&
-                                !satelliteItem.Name.EndsWith(".AccessibleName"))
+                            if (!primaryEntry.Key.EndsWith(".Text", StringComparison.Ordinal) &&
+                                !primaryEntry.Key.EndsWith(".Title", StringComparison.Ordinal) &&
+                                !primaryEntry.Key.EndsWith(".Filter", StringComparison.Ordinal) &&
+                                !primaryEntry.Key.EndsWith(".AccessibleName", StringComparison.Ordinal))
                                 continue;
                         }
 
-                        if (Equals(satelliteItem.GetValue(trs), primaryEntry.Value.GetValue(trs)))
-                            continue;
+                        if (string.Equals(satelliteValue, primaryEntry.Value, StringComparison.Ordinal))
+                            continue; // untranslated - the primary already says this
 
-                        newSatellite.Add(satelliteItem.Name, satelliteItem);
+                        kept.Add(new KeyValuePair<string, string>(primaryEntry.Key, satelliteValue));
                     }
 
-                    string outPath = Path.Combine(OptimizeOutputPath.Text, Path.GetFileName(satellitePath));
-                    using var resxWriter = new ResXResourceWriter(outPath);
-                    foreach (var kv in newSatellite)
-                        resxWriter.AddResource(kv.Value);
-                    resxWriter.Generate();
+                    var outPath = Path.Combine(OptimizeOutputPath.Text, Path.GetFileName(satellitePath));
+                    ResxFile.Write(outPath, kept);
                 }
             }
         }

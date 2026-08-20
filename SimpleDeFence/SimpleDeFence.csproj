@@ -4,13 +4,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>latest</LangVersion>
     <OutputType>WinExe</OutputType>
-    <!-- Retained, though no code in this project uses WinForms any more. It is here for
-         SimpleDeFence.UI's DevelToolWindow, whose .resx round-trip needs ResXResourceReader/Writer
-         and ResXDataNode - those live in the System.Windows.Forms assembly and have no
-         in-framework equivalent. The UI project cannot declare it itself: WinUI plus
-         UseWindowsForms pulls in the WPF targets and fails the build (MC6000), so it flows from
-         here transitively as it always did. -->
-    <UseWindowsForms>true</UseWindowsForms>
     <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

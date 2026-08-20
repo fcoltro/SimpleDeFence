@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
@@ -94,7 +94,7 @@ namespace SimpleDeFence.DatabaseClasses
         /// <summary>The prompt-free half of what was SimpleDeFence/DatabaseClasses/AppDatabase.cs's
         /// GetExceptionsForApp(subject, guiPrompt, out app) - moved here because this half has no
         /// WinForms dependency (unlike the guiPrompt=true path, which shows a
-        /// Microsoft.Samples.TaskDialog prompt and stays in that WinForms-only partial as a thin
+        /// native TaskDialog prompt and stayed in that WinForms-only partial as a thin
         /// wrapper around this method).</summary>
         public List<FirewallExceptionV3> GetExceptionsForApp(ExceptionSubject fromSubject, out Application? app)
         {

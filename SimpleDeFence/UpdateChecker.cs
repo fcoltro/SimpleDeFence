@@ -14,7 +14,7 @@ namespace SimpleDeFence
     /// This file used to also carry an <c>Updater</c> class that drove the same flow through
     /// native TaskDialogs. It was superseded by SimpleDeFence.UI/Services/Updater.cs during the
     /// WinUI migration and left behind unreferenced - nothing ever called its StartUpdate entry
-    /// point - so it has been removed along with the Microsoft.Samples TaskDialog wrapper it was
+    /// point - so it has been removed along with the vendored TaskDialog wrapper it was
     /// the last consumer of.
     /// </summary>
     internal static class UpdateChecker

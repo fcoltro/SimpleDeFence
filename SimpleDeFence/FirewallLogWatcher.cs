@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Runtime.InteropServices;
-using Microsoft.Samples;
 using SimpleDeFence.Utilities;
 using SimpleDeFence.Windows;
 
