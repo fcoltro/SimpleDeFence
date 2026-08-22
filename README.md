@@ -13,7 +13,7 @@
 
 SimpleDeFence is a free, lightweight, and non-intrusive, secure by default firewall for Windows. Built to just simply sit in your system tray, quietly blocking any application you did not explicitly allow network access. It installs no kernel drivers, so it cannot negatively influence system stability. It also respects your privacy and collects absolutely no data about the user or their computer.
 
-SimpleDeFence began as a fork of [TinyWall](https://github.com/pylorak/TinyWall), written by Károly Pados, and that code base is its origin. It has since diverged: the WinForms interface has been replaced by a WinUI 3 one, the projects target .NET 10, and the configuration and password protection have been reworked. See [NOTICE.md](NOTICE.md) for attribution and licensing, and [ROADMAP.md](ROADMAP.md) for where it is going.
+SimpleDeFence began as a fork of [TinyWall](https://github.com/pylorak/TinyWall), written by Károly Pados, and that code base is its origin. It has since diverged: the WinForms interface has been replaced by a WinUI 3 one, the projects target .NET 10, and the configuration and password protection have been reworked. Like TinyWall, it is licensed under the GPLv3 - see [LICENSE.txt](LICENSE.txt) for the full text. `SimpleDeFence.Windows/Privilege.cs` originates from a March 2005 MSDN Magazine article by Mark Novak and carries its own terms in `Privilege.cs.LICENSE`.
 
 TinyWall and its authors are the origin of this code, not participants in this project — please do not report SimpleDeFence issues to them.
 

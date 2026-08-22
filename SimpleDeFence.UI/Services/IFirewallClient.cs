@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SimpleDeFence.DatabaseClasses;
@@ -7,7 +7,7 @@ namespace SimpleDeFence.UI.Services
 {
     /// <summary>
     /// What the GUI needs from the service. Exists so the screens can run against sample data
-    /// while the real client is blocked by AuthAsServer (see ROADMAP.md) - without it, none of
+    /// while the real client is blocked by AuthAsServer - without it, none of
     /// these screens could be run or visually verified while being built.
     /// </summary>
     internal interface IFirewallClient
