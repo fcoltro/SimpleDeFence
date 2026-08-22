@@ -97,14 +97,6 @@ namespace SimpleDeFence
             return sb.ToString();
         }
 
-#if NET48
-        // Use string.IsNullOrEmpty() on .Net 5 and newer
-        public static bool IsNullOrEmpty([NotNullWhen(false)] string? str)
-        {
-            return (str is null) || (str == string.Empty);
-        }
-#endif
-
         public static T OnlyFirst<T>(IEnumerable<T> items)
         {
             using IEnumerator<T> iter = items.GetEnumerator();

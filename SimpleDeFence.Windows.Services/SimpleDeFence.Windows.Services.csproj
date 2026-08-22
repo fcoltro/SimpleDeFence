@@ -17,16 +17,9 @@
 		<Copyright>Copyright © 2021 Károly Pados</Copyright>
 		<Version>1.0.0</Version>
 	</PropertyGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net48'">
-		<PackageReference Include="Nullable" Version="1.3.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<Reference Include="System.ServiceProcess" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'!='net48'">
-		<!-- Restores ServiceController/ServiceControllerStatus for modern .NET; the framework-only
-		     System.ServiceProcess assembly reference above doesn't resolve here. -->
+	<ItemGroup>
+		<!-- ServiceController/ServiceControllerStatus. Not in the shared framework on .NET, unlike
+		     .NET Framework, where they came from a System.ServiceProcess assembly reference. -->
 		<PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.10" />
 	</ItemGroup>
 	<ItemGroup>

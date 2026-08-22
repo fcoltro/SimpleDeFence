@@ -13,28 +13,10 @@
     <Product>SimpleDeFence.Core</Product>
     <AssemblyTitle>SimpleDeFence.Core</AssemblyTitle>
     <Company>fcoltro</Company>
-    <Description>Protocol, IPC, and shared config/rule model for SimpleDeFence - used by both the WinForms and WinUI 3 GUIs to talk to the service.</Description>
+    <Description>Protocol, IPC, and shared config/rule model for SimpleDeFence - used by the WinUI 3 GUI and the service.</Description>
     <Copyright>Copyright © 2011 Károly Pados, Copyright © 2026 fcoltro</Copyright>
     <Version>1.0.0</Version>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net48'">
-    <PackageReference Include="Nullable" Version="1.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <!-- Used for WinRT access (UwpPackageList) in .Net 4.8, not needed with .NET 5+ -->
-    <Reference Include="Windows.Management" />
-    <Reference Include="Windows.ApplicationModel" />
-    <Reference Include="System.Runtime" />
-    <!-- UpdateDescriptorFetcher.cs uses HttpClient; on net10 it resolves implicitly, but net48 SDK
-         projects don't implicitly reference System.Net.Http the way they do System/System.Core. -->
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='net48'">
-    <TargetPlatformVersion>8.0</TargetPlatformVersion>
-  </PropertyGroup>
-  <ItemGroup>
-  </ItemGroup>
   <ItemGroup>
     <!-- One file per language holds every string in the app. Embedded rather than shipped loose so
          a translation cannot go missing at runtime. WithCulture="false" is required: MSBuild's
@@ -54,11 +36,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SimpleDeFence.Windows\SimpleDeFence.Windows.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <!-- DPAPI. Not in the shared framework on .NET (unlike .NET Framework), so it comes from this
-         package; ConfigProtection uses it to wrap the per-installation config key. -->
-  </ItemGroup>
-
   <ItemGroup>
     <!-- DPAPI, used by ConfigProtection to wrap the per-installation config key. Not in the shared
          framework on .NET. It briefly looked unnecessary - the SDK flagged it NU1510 - but that was

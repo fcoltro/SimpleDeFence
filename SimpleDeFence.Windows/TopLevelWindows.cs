@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -18,7 +18,7 @@ namespace SimpleDeFence.Windows
         public uint ProcessId { get; }
     }
 
-    /// <summary>EnumWindows interop for the window picker. Pure P/Invoke - net48 and net10 safe.</summary>
+    /// <summary>EnumWindows interop for the window picker.</summary>
     public static class TopLevelWindows
     {
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
