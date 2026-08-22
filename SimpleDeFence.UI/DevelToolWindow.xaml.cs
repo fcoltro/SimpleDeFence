@@ -24,6 +24,11 @@ namespace SimpleDeFence.UI
         public DevelToolWindow()
         {
             InitializeComponent();
+
+            // Without this the window reports WinUI's default, so it shows up in the taskbar and in
+            // the window list as "WinUI Desktop" - indistinguishable from any other WinUI app, and
+            // from the main window when both are open.
+            Title = "SimpleDeFence Dev Helper";
         }
 
         /// <summary>Called right after Activate() (see HostBootstrap.RunAsDevelTool). Content.XamlRoot
