@@ -1,0 +1,17 @@
+{
+  "MagicWord": "SimpleDeFence Update Descriptor",
+  "Modules": [
+    {
+      "Component": "SimpleDeFence_x86",
+      "ComponentVersion": "0.1.0",
+      "DownloadHash": "",
+      "UpdateURL": "https://github.com/fcoltro/SimpleDeFence/releases"
+    },
+    {
+      "Component": "SimpleDeFence_arm64",
+      "ComponentVersion": "0.1.0",
+      "DownloadHash": "",
+      "UpdateURL": "https://github.com/fcoltro/SimpleDeFence/releases"
+    }
+  ]
+}

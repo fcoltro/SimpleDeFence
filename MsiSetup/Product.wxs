@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <!-- String constants -->
+  <?define ProductName="SimpleDeFence" ?>
+  <?define Manufacturer="fcoltro" ?>
+  <?define Description="A non-intrusive firewall solution. Fork of TinyWall." ?>
+  <?define ProductURL="https://github.com/fcoltro/SimpleDeFence" ?>
+  <!-- Releases page rather than a Changelog.txt in the tree: the file this used to point at was
+       upstream TinyWall's changelog, describing releases of a different project. -->
+  <?define ReleaseNotesURL="https://github.com/fcoltro/SimpleDeFence/releases" ?>
+  <?define ProductVersion="!(bind.fileVersion.TinyWallEXE)" ?>
+  <!-- Floor of the upgradeable range. It must sit strictly BELOW ProductVersion: that
+       range's ceiling is exclusive, and ICE61 rejects both an inverted range and an empty
+       one. This tracked TinyWall's 3.x line, so resetting the product to 0.1.0 had to
+       reset it too - and 0.1.0.0 was still wrong, because it made floor and ceiling equal.
+       An installed 3.5.1 sits above the range entirely, so it matches NEWER_FOUND and
+       FoundNewerVersion refuses the install rather than laying a second product beside it. -->
+  <?define OldestUpgradeableVersion="0.0.1.0" ?>
+
+  <!-- Architecture selection -->
+  <?if $(var.Platform) = x64 ?>
+    <?define BuildArch="x64" ?>
+    <?define Win64 = "yes" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+    <?define NgenBitness = "64bit" ?>
+    <?define System32Dir = "System64Folder" ?>
+  <?elseif $(var.Platform) = "arm64"?>
+	<?define BuildArch="arm64" ?>
+	<?define Win64 = "yes" ?>
+	<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+	<?define NgenBitness = "64bit" ?>
+	<?define System32Dir = "System64Folder" ?>
+  <?elseif $(var.Platform) = "x86"?>
+    <?define BuildArch="x86" ?>
+    <?define Win64 = "no" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+    <?define NgenBitness = "32bit" ?>
+    <?define System32Dir = "SystemFolder" ?>
+  <?endif ?>
+
+  <Product Id="*" Codepage="1250" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="{5D6FBFAF-3552-4F7D-9ABF-79F04E73661C}">
+    <Package InstallerVersion="301" Compressed="yes" InstallScope="perMachine" SummaryCodepage="1250" Description="$(var.Description)" Manufacturer="$(var.Manufacturer)" />
+
+    <!-- Automatic media generation and assignment -->
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- Add/Remove Programs -->
+    <Property Id="ARPPRODUCTICON" Value="TinyWallIcon.exe" />
+    <Property Id="ARPCOMMENTS" Value="$(var.Description)" />
+    <Property Id="ARPCONTACT" Value="$(var.Manufacturer)" />
+    <Property Id="ARPURLINFOABOUT" Value="$(var.ProductURL)" />
+    <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" /> 
+    <CustomAction Id="SetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
+
+    <!-- Disable use of "Files in Use" dialogs, we manage that ourself over custom actions -->
+    <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" />
+
+    <!-- Windows version detection -->
+    <Property Id="WINDOWSBUILDNUMBER" Secure="yes">
+      <RegistrySearch Id="BuildNumberSearch" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Name="CurrentBuildNumber" Type="raw" />
+    </Property>
+    <Condition Message="This application requires Windows 10 version 21H2 (build 19044) or newer.">
+      <![CDATA[Installed OR (WINDOWSBUILDNUMBER >= 19044)]]>
+    </Condition>
+
+    <!-- No .NET runtime detection: the payload is a self-contained net10 publish, so the whole
+         runtime ships inside the MSI and no machine-wide .NET (Framework or Core) is required. -->
+
+    <!-- Feature description -->
+    <Feature Id="ProductFeature" Title="Complete" Description="The complete package." ConfigurableDirectory="INSTALLDIR" Level="1">
+      <ComponentRef Id='MainExecutable' />
+      <ComponentRef Id='ProgramMenuDir' />
+      <ComponentRef Id='RemoveAppDataDir' />
+      <ComponentRef Id='RegistryKeys' />
+      <ComponentRef Id='License' />
+      <ComponentRef Id='Attributions' />
+      <ComponentRef Id='Database' />
+      <ComponentRef Id='hosts' />
+      <!-- Everything under the publish root - runtime, app DLL, satellite resource assemblies,
+           .deps.json/.runtimeconfig.json - comes from the heat-harvested group in Dependencies.wxs. -->
+      <ComponentGroupRef Id='PublishedDependencies' />
+      <ComponentGroupRef Id='Documentation' />
+    </Feature>
+
+    <!-- Search for older versions -->
+    <Property Id="OLDER_INCOMPATIBLE_FOUND" Secure="yes" />
+    <Property Id="OLDER_UPGRADEABLE_FOUND" Secure="yes" />
+    <Property Id="NEWER_FOUND" Secure="yes" />
+    <Upgrade Id='{5D6FBFAF-3552-4F7D-9ABF-79F04E73661C}'>
+      <UpgradeVersion OnlyDetect='yes' Property='OLDER_INCOMPATIBLE_FOUND'
+        Maximum="$(var.OldestUpgradeableVersion)" IncludeMaximum='no' />
+      <!-- IncludeMaximum is 'yes' so this range covers the version being installed, not just the
+           ones below it. Product Id="*" mints a fresh ProductCode on every build, so installing
+           the same version twice presented Windows with a genuinely different product; with the
+           equal version excluded here, RemoveExistingProducts did not fire and nothing else
+           blocked it, so the second install landed *beside* the first. Two entries in Add/Remove,
+           both owning the same files and the same service, and uninstalling either broke the
+           other. Including it makes a same-version install replace what is there, which is also
+           what a repair or a rebuild during development wants. -->
+      <UpgradeVersion Property='OLDER_UPGRADEABLE_FOUND'
+        Minimum="$(var.OldestUpgradeableVersion)" IncludeMinimum='yes'
+        Maximum="$(var.ProductVersion)" IncludeMaximum='yes' />
+      <!-- SELF_FOUND used to sit here matching exactly this version. It was declared, set, and
+           then never named by any action or condition - so it detected the side-by-side case and
+           did nothing about it. Its range is now wholly inside OLDER_UPGRADEABLE_FOUND, which does
+           act on it, so it is gone rather than left as a property that looks like a guard. -->
+      <UpgradeVersion OnlyDetect='yes' Property='NEWER_FOUND'
+        Minimum="$(var.ProductVersion)" IncludeMinimum='no' />
+    </Upgrade>
+
+    <!-- Custom actions -->
+    <CustomAction Id='FoundIncompatibleVersion' Error='An older version of $(var.ProductName) is installed that cannot be automatically updated. Please uninstall the existing version first, then try again.' />
+    <CustomAction Id='FoundNewerVersion' Error='A newer version of $(var.ProductName) is already installed. Installation cannot continue.' />
+    <CustomAction Id='InstallCustom' FileKey='TinyWallEXE' ExeCommand='/install' Return='check' Execute='commit' Impersonate='no' />
+    <CustomAction Id='InstallCustomRollback' FileKey='TinyWallEXE' ExeCommand='/uninstall' Return='check' Execute='rollback' Impersonate='no' />
+    <CustomAction Id='UninstallCustom' FileKey='TinyWallEXE' ExeCommand='/uninstall' Return='check' Execute='deferred' Impersonate='no' />
+    <CustomAction Id='StartControllerAndDetect' FileKey='TinyWallEXE' ExeCommand='/autowhitelist' Return='asyncNoWait' Execute='commit' />
+    <CustomAction Id='StartController' FileKey='TinyWallEXE' ExeCommand='' Return='asyncNoWait' Execute='commit' />
+
+    <!-- Sequencing -->
+    <InstallExecuteSequence>
+      <!-- FindRelatedProducts -->
+      <Custom Action='FoundNewerVersion' After='FindRelatedProducts'>NEWER_FOUND</Custom>
+      <Custom Action='FoundIncompatibleVersion' After='FindRelatedProducts'>OLDER_INCOMPATIBLE_FOUND</Custom>
+      <!-- InstallValidate -->
+      <Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
+      <RemoveExistingProducts After='InstallValidate'>OLDER_UPGRADEABLE_FOUND</RemoveExistingProducts>
+      <!-- InstallInitialize -->
+      <Custom Action='UninstallCustom' Before='UnpublishFeatures'>Installed</Custom>
+      <Custom Action='InstallCustomRollback' Before='InstallCustom'>NOT Installed</Custom>
+      <Custom Action='InstallCustom' Before='InstallFinalize'>NOT Installed</Custom>
+      <Custom Action='StartControllerAndDetect' After='InstallCustom'>(NOT Installed) AND (NOT OLDER_UPGRADEABLE_FOUND)</Custom>
+      <Custom Action='StartController' After='InstallCustom'>(NOT Installed) AND OLDER_UPGRADEABLE_FOUND</Custom>
+      <!-- InstallFinalize -->
+    </InstallExecuteSequence>
+
+    <!-- Sequencing -->
+    <InstallUISequence>
+      <Custom Action='FoundNewerVersion' After='FindRelatedProducts'>NEWER_FOUND</Custom>
+      <Custom Action='FoundIncompatibleVersion' After='FoundNewerVersion'>OLDER_INCOMPATIBLE_FOUND</Custom>
+    </InstallUISequence>
+
+    <!-- UI definition and overrides -->
+    <UIRef Id="WixUI_InstallDir_Custom" />
+    <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="background.bmp" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value='The default configuration of SimpleDeFence is to block most programs. If an application is unable to access the network, remember to use one of the "Whitelist by..." options from the tray menu.' />
+    <WixVariable Id="WixUILicenseRtf" Value="Sources\ProgramFiles\SimpleDeFence\License.rtf" />
+
+  </Product>
+
+  <Fragment>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <!-- Program Files -->
+      <Directory Id="$(var.PlatformProgramFilesFolder)" Name="ProgramFiles">
+        <Directory Id="INSTALLDIR" Name="SimpleDeFence">
+          <!-- The main executable stays hand-authored (and is excluded from the harvest by
+               HarvestPublishDir.xslt) purely so its File keeps the stable Id "TinyWallEXE", which
+               !(bind.fileVersion.TinyWallEXE) and the five FileKey='TinyWallEXE' custom actions
+               below both depend on; heat generates unpredictable hash-based Ids.
+               Source now points into the publish output rather than a separately staged copy, so
+               the packaged apphost is guaranteed to be the same build as the runtime beside it.
+               Assembly=".net"/AssemblyApplication were dropped: under a self-contained publish
+               SimpleDeFence.exe is a native apphost launcher (verified - its OriginalFilename is
+               "SimpleDeFence.dll" and the IL lives in that separate 1MB assembly), so it carries no
+               managed manifest for light.exe to read into the MsiAssembly table. -->
+          <Component Id="MainExecutable" Guid="{422FE697-4CCC-4B6C-B5E6-F4BB54CC1AF3}" Win64="$(var.Win64)">
+            <File Id="TinyWallEXE" Source="$(var.PublishDir)\SimpleDeFence.exe" Vital="yes" KeyPath="yes" Checksum="yes" />
+          </Component>
+          <!-- MainExecutableConfig removed: SimpleDeFence.exe.config is a .NET Framework convention.
+               The net10 equivalent (SimpleDeFence.dll.config, from app.config) plus .deps.json and
+               .runtimeconfig.json all sit in the publish root and are picked up by the harvest. -->
+          <Component Id="License" Guid="{205DCF42-A705-401A-9868-015BA855B5DB}" Win64="$(var.Win64)">
+            <File Id="LicenseRTF" Source="Sources\ProgramFiles\SimpleDeFence\License.rtf" KeyPath="yes" />
+          </Component>
+          <Component Id="Attributions" Guid="{2FE1A628-B97D-4C67-B240-F1A0971310EB}" Win64="$(var.Win64)">
+            <File Id="AttributionsTXT" Source="Sources\ProgramFiles\SimpleDeFence\Attributions.txt" KeyPath="yes" />
+          </Component>
+          <!-- The 17 hand-authored LOCDIR_* satellite-assembly components that used to live here
+               were removed for the same reason as the Dependencies group below: `dotnet publish`
+               emits every SimpleDeFence.resources.dll into <publish>\<lang>\, so the harvest already
+               installs all of them. Keeping both would have put the same target file under two
+               different components (ICE30) and double-declared the language directories.
+               The harvest is also strictly broader than this list was - it additionally carries the
+               WinForms runtime's own zh-Hans/zh-Hant resource assemblies, which the hand-authored
+               list never covered. -->
+          <Directory Id="DOCDIR" Name="doc">
+            <Component Id="DocFAQComp" Win64="$(var.Win64)">
+              <File Id="DocFAQFile" Source="Sources\ProgramFiles\SimpleDeFence\doc\faq.html" Vital="yes" KeyPath="yes" Checksum="yes" />
+            </Component>
+            <Directory Id="DOCCSSDIR" Name="css">
+              <Component Id="DocCss00Comp" Win64="$(var.Win64)">
+                <File Id="DocCss00File" Source="Sources\ProgramFiles\SimpleDeFence\doc\css\1140.css" Vital="yes" KeyPath="yes" Checksum="yes" />
+              </Component>
+              <Component Id="DocCss02Comp" Win64="$(var.Win64)">
+                <File Id="DocCss02File" Source="Sources\ProgramFiles\SimpleDeFence\doc\css\style.css" Vital="yes" KeyPath="yes" Checksum="yes" />
+              </Component>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+      
+      <!-- ProgramData -->
+      <Directory Id="CommonAppDataFolder" Name="CommonAppData">
+        <Directory Id="AppDataDir" Name="SimpleDeFence">
+          <Component Id="Database" Guid="{93D21865-93BD-4DF0-85FA-7DF5CD4BAB74}" Win64="$(var.Win64)">
+            <File Id="DatabaseJson" Source="Sources\CommonAppData\SimpleDeFence\profiles.json" Vital="yes" KeyPath="yes" />
+          </Component>
+          <Component Id="hosts" Guid="{F3ABB78F-BA69-47E0-98B4-439C74018233}" Win64="$(var.Win64)">
+            <File Id="HostsBCK" Source="Sources\CommonAppData\SimpleDeFence\hosts.bck" Vital="yes" KeyPath="yes" />
+          </Component>
+          <Component Id="RemoveAppDataDir" Guid="{602DBDBF-489B-4F86-849B-30FDBE6D5EFF}" Win64="$(var.Win64)" Transitive="yes">
+            <RemoveFile Id="AppDataDirFiles" On='install' Name='*' />
+            <RemoveFolder Id="AppDataDirFolder" On='install' />
+            <Condition><![CDATA[NOT OLDER_UPGRADEABLE_FOUND]]></Condition>
+          </Component>
+        </Directory>
+      </Directory>
+
+      <!-- Start Menu -->
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ProgramMenuDir" Name="$(var.ProductName)">
+          <Component Id="ProgramMenuDir" Guid="{5A29C3A4-558D-498B-95A4-1FCC24DA2EFB}" Win64="$(var.Win64)">
+            <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+            <RegistryValue Root='HKCU' Key='Software\[ProductName]' Type='string' Value='' KeyPath='yes' />
+            <Shortcut Id="ControllerShortcut" Icon="TinyWallIcon.exe" Directory="ProgramMenuDir" Name="SimpleDeFence Controller" Target="[INSTALLDIR]SimpleDeFence.exe">
+              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 5" Value="fcoltro.SimpleDeFence.Controller" /> <!-- System.AppUserModel.ID -->
+              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 12" Value="1" />                         <!-- System.AppUserModel.StartPinOption, http://support.microsoft.com/kb/2745126/en-us -->
+              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 8" Value="1" />                          <!-- System.AppUserModel.ExcludeFromShowInNewInstall -->
+            </Shortcut>
+            <Shortcut Id="DevelToolShortcut" Icon="TinyWallIcon.exe" Directory="ProgramMenuDir" Name="SimpleDeFence Dev Helper" Arguments="/develtool" Target="[INSTALLDIR]SimpleDeFence.exe">
+              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 5" Value="fcoltro.SimpleDeFence.DevelTool" />  <!-- System.AppUserModel.ID -->
+              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 12" Value="1" />                         <!-- System.AppUserModel.StartPinOption, http://support.microsoft.com/kb/2745126/en-us -->
+              <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 8" Value="1" />                          <!-- System.AppUserModel.ExcludeFromShowInNewInstall -->
+            </Shortcut>
+            <Shortcut Id="FAQShortcut" Directory="ProgramMenuDir" Name="FAQ" Target="[INSTALLDIR]doc\faq.html"/>
+            <util:InternetShortcut Id="WebsiteShortcut" Name="Website" Target="$(var.ProductURL)"/>
+            <util:InternetShortcut Id="ReleaseNotesShortcut" Name="Release Notes" Target="$(var.ReleaseNotesURL)"/>
+            <!-- <Shortcut Id="UninstallProduct"
+                      Name="Uninstall SimpleDeFence"
+                      Target="[$(var.System32Dir)]msiexec.exe"
+                      Arguments="/x [ProductCode]" /> -->
+          </Component>
+        </Directory>
+      </Directory>
+
+    </Directory>
+
+    <!-- Registry -->
+    <Component Id="RegistryKeys" Guid="{6653D907-039F-40A3-A4F5-90DAB4E78028}" Directory="INSTALLDIR" Win64="$(var.Win64)">
+      <RegistryKey Id='RegInstallDir' Root='HKLM' Key='Software\SimpleDeFence' ForceDeleteOnUninstall='yes'>
+        <RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]'/>
+      </RegistryKey>
+    </Component>
+
+    <!-- Icons -->
+    <Icon Id="TinyWallIcon.exe" SourceFile="Sources\ProgramFiles\SimpleDeFence\SimpleDeFence.ico" />
+
+    <!-- Dependencies groupping - harvested from the self-contained publish output by heat.exe
+         (see Dependencies.wxs); hand-authoring one <Component> per file stopped being practical
+         once the app became self-contained (hundreds of runtime files vs. the ~9 small NuGet
+         package DLLs net48's framework-dependent build needed). The real Release publish of this
+         project is 293 files / 145 MB. The generated ComponentGroup is named PublishedDependencies
+         and is referenced from <Feature> above. -->
+
+    <!-- Localization groupping - likewise harvested; see the note where the LOCDIR_* directories
+         used to be. -->
+
+    <!-- Documentation groupping -->
+    <ComponentGroup Id="Documentation">
+      <ComponentRef Id="DocFAQComp"/>
+      <ComponentRef Id="DocCss00Comp"/>
+      <ComponentRef Id="DocCss02Comp"/>
+    </ComponentGroup>
+    
+  </Fragment>
+
+</Wix>

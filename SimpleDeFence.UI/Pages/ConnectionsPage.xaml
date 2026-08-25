@@ -1,0 +1,573 @@
+﻿<Page
+    x:Class="SimpleDeFence.UI.Pages.ConnectionsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SimpleDeFence.UI.Pages"
+    xmlns:loc="using:SimpleDeFence.UI.Localization">
+    <Page.Resources>
+        <!-- Two templates per list, wide and folded, generated from one definition so they
+             cannot drift apart. Below 1000px the page swaps every list to the folded
+             pair: the detail, "Show all" and the timestamp drop to a second line under the app
+             name instead of being pushed off the right edge, where they were simply clipped -
+             not scrollable, just unreachable.
+
+             The swap is driven from the page, not from inside the templates. A VisualState
+             with an AdaptiveTrigger placed inside a DataTemplate never activates - state
+             groups are only evaluated on a control template root - so the first attempt at
+             this simply did nothing. -->
+        <DataTemplate x:Key="BlockedRowWide" x:DataType="local:BlockedListItem">
+            <Grid>
+                <!-- Row fills. Yellow means every address on this row stayed on the local network;
+                     the legend above the lists says so. -->
+                <Border Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" Visibility="{x:Bind RemoteVisibility}"/>
+                <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
+
+                <Grid Padding="12,8" ColumnSpacing="12" RowSpacing="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*" MinWidth="120" MaxWidth="260"/>
+                        <ColumnDefinition Width="Auto" MinWidth="42"/>
+                        <ColumnDefinition Width="*" MinWidth="90"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <FontIcon Grid.Row="0" Grid.Column="0" FontSize="14" Glyph="&#xE733;"
+                              VerticalAlignment="Center" HorizontalAlignment="Center"
+                              Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind AppName}"
+                               Style="{StaticResource BodyStrongTextBlockStyle}"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Bind Protocol}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="{x:Bind Detail}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+
+                    <Button Grid.Row="0" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
+                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                    <TextBlock Text="{loc:Loc Key=connections.blocked.attemptsHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{x:Bind Attempts}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="local:BlockedAttempt">
+                                                    <Grid ColumnSpacing="12" Padding="0,3">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind When}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
+                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+
+                    <TextBlock Grid.Row="0" Grid.Column="5" Text="{x:Bind When}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.6" TextWrapping="NoWrap"/>
+                    <!-- Allow stays on the first line even when the row folds: it is the action,
+                         and burying it under the detail would be the wrong thing to demote. -->
+                    <Button Grid.Row="0" Grid.Column="6" Content="{loc:Loc Key=connections.allow}"
+                            VerticalAlignment="Center" Click="{x:Bind AllowButton_Click}"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="BlockedRowNarrow" x:DataType="local:BlockedListItem">
+            <Grid>
+                <!-- Row fills. Yellow means every address on this row stayed on the local network;
+                     the legend above the lists says so. -->
+                <Border Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" Visibility="{x:Bind RemoteVisibility}"/>
+                <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
+
+                <Grid Padding="12,8" ColumnSpacing="12" RowSpacing="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*" MinWidth="120" MaxWidth="260"/>
+                        <ColumnDefinition Width="Auto" MinWidth="42"/>
+                        <ColumnDefinition Width="*" MinWidth="90"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <FontIcon Grid.Row="0" Grid.Column="0" FontSize="14" Glyph="&#xE733;"
+                              VerticalAlignment="Center" HorizontalAlignment="Center"
+                              Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind AppName}"
+                               Style="{StaticResource BodyStrongTextBlockStyle}"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Bind Protocol}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{x:Bind Detail}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+
+                    <Button Grid.Row="1" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
+                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                    <TextBlock Text="{loc:Loc Key=connections.blocked.attemptsHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{x:Bind Attempts}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="local:BlockedAttempt">
+                                                    <Grid ColumnSpacing="12" Padding="0,3">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind When}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
+                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+
+                    <TextBlock Grid.Row="1" Grid.Column="5" Text="{x:Bind When}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.6" TextWrapping="NoWrap"/>
+                    <!-- Allow stays on the first line even when the row folds: it is the action,
+                         and burying it under the detail would be the wrong thing to demote. -->
+                    <Button Grid.Row="0" Grid.Column="6" Content="{loc:Loc Key=connections.allow}"
+                            VerticalAlignment="Center" Click="{x:Bind AllowButton_Click}"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ConnectedRowWide" x:DataType="local:ConnectionListItem">
+            <Grid>
+                <!-- Row fills. Yellow means every address on this row stayed on the local network;
+                     the legend above the lists says so. -->
+                <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
+
+                <Grid Padding="12,8" ColumnSpacing="12" RowSpacing="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*" MinWidth="120" MaxWidth="260"/>
+                        <ColumnDefinition Width="Auto" MinWidth="42"/>
+                        <ColumnDefinition Width="*" MinWidth="90"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind AppName}"
+                               Style="{StaticResource BodyStrongTextBlockStyle}"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Bind Protocol}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="{x:Bind RemoteEndpoint}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+
+                    <Button Grid.Row="0" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
+                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                    <TextBlock Text="{x:Bind FlyoutHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{x:Bind Lines}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="local:ConnectionLine">
+                                                    <Grid ColumnSpacing="12" Padding="0,3">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{x:Bind Endpoint}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind Trailing}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
+                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+
+                    <TextBlock Grid.Row="0" Grid.Column="5" Text="{x:Bind State}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ConnectedRowNarrow" x:DataType="local:ConnectionListItem">
+            <Grid>
+                <!-- Row fills. Yellow means every address on this row stayed on the local network;
+                     the legend above the lists says so. -->
+                <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
+
+                <Grid Padding="12,8" ColumnSpacing="12" RowSpacing="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*" MinWidth="120" MaxWidth="260"/>
+                        <ColumnDefinition Width="Auto" MinWidth="42"/>
+                        <ColumnDefinition Width="*" MinWidth="90"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind AppName}"
+                               Style="{StaticResource BodyStrongTextBlockStyle}"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Bind Protocol}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{x:Bind RemoteEndpoint}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+
+                    <Button Grid.Row="1" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
+                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                    <TextBlock Text="{x:Bind FlyoutHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{x:Bind Lines}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="local:ConnectionLine">
+                                                    <Grid ColumnSpacing="12" Padding="0,3">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{x:Bind Endpoint}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind Trailing}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
+                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+
+                    <TextBlock Grid.Row="1" Grid.Column="5" Text="{x:Bind State}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="OpenRowWide" x:DataType="local:ConnectionListItem">
+            <Grid>
+                <!-- Row fills. Yellow means every address on this row stayed on the local network;
+                     the legend above the lists says so. -->
+                <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
+
+                <Grid Padding="12,8" ColumnSpacing="12" RowSpacing="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*" MinWidth="120" MaxWidth="260"/>
+                        <ColumnDefinition Width="Auto" MinWidth="42"/>
+                        <ColumnDefinition Width="*" MinWidth="90"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind AppName}"
+                               Style="{StaticResource BodyStrongTextBlockStyle}"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Bind Protocol}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="{x:Bind LocalEndpoint}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+
+                    <Button Grid.Row="0" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
+                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                    <TextBlock Text="{x:Bind FlyoutHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{x:Bind Lines}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="local:ConnectionLine">
+                                                    <Grid ColumnSpacing="12" Padding="0,3">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{x:Bind Endpoint}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind Trailing}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
+                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="OpenRowNarrow" x:DataType="local:ConnectionListItem">
+            <Grid>
+                <!-- Row fills. Yellow means every address on this row stayed on the local network;
+                     the legend above the lists says so. -->
+                <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
+
+                <Grid Padding="12,8" ColumnSpacing="12" RowSpacing="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*" MinWidth="120" MaxWidth="260"/>
+                        <ColumnDefinition Width="Auto" MinWidth="42"/>
+                        <ColumnDefinition Width="*" MinWidth="90"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind AppName}"
+                               Style="{StaticResource BodyStrongTextBlockStyle}"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Bind Protocol}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{x:Bind LocalEndpoint}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" Opacity="0.8"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+
+                    <Button Grid.Row="1" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
+                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                    <TextBlock Text="{x:Bind FlyoutHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{x:Bind Lines}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="local:ConnectionLine">
+                                                    <Grid ColumnSpacing="12" Padding="0,3">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{x:Bind Endpoint}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind Trailing}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
+                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+    </Page.Resources>
+
+
+    <Grid Padding="28" RowSpacing="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="WideRows">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1000"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="FoldedRows">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="BlockedList.ItemTemplate" Value="{StaticResource BlockedRowNarrow}"/>
+                        <Setter Target="ConnectedList.ItemTemplate" Value="{StaticResource ConnectedRowNarrow}"/>
+                        <Setter Target="OpenList.ItemTemplate" Value="{StaticResource OpenRowNarrow}"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <TextBlock Grid.Row="0" Text="{loc:Loc Key=connections.title}" Style="{StaticResource TitleTextBlockStyle}"/>
+
+        <InfoBar Grid.Row="1" x:Name="Notice" IsOpen="False" IsClosable="True"/>
+
+        <Grid Grid.Row="2" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" x:Name="FilterBox" PlaceholderText="{loc:Loc Key=connections.filterPlaceholder}"
+                     TextChanged="FilterBox_TextChanged" MaxWidth="360" HorizontalAlignment="Left"/>
+            <ToggleSwitch Grid.Column="1" x:Name="AutoRefreshToggle" OnContent="{loc:Loc Key=connections.autoRefresh}"
+                          OffContent="{loc:Loc Key=connections.autoRefresh}" Toggled="AutoRefreshToggle_Toggled"/>
+            <Button Grid.Column="2" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"/>
+            <ProgressRing Grid.Column="3" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- A colour that means something needs to say what it means. Sits with the controls
+             rather than at the foot of the page, because a legend below three scrolling lists is
+             a legend nobody reads. The swatch takes the same brush the rows do, so the two cannot
+             drift apart. -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" Margin="0,10,0,0" VerticalAlignment="Center">
+            <Border Width="14" Height="14" CornerRadius="3" VerticalAlignment="Center"
+                    Background="{ThemeResource SystemFillColorCautionBackgroundBrush}"
+                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"/>
+            <TextBlock Text="{loc:Loc Key=connections.legend.local}" VerticalAlignment="Center"
+                       Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+        </StackPanel>
+
+        <!-- Horizontal axis disabled for the same reason SettingsPage's is: the row templates
+             below use fixed-width columns, so at narrow window sizes they measure wider than the
+             viewport and would otherwise grow a sideways scroll instead of letting the cells trim. -->
+        <ScrollViewer Grid.Row="4"
+                      HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="12">
+                <Expander x:Name="BlockedExpander" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="16" Glyph="&#xE733;"/>
+                            <TextBlock x:Name="BlockedHeaderText" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        </StackPanel>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock x:Name="BlockedEmpty" Text="{loc:Loc Key=connections.empty.blocked}"
+                                   Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
+                        <ListView x:Name="BlockedList" SelectionMode="None"
+                                  ItemTemplate="{StaticResource BlockedRowWide}"/>
+                    </StackPanel>
+                </Expander>
+
+                <Expander x:Name="ConnectedExpander" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="16" Glyph="&#xE8AB;"/>
+                            <TextBlock x:Name="ConnectedHeaderText" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        </StackPanel>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock x:Name="ConnectedEmpty" Text="{loc:Loc Key=connections.empty.connected}"
+                                   Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
+                        <ListView x:Name="ConnectedList" SelectionMode="None"
+                                  ItemTemplate="{StaticResource ConnectedRowWide}"/>
+                    </StackPanel>
+                </Expander>
+
+                <Expander x:Name="OpenExpander" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="16" Glyph="&#xE704;"/>
+                            <TextBlock x:Name="OpenHeaderText" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        </StackPanel>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock x:Name="OpenEmpty" Text="{loc:Loc Key=connections.empty.open}"
+                                   Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
+                        <ListView x:Name="OpenList" SelectionMode="None"
+                                  ItemTemplate="{StaticResource OpenRowWide}"/>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

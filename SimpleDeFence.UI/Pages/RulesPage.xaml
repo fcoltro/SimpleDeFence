@@ -1,0 +1,209 @@
+﻿<Page
+    x:Class="SimpleDeFence.UI.Pages.RulesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SimpleDeFence.UI.Pages"
+    xmlns:loc="using:SimpleDeFence.UI.Localization">
+
+    <Grid Padding="28" RowSpacing="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="{loc:Loc Key=rules.title}" Style="{StaticResource TitleTextBlockStyle}"/>
+
+        <InfoBar Grid.Row="1" x:Name="Notice" IsOpen="False" IsClosable="True"/>
+
+        <Grid Grid.Row="2" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" x:Name="FilterBox" PlaceholderText="{loc:Loc Key=rules.filterPlaceholder}"
+                     TextChanged="FilterBox_TextChanged" MaxWidth="360" HorizontalAlignment="Left"/>
+            <SplitButton Grid.Column="1" x:Name="AddButton" Content="{loc:Loc Key=rules.add}">
+                <SplitButton.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickExecutable}" Click="AddPickExecutable_Click"/>
+                        <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickProcess}" Click="AddPickProcess_Click"/>
+                        <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickWindow}" Click="AddPickWindow_Click"/>
+                        <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickUwp}" Click="AddPickUwp_Click"/>
+                        <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickFolder}" Click="AddPickFolder_Click"/>
+                    </MenuFlyout>
+                </SplitButton.Flyout>
+            </SplitButton>
+            <Button Grid.Column="2" x:Name="RemoveButton" Content="{loc:Loc Key=rules.remove}"
+                    Click="RemoveButton_Click" IsEnabled="False"/>
+            <Button Grid.Column="3" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"/>
+            <ProgressRing Grid.Column="4" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Horizontal axis disabled for the same reason SettingsPage's is: the row templates
+             below use fixed-width columns, so at narrow window sizes they measure wider than the
+             viewport and would otherwise grow a sideways scroll instead of letting the cells trim. -->
+        <ScrollViewer Grid.Row="3"
+                      HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="12">
+                <Expander IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <TextBlock x:Name="AppsHeader" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    </Expander.Header>
+                    <Grid ColumnSpacing="16">
+                        <!-- Auto, not "*" with a MinWidth: a "*" column keeps its full share of the
+                             width even when its only child is Collapsed, so the detail pane - which
+                             is Collapsed until a rule is selected (UpdateDetailPane) - was holding a
+                             third of the row area open for nothing, and starving the rule rows'
+                             own "*" Detail column down to a couple of dozen pixels at ordinary
+                             window sizes. Auto collapses to zero while the pane is hidden and sizes
+                             to the pane's own MinWidth once it is shown. -->
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock x:Name="AppsEmpty" Style="{StaticResource BodyTextBlockStyle}"
+                                       Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
+                            <ListView x:Name="AppsList" SelectionMode="Multiple"
+                                      SelectionChanged="AppsList_SelectionChanged">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="local:RuleListItem">
+                                        <!-- TextWrapping="NoWrap" on every cell below. These row
+                                             templates use fixed 220/110px columns plus a "*" column,
+                                             so once the pane and the 320px-minimum detail pane have
+                                             taken their share the "*" column collapses to a few
+                                             pixels at ordinary window sizes. The Fluent TextBlock
+                                             styles wrap by default, and TextTrimming only trims the
+                                             *last* line - so a starved cell wrapped into a tall thin
+                                             ribbon instead of ellipsing: measured live at a 1024x730
+                                             window, one Detail cell 26px wide by 408px tall, which
+                                             pushed every row after it below the fold and made
+                                             "Applications (8)" look like it had exactly one rule.
+                                             NoWrap keeps each row one line high and lets
+                                             TextTrimming do the eliding it was already asking for. -->
+                                        <Grid Padding="0,6" ColumnSpacing="14"
+                                              Background="{x:Bind RowBackground}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="220"/>
+                                                <ColumnDefinition Width="110"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                            <TextBlock Grid.Column="1" Text="{x:Bind Kind}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextWrapping="NoWrap"/>
+                                            <TextBlock Grid.Column="2" Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                            <TextBlock Grid.Column="3" Text="{x:Bind Policy}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextWrapping="NoWrap"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+
+                        <!-- Occupies the same column as DetailPane and is shown in its place when
+                             more than one rule is checked. Checking several rows does do something
+                             - Remove deletes them all in one commit - but nothing said so, and the
+                             detail pane simply vanishing on the second check reads as the selection
+                             having broken rather than having switched to a bulk action. -->
+                        <Border x:Name="MultiSelectHint" Grid.Column="1" Visibility="Collapsed" MinWidth="320"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                CornerRadius="4" Padding="16" VerticalAlignment="Top">
+                            <TextBlock x:Name="MultiSelectHintText" TextWrapping="Wrap"
+                                       Style="{StaticResource BodyTextBlockStyle}" Opacity="0.8"/>
+                        </Border>
+
+                        <Border x:Name="DetailPane" Grid.Column="1" Visibility="Collapsed" MinWidth="320"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                CornerRadius="4" Padding="16" VerticalAlignment="Top">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="{loc:Loc Key=rules.detail.title}" Style="{StaticResource SubtitleTextBlockStyle}"/>
+
+                                <StackPanel Spacing="2">
+                                    <TextBlock x:Name="DetailName" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="DetailKind" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
+                                    <TextBlock x:Name="DetailSubjectDetail" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <TextBlock x:Name="DetailReadOnlyNote" Text="{loc:Loc Key=rules.detail.customRulesReadOnly}"
+                                           TextWrapping="Wrap" Visibility="Collapsed"/>
+
+                                <StackPanel x:Name="DetailEditorFields" Spacing="8">
+                                    <RadioButton x:Name="PresetBlocked" Content="{loc:Loc Key=rules.detail.policyBlocked}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+                                    <RadioButton x:Name="PresetUnrestricted" Content="{loc:Loc Key=rules.detail.policyUnrestricted}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+                                    <RadioButton x:Name="PresetUnrestrictedLan" Content="{loc:Loc Key=rules.detail.policyUnrestrictedLan}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+                                    <RadioButton x:Name="PresetTcpUdp" Content="{loc:Loc Key=rules.detail.policyTcpUdp}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+
+                                    <StackPanel x:Name="TcpUdpFields" Spacing="6" Margin="26,0,0,0">
+                                        <TextBlock Text="{loc:Loc Key=rules.detail.tcpOut}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                        <TextBox x:Name="TcpOutBox"/>
+                                        <TextBlock Text="{loc:Loc Key=rules.detail.udpOut}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                        <TextBox x:Name="UdpOutBox"/>
+                                        <TextBlock Text="{loc:Loc Key=rules.detail.tcpIn}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                        <TextBox x:Name="TcpInBox"/>
+                                        <TextBlock Text="{loc:Loc Key=rules.detail.udpIn}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                        <TextBox x:Name="UdpInBox"/>
+                                        <CheckBox x:Name="LanOnlyCheck" Content="{loc:Loc Key=rules.detail.lanOnly}"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Button x:Name="ApplyButton" Content="{loc:Loc Key=rules.detail.apply}"
+                                        Click="ApplyButton_Click" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Expander>
+
+                <Expander IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{loc:Loc Key=rules.specialKind}"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock x:Name="SpecialEmpty" Style="{StaticResource BodyTextBlockStyle}"
+                                   Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
+                        <TextBlock x:Name="SpecialRecommendedHeader" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,4"/>
+                        <ListView x:Name="SpecialRecommendedList" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="local:SpecialListItem">
+                                    <Grid Padding="0,4" ColumnSpacing="14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{x:Bind Name}" VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                                        <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsOn, Mode=TwoWay}" OnContent="" OffContent=""/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <TextBlock x:Name="SpecialOptionalHeader" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,8,0,4"/>
+                        <ListView x:Name="SpecialOptionalList" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="local:SpecialListItem">
+                                    <Grid Padding="0,4" ColumnSpacing="14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{x:Bind Name}" VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                                        <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsOn, Mode=TwoWay}" OnContent="" OffContent=""/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

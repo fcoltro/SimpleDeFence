@@ -1,0 +1,408 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+  "nav": {
+    "rules": "Reglas",
+    "settings": "Configuración",
+    "modeChip": "Modo del firewall"
+  },
+  "common": {
+    "ok": "Aceptar",
+    "cancel": "Cancelar",
+    "on": "Activado",
+    "off": "Desactivado",
+    "refresh": "Actualizar",
+    "loading": "Cargando...",
+    "connecting": "Conectando...",
+    "unknown": "Desconocido",
+    "anotherDialogOpenDetail": "Ya hay otro cuadro de diálogo abierto. Inténtalo de nuevo."
+  },
+  "status": {
+    "notConnected": "Sin conexión",
+    "notConnectedDetail": "No se pudo contactar con el servicio de SimpleDeFence. ¿Está instalado y en ejecución?",
+    "locked": "La configuración está bloqueada",
+    "lockedDetail": "Desbloquea la configuración antes de cambiar el modo.",
+    "connected": "Conectado",
+    "degraded": {
+      "title": "El firewall no está haciendo todo lo que tiene configurado",
+      "initFailed": "El inicio no se completó, por lo que las reglas vigentes pueden ser de una sesión anterior.",
+      "databaseUnavailable": "No se pudo cargar la base de datos de aplicaciones, por lo que las listas de bloqueo y los perfiles de aplicación no generan reglas.",
+      "rulesIncomplete": "Windows rechazó algunas reglas del firewall, por lo que el conjunto instalado no es el configurado.",
+      "hostsUnavailable": "La lista de bloqueo de hosts está activada pero no está instalada."
+    }
+  },
+  "mode": {
+    "normal": {
+      "label": "Normal",
+      "description": "El firewall funciona según lo recomendado."
+    },
+    "blockAll": {
+      "label": "Bloquear todo",
+      "description": "El firewall está bloqueando todo el tráfico entrante y saliente."
+    },
+    "allowOutgoing": {
+      "label": "Permitir salientes",
+      "description": "El firewall permite las conexiones salientes."
+    },
+    "disabled": {
+      "label": "Desactivado",
+      "description": "El firewall está desactivado."
+    },
+    "learning": {
+      "label": "Aprendizaje automático",
+      "description": "El firewall aprende mientras deja pasar todo el tráfico."
+    },
+    "switchFailed": {
+      "lockedTitle": "SimpleDeFence está bloqueado en este momento",
+      "comErrorTitle": "Error de comunicación con el servicio",
+      "comErrorDetail": "El modo no se cambió.",
+      "genericTitle": "La operación falló",
+      "genericDetail": "El servicio devolvió {0}. El modo no se cambió.",
+      "unreachableTitle": "No se pudo contactar con el servicio"
+    },
+    "learningConfirm": {
+      "title": "¿Iniciar el aprendizaje automático?",
+      "body": "En el modo de aprendizaje automático, SimpleDeFence permite todo el tráfico y recuerda qué aplicaciones usaron la red; al salir del modo, añade excepciones para ellas. No se pueden aprender reglas para las excepciones especiales.\n\nUsa esto solo en un sistema que estés seguro de que no tiene malware.",
+      "confirm": "Entrar en modo de aprendizaje"
+    }
+  },
+  "applications": {
+    "title": "Aplicaciones",
+    "filterPlaceholder": "Filtrar por nombre o ruta",
+    "summary": "{0} excepciones en el perfil \"{1}\"",
+    "summaryOne": "1 excepción en el perfil \"{0}\"",
+    "empty": "Todavía no hay excepciones de aplicaciones."
+  },
+  "connections": {
+    "title": "Conexiones",
+    "section": {
+      "blocked": "Bloqueadas",
+      "connected": "Conectadas",
+      "open": "Abiertas",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "Nada bloqueado en los últimos 5 minutos.",
+      "connected": "No hay conexiones establecidas.",
+      "open": "No hay puertos a la escucha.",
+      "filtered": "Nada coincide con el filtro actual."
+    },
+    "filterPlaceholder": "Filtrar por nombre de aplicación",
+    "autoRefresh": "Actualización automática",
+    "allow": "Permitir esta aplicación",
+    "allowSuccess": {
+      "title": "Excepción añadida",
+      "body": "{0} ya puede conectarse."
+    },
+    "allowFailed": {
+      "title": "No se pudo añadir la excepción",
+      "lockedDetail": "Desbloquea la configuración antes de añadir una excepción.",
+      "staleDetail": "La configuración acaba de cambiar en otro lugar; la excepción no se añadió. Inténtalo de nuevo.",
+      "genericDetail": "El servicio devolvió {0}. La excepción no se añadió.",
+      "unidentified": "No se pudo identificar la aplicación (sin ruta ni paquete), así que no se añadió ninguna excepción."
+    },
+    "gatherFailed": {
+      "title": "No se pudieron leer los datos de conexión"
+    },
+    "blocked": {
+      "attempts": "{0} intentos, {1} direcciones",
+      "attemptsOneAddress": "{0} intentos",
+      "attemptsHeader": "Intentos bloqueados"
+    },
+    "showAll": "Mostrar todo",
+    "truncated": "Mostrando las {0} más recientes.",
+    "connected": {
+      "summary": "{0} conexiones",
+      "header": "Conexiones establecidas"
+    },
+    "open": {
+      "summary": "{0} puertos a la escucha",
+      "header": "Puertos a la escucha"
+    },
+    "legend": {
+      "local": "Las filas resaltadas se quedaron en tu red local"
+    }
+  },
+  "subject": {
+    "executable": "Ejecutable",
+    "service": "Servicio",
+    "uwpPackage": "Paquete UWP",
+    "global": "Global",
+    "allApplications": "Todas las aplicaciones"
+  },
+  "policy": {
+    "blocked": "Bloqueado",
+    "unrestricted": "Sin restricciones",
+    "unrestrictedLan": "Sin restricciones (solo LAN)",
+    "noPorts": "Ningún puerto permitido",
+    "lanOnlySuffix": "{0} (solo LAN)",
+    "customRuleOne": "1 regla personalizada",
+    "customRuleMany": "{0} reglas personalizadas",
+    "tcpOut": "TCP salida",
+    "udpOut": "UDP salida",
+    "tcpIn": "TCP entrada",
+    "udpIn": "UDP entrada",
+    "allPorts": "todos"
+  },
+  "rules": {
+    "specialKind": "Excepción especial",
+    "specialPolicy": "Predefinida",
+    "title": "Reglas",
+    "section": {
+      "applications": "Aplicaciones",
+      "specialRecommended": "Especiales (recomendadas)",
+      "specialOptional": "Especiales (opcionales)"
+    },
+    "filterPlaceholder": "Filtrar por nombre o ruta",
+    "empty": {
+      "applications": "Todavía no hay excepciones de aplicaciones.",
+      "special": "No hay excepciones especiales disponibles.",
+      "filtered": "Nada coincide con el filtro actual."
+    },
+    "remove": "Quitar",
+    "removeConfirm": {
+      "title": "¿Quitar las excepciones?",
+      "body": "¿Quitar {0} excepción(es)? Las aplicaciones afectadas volverán a estar bloqueadas."
+    },
+    "removeSuccess": {
+      "title": "Excepciones quitadas",
+      "body": "Se quitaron {0} excepción(es)."
+    },
+    "removeFailed": {
+      "title": "No se pudieron quitar las excepciones",
+      "lockedDetail": "Desbloquea la configuración antes de quitar excepciones.",
+      "staleDetail": "La configuración acaba de cambiar en otro lugar; las excepciones no se quitaron. Inténtalo de nuevo.",
+      "genericDetail": "El servicio devolvió {0}. Las excepciones no se quitaron."
+    },
+    "specialToggleFailed": {
+      "title": "No se pudo cambiar la excepción especial",
+      "lockedDetail": "Desbloquea la configuración antes de cambiar esta excepción.",
+      "staleDetail": "La configuración acaba de cambiar en otro lugar; la excepción no se cambió. Inténtalo de nuevo.",
+      "genericDetail": "El servicio devolvió {0}. La excepción no se cambió."
+    },
+    "add": "Añadir",
+    "addPickExecutable": "Archivo ejecutable...",
+    "addPickProcess": "Proceso en ejecución...",
+    "addPickWindow": "Ventana...",
+    "addPickUwp": "Aplicación UWP...",
+    "addPickFolder": "Elegir carpeta...",
+    "pickUwpTitle": "Elige una aplicación UWP",
+    "pickProcessTitle": "Elige un proceso en ejecución",
+    "pickWindowTitle": "Elige una ventana",
+    "pickEmpty": "No hay entradas coincidentes.",
+    "detail": {
+      "title": "Regla",
+      "policyBlocked": "Bloqueado",
+      "policyUnrestricted": "Sin restricciones",
+      "policyUnrestrictedLan": "Sin restricciones (solo LAN)",
+      "policyTcpUdp": "Solo TCP/UDP",
+      "tcpOut": "TCP salida",
+      "udpOut": "UDP salida",
+      "tcpIn": "TCP entrada",
+      "udpIn": "UDP entrada",
+      "lanOnly": "Solo LAN",
+      "apply": "Aplicar",
+      "customRulesReadOnly": "Las listas de reglas personalizadas todavía no se pueden editar aquí.",
+      "applySuccess": "Directiva actualizada.",
+      "applyFailed": {
+        "title": "No se pudo actualizar la directiva",
+        "lockedDetail": "Desbloquea la configuración antes de cambiar esta regla.",
+        "staleDetail": "La configuración acaba de cambiar en otro lugar; la directiva no se cambió. Inténtalo de nuevo.",
+        "genericDetail": "El servicio devolvió {0}. La directiva no se cambió."
+      }
+    },
+    "multiSelectHint": "{0} reglas seleccionadas. Quitar las elimina todas; selecciona una sola regla para editarla."
+  },
+  "settings": {
+    "title": "Configuración",
+    "section": {
+      "general": "General",
+      "protection": "Protección",
+      "blocklists": "Listas de bloqueo",
+      "security": "Seguridad",
+      "updates": "Actualizaciones",
+      "maintenance": "Mantenimiento",
+      "about": "Acerca de",
+      "logging": "Registro"
+    },
+    "commitFailed": {
+      "title": "No se pudo guardar el ajuste",
+      "lockedDetail": "Desbloquea la configuración antes de cambiar ajustes.",
+      "staleDetail": "La configuración acaba de cambiar en otro lugar; el ajuste no se cambió. Inténtalo de nuevo.",
+      "genericDetail": "El servicio devolvió {0}. El ajuste no se cambió."
+    },
+    "localSaveFailed": {
+      "title": "Este ajuste no sobrevivirá a un reinicio",
+      "detail": "El cambio está activo ahora, pero no se pudo escribir en el disco, así que SimpleDeFence lo olvidará la próxima vez que se inicie. {0}"
+    },
+    "general": {
+      "theme": "Tema de la aplicación",
+      "themeDescription": "Se aplica de inmediato.",
+      "themeAuto": "Usar la configuración del sistema",
+      "themeLight": "Claro",
+      "themeDark": "Oscuro",
+      "language": "Idioma",
+      "languageDescription": "Anula el idioma del sistema para la interfaz de SimpleDeFence.",
+      "languageAuto": "Usar la configuración del sistema",
+      "languageRestartTitle": "Reinicie para completar el cambio de idioma",
+      "languageRestartDetail": "Parte del texto en pantalla conserva el idioma anterior hasta que se reinicie SimpleDeFence.",
+      "askForExceptionDetails": "Pedir detalles al añadir una sola excepción",
+      "askForExceptionDetailsDescription": "Muestra una confirmación editable antes de añadir una excepción mediante los atajos rápidos de la bandeja. Las adiciones masivas (p. ej. una carpeta entera) nunca preguntan.",
+      "enableHotkeys": "Activar los atajos de teclado globales",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permiten al instante un ejecutable, proceso o ventana desde cualquier lugar.",
+      "autoRefreshInterval": "Intervalo de actualización automática",
+      "autoRefreshIntervalDescription": "Con qué frecuencia la página Conexiones vuelve a comprobar mientras su interruptor de actualización automática está activado. Nada le envía cambios, así que este es un intervalo de sondeo; menos es más reciente y cuesta más."
+    },
+    "protection": {
+      "allowLocalSubnet": "Permitir la red local",
+      "allowLocalSubnetDescription": "Permite siempre el tráfico hacia y desde otros dispositivos de tu red local.",
+      "displayOffBlock": "Bloquear la red cuando la pantalla esté apagada",
+      "displayOffBlockDescription": "Bloquea todo el tráfico de red mientras la pantalla está apagada."
+    },
+    "blocklists": {
+      "enable": "Activar las listas de bloqueo",
+      "enableDescription": "Bloquea el tráfico hacia hosts y puertos conocidos como maliciosos.",
+      "hosts": "Bloquear hosts maliciosos",
+      "ports": "Bloquear puertos maliciosos"
+    },
+    "security": {
+      "lockHostsFile": "Bloquear el archivo hosts",
+      "lockHostsFileDescription": "Impide que otros programas modifiquen el archivo hosts.",
+      "passwordSet": "Hay una contraseña establecida.",
+      "passwordNotSet": "No hay ninguna contraseña establecida.",
+      "passwordNotSetDetail": "Cualquier persona que pueda iniciar sesión en este PC puede cambiar esta configuración hasta que establezca una contraseña.",
+      "newPassword": "Contraseña nueva",
+      "confirmPassword": "Confirmar contraseña",
+      "setPassword": "Establecer contraseña",
+      "removePassword": "Quitar contraseña",
+      "passwordMismatch": {
+        "title": "Las contraseñas no coinciden",
+        "detail": "Escribe la misma contraseña en ambos campos."
+      },
+      "passwordUpdated": {
+        "title": "Contraseña actualizada",
+        "body": "Se cambió la contraseña de la configuración."
+      },
+      "passwordRemoved": {
+        "body": "Se quitó la contraseña de la configuración."
+      },
+      "passwordUpdateFailed": {
+        "title": "No se pudo actualizar la contraseña"
+      },
+      "lockedStatus": "La configuración está bloqueada.",
+      "unlockedStatus": "La configuración no está bloqueada.",
+      "lockNow": "Bloquear ahora",
+      "lockFailed": {
+        "title": "No se pudo bloquear la configuración"
+      },
+      "unlockPasswordPlaceholder": "Contraseña",
+      "unlock": "Desbloquear",
+      "unlockFailed": {
+        "title": "No se pudo desbloquear la configuración",
+        "detail": "La contraseña no se aceptó."
+      }
+    },
+    "updates": {
+      "autoCheck": "Buscar actualizaciones automáticamente",
+      "autoCheckDescription": "SimpleDeFence busca nuevas versiones periódicamente.",
+      "checkNow": "Buscar actualizaciones ahora",
+      "checkingTitle": "Buscando actualizaciones...",
+      "checkFailedTitle": "La búsqueda de actualizaciones falló",
+      "noneAvailable": "Estás usando la última versión.",
+      "available": "La versión {0} está disponible. ¿Descargarla e instalarla ahora?",
+      "downloading": "Descargando la actualización...",
+      "verificationFailed": "La descarga no coincidió con la suma de comprobación publicada para esta versión, así que no se ejecutó. No se ha instalado nada."
+    },
+    "maintenance": {
+      "import": "Importar configuración...",
+      "export": "Exportar configuración...",
+      "filePickerName": "Ajustes de SimpleDeFence",
+      "importConfirm": {
+        "title": "¿Importar la configuración?",
+        "body": "Esto reemplaza todas las reglas y ajustes de la configuración actual. No se puede deshacer.",
+        "confirm": "Importar"
+      },
+      "importSuccess": {
+        "title": "Configuración importada",
+        "body": "Se importó {0}."
+      },
+      "importFailed": {
+        "title": "No se pudo importar la configuración"
+      },
+      "exportSuccess": {
+        "title": "Configuración exportada",
+        "body": "Guardada en {0}."
+      },
+      "exportFailed": {
+        "title": "No se pudo exportar la configuración"
+      }
+    },
+    "about": {
+      "version": "Versión {0}",
+      "homepage": "Página del proyecto",
+      "license": "Licencia",
+      "attributions": "Componentes de terceros",
+      "linkFailed": {
+        "title": "No se pudo abrir"
+      },
+      "tagline": "Un firewall de Windows gratuito y ligero.",
+      "basedOn": "Basado en TinyWall",
+      "basedOnDetail": "De Karoly Pados. Abre el proyecto original en GitHub.",
+      "licenseDetail": "Licencia Pública General de GNU, versión 3",
+      "attributionsDetail": "En qué se basa SimpleDeFence y qué toma prestado",
+      "homepageDetail": "Abre github.com/fcoltro/SimpleDeFence",
+      "readFailed": "No se pudo leer este texto."
+    },
+    "logging": {
+      "enabled": "Guardar un registro de conexiones",
+      "enabledDescription": "Registra los intentos bloqueados y las conexiones establecidas en un archivo CSV, incluido qué programa las hizo. Desactivado de forma predeterminada.",
+      "path": "Archivo de registro",
+      "pathDescription": "Déjalo vacío para usar la ubicación predeterminada dentro de los datos locales de la aplicación.",
+      "pathPlaceholder": "Ubicación predeterminada",
+      "interval": "Intervalo de comprobación del registro",
+      "intervalDescription": "Con qué frecuencia se actualiza el registro. El registro sondea, así que puede perderse cualquier cosa más breve que un intervalo.",
+      "maxSize": "Tamaño máximo del registro",
+      "maxSizeDescription": "En megabytes. Cuando el registro alcanza este tamaño se renombra a .1 y se empieza uno nuevo; solo se conserva el archivo anterior.",
+      "openFolder": "Abrir la carpeta del registro",
+      "writeFailedTitle": "No se pudo escribir el registro de conexiones"
+    }
+  },
+  "tray": {
+    "mode": {
+      "normal": "Normal",
+      "blockAll": "Bloquear todo",
+      "allowOutgoing": "Permitir salientes",
+      "disabled": "Desactivado",
+      "learning": "Aprendizaje"
+    },
+    "manage": "Administrar...",
+    "connections": "Conexiones...",
+    "lock": "Bloquear",
+    "elevate": "Ejecutar como administrador",
+    "allowLocalSubnet": "Permitir la subred local",
+    "enableHostsBlocklist": "Activar la lista de bloqueo de hosts",
+    "whitelistByExecutable": "Permitir un ejecutable...",
+    "whitelistByProcess": "Permitir un proceso en ejecución...",
+    "whitelistByWindow": "Permitir por ventana...",
+    "quit": "Salir",
+    "unlock": {
+      "title": "Desbloquear SimpleDeFence",
+      "passwordPlaceholder": "Contraseña",
+      "button": "Desbloquear",
+      "failedTitle": "Contraseña incorrecta"
+    },
+    "quickAdd": {
+      "confirmTitle": "¿Añadir la excepción?",
+      "confirmBody": "¿Permitir que \"{0}\" pase por el firewall?",
+      "confirmAdd": "Añadir"
+    },
+    "elevateFailed": {
+      "title": "No se pudo reiniciar con privilegios de administrador"
+    },
+    "stillRunning": {
+      "title": "SimpleDeFence sigue en ejecución",
+      "body": "Cerrar la ventana no detiene el firewall. Usa Salir en este menú para detenerlo."
+    }
+  }
+}

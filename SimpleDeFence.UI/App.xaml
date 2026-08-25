@@ -1,0 +1,40 @@
+﻿<Application
+    x:Class="SimpleDeFence.UI.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Brings in the WinUI control templates and theme resources. Without this every
+                     {StaticResource} lookup fails and the app dies during XAML parse with
+                     0x802B000A. -->
+                <controls:XamlControlsResources/>
+                <ResourceDictionary Source="ms-appx:///Themes/StatusResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- ComboBox drop-downs default to an acrylic brush, which blurs and tints whatever is
+                 behind the popup and lays a noise texture over it. Under this window's Mica
+                 backdrop that reads as genuinely soft, slightly grey text - the theme picker's
+                 "Use system setting / Light / Dark" items looked out of focus next to the crisp
+                 setting labels a few pixels away. A flyout is a momentary, opaque surface; it has
+                 nothing to gain from translucency here, so it gets a solid theme-aware fill and
+                 its text rasterises like every other label on the page. -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="ComboBoxDropDownBackground"
+                                     Color="{StaticResource SolidBackgroundFillColorQuarternary}"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="ComboBoxDropDownBackground"
+                                     Color="{StaticResource SolidBackgroundFillColorTertiary}"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush x:Key="ComboBoxDropDownBackground"
+                                     Color="{ThemeResource SystemColorWindowColor}"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

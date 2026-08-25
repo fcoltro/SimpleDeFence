@@ -1,0 +1,183 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <!-- Restore-only. Every project here targets net10.0-windows*, and restoring a
+    Windows-targeting project on a non-Windows host fails NETSDK1100 without this - which is
+    what GitHub's dependency submission does, on Linux runners. It does not make anything
+    buildable off Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>latest</LangVersion>
+    <OutputType>WinExe</OutputType>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <RootNamespace>SimpleDeFence</RootNamespace>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+
+    <!-- SimpleDeFence.UI.csproj's own ProjectReference graph (Core/Windows.Services/Windows/
+         Utilities) would otherwise flow up transitively and become compile-time references here
+         too - but this project already compiles those same libraries' .cs files directly via
+         <Compile Include> below (a legacy pattern predating the WinUI merge), so the transitive
+         DLL references collide with the source-included types (CS0121 ambiguous call). Disabling
+         transitive project references keeps only the direct reference to SimpleDeFence.UI.dll at
+         compile time; SimpleDeFence.UI.dll's own dependencies still get copied to the output
+         directory at runtime; see Task 1 of the net10-winui-exe-merge design doc. -->
+    <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+
+    <!-- Required for Application.Start(...) (WinUI's Microsoft.UI.Xaml.Application) to activate at
+         runtime from this exe: WindowsAppSDKSelfContained (which SimpleDeFence.UI.csproj already
+         sets) is what makes Microsoft.WindowsAppSDK.SelfContained.targets merge every WinRT
+         activatableClass registration the Windows App SDK needs (Microsoft.UI.Xaml.Application
+         included) into this exe's own embedded manifest via mt.exe, at
+         obj\...\Manifests\WindowsAppSDK.manifest. Without it, SimpleDeFence.exe's manifest never
+         gets those entries, and regfree-WinRT activation of Microsoft.UI.Xaml.Application fails
+         with REGDB_E_CLASSNOTREG (0x80040154), crashing the process instantly - discovered by
+         actually launching the merged exe per Task 1's Step 5, not by the build. -->
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Product>SimpleDeFence</Product>
+    <AssemblyTitle>SimpleDeFence</AssemblyTitle>
+    <Company>fcoltro</Company>
+    <Description>A free, lightweight and non-intrusive firewall. Fork of TinyWall.</Description>
+    <Copyright>Copyright © 2011 Károly Pados, Copyright © 2026 fcoltro</Copyright>
+    <Version>0.1.0</Version>
+
+    <!-- Ship one language of satellite resources. The 34 localized .resx files this project
+         inherited from TinyWall are gone, but NuGet packages carry their own satellites and
+         would still lay down a folder per culture beside the exe. The interface is translated
+         through SimpleDeFence.Core's Strings.<culture>.json, which are embedded resources with
+         WithCulture="false" and are unaffected by this. -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- The window, taskbar and Explorer icon. An unpackaged WinUI 3 app takes it from the exe's
+         embedded Win32 icon resource and nothing overrides it at runtime, so this project's
+         ApplicationIcon - not SimpleDeFence.UI.csproj's - is what actually ships. It points at the
+         same AppIcon.ico the tray uses for Normal mode, so the two cannot drift apart. -->
+    <ApplicationIcon>..\SimpleDeFence.UI\Assets\AppIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="10.0.0" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.10" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleDeFence.UI\SimpleDeFence.UI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+
+    <Compile Include="../SimpleDeFence.Utilities/*.cs" LinkBase="SimpleDeFence.Utilities" />
+    <Compile Include="../SimpleDeFence.Windows/*.cs" LinkBase="SimpleDeFence.Windows" />
+    <Compile Include="../SimpleDeFence.Windows/NetStat/*.cs" LinkBase="SimpleDeFence.Windows.NetStat" />
+    <Compile Include="../SimpleDeFence.Windows.Services/*.cs" LinkBase="SimpleDeFence.Windows.Services" />
+    <Compile Include="../SimpleDeFence.Windows.WFP/*.cs" LinkBase="SimpleDeFence.Windows.WFP" />
+    <Compile Include="../SimpleDeFence.Core/*.cs" LinkBase="SimpleDeFence.Core" />
+    <Compile Include="../SimpleDeFence.Core/Parser/*.cs" LinkBase="SimpleDeFence.Core.Parser" />
+    <!-- ExceptionDescriptor.cs and FirewallModeInfo.cs (both top-level, globbed above) depend on
+         SimpleDeFence.Localization.Loc/LocKeys. Neither is actually called from WinForms code -
+         localization is WinUI-only by design - but the glob still needs this folder or the build
+         fails with CS0234. Loc.Load finds no embedded resources in this app (those are only
+         embedded into SimpleDeFence.Core.dll), so if these ever were called here every string
+         would render as its bracketed fallback; harmless today since nothing calls them. -->
+    <Compile Include="../SimpleDeFence.Core/Localization/*.cs" LinkBase="SimpleDeFence.Core.Localization" />
+    <Compile Include="../SimpleDeFence.Core/Database/*.cs" LinkBase="SimpleDeFence.Core.Database" />
+
+    <!-- The NetFwTypeLib and TaskScheduler COMReferences were removed in favour of late-bound
+         COM (see WindowsFirewallInterop.cs). ResolveComReference only runs under .NET Framework
+         MSBuild, which cannot build a .NET 10 target, so no toolchain could build this project
+         once it is retargeted while those references remained. -->
+
+    <EmbeddedResource Update="Resources\Exceptions.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Exceptions.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Messages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+
+    <Compile Update="Resources\Exceptions.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Exceptions.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Messages.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <!-- `dotnet publish` for this project's self-contained win-x64 output does not include the
+       XAML-compiler-generated content from the referenced SimpleDeFence.UI project (compiled
+       .xbf pages, the .pri resource index, and the Assets/Pages/Resources/Themes folders) - even
+       though `dotnet build`'s own $(OutDir) has all of them, confirmed by direct comparison of the
+       two output trees. Without these, App.xaml's InitializeComponent() has nothing to load and
+       every WinUI window construction crashes instantly and silently (native STATUS_STOWED_EXCEPTION,
+       0xc000027b, deep inside Microsoft.UI.Xaml.dll) - reproduced identically on two independent
+       machines (a Hyper-V VM and the host), ruling out an environment/graphics-driver cause.
+       $(OutDir) already has everything correctly (build's own copy-local mechanism isn't affected),
+       so copy from there into $(PublishDir) once publish's own file list has been computed. -->
+  <Target Name="CopyMissingXamlResourcesToPublishDir" AfterTargets="Publish" Condition="'$(PublishDir)' != ''">
+    <PropertyGroup>
+      <_FullOutDir>$([System.IO.Path]::GetFullPath('$(OutDir)'))</_FullOutDir>
+      <_FullPublishDir>$([System.IO.Path]::GetFullPath('$(PublishDir)'))</_FullPublishDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_XamlResourceToCopy Include="$(_FullOutDir)**\*.xbf" />
+      <_XamlResourceToCopy Include="$(_FullOutDir)**\*.pri" />
+      <_XamlResourceToCopy Include="$(_FullOutDir)Assets\**\*.*" />
+      <_XamlResourceToCopy Include="$(_FullOutDir)Themes\**\*.*" />
+    </ItemGroup>
+    <ItemGroup>
+      <_XamlResourceToCopy>
+        <DestinationPath>$(_FullPublishDir)$([MSBuild]::MakeRelative($(_FullOutDir), %(Identity)))</DestinationPath>
+      </_XamlResourceToCopy>
+    </ItemGroup>
+    <Copy SourceFiles="@(_XamlResourceToCopy)"
+          DestinationFiles="@(_XamlResourceToCopy->'%(DestinationPath)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+  <ItemGroup>
+    <!-- DPAPI. Not in the shared framework on .NET (unlike .NET Framework), so it comes from this
+         package; ConfigProtection uses it to wrap the per-installation config key. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- DPAPI, used by ConfigProtection to wrap the per-installation config key. Not in the shared
+         framework on .NET. It briefly looked unnecessary - the SDK flagged it NU1510 - but that was
+         only true while UseWindowsForms dragged it in transitively; with WinForms gone the build
+         fails without it. -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
+  </ItemGroup>
+
+  <!-- WinUI ships its own native .mui resources - 86 language folders beside the exe, one per
+       culture Microsoft translates its built-in control strings into. SatelliteResourceLanguages
+       does not reach them: they are native MUI files, not .NET satellite assemblies.
+
+       en-us is kept and the rest dropped. This app is translated into English and Portuguese
+       only, so the other 85 localize strings nobody using it will see, and WinUI falls back to
+       en-us when a culture has no .mui of its own. Worth doing for the install directory as much
+       as the ~4 MB: 86 folders of someone else's resources makes the folder unreadable. -->
+  <Target Name="TrimWinUiMuiLanguages" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish
+        Remove="@(ResolvedFileToPublish)"
+        Condition="'%(Extension)' == '.mui' AND !$([System.String]::Copy('%(RelativePath)').StartsWith('en-us'))" />
+    </ItemGroup>
+  </Target>
+
+</Project>

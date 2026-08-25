@@ -1,0 +1,132 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # The one path the MSI is built around. MsiSetup.wixproj hard-codes it in its PublishDir
+  # constant, and SimpleDeFence.csproj sets AppendTargetFrameworkToOutputPath=false, so a bare
+  # `dotnet publish` lands somewhere else entirely and the installer harvests nothing.
+  PUBLISH_DIR: SimpleDeFence/bin/Release/net10.0-windows10.0.19041.0/win-x64/publish
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-2022
+          - windows-2025-vs2026
+        configuration:
+          - Debug
+          - Release
+        include:
+          - os: windows-2022
+            name: VS2022
+          - os: windows-2025-vs2026
+            name: VS2026
+
+    name: ${{ matrix.name }} ${{ matrix.configuration }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+
+    - name: Restore
+      run: dotnet restore SimpleDeFence/SimpleDeFence.csproj
+
+    - name: Build
+      run: dotnet build SimpleDeFence/SimpleDeFence.csproj --configuration ${{ matrix.configuration }} --no-restore
+
+    # Runs on the .NET SDK rather than Framework MSBuild - SimpleDeFence.Tests targets net10
+    # and covers SimpleDeFence.Core, which the service and the GUI share.
+    - name: Test
+      run: dotnet test SimpleDeFence.Tests/SimpleDeFence.Tests.csproj --configuration ${{ matrix.configuration }}
+
+    # Builds every library on every target framework it declares. The app project compiles those
+    # libraries' *sources* directly, so building it alone leaves their own target frameworks
+    # unbuilt - which is how a change that compiled for one target and broke another reached main
+    # unnoticed.
+    - name: Build all projects
+      run: dotnet build SimpleDeFence.sln --configuration ${{ matrix.configuration }}
+
+    # --- MSI packaging (Release only) ---
+
+    - name: Publish for packaging
+      if: matrix.configuration == 'Release'
+      run: dotnet publish SimpleDeFence/SimpleDeFence.csproj -c Release -r win-x64 -p:SelfContained=true -o ${{ env.PUBLISH_DIR }}
+
+    - name: Upload build output
+      if: matrix.configuration == 'Release'
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+      with:
+        name: SimpleDeFence-${{ matrix.name }}-${{ matrix.configuration }}
+        path: ${{ env.PUBLISH_DIR }}
+        if-no-files-found: error
+
+    - name: Get version info
+      if: matrix.configuration == 'Release'
+      id: version
+      shell: pwsh
+      run: |
+        $ver = (Get-Item "${{ env.PUBLISH_DIR }}/SimpleDeFence.exe").VersionInfo.ProductVersion
+        $date = Get-Date -Format 'yyyyMMdd'
+        $sha = "${{ github.sha }}".Substring(0, 7)
+        echo "product_version=$ver" >> $env:GITHUB_OUTPUT
+        echo "date=$date" >> $env:GITHUB_OUTPUT
+        echo "sha=$sha" >> $env:GITHUB_OUTPUT
+        echo "msi_name=SimpleDeFence-$ver-${{ matrix.name }}-$date-$sha.msi" >> $env:GITHUB_OUTPUT
+
+    - name: Install WiX 3
+      if: matrix.configuration == 'Release'
+      run: choco install wixtoolset -y --no-progress
+
+    # Dependencies.wxs is generated, not checked in, and MsiSetup.wixproj fails the build with
+    # instructions if it is missing. The arguments come from the header comment of
+    # HarvestPublishDir.xslt, which is the authority on what they mean.
+    - name: Harvest publish output
+      if: matrix.configuration == 'Release'
+      shell: pwsh
+      working-directory: MsiSetup
+      run: |
+        $heat = Join-Path ${env:ProgramFiles(x86)} 'WiX Toolset v3.14\bin\heat.exe'
+        if (-not (Test-Path $heat)) { throw "heat.exe not found at $heat" }
+        # Named so the path can be existence-checked first: heat.exe reports a missing source
+        # directory as an empty harvest, which fails later and less legibly at the MSI link step.
+        $publishDir = '..' + [char]92 + '${{ env.PUBLISH_DIR }}'.Replace('/', [char]92)
+        if (-not (Test-Path $publishDir)) { throw "publish output missing at $publishDir" }
+        & $heat dir $publishDir `
+          -platform x64 -cg PublishedDependencies -ag -scom -sreg -srd `
+          -dr INSTALLDIR -var var.PublishDir -t HarvestPublishDir.xslt -out Dependencies.wxs
+        if ($LASTEXITCODE -ne 0) { throw "heat.exe failed with exit code $LASTEXITCODE" }
+
+    # x64, matching the payload. The publish is win-x64 self-contained and the harvest above
+    # runs -platform x64, which marks every generated component 64-bit; authoring those into an
+    # x86 package fails ICE validation and would target 32-bit Program Files. Note this is a
+    # separate axis from UpdateDescriptor.ISTALLER_ARCH_SUFFIX, which deliberately maps X64 to
+    # the "x86" module name - that name is only a lookup key for the descriptor, not a filename.
+    - name: Build MSI
+      if: matrix.configuration == 'Release'
+      run: msbuild MsiSetup/MsiSetup.wixproj /p:Configuration=Release /p:Platform=x64
+
+    - name: Upload MSI
+      if: matrix.configuration == 'Release'
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+      with:
+        name: ${{ steps.version.outputs.msi_name }}
+        # MsiSetup.wixproj appends the platform to OutputName, so the x64 build
+        # produces SimpleDeFence_x64.msi - not the old TinyWall-era installer name.
+        path: MsiSetup/bin/Release/SimpleDeFence_x64.msi
+        # Without this the job goes green while uploading nothing, which is how
+        # the stale path above went unnoticed.
+        if-no-files-found: error

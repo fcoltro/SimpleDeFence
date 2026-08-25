@@ -1,0 +1,408 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+  "nav": {
+    "rules": "القواعد",
+    "settings": "الإعدادات",
+    "modeChip": "وضع جدار الحماية"
+  },
+  "common": {
+    "ok": "موافق",
+    "cancel": "إلغاء",
+    "on": "تشغيل",
+    "off": "إيقاف",
+    "refresh": "تحديث",
+    "loading": "جارٍ التحميل...",
+    "connecting": "جارٍ الاتصال...",
+    "unknown": "غير معروف",
+    "anotherDialogOpenDetail": "هناك مربع حوار آخر مفتوح بالفعل. يُرجى المحاولة مرة أخرى."
+  },
+  "status": {
+    "notConnected": "غير متصل",
+    "notConnectedDetail": "تعذّر الوصول إلى خدمة SimpleDeFence. هل هي مثبّتة وقيد التشغيل؟",
+    "locked": "الإعدادات مقفلة",
+    "lockedDetail": "افتح قفل الإعدادات قبل تغيير الوضع.",
+    "connected": "متصل",
+    "degraded": {
+      "title": "جدار الحماية لا ينفّذ كل ما تم ضبطه",
+      "initFailed": "لم يكتمل بدء التشغيل، لذا قد تكون القواعد السارية من جلسة سابقة.",
+      "databaseUnavailable": "تعذّر تحميل قاعدة بيانات التطبيقات، لذا لا تنتج قوائم الحظر وملفات التطبيقات أي قواعد.",
+      "rulesIncomplete": "رفض Windows بعض قواعد جدار الحماية، لذا المجموعة المثبَّتة ليست المجموعة التي تم ضبطها.",
+      "hostsUnavailable": "قائمة حظر hosts مفعّلة لكنها غير مثبَّتة."
+    }
+  },
+  "mode": {
+    "normal": {
+      "label": "عادي",
+      "description": "يعمل جدار الحماية على النحو الموصى به."
+    },
+    "blockAll": {
+      "label": "حظر الكل",
+      "description": "يحظر جدار الحماية كل حركة المرور الواردة والصادرة."
+    },
+    "allowOutgoing": {
+      "label": "السماح بالصادر",
+      "description": "يسمح جدار الحماية بالاتصالات الصادرة."
+    },
+    "disabled": {
+      "label": "معطّل",
+      "description": "جدار الحماية معطّل."
+    },
+    "learning": {
+      "label": "التعلّم التلقائي",
+      "description": "يتعلّم جدار الحماية بينما يسمح بمرور كل حركة المرور."
+    },
+    "switchFailed": {
+      "lockedTitle": "‏SimpleDeFence مقفل حاليًا",
+      "comErrorTitle": "فشل الاتصال بالخدمة",
+      "comErrorDetail": "لم يتغيّر الوضع.",
+      "genericTitle": "فشلت العملية",
+      "genericDetail": "أرجعت الخدمة {0}. لم يتغيّر الوضع.",
+      "unreachableTitle": "تعذّر الوصول إلى الخدمة"
+    },
+    "learningConfirm": {
+      "title": "هل تريد بدء التعلّم التلقائي؟",
+      "body": "في وضع التعلّم التلقائي، يسمح SimpleDeFence بكل حركة المرور ويتذكّر التطبيقات التي استخدمت الشبكة، ثم يضيف استثناءات لها عند خروجك من الوضع. لا يمكن تعلّم قواعد للاستثناءات الخاصة.\n\nاستخدم هذا فقط على نظام تثق بأنه خالٍ من البرامج الضارة.",
+      "confirm": "الدخول في وضع التعلّم"
+    }
+  },
+  "applications": {
+    "title": "التطبيقات",
+    "filterPlaceholder": "تصفية حسب الاسم أو المسار",
+    "summary": "{0} استثناء في الملف الشخصي \"{1}\"",
+    "summaryOne": "استثناء واحد في الملف الشخصي \"{0}\"",
+    "empty": "لا توجد استثناءات تطبيقات بعد."
+  },
+  "connections": {
+    "title": "الاتصالات",
+    "section": {
+      "blocked": "محظورة",
+      "connected": "متصلة",
+      "open": "مفتوحة",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "لم يُحظر شيء خلال آخر 5 دقائق.",
+      "connected": "لا توجد اتصالات قائمة.",
+      "open": "لا توجد منافذ في وضع الإصغاء.",
+      "filtered": "لا شيء يطابق عامل التصفية الحالي."
+    },
+    "filterPlaceholder": "تصفية حسب اسم التطبيق",
+    "autoRefresh": "التحديث التلقائي",
+    "allow": "السماح لهذا التطبيق",
+    "allowSuccess": {
+      "title": "تمت إضافة الاستثناء",
+      "body": "يمكن لـ {0} الاتصال الآن."
+    },
+    "allowFailed": {
+      "title": "تعذّرت إضافة الاستثناء",
+      "lockedDetail": "افتح قفل الإعدادات قبل إضافة استثناء.",
+      "staleDetail": "تغيّرت الإعدادات في مكان آخر للتو؛ لم تتم إضافة الاستثناء. يُرجى المحاولة مرة أخرى.",
+      "genericDetail": "أرجعت الخدمة {0}. لم تتم إضافة الاستثناء.",
+      "unidentified": "تعذّر تحديد التطبيق (لا مسار ولا حزمة)، لذا لم تتم إضافة أي استثناء."
+    },
+    "gatherFailed": {
+      "title": "تعذّرت قراءة بيانات الاتصال"
+    },
+    "blocked": {
+      "attempts": "{0} محاولة، {1} عنوان",
+      "attemptsOneAddress": "{0} محاولة",
+      "attemptsHeader": "المحاولات المحظورة"
+    },
+    "showAll": "عرض الكل",
+    "truncated": "يتم عرض أحدث {0}.",
+    "connected": {
+      "summary": "{0} اتصال",
+      "header": "الاتصالات القائمة"
+    },
+    "open": {
+      "summary": "{0} منفذ في وضع الإصغاء",
+      "header": "المنافذ في وضع الإصغاء"
+    },
+    "legend": {
+      "local": "الصفوف المميّزة بقيت داخل شبكتك المحلية"
+    }
+  },
+  "subject": {
+    "executable": "ملف تنفيذي",
+    "service": "خدمة",
+    "uwpPackage": "حزمة UWP",
+    "global": "عام",
+    "allApplications": "كل التطبيقات"
+  },
+  "policy": {
+    "blocked": "محظور",
+    "unrestricted": "بلا قيود",
+    "unrestrictedLan": "بلا قيود (الشبكة المحلية فقط)",
+    "noPorts": "لا منافذ مسموح بها",
+    "lanOnlySuffix": "{0} (الشبكة المحلية فقط)",
+    "customRuleOne": "قاعدة مخصّصة واحدة",
+    "customRuleMany": "{0} قاعدة مخصّصة",
+    "tcpOut": "TCP صادر",
+    "udpOut": "UDP صادر",
+    "tcpIn": "TCP وارد",
+    "udpIn": "UDP وارد",
+    "allPorts": "الكل"
+  },
+  "rules": {
+    "specialKind": "استثناء خاص",
+    "specialPolicy": "معرّف مسبقًا",
+    "title": "القواعد",
+    "section": {
+      "applications": "التطبيقات",
+      "specialRecommended": "خاصة (موصى بها)",
+      "specialOptional": "خاصة (اختيارية)"
+    },
+    "filterPlaceholder": "تصفية حسب الاسم أو المسار",
+    "empty": {
+      "applications": "لا توجد استثناءات تطبيقات بعد.",
+      "special": "لا تتوفّر استثناءات خاصة.",
+      "filtered": "لا شيء يطابق عامل التصفية الحالي."
+    },
+    "remove": "إزالة",
+    "removeConfirm": {
+      "title": "هل تريد إزالة الاستثناءات؟",
+      "body": "هل تريد إزالة {0} استثناء؟ ستُحظر التطبيقات المتأثرة من جديد."
+    },
+    "removeSuccess": {
+      "title": "تمت إزالة الاستثناءات",
+      "body": "تمت إزالة {0} استثناء."
+    },
+    "removeFailed": {
+      "title": "تعذّرت إزالة الاستثناءات",
+      "lockedDetail": "افتح قفل الإعدادات قبل إزالة الاستثناءات.",
+      "staleDetail": "تغيّرت الإعدادات في مكان آخر للتو؛ لم تتم إزالة الاستثناءات. يُرجى المحاولة مرة أخرى.",
+      "genericDetail": "أرجعت الخدمة {0}. لم تتم إزالة الاستثناءات."
+    },
+    "specialToggleFailed": {
+      "title": "تعذّر تغيير الاستثناء الخاص",
+      "lockedDetail": "افتح قفل الإعدادات قبل تغيير هذا الاستثناء.",
+      "staleDetail": "تغيّرت الإعدادات في مكان آخر للتو؛ لم يتغيّر الاستثناء. يُرجى المحاولة مرة أخرى.",
+      "genericDetail": "أرجعت الخدمة {0}. لم يتغيّر الاستثناء."
+    },
+    "add": "إضافة",
+    "addPickExecutable": "ملف تنفيذي...",
+    "addPickProcess": "عملية قيد التشغيل...",
+    "addPickWindow": "نافذة...",
+    "addPickUwp": "تطبيق UWP...",
+    "addPickFolder": "اختيار مجلد...",
+    "pickUwpTitle": "اختر تطبيق UWP",
+    "pickProcessTitle": "اختر عملية قيد التشغيل",
+    "pickWindowTitle": "اختر نافذة",
+    "pickEmpty": "لا توجد إدخالات مطابقة.",
+    "detail": {
+      "title": "قاعدة",
+      "policyBlocked": "محظور",
+      "policyUnrestricted": "بلا قيود",
+      "policyUnrestrictedLan": "بلا قيود (الشبكة المحلية فقط)",
+      "policyTcpUdp": "TCP/UDP فقط",
+      "tcpOut": "TCP صادر",
+      "udpOut": "UDP صادر",
+      "tcpIn": "TCP وارد",
+      "udpIn": "UDP وارد",
+      "lanOnly": "الشبكة المحلية فقط",
+      "apply": "تطبيق",
+      "customRulesReadOnly": "لا يمكن تحرير قوائم القواعد المخصّصة هنا بعد.",
+      "applySuccess": "تم تحديث النهج.",
+      "applyFailed": {
+        "title": "تعذّر تحديث النهج",
+        "lockedDetail": "افتح قفل الإعدادات قبل تغيير هذه القاعدة.",
+        "staleDetail": "تغيّرت الإعدادات في مكان آخر للتو؛ لم يتغيّر النهج. يُرجى المحاولة مرة أخرى.",
+        "genericDetail": "أرجعت الخدمة {0}. لم يتغيّر النهج."
+      }
+    },
+    "multiSelectHint": "تم تحديد {0} قاعدة. الإزالة تحذفها كلها؛ حدّد قاعدة واحدة لتحريرها."
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "section": {
+      "general": "عام",
+      "protection": "الحماية",
+      "blocklists": "قوائم الحظر",
+      "security": "الأمان",
+      "updates": "التحديثات",
+      "maintenance": "الصيانة",
+      "about": "حول",
+      "logging": "التسجيل"
+    },
+    "commitFailed": {
+      "title": "تعذّر حفظ الإعداد",
+      "lockedDetail": "افتح قفل الإعدادات قبل تغيير الإعدادات.",
+      "staleDetail": "تغيّرت الإعدادات في مكان آخر للتو؛ لم يتغيّر الإعداد. يُرجى المحاولة مرة أخرى.",
+      "genericDetail": "أرجعت الخدمة {0}. لم يتغيّر الإعداد."
+    },
+    "localSaveFailed": {
+      "title": "لن يبقى هذا الإعداد بعد إعادة التشغيل",
+      "detail": "التغيير نشط الآن، لكن تعذّرت كتابته على القرص، لذا سينساه SimpleDeFence عند بدء التشغيل التالي. {0}"
+    },
+    "general": {
+      "theme": "سمة التطبيق",
+      "themeDescription": "يُطبَّق فورًا.",
+      "themeAuto": "استخدام إعداد النظام",
+      "themeLight": "فاتحة",
+      "themeDark": "داكنة",
+      "language": "اللغة",
+      "languageDescription": "يتجاوز لغة النظام لواجهة SimpleDeFence نفسها.",
+      "languageAuto": "استخدام إعداد النظام",
+      "languageRestartTitle": "أعد التشغيل لإكمال تغيير اللغة",
+      "languageRestartDetail": "يبقى بعض النص على الشاشة باللغة السابقة حتى إعادة تشغيل SimpleDeFence.",
+      "askForExceptionDetails": "طلب التفاصيل عند إضافة استثناء واحد",
+      "askForExceptionDetailsDescription": "يعرض تأكيدًا قابلاً للتحرير قبل إضافة استثناء واحد عبر اختصارات الإضافة السريعة في علبة النظام. الإضافات الجماعية (مجلد كامل مثلًا) لا تطلب تأكيدًا أبدًا.",
+      "enableHotkeys": "تمكين اختصارات لوحة المفاتيح العامة",
+      "enableHotkeysDescription": "‏Ctrl+Alt+E/P/W تسمح فورًا بملف تنفيذي أو عملية أو نافذة من أي مكان.",
+      "autoRefreshInterval": "فاصل التحديث التلقائي",
+      "autoRefreshIntervalDescription": "عدد مرات إعادة فحص صفحة الاتصالات أثناء تشغيل مفتاح التحديث التلقائي فيها. لا شيء يرسل إليها التغييرات، لذا فهذا فاصل استقصاء؛ كلما قلّ كانت البيانات أحدث وارتفعت التكلفة."
+    },
+    "protection": {
+      "allowLocalSubnet": "السماح بالشبكة المحلية",
+      "allowLocalSubnetDescription": "السماح دائمًا بحركة المرور من وإلى الأجهزة الأخرى على شبكتك المحلية.",
+      "displayOffBlock": "حظر الشبكة عند إطفاء الشاشة",
+      "displayOffBlockDescription": "يحظر كل حركة مرور الشبكة أثناء إطفاء الشاشة."
+    },
+    "blocklists": {
+      "enable": "تمكين قوائم الحظر",
+      "enableDescription": "يحظر حركة المرور إلى المضيفين والمنافذ المعروفة بأنها ضارة.",
+      "hosts": "حظر المضيفين الضارين",
+      "ports": "حظر المنافذ الضارة"
+    },
+    "security": {
+      "lockHostsFile": "قفل ملف hosts",
+      "lockHostsFileDescription": "يمنع البرامج الأخرى من تعديل ملف hosts.",
+      "passwordSet": "تم تعيين كلمة مرور.",
+      "passwordNotSet": "لم يتم تعيين كلمة مرور.",
+      "passwordNotSetDetail": "يمكن لأي شخص يستطيع تسجيل الدخول إلى هذا الجهاز تغيير هذه الإعدادات إلى أن تعيّن كلمة مرور.",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "setPassword": "تعيين كلمة المرور",
+      "removePassword": "إزالة كلمة المرور",
+      "passwordMismatch": {
+        "title": "كلمتا المرور غير متطابقتين",
+        "detail": "اكتب كلمة المرور نفسها في كلا الحقلين."
+      },
+      "passwordUpdated": {
+        "title": "تم تحديث كلمة المرور",
+        "body": "تم تغيير كلمة مرور الإعدادات."
+      },
+      "passwordRemoved": {
+        "body": "تمت إزالة كلمة مرور الإعدادات."
+      },
+      "passwordUpdateFailed": {
+        "title": "تعذّر تحديث كلمة المرور"
+      },
+      "lockedStatus": "الإعدادات مقفلة.",
+      "unlockedStatus": "الإعدادات غير مقفلة.",
+      "lockNow": "القفل الآن",
+      "lockFailed": {
+        "title": "تعذّر قفل الإعدادات"
+      },
+      "unlockPasswordPlaceholder": "كلمة المرور",
+      "unlock": "فتح القفل",
+      "unlockFailed": {
+        "title": "تعذّر فتح قفل الإعدادات",
+        "detail": "لم يتم قبول كلمة المرور."
+      }
+    },
+    "updates": {
+      "autoCheck": "التحقق من التحديثات تلقائيًا",
+      "autoCheckDescription": "يتحقق SimpleDeFence دوريًا من وجود إصدارات جديدة.",
+      "checkNow": "التحقق من التحديثات الآن",
+      "checkingTitle": "جارٍ التحقق من التحديثات...",
+      "checkFailedTitle": "فشل التحقق من التحديثات",
+      "noneAvailable": "أنت تستخدم أحدث إصدار.",
+      "available": "الإصدار {0} متاح. هل تريد تنزيله وتثبيته الآن؟",
+      "downloading": "جارٍ تنزيل التحديث...",
+      "verificationFailed": "لم يطابق الملف المُنزَّل المجموع الاختباري المنشور لهذا الإصدار، لذا لم يُشغَّل. لم يُثبَّت أي شيء."
+    },
+    "maintenance": {
+      "import": "استيراد الإعدادات...",
+      "export": "تصدير الإعدادات...",
+      "filePickerName": "إعدادات SimpleDeFence",
+      "importConfirm": {
+        "title": "هل تريد استيراد الإعدادات؟",
+        "body": "سيستبدل هذا كل قاعدة وكل إعداد في الإعدادات الحالية. لا يمكن التراجع عن ذلك.",
+        "confirm": "استيراد"
+      },
+      "importSuccess": {
+        "title": "تم استيراد الإعدادات",
+        "body": "تم استيراد {0}."
+      },
+      "importFailed": {
+        "title": "تعذّر استيراد الإعدادات"
+      },
+      "exportSuccess": {
+        "title": "تم تصدير الإعدادات",
+        "body": "تم الحفظ في {0}."
+      },
+      "exportFailed": {
+        "title": "تعذّر تصدير الإعدادات"
+      }
+    },
+    "about": {
+      "version": "الإصدار {0}",
+      "homepage": "الصفحة الرئيسية للمشروع",
+      "license": "الترخيص",
+      "attributions": "مكوّنات الطرف الثالث",
+      "linkFailed": {
+        "title": "تعذّر الفتح"
+      },
+      "tagline": "جدار حماية حر وخفيف لنظام Windows.",
+      "basedOn": "مبني على TinyWall",
+      "basedOnDetail": "بقلم Karoly Pados. يفتح المشروع الأصلي على GitHub.",
+      "licenseDetail": "رخصة جنو العمومية العامة، الإصدار 3",
+      "attributionsDetail": "ما بُني عليه SimpleDeFence وما يستعيره",
+      "homepageDetail": "يفتح github.com/fcoltro/SimpleDeFence",
+      "readFailed": "تعذّرت قراءة هذا النص."
+    },
+    "logging": {
+      "enabled": "حفظ سجل الاتصالات",
+      "enabledDescription": "يسجّل المحاولات المحظورة والاتصالات القائمة في ملف CSV، بما في ذلك البرنامج الذي قام بها. معطّل افتراضيًا.",
+      "path": "ملف السجل",
+      "pathDescription": "اتركه فارغًا لاستخدام الموقع الافتراضي ضمن بيانات التطبيق المحلية.",
+      "pathPlaceholder": "الموقع الافتراضي",
+      "interval": "فاصل فحص السجل",
+      "intervalDescription": "عدد مرات تحديث السجل. يعمل التسجيل بالاستقصاء، لذا قد يفوته أي شيء أقصر عمرًا من فاصل واحد.",
+      "maxSize": "الحد الأقصى لحجم السجل",
+      "maxSizeDescription": "بالميغابايت. عندما يبلغ السجل هذا الحجم تتم إعادة تسميته إلى ‎.1‎ ويبدأ سجل جديد؛ ولا يُحتفظ إلا بالملف السابق الواحد.",
+      "openFolder": "فتح مجلد السجل",
+      "writeFailedTitle": "تعذّرت كتابة سجل الاتصالات"
+    }
+  },
+  "tray": {
+    "mode": {
+      "normal": "عادي",
+      "blockAll": "حظر الكل",
+      "allowOutgoing": "السماح بالصادر",
+      "disabled": "معطّل",
+      "learning": "التعلّم"
+    },
+    "manage": "إدارة...",
+    "connections": "الاتصالات...",
+    "lock": "قفل",
+    "elevate": "التشغيل كمسؤول",
+    "allowLocalSubnet": "السماح بالشبكة الفرعية المحلية",
+    "enableHostsBlocklist": "تمكين قائمة حظر المضيفين",
+    "whitelistByExecutable": "السماح بملف تنفيذي...",
+    "whitelistByProcess": "السماح بعملية قيد التشغيل...",
+    "whitelistByWindow": "السماح حسب النافذة...",
+    "quit": "إنهاء",
+    "unlock": {
+      "title": "فتح قفل SimpleDeFence",
+      "passwordPlaceholder": "كلمة المرور",
+      "button": "فتح القفل",
+      "failedTitle": "كلمة مرور غير صحيحة"
+    },
+    "quickAdd": {
+      "confirmTitle": "هل تريد إضافة استثناء؟",
+      "confirmBody": "هل تسمح لـ \"{0}\" بالمرور عبر جدار الحماية؟",
+      "confirmAdd": "إضافة"
+    },
+    "elevateFailed": {
+      "title": "تعذّرت إعادة التشغيل بامتيازات المسؤول"
+    },
+    "stillRunning": {
+      "title": "‏SimpleDeFence لا يزال قيد التشغيل",
+      "body": "إغلاق النافذة لا يوقف جدار الحماية. استخدم \"إنهاء\" في هذه القائمة لإيقافه."
+    }
+  }
+}

@@ -1,0 +1,408 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+  "nav": {
+    "rules": "Rules",
+    "settings": "Settings",
+    "modeChip": "Firewall mode"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "on": "On",
+    "off": "Off",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "connecting": "Connecting...",
+    "unknown": "Unknown",
+    "anotherDialogOpenDetail": "Another dialog is already open. Please try again."
+  },
+  "status": {
+    "notConnected": "Not connected",
+    "notConnectedDetail": "Could not reach the SimpleDeFence service. Is it installed and running?",
+    "locked": "Configuration is locked",
+    "lockedDetail": "Unlock the configuration before changing the mode.",
+    "connected": "Connected",
+    "degraded": {
+      "title": "The firewall is not doing everything it is set to",
+      "initFailed": "Startup did not finish, so the rules in force may be from an earlier session.",
+      "databaseUnavailable": "The application database could not be loaded, so blocklists and application profiles produce no rules.",
+      "rulesIncomplete": "Windows refused some of the firewall rules, so the installed set is not the one that was configured.",
+      "hostsUnavailable": "The hosts blocklist is switched on but is not installed."
+    }
+  },
+  "mode": {
+    "normal": {
+      "label": "Normal",
+      "description": "The firewall is operating as recommended."
+    },
+    "blockAll": {
+      "label": "Block all",
+      "description": "The firewall is blocking all incoming and outgoing traffic."
+    },
+    "allowOutgoing": {
+      "label": "Allow outgoing",
+      "description": "The firewall allows outgoing connections."
+    },
+    "disabled": {
+      "label": "Disabled",
+      "description": "The firewall is disabled."
+    },
+    "learning": {
+      "label": "Autolearn",
+      "description": "The firewall is learning while letting all traffic through."
+    },
+    "switchFailed": {
+      "lockedTitle": "SimpleDeFence is currently locked",
+      "comErrorTitle": "Communication with the service failed",
+      "comErrorDetail": "The mode was not changed.",
+      "genericTitle": "Operation failed",
+      "genericDetail": "The service returned {0}. The mode was not changed.",
+      "unreachableTitle": "Could not reach the service"
+    },
+    "learningConfirm": {
+      "title": "Start automatic learning?",
+      "body": "In automatic learning mode SimpleDeFence allows all traffic and remembers which applications used the network, then adds exceptions for them when you leave the mode. Rules cannot be learned for Special Exceptions.\n\nOnly use this on a system you are confident is free of malware.",
+      "confirm": "Enter learning mode"
+    }
+  },
+  "applications": {
+    "title": "Applications",
+    "filterPlaceholder": "Filter by name or path",
+    "summary": "{0} exceptions in profile \"{1}\"",
+    "summaryOne": "1 exception in profile \"{0}\"",
+    "empty": "No application exceptions yet."
+  },
+  "connections": {
+    "title": "Connections",
+    "section": {
+      "blocked": "Blocked",
+      "connected": "Connected",
+      "open": "Open",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "Nothing blocked in the last 5 minutes.",
+      "connected": "No established connections.",
+      "open": "No listening ports.",
+      "filtered": "Nothing matches the current filter."
+    },
+    "filterPlaceholder": "Filter by app name",
+    "autoRefresh": "Auto-refresh",
+    "allow": "Allow this app",
+    "allowSuccess": {
+      "title": "Exception added",
+      "body": "{0} can now connect."
+    },
+    "allowFailed": {
+      "title": "Could not add the exception",
+      "lockedDetail": "Unlock the configuration before adding an exception.",
+      "staleDetail": "The configuration changed elsewhere just now; the exception was not added. Please try again.",
+      "genericDetail": "The service returned {0}. The exception was not added.",
+      "unidentified": "The application could not be identified (no path or package), so no exception was added."
+    },
+    "gatherFailed": {
+      "title": "Could not read connection data"
+    },
+    "blocked": {
+      "attempts": "{0} attempts, {1} addresses",
+      "attemptsOneAddress": "{0} attempts",
+      "attemptsHeader": "Blocked attempts"
+    },
+    "showAll": "Show all",
+    "truncated": "Showing the {0} most recent.",
+    "connected": {
+      "summary": "{0} connections",
+      "header": "Established connections"
+    },
+    "open": {
+      "summary": "{0} listening ports",
+      "header": "Listening ports"
+    },
+    "legend": {
+      "local": "Highlighted rows stayed on your local network"
+    }
+  },
+  "subject": {
+    "executable": "Executable",
+    "service": "Service",
+    "uwpPackage": "UWP Package",
+    "global": "Global",
+    "allApplications": "All applications"
+  },
+  "policy": {
+    "blocked": "Blocked",
+    "unrestricted": "Unrestricted",
+    "unrestrictedLan": "Unrestricted (LAN only)",
+    "noPorts": "No ports allowed",
+    "lanOnlySuffix": "{0} (LAN only)",
+    "customRuleOne": "1 custom rule",
+    "customRuleMany": "{0} custom rules",
+    "tcpOut": "TCP out",
+    "udpOut": "UDP out",
+    "tcpIn": "TCP in",
+    "udpIn": "UDP in",
+    "allPorts": "all"
+  },
+  "rules": {
+    "specialKind": "Special exception",
+    "specialPolicy": "Predefined",
+    "title": "Rules",
+    "section": {
+      "applications": "Applications",
+      "specialRecommended": "Special (recommended)",
+      "specialOptional": "Special (optional)"
+    },
+    "filterPlaceholder": "Filter by name or path",
+    "empty": {
+      "applications": "No application exceptions yet.",
+      "special": "No special exceptions available.",
+      "filtered": "Nothing matches the current filter."
+    },
+    "remove": "Remove",
+    "removeConfirm": {
+      "title": "Remove exceptions?",
+      "body": "Remove {0} exception(s)? The affected applications will be blocked again."
+    },
+    "removeSuccess": {
+      "title": "Exceptions removed",
+      "body": "{0} exception(s) were removed."
+    },
+    "removeFailed": {
+      "title": "Could not remove the exceptions",
+      "lockedDetail": "Unlock the configuration before removing exceptions.",
+      "staleDetail": "The configuration changed elsewhere just now; the exceptions were not removed. Please try again.",
+      "genericDetail": "The service returned {0}. The exceptions were not removed."
+    },
+    "specialToggleFailed": {
+      "title": "Could not change the special exception",
+      "lockedDetail": "Unlock the configuration before changing this exception.",
+      "staleDetail": "The configuration changed elsewhere just now; the exception was not changed. Please try again.",
+      "genericDetail": "The service returned {0}. The exception was not changed."
+    },
+    "add": "Add",
+    "addPickExecutable": "Executable file...",
+    "addPickProcess": "Running process...",
+    "addPickWindow": "Window...",
+    "addPickUwp": "UWP app...",
+    "addPickFolder": "Pick folder...",
+    "pickUwpTitle": "Choose a UWP app",
+    "pickProcessTitle": "Choose a running process",
+    "pickWindowTitle": "Choose a window",
+    "pickEmpty": "No matching entries.",
+    "detail": {
+      "title": "Rule",
+      "policyBlocked": "Blocked",
+      "policyUnrestricted": "Unrestricted",
+      "policyUnrestrictedLan": "Unrestricted (LAN only)",
+      "policyTcpUdp": "TCP/UDP only",
+      "tcpOut": "TCP out",
+      "udpOut": "UDP out",
+      "tcpIn": "TCP in",
+      "udpIn": "UDP in",
+      "lanOnly": "LAN only",
+      "apply": "Apply",
+      "customRulesReadOnly": "Custom rule lists can't be edited here yet.",
+      "applySuccess": "Policy updated.",
+      "applyFailed": {
+        "title": "Could not update the policy",
+        "lockedDetail": "Unlock the configuration before changing this rule.",
+        "staleDetail": "The configuration changed elsewhere just now; the policy was not changed. Please try again.",
+        "genericDetail": "The service returned {0}. The policy was not changed."
+      }
+    },
+    "multiSelectHint": "{0} rules selected. Remove deletes all of them; select a single rule to edit it."
+  },
+  "settings": {
+    "title": "Settings",
+    "section": {
+      "general": "General",
+      "protection": "Protection",
+      "blocklists": "Blocklists",
+      "security": "Security",
+      "updates": "Updates",
+      "maintenance": "Maintenance",
+      "about": "About",
+      "logging": "Logging"
+    },
+    "commitFailed": {
+      "title": "Could not save the setting",
+      "lockedDetail": "Unlock the configuration before changing settings.",
+      "staleDetail": "The configuration changed elsewhere just now; the setting was not changed. Please try again.",
+      "genericDetail": "The service returned {0}. The setting was not changed."
+    },
+    "localSaveFailed": {
+      "title": "This setting will not survive a restart",
+      "detail": "The change is active now, but it could not be written to disk, so SimpleDeFence will forget it when it next starts. {0}"
+    },
+    "general": {
+      "theme": "App theme",
+      "themeDescription": "Applies immediately.",
+      "themeAuto": "Use system setting",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "language": "Language",
+      "languageDescription": "Overrides the system language for SimpleDeFence's own UI.",
+      "languageAuto": "Use system setting",
+      "languageRestartTitle": "Restart to finish switching language",
+      "languageRestartDetail": "Some of the text on screen keeps the previous language until SimpleDeFence is restarted.",
+      "askForExceptionDetails": "Ask for details when adding a single exception",
+      "askForExceptionDetailsDescription": "Show an editable confirmation before adding one exception via the tray's quick-add shortcuts. Bulk adds (e.g. a whole folder) never prompt.",
+      "enableHotkeys": "Enable global keyboard shortcuts",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere.",
+      "autoRefreshInterval": "Auto-refresh interval",
+      "autoRefreshIntervalDescription": "How often the Connections page re-checks while its Auto-refresh switch is on. Nothing pushes changes to it, so this is a polling interval; lower is fresher and costs more."
+    },
+    "protection": {
+      "allowLocalSubnet": "Allow local network",
+      "allowLocalSubnetDescription": "Always allow traffic to and from other devices on your local network.",
+      "displayOffBlock": "Block network when display is off",
+      "displayOffBlockDescription": "Blocks all network traffic while the screen is off."
+    },
+    "blocklists": {
+      "enable": "Enable blocklists",
+      "enableDescription": "Blocks traffic to known-malicious hosts and ports.",
+      "hosts": "Block malicious hosts",
+      "ports": "Block malicious ports"
+    },
+    "security": {
+      "lockHostsFile": "Lock the hosts file",
+      "lockHostsFileDescription": "Prevents other programs from modifying the hosts file.",
+      "passwordSet": "A password is set.",
+      "passwordNotSet": "No password is set.",
+      "passwordNotSetDetail": "Anyone who can sign in to this PC can change these settings until you set a password.",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "setPassword": "Set password",
+      "removePassword": "Remove password",
+      "passwordMismatch": {
+        "title": "Passwords do not match",
+        "detail": "Type the same password in both fields."
+      },
+      "passwordUpdated": {
+        "title": "Password updated",
+        "body": "The configuration password was changed."
+      },
+      "passwordRemoved": {
+        "body": "The configuration password was removed."
+      },
+      "passwordUpdateFailed": {
+        "title": "Could not update the password"
+      },
+      "lockedStatus": "The configuration is locked.",
+      "unlockedStatus": "The configuration is not locked.",
+      "lockNow": "Lock now",
+      "lockFailed": {
+        "title": "Could not lock the configuration"
+      },
+      "unlockPasswordPlaceholder": "Password",
+      "unlock": "Unlock",
+      "unlockFailed": {
+        "title": "Could not unlock the configuration",
+        "detail": "The password was not accepted."
+      }
+    },
+    "updates": {
+      "autoCheck": "Automatically check for updates",
+      "autoCheckDescription": "SimpleDeFence periodically checks for new versions.",
+      "checkNow": "Check for updates now",
+      "checkingTitle": "Checking for updates...",
+      "checkFailedTitle": "Update check failed",
+      "noneAvailable": "You're running the latest version.",
+      "available": "Version {0} is available. Download and install it now?",
+      "downloading": "Downloading update...",
+      "verificationFailed": "The download did not match the checksum published for this release, so it was not run. Nothing has been installed."
+    },
+    "maintenance": {
+      "import": "Import configuration...",
+      "export": "Export configuration...",
+      "filePickerName": "SimpleDeFence settings",
+      "importConfirm": {
+        "title": "Import configuration?",
+        "body": "This replaces every rule and setting in the current configuration. This cannot be undone.",
+        "confirm": "Import"
+      },
+      "importSuccess": {
+        "title": "Configuration imported",
+        "body": "{0} was imported."
+      },
+      "importFailed": {
+        "title": "Could not import the configuration"
+      },
+      "exportSuccess": {
+        "title": "Configuration exported",
+        "body": "Saved to {0}."
+      },
+      "exportFailed": {
+        "title": "Could not export the configuration"
+      }
+    },
+    "about": {
+      "version": "Version {0}",
+      "homepage": "Project homepage",
+      "license": "Licence",
+      "attributions": "Third-party components",
+      "linkFailed": {
+        "title": "Could not open"
+      },
+      "tagline": "A free, lightweight Windows firewall.",
+      "basedOn": "Based on TinyWall",
+      "basedOnDetail": "By Karoly Pados. Opens the original project on GitHub.",
+      "licenseDetail": "GNU General Public License, version 3",
+      "attributionsDetail": "What SimpleDeFence is built on, and what it borrows",
+      "homepageDetail": "Opens github.com/fcoltro/SimpleDeFence",
+      "readFailed": "This text could not be read."
+    },
+    "logging": {
+      "enabled": "Save a connection log",
+      "enabledDescription": "Records blocked attempts and established connections to a CSV file, including which program made them. Off by default.",
+      "path": "Log file",
+      "pathDescription": "Leave empty to use the default location under your local app data.",
+      "pathPlaceholder": "Default location",
+      "interval": "Log check interval",
+      "intervalDescription": "How often the log is updated. Logging polls, so anything shorter-lived than one interval can be missed.",
+      "maxSize": "Maximum log size",
+      "maxSizeDescription": "In megabytes. When the log reaches this size it is renamed to .1 and a fresh one is started; only the one previous file is kept.",
+      "openFolder": "Open log folder",
+      "writeFailedTitle": "The connection log could not be written"
+    }
+  },
+  "tray": {
+    "mode": {
+      "normal": "Normal",
+      "blockAll": "Block All",
+      "allowOutgoing": "Allow Outgoing",
+      "disabled": "Disabled",
+      "learning": "Learning"
+    },
+    "manage": "Manage...",
+    "connections": "Connections...",
+    "lock": "Lock",
+    "elevate": "Run as Administrator",
+    "allowLocalSubnet": "Allow Local Subnet",
+    "enableHostsBlocklist": "Enable Hosts Blocklist",
+    "whitelistByExecutable": "Whitelist executable...",
+    "whitelistByProcess": "Whitelist running process...",
+    "whitelistByWindow": "Whitelist by window...",
+    "quit": "Quit",
+    "unlock": {
+      "title": "Unlock SimpleDeFence",
+      "passwordPlaceholder": "Password",
+      "button": "Unlock",
+      "failedTitle": "Incorrect password"
+    },
+    "quickAdd": {
+      "confirmTitle": "Add exception?",
+      "confirmBody": "Allow \"{0}\" through the firewall?",
+      "confirmAdd": "Add"
+    },
+    "elevateFailed": {
+      "title": "Could not restart with administrator privileges"
+    },
+    "stillRunning": {
+      "title": "SimpleDeFence is still running",
+      "body": "Closing the window does not stop the firewall. Use Quit in this menu to stop it."
+    }
+  }
+}

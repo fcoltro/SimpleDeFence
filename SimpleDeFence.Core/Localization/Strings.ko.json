@@ -1,0 +1,408 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+  "nav": {
+    "rules": "규칙",
+    "settings": "설정",
+    "modeChip": "방화벽 모드"
+  },
+  "common": {
+    "ok": "확인",
+    "cancel": "취소",
+    "on": "켬",
+    "off": "끔",
+    "refresh": "새로 고침",
+    "loading": "불러오는 중...",
+    "connecting": "연결 중...",
+    "unknown": "알 수 없음",
+    "anotherDialogOpenDetail": "다른 대화 상자가 이미 열려 있습니다. 다시 시도해 주세요."
+  },
+  "status": {
+    "notConnected": "연결되지 않음",
+    "notConnectedDetail": "SimpleDeFence 서비스에 연결할 수 없습니다. 설치되어 실행 중인가요?",
+    "locked": "구성이 잠겨 있습니다",
+    "lockedDetail": "모드를 변경하기 전에 구성을 잠금 해제하세요.",
+    "connected": "연결됨",
+    "degraded": {
+      "title": "방화벽이 설정된 모든 작업을 수행하고 있지 않습니다",
+      "initFailed": "시작이 완료되지 않아 적용 중인 규칙이 이전 세션의 것일 수 있습니다.",
+      "databaseUnavailable": "응용 프로그램 데이터베이스를 불러오지 못해 차단 목록과 응용 프로그램 프로필이 규칙을 만들지 않습니다.",
+      "rulesIncomplete": "Windows가 일부 방화벽 규칙을 거부하여 설치된 규칙이 구성한 것과 다릅니다.",
+      "hostsUnavailable": "hosts 차단 목록이 켜져 있지만 설치되지 않았습니다."
+    }
+  },
+  "mode": {
+    "normal": {
+      "label": "일반",
+      "description": "방화벽이 권장 방식으로 동작하고 있습니다."
+    },
+    "blockAll": {
+      "label": "모두 차단",
+      "description": "방화벽이 모든 수신 및 송신 트래픽을 차단하고 있습니다."
+    },
+    "allowOutgoing": {
+      "label": "송신 허용",
+      "description": "방화벽이 송신 연결을 허용합니다."
+    },
+    "disabled": {
+      "label": "사용 안 함",
+      "description": "방화벽이 비활성화되어 있습니다."
+    },
+    "learning": {
+      "label": "자동 학습",
+      "description": "방화벽이 모든 트래픽을 통과시키면서 학습하고 있습니다."
+    },
+    "switchFailed": {
+      "lockedTitle": "SimpleDeFence가 현재 잠겨 있습니다",
+      "comErrorTitle": "서비스와의 통신에 실패했습니다",
+      "comErrorDetail": "모드가 변경되지 않았습니다.",
+      "genericTitle": "작업에 실패했습니다",
+      "genericDetail": "서비스가 {0}을(를) 반환했습니다. 모드가 변경되지 않았습니다.",
+      "unreachableTitle": "서비스에 연결할 수 없습니다"
+    },
+    "learningConfirm": {
+      "title": "자동 학습을 시작할까요?",
+      "body": "자동 학습 모드에서 SimpleDeFence는 모든 트래픽을 허용하고 어떤 응용 프로그램이 네트워크를 사용했는지 기억한 다음, 모드를 벗어날 때 해당 프로그램에 대한 예외를 추가합니다. 특수 예외에 대해서는 규칙을 학습할 수 없습니다.\n\n악성 코드가 없다고 확신하는 시스템에서만 사용하세요.",
+      "confirm": "학습 모드 시작"
+    }
+  },
+  "applications": {
+    "title": "응용 프로그램",
+    "filterPlaceholder": "이름 또는 경로로 필터링",
+    "summary": "프로필 \"{1}\"의 예외 {0}개",
+    "summaryOne": "프로필 \"{0}\"의 예외 1개",
+    "empty": "아직 응용 프로그램 예외가 없습니다."
+  },
+  "connections": {
+    "title": "연결",
+    "section": {
+      "blocked": "차단됨",
+      "connected": "연결됨",
+      "open": "열림",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "지난 5분 동안 차단된 항목이 없습니다.",
+      "connected": "설정된 연결이 없습니다.",
+      "open": "수신 대기 중인 포트가 없습니다.",
+      "filtered": "현재 필터와 일치하는 항목이 없습니다."
+    },
+    "filterPlaceholder": "응용 프로그램 이름으로 필터링",
+    "autoRefresh": "자동 새로 고침",
+    "allow": "이 응용 프로그램 허용",
+    "allowSuccess": {
+      "title": "예외가 추가되었습니다",
+      "body": "이제 {0}이(가) 연결할 수 있습니다."
+    },
+    "allowFailed": {
+      "title": "예외를 추가할 수 없습니다",
+      "lockedDetail": "예외를 추가하기 전에 구성을 잠금 해제하세요.",
+      "staleDetail": "구성이 방금 다른 곳에서 변경되었습니다. 예외가 추가되지 않았습니다. 다시 시도해 주세요.",
+      "genericDetail": "서비스가 {0}을(를) 반환했습니다. 예외가 추가되지 않았습니다.",
+      "unidentified": "응용 프로그램을 식별할 수 없어(경로도 패키지도 없음) 예외가 추가되지 않았습니다."
+    },
+    "gatherFailed": {
+      "title": "연결 데이터를 읽을 수 없습니다"
+    },
+    "blocked": {
+      "attempts": "{0}회 시도, 주소 {1}개",
+      "attemptsOneAddress": "{0}회 시도",
+      "attemptsHeader": "차단된 시도"
+    },
+    "showAll": "모두 표시",
+    "truncated": "최근 {0}개를 표시하고 있습니다.",
+    "connected": {
+      "summary": "연결 {0}개",
+      "header": "설정된 연결"
+    },
+    "open": {
+      "summary": "수신 대기 포트 {0}개",
+      "header": "수신 대기 포트"
+    },
+    "legend": {
+      "local": "강조 표시된 행은 로컬 네트워크를 벗어나지 않았습니다"
+    }
+  },
+  "subject": {
+    "executable": "실행 파일",
+    "service": "서비스",
+    "uwpPackage": "UWP 패키지",
+    "global": "전역",
+    "allApplications": "모든 응용 프로그램"
+  },
+  "policy": {
+    "blocked": "차단됨",
+    "unrestricted": "제한 없음",
+    "unrestrictedLan": "제한 없음(LAN만)",
+    "noPorts": "허용된 포트 없음",
+    "lanOnlySuffix": "{0}(LAN만)",
+    "customRuleOne": "사용자 지정 규칙 1개",
+    "customRuleMany": "사용자 지정 규칙 {0}개",
+    "tcpOut": "TCP 송신",
+    "udpOut": "UDP 송신",
+    "tcpIn": "TCP 수신",
+    "udpIn": "UDP 수신",
+    "allPorts": "전체"
+  },
+  "rules": {
+    "specialKind": "특수 예외",
+    "specialPolicy": "미리 정의됨",
+    "title": "규칙",
+    "section": {
+      "applications": "응용 프로그램",
+      "specialRecommended": "특수(권장)",
+      "specialOptional": "특수(선택)"
+    },
+    "filterPlaceholder": "이름 또는 경로로 필터링",
+    "empty": {
+      "applications": "아직 응용 프로그램 예외가 없습니다.",
+      "special": "사용할 수 있는 특수 예외가 없습니다.",
+      "filtered": "현재 필터와 일치하는 항목이 없습니다."
+    },
+    "remove": "제거",
+    "removeConfirm": {
+      "title": "예외를 제거할까요?",
+      "body": "예외 {0}개를 제거할까요? 해당 응용 프로그램은 다시 차단됩니다."
+    },
+    "removeSuccess": {
+      "title": "예외가 제거되었습니다",
+      "body": "예외 {0}개가 제거되었습니다."
+    },
+    "removeFailed": {
+      "title": "예외를 제거할 수 없습니다",
+      "lockedDetail": "예외를 제거하기 전에 구성을 잠금 해제하세요.",
+      "staleDetail": "구성이 방금 다른 곳에서 변경되었습니다. 예외가 제거되지 않았습니다. 다시 시도해 주세요.",
+      "genericDetail": "서비스가 {0}을(를) 반환했습니다. 예외가 제거되지 않았습니다."
+    },
+    "specialToggleFailed": {
+      "title": "특수 예외를 변경할 수 없습니다",
+      "lockedDetail": "이 예외를 변경하기 전에 구성을 잠금 해제하세요.",
+      "staleDetail": "구성이 방금 다른 곳에서 변경되었습니다. 예외가 변경되지 않았습니다. 다시 시도해 주세요.",
+      "genericDetail": "서비스가 {0}을(를) 반환했습니다. 예외가 변경되지 않았습니다."
+    },
+    "add": "추가",
+    "addPickExecutable": "실행 파일...",
+    "addPickProcess": "실행 중인 프로세스...",
+    "addPickWindow": "창...",
+    "addPickUwp": "UWP 앱...",
+    "addPickFolder": "폴더 선택...",
+    "pickUwpTitle": "UWP 앱 선택",
+    "pickProcessTitle": "실행 중인 프로세스 선택",
+    "pickWindowTitle": "창 선택",
+    "pickEmpty": "일치하는 항목이 없습니다.",
+    "detail": {
+      "title": "규칙",
+      "policyBlocked": "차단됨",
+      "policyUnrestricted": "제한 없음",
+      "policyUnrestrictedLan": "제한 없음(LAN만)",
+      "policyTcpUdp": "TCP/UDP만",
+      "tcpOut": "TCP 송신",
+      "udpOut": "UDP 송신",
+      "tcpIn": "TCP 수신",
+      "udpIn": "UDP 수신",
+      "lanOnly": "LAN만",
+      "apply": "적용",
+      "customRulesReadOnly": "사용자 지정 규칙 목록은 아직 여기에서 편집할 수 없습니다.",
+      "applySuccess": "정책이 업데이트되었습니다.",
+      "applyFailed": {
+        "title": "정책을 업데이트할 수 없습니다",
+        "lockedDetail": "이 규칙을 변경하기 전에 구성을 잠금 해제하세요.",
+        "staleDetail": "구성이 방금 다른 곳에서 변경되었습니다. 정책이 변경되지 않았습니다. 다시 시도해 주세요.",
+        "genericDetail": "서비스가 {0}을(를) 반환했습니다. 정책이 변경되지 않았습니다."
+      }
+    },
+    "multiSelectHint": "규칙 {0}개가 선택되었습니다. 제거하면 모두 삭제됩니다. 편집하려면 규칙을 하나만 선택하세요."
+  },
+  "settings": {
+    "title": "설정",
+    "section": {
+      "general": "일반",
+      "protection": "보호",
+      "blocklists": "차단 목록",
+      "security": "보안",
+      "updates": "업데이트",
+      "maintenance": "유지 관리",
+      "about": "정보",
+      "logging": "로깅"
+    },
+    "commitFailed": {
+      "title": "설정을 저장할 수 없습니다",
+      "lockedDetail": "설정을 변경하기 전에 구성을 잠금 해제하세요.",
+      "staleDetail": "구성이 방금 다른 곳에서 변경되었습니다. 설정이 변경되지 않았습니다. 다시 시도해 주세요.",
+      "genericDetail": "서비스가 {0}을(를) 반환했습니다. 설정이 변경되지 않았습니다."
+    },
+    "localSaveFailed": {
+      "title": "이 설정은 다시 시작하면 사라집니다",
+      "detail": "변경 사항은 지금 적용되어 있지만 디스크에 기록되지 않아 SimpleDeFence가 다음에 시작할 때 잊어버립니다. {0}"
+    },
+    "general": {
+      "theme": "앱 테마",
+      "themeDescription": "즉시 적용됩니다.",
+      "themeAuto": "시스템 설정 사용",
+      "themeLight": "밝게",
+      "themeDark": "어둡게",
+      "language": "언어",
+      "languageDescription": "SimpleDeFence 자체 화면에 대해 시스템 언어를 재정의합니다.",
+      "languageAuto": "시스템 설정 사용",
+      "languageRestartTitle": "언어 변경을 완료하려면 다시 시작하세요",
+      "languageRestartDetail": "화면의 일부 텍스트는 SimpleDeFence를 다시 시작할 때까지 이전 언어로 남아 있습니다.",
+      "askForExceptionDetails": "예외를 하나 추가할 때 세부 정보 묻기",
+      "askForExceptionDetailsDescription": "트레이의 빠른 추가 바로 가기로 예외를 하나 추가하기 전에 편집 가능한 확인 창을 표시합니다. 일괄 추가(예: 폴더 전체)는 묻지 않습니다.",
+      "enableHotkeys": "전역 키보드 단축키 사용",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W로 어디서나 실행 파일, 프로세스 또는 창을 즉시 허용합니다.",
+      "autoRefreshInterval": "자동 새로 고침 간격",
+      "autoRefreshIntervalDescription": "연결 페이지의 자동 새로 고침 스위치가 켜져 있는 동안 다시 확인하는 주기입니다. 변경 사항을 밀어 주는 것이 없으므로 이것은 폴링 간격입니다. 짧을수록 최신이지만 비용이 더 듭니다."
+    },
+    "protection": {
+      "allowLocalSubnet": "로컬 네트워크 허용",
+      "allowLocalSubnetDescription": "로컬 네트워크의 다른 장치와 주고받는 트래픽을 항상 허용합니다.",
+      "displayOffBlock": "디스플레이가 꺼져 있을 때 네트워크 차단",
+      "displayOffBlockDescription": "화면이 꺼져 있는 동안 모든 네트워크 트래픽을 차단합니다."
+    },
+    "blocklists": {
+      "enable": "차단 목록 사용",
+      "enableDescription": "악성으로 알려진 호스트와 포트로 향하는 트래픽을 차단합니다.",
+      "hosts": "악성 호스트 차단",
+      "ports": "악성 포트 차단"
+    },
+    "security": {
+      "lockHostsFile": "hosts 파일 잠금",
+      "lockHostsFileDescription": "다른 프로그램이 hosts 파일을 수정하지 못하게 합니다.",
+      "passwordSet": "암호가 설정되어 있습니다.",
+      "passwordNotSet": "설정된 암호가 없습니다.",
+      "passwordNotSetDetail": "암호를 설정하기 전까지는 이 PC에 로그인할 수 있는 누구나 이 설정을 변경할 수 있습니다.",
+      "newPassword": "새 암호",
+      "confirmPassword": "암호 확인",
+      "setPassword": "암호 설정",
+      "removePassword": "암호 제거",
+      "passwordMismatch": {
+        "title": "암호가 일치하지 않습니다",
+        "detail": "두 칸에 같은 암호를 입력하세요."
+      },
+      "passwordUpdated": {
+        "title": "암호가 업데이트되었습니다",
+        "body": "구성 암호가 변경되었습니다."
+      },
+      "passwordRemoved": {
+        "body": "구성 암호가 제거되었습니다."
+      },
+      "passwordUpdateFailed": {
+        "title": "암호를 업데이트할 수 없습니다"
+      },
+      "lockedStatus": "구성이 잠겨 있습니다.",
+      "unlockedStatus": "구성이 잠겨 있지 않습니다.",
+      "lockNow": "지금 잠그기",
+      "lockFailed": {
+        "title": "구성을 잠글 수 없습니다"
+      },
+      "unlockPasswordPlaceholder": "암호",
+      "unlock": "잠금 해제",
+      "unlockFailed": {
+        "title": "구성을 잠금 해제할 수 없습니다",
+        "detail": "암호가 받아들여지지 않았습니다."
+      }
+    },
+    "updates": {
+      "autoCheck": "자동으로 업데이트 확인",
+      "autoCheckDescription": "SimpleDeFence가 주기적으로 새 버전을 확인합니다.",
+      "checkNow": "지금 업데이트 확인",
+      "checkingTitle": "업데이트를 확인하는 중...",
+      "checkFailedTitle": "업데이트 확인에 실패했습니다",
+      "noneAvailable": "최신 버전을 사용하고 있습니다.",
+      "available": "버전 {0}을(를) 사용할 수 있습니다. 지금 내려받아 설치할까요?",
+      "downloading": "업데이트를 내려받는 중...",
+      "verificationFailed": "내려받은 파일이 이 릴리스에 공개된 체크섬과 일치하지 않아 실행되지 않았습니다. 아무것도 설치되지 않았습니다."
+    },
+    "maintenance": {
+      "import": "구성 가져오기...",
+      "export": "구성 내보내기...",
+      "filePickerName": "SimpleDeFence 설정",
+      "importConfirm": {
+        "title": "구성을 가져올까요?",
+        "body": "현재 구성의 모든 규칙과 설정을 대체합니다. 되돌릴 수 없습니다.",
+        "confirm": "가져오기"
+      },
+      "importSuccess": {
+        "title": "구성을 가져왔습니다",
+        "body": "{0}을(를) 가져왔습니다."
+      },
+      "importFailed": {
+        "title": "구성을 가져올 수 없습니다"
+      },
+      "exportSuccess": {
+        "title": "구성을 내보냈습니다",
+        "body": "{0}에 저장했습니다."
+      },
+      "exportFailed": {
+        "title": "구성을 내보낼 수 없습니다"
+      }
+    },
+    "about": {
+      "version": "버전 {0}",
+      "homepage": "프로젝트 홈페이지",
+      "license": "라이선스",
+      "attributions": "타사 구성 요소",
+      "linkFailed": {
+        "title": "열 수 없습니다"
+      },
+      "tagline": "자유롭고 가벼운 Windows 방화벽.",
+      "basedOn": "TinyWall 기반",
+      "basedOnDetail": "Karoly Pados 제작. GitHub에서 원본 프로젝트를 엽니다.",
+      "licenseDetail": "GNU 일반 공중 사용 허가서 버전 3",
+      "attributionsDetail": "SimpleDeFence가 무엇을 토대로 만들어졌고 무엇을 빌려 왔는지",
+      "homepageDetail": "github.com/fcoltro/SimpleDeFence를 엽니다",
+      "readFailed": "이 텍스트를 읽을 수 없습니다."
+    },
+    "logging": {
+      "enabled": "연결 로그 저장",
+      "enabledDescription": "차단된 시도와 설정된 연결을, 그것을 일으킨 프로그램과 함께 CSV 파일에 기록합니다. 기본적으로 꺼져 있습니다.",
+      "path": "로그 파일",
+      "pathDescription": "로컬 앱 데이터 아래의 기본 위치를 사용하려면 비워 두세요.",
+      "pathPlaceholder": "기본 위치",
+      "interval": "로그 확인 간격",
+      "intervalDescription": "로그가 업데이트되는 주기입니다. 로깅은 폴링 방식이므로 한 간격보다 짧게 지속되는 것은 놓칠 수 있습니다.",
+      "maxSize": "최대 로그 크기",
+      "maxSizeDescription": "메가바이트 단위. 로그가 이 크기에 이르면 .1로 이름이 바뀌고 새 로그가 시작됩니다. 이전 파일은 하나만 보관됩니다.",
+      "openFolder": "로그 폴더 열기",
+      "writeFailedTitle": "연결 로그를 기록할 수 없습니다"
+    }
+  },
+  "tray": {
+    "mode": {
+      "normal": "일반",
+      "blockAll": "모두 차단",
+      "allowOutgoing": "송신 허용",
+      "disabled": "사용 안 함",
+      "learning": "학습 중"
+    },
+    "manage": "관리...",
+    "connections": "연결...",
+    "lock": "잠금",
+    "elevate": "관리자 권한으로 실행",
+    "allowLocalSubnet": "로컬 서브넷 허용",
+    "enableHostsBlocklist": "호스트 차단 목록 사용",
+    "whitelistByExecutable": "실행 파일 허용...",
+    "whitelistByProcess": "실행 중인 프로세스 허용...",
+    "whitelistByWindow": "창으로 허용...",
+    "quit": "종료",
+    "unlock": {
+      "title": "SimpleDeFence 잠금 해제",
+      "passwordPlaceholder": "암호",
+      "button": "잠금 해제",
+      "failedTitle": "잘못된 암호"
+    },
+    "quickAdd": {
+      "confirmTitle": "예외를 추가할까요?",
+      "confirmBody": "\"{0}\"이(가) 방화벽을 통과하도록 허용할까요?",
+      "confirmAdd": "추가"
+    },
+    "elevateFailed": {
+      "title": "관리자 권한으로 다시 시작할 수 없습니다"
+    },
+    "stillRunning": {
+      "title": "SimpleDeFence가 계속 실행 중입니다",
+      "body": "창을 닫아도 방화벽은 멈추지 않습니다. 멈추려면 이 메뉴의 종료를 사용하세요."
+    }
+  }
+}

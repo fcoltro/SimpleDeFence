@@ -1,0 +1,408 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+  "nav": {
+    "rules": "规则",
+    "settings": "设置",
+    "modeChip": "防火墙模式"
+  },
+  "common": {
+    "ok": "确定",
+    "cancel": "取消",
+    "on": "开",
+    "off": "关",
+    "refresh": "刷新",
+    "loading": "正在加载...",
+    "connecting": "正在连接...",
+    "unknown": "未知",
+    "anotherDialogOpenDetail": "已有另一个对话框处于打开状态。请重试。"
+  },
+  "status": {
+    "notConnected": "未连接",
+    "notConnectedDetail": "无法连接到 SimpleDeFence 服务。它是否已安装并正在运行？",
+    "locked": "配置已锁定",
+    "lockedDetail": "更改模式前请先解锁配置。",
+    "connected": "已连接",
+    "degraded": {
+      "title": "防火墙未执行全部已配置的设置",
+      "initFailed": "启动未完成，当前生效的规则可能来自上一次会话。",
+      "databaseUnavailable": "无法加载应用程序数据库，因此阻止列表和应用程序配置不会生成任何规则。",
+      "rulesIncomplete": "Windows 拒绝了部分防火墙规则，已安装的规则集与配置的并不一致。",
+      "hostsUnavailable": "hosts 阻止列表已开启，但尚未安装。"
+    }
+  },
+  "mode": {
+    "normal": {
+      "label": "正常",
+      "description": "防火墙正按推荐方式运行。"
+    },
+    "blockAll": {
+      "label": "全部阻止",
+      "description": "防火墙正在阻止所有入站和出站流量。"
+    },
+    "allowOutgoing": {
+      "label": "允许出站",
+      "description": "防火墙允许出站连接。"
+    },
+    "disabled": {
+      "label": "已禁用",
+      "description": "防火墙已禁用。"
+    },
+    "learning": {
+      "label": "自动学习",
+      "description": "防火墙在放行所有流量的同时进行学习。"
+    },
+    "switchFailed": {
+      "lockedTitle": "SimpleDeFence 当前已锁定",
+      "comErrorTitle": "与服务的通信失败",
+      "comErrorDetail": "模式未更改。",
+      "genericTitle": "操作失败",
+      "genericDetail": "服务返回 {0}。模式未更改。",
+      "unreachableTitle": "无法连接到服务"
+    },
+    "learningConfirm": {
+      "title": "开始自动学习？",
+      "body": "在自动学习模式下，SimpleDeFence 会放行所有流量并记住哪些应用程序使用了网络，退出该模式时再为它们添加例外。特殊例外无法通过学习生成规则。\n\n请仅在你确信没有恶意软件的系统上使用此模式。",
+      "confirm": "进入学习模式"
+    }
+  },
+  "applications": {
+    "title": "应用程序",
+    "filterPlaceholder": "按名称或路径筛选",
+    "summary": "配置文件“{1}”中有 {0} 个例外",
+    "summaryOne": "配置文件“{0}”中有 1 个例外",
+    "empty": "尚无应用程序例外。"
+  },
+  "connections": {
+    "title": "连接",
+    "section": {
+      "blocked": "已阻止",
+      "connected": "已连接",
+      "open": "已开放",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "过去 5 分钟内没有阻止任何内容。",
+      "connected": "没有已建立的连接。",
+      "open": "没有正在侦听的端口。",
+      "filtered": "没有符合当前筛选条件的内容。"
+    },
+    "filterPlaceholder": "按应用程序名称筛选",
+    "autoRefresh": "自动刷新",
+    "allow": "允许此应用程序",
+    "allowSuccess": {
+      "title": "已添加例外",
+      "body": "{0} 现在可以连接了。"
+    },
+    "allowFailed": {
+      "title": "无法添加例外",
+      "lockedDetail": "添加例外前请先解锁配置。",
+      "staleDetail": "配置刚刚在别处发生了更改；例外未被添加。请重试。",
+      "genericDetail": "服务返回 {0}。例外未被添加。",
+      "unidentified": "无法识别该应用程序（没有路径或程序包），因此未添加任何例外。"
+    },
+    "gatherFailed": {
+      "title": "无法读取连接数据"
+    },
+    "blocked": {
+      "attempts": "{0} 次尝试，{1} 个地址",
+      "attemptsOneAddress": "{0} 次尝试",
+      "attemptsHeader": "被阻止的尝试"
+    },
+    "showAll": "显示全部",
+    "truncated": "正在显示最近的 {0} 条。",
+    "connected": {
+      "summary": "{0} 个连接",
+      "header": "已建立的连接"
+    },
+    "open": {
+      "summary": "{0} 个侦听端口",
+      "header": "侦听端口"
+    },
+    "legend": {
+      "local": "高亮显示的行未离开你的本地网络"
+    }
+  },
+  "subject": {
+    "executable": "可执行文件",
+    "service": "服务",
+    "uwpPackage": "UWP 程序包",
+    "global": "全局",
+    "allApplications": "所有应用程序"
+  },
+  "policy": {
+    "blocked": "已阻止",
+    "unrestricted": "不受限制",
+    "unrestrictedLan": "不受限制（仅局域网）",
+    "noPorts": "不允许任何端口",
+    "lanOnlySuffix": "{0}（仅局域网）",
+    "customRuleOne": "1 条自定义规则",
+    "customRuleMany": "{0} 条自定义规则",
+    "tcpOut": "TCP 出站",
+    "udpOut": "UDP 出站",
+    "tcpIn": "TCP 入站",
+    "udpIn": "UDP 入站",
+    "allPorts": "全部"
+  },
+  "rules": {
+    "specialKind": "特殊例外",
+    "specialPolicy": "预定义",
+    "title": "规则",
+    "section": {
+      "applications": "应用程序",
+      "specialRecommended": "特殊（推荐）",
+      "specialOptional": "特殊（可选）"
+    },
+    "filterPlaceholder": "按名称或路径筛选",
+    "empty": {
+      "applications": "尚无应用程序例外。",
+      "special": "没有可用的特殊例外。",
+      "filtered": "没有符合当前筛选条件的内容。"
+    },
+    "remove": "移除",
+    "removeConfirm": {
+      "title": "移除例外？",
+      "body": "移除 {0} 个例外？受影响的应用程序将再次被阻止。"
+    },
+    "removeSuccess": {
+      "title": "例外已移除",
+      "body": "已移除 {0} 个例外。"
+    },
+    "removeFailed": {
+      "title": "无法移除例外",
+      "lockedDetail": "移除例外前请先解锁配置。",
+      "staleDetail": "配置刚刚在别处发生了更改；例外未被移除。请重试。",
+      "genericDetail": "服务返回 {0}。例外未被移除。"
+    },
+    "specialToggleFailed": {
+      "title": "无法更改该特殊例外",
+      "lockedDetail": "更改此例外前请先解锁配置。",
+      "staleDetail": "配置刚刚在别处发生了更改；例外未被更改。请重试。",
+      "genericDetail": "服务返回 {0}。例外未被更改。"
+    },
+    "add": "添加",
+    "addPickExecutable": "可执行文件...",
+    "addPickProcess": "正在运行的进程...",
+    "addPickWindow": "窗口...",
+    "addPickUwp": "UWP 应用...",
+    "addPickFolder": "选择文件夹...",
+    "pickUwpTitle": "选择一个 UWP 应用",
+    "pickProcessTitle": "选择一个正在运行的进程",
+    "pickWindowTitle": "选择一个窗口",
+    "pickEmpty": "没有匹配的条目。",
+    "detail": {
+      "title": "规则",
+      "policyBlocked": "已阻止",
+      "policyUnrestricted": "不受限制",
+      "policyUnrestrictedLan": "不受限制（仅局域网）",
+      "policyTcpUdp": "仅 TCP/UDP",
+      "tcpOut": "TCP 出站",
+      "udpOut": "UDP 出站",
+      "tcpIn": "TCP 入站",
+      "udpIn": "UDP 入站",
+      "lanOnly": "仅局域网",
+      "apply": "应用",
+      "customRulesReadOnly": "自定义规则列表暂时无法在此编辑。",
+      "applySuccess": "策略已更新。",
+      "applyFailed": {
+        "title": "无法更新策略",
+        "lockedDetail": "更改此规则前请先解锁配置。",
+        "staleDetail": "配置刚刚在别处发生了更改；策略未被更改。请重试。",
+        "genericDetail": "服务返回 {0}。策略未被更改。"
+      }
+    },
+    "multiSelectHint": "已选择 {0} 条规则。“移除”会全部删除；选择单条规则才能编辑它。"
+  },
+  "settings": {
+    "title": "设置",
+    "section": {
+      "general": "常规",
+      "protection": "保护",
+      "blocklists": "阻止列表",
+      "security": "安全",
+      "updates": "更新",
+      "maintenance": "维护",
+      "about": "关于",
+      "logging": "日志记录"
+    },
+    "commitFailed": {
+      "title": "无法保存该设置",
+      "lockedDetail": "更改设置前请先解锁配置。",
+      "staleDetail": "配置刚刚在别处发生了更改；设置未被更改。请重试。",
+      "genericDetail": "服务返回 {0}。设置未被更改。"
+    },
+    "localSaveFailed": {
+      "title": "此设置在重启后不会保留",
+      "detail": "更改现已生效，但无法写入磁盘，因此 SimpleDeFence 下次启动时会忘记它。{0}"
+    },
+    "general": {
+      "theme": "应用主题",
+      "themeDescription": "立即生效。",
+      "themeAuto": "使用系统设置",
+      "themeLight": "浅色",
+      "themeDark": "深色",
+      "language": "语言",
+      "languageDescription": "为 SimpleDeFence 自身的界面覆盖系统语言。",
+      "languageAuto": "使用系统设置",
+      "languageRestartTitle": "重启以完成语言切换",
+      "languageRestartDetail": "屏幕上的部分文字会保持之前的语言，直到重新启动 SimpleDeFence。",
+      "askForExceptionDetails": "添加单个例外时询问详细信息",
+      "askForExceptionDetailsDescription": "通过托盘的快速添加快捷方式添加单个例外前，显示一个可编辑的确认框。批量添加（例如整个文件夹）从不询问。",
+      "enableHotkeys": "启用全局键盘快捷键",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W 可在任何位置立即将可执行文件、进程或窗口加入白名单。",
+      "autoRefreshInterval": "自动刷新间隔",
+      "autoRefreshIntervalDescription": "“连接”页面在其自动刷新开关打开时重新检查的频率。没有任何机制会主动向它推送更改，因此这是一个轮询间隔；间隔越短数据越新，开销也越大。"
+    },
+    "protection": {
+      "allowLocalSubnet": "允许本地网络",
+      "allowLocalSubnetDescription": "始终允许与本地网络中其他设备之间的流量。",
+      "displayOffBlock": "显示器关闭时阻止网络",
+      "displayOffBlockDescription": "在屏幕关闭期间阻止所有网络流量。"
+    },
+    "blocklists": {
+      "enable": "启用阻止列表",
+      "enableDescription": "阻止通往已知恶意主机和端口的流量。",
+      "hosts": "阻止恶意主机",
+      "ports": "阻止恶意端口"
+    },
+    "security": {
+      "lockHostsFile": "锁定 hosts 文件",
+      "lockHostsFileDescription": "阻止其他程序修改 hosts 文件。",
+      "passwordSet": "已设置密码。",
+      "passwordNotSet": "尚未设置密码。",
+      "passwordNotSetDetail": "在设置密码之前，任何能登录这台电脑的人都可以更改这些设置。",
+      "newPassword": "新密码",
+      "confirmPassword": "确认密码",
+      "setPassword": "设置密码",
+      "removePassword": "移除密码",
+      "passwordMismatch": {
+        "title": "两次输入的密码不一致",
+        "detail": "请在两个字段中输入相同的密码。"
+      },
+      "passwordUpdated": {
+        "title": "密码已更新",
+        "body": "配置密码已更改。"
+      },
+      "passwordRemoved": {
+        "body": "配置密码已移除。"
+      },
+      "passwordUpdateFailed": {
+        "title": "无法更新密码"
+      },
+      "lockedStatus": "配置已锁定。",
+      "unlockedStatus": "配置未锁定。",
+      "lockNow": "立即锁定",
+      "lockFailed": {
+        "title": "无法锁定配置"
+      },
+      "unlockPasswordPlaceholder": "密码",
+      "unlock": "解锁",
+      "unlockFailed": {
+        "title": "无法解锁配置",
+        "detail": "密码未被接受。"
+      }
+    },
+    "updates": {
+      "autoCheck": "自动检查更新",
+      "autoCheckDescription": "SimpleDeFence 会定期检查新版本。",
+      "checkNow": "立即检查更新",
+      "checkingTitle": "正在检查更新...",
+      "checkFailedTitle": "检查更新失败",
+      "noneAvailable": "你正在使用最新版本。",
+      "available": "版本 {0} 可用。现在下载并安装吗？",
+      "downloading": "正在下载更新...",
+      "verificationFailed": "下载的文件与该版本公布的校验和不符，因此没有运行。未安装任何内容。"
+    },
+    "maintenance": {
+      "import": "导入配置...",
+      "export": "导出配置...",
+      "filePickerName": "SimpleDeFence 设置",
+      "importConfirm": {
+        "title": "导入配置？",
+        "body": "这将替换当前配置中的每一条规则和每一项设置。此操作无法撤消。",
+        "confirm": "导入"
+      },
+      "importSuccess": {
+        "title": "配置已导入",
+        "body": "已导入 {0}。"
+      },
+      "importFailed": {
+        "title": "无法导入配置"
+      },
+      "exportSuccess": {
+        "title": "配置已导出",
+        "body": "已保存到 {0}。"
+      },
+      "exportFailed": {
+        "title": "无法导出配置"
+      }
+    },
+    "about": {
+      "version": "版本 {0}",
+      "homepage": "项目主页",
+      "license": "许可证",
+      "attributions": "第三方组件",
+      "linkFailed": {
+        "title": "无法打开"
+      },
+      "tagline": "一款自由、轻量的 Windows 防火墙。",
+      "basedOn": "基于 TinyWall",
+      "basedOnDetail": "作者 Karoly Pados。在 GitHub 上打开原始项目。",
+      "licenseDetail": "GNU 通用公共许可证第 3 版",
+      "attributionsDetail": "SimpleDeFence 的构建基础及其借鉴之处",
+      "homepageDetail": "打开 github.com/fcoltro/SimpleDeFence",
+      "readFailed": "无法读取此文本。"
+    },
+    "logging": {
+      "enabled": "保存连接日志",
+      "enabledDescription": "将被阻止的尝试和已建立的连接记录到 CSV 文件中，包括发起它们的程序。默认关闭。",
+      "path": "日志文件",
+      "pathDescription": "留空则使用本地应用数据下的默认位置。",
+      "pathPlaceholder": "默认位置",
+      "interval": "日志检查间隔",
+      "intervalDescription": "日志更新的频率。日志记录采用轮询方式，因此存续时间短于一个间隔的内容可能会被遗漏。",
+      "maxSize": "日志大小上限",
+      "maxSizeDescription": "以兆字节为单位。日志达到此大小时会被重命名为 .1 并新建一个；仅保留前一个文件。",
+      "openFolder": "打开日志文件夹",
+      "writeFailedTitle": "无法写入连接日志"
+    }
+  },
+  "tray": {
+    "mode": {
+      "normal": "正常",
+      "blockAll": "全部阻止",
+      "allowOutgoing": "允许出站",
+      "disabled": "已禁用",
+      "learning": "学习中"
+    },
+    "manage": "管理...",
+    "connections": "连接...",
+    "lock": "锁定",
+    "elevate": "以管理员身份运行",
+    "allowLocalSubnet": "允许本地子网",
+    "enableHostsBlocklist": "启用主机阻止列表",
+    "whitelistByExecutable": "将可执行文件加入白名单...",
+    "whitelistByProcess": "将正在运行的进程加入白名单...",
+    "whitelistByWindow": "按窗口加入白名单...",
+    "quit": "退出",
+    "unlock": {
+      "title": "解锁 SimpleDeFence",
+      "passwordPlaceholder": "密码",
+      "button": "解锁",
+      "failedTitle": "密码不正确"
+    },
+    "quickAdd": {
+      "confirmTitle": "添加例外？",
+      "confirmBody": "允许“{0}”通过防火墙吗？",
+      "confirmAdd": "添加"
+    },
+    "elevateFailed": {
+      "title": "无法以管理员权限重新启动"
+    },
+    "stillRunning": {
+      "title": "SimpleDeFence 仍在运行",
+      "body": "关闭窗口不会停止防火墙。请使用此菜单中的“退出”来停止它。"
+    }
+  }
+}

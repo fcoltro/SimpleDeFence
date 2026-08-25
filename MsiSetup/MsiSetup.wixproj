@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <!-- x64, not x86: the payload is a win-x64 self-contained publish. An x86 build still
+         succeeds, but silently produces a wrong-shaped package - Win64="no" components, install
+         into 32-bit ProgramFilesFolder, WOW6432Node registry redirection - wrapping an x64-only
+         runtime. A default that builds clean and ships broken is the worst of the options. -->
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProductVersion>0.1</ProductVersion>
+    <ProjectGuid>{e864e1f9-3383-454f-bb6f-d89ee97c518b}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>SimpleDeFence</OutputName>
+    <OutputType>Package</OutputType>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <IncludeSearchPaths>
+    </IncludeSearchPaths>
+    <!-- Root of the self-contained `dotnet publish` output that Dependencies.wxs (heat-harvested)
+         and Product.wxs's MainExecutable both resolve their Source paths against. Must match the
+         -o argument of the publish command documented in HarvestPublishDir.xslt:
+           dotnet publish SimpleDeFence/SimpleDeFence.csproj -c Release -r win-x64 -p:SelfContained=true -o SimpleDeFence/bin/Release/net10.0-windows10.0.19041.0/win-x64/publish
+         NOTE: SimpleDeFence.csproj sets AppendTargetFrameworkToOutputPath=false, so a bare
+         `dotnet publish` with no -o lands in bin\$(Configuration)\win-x64\publish instead - the
+         explicit -o above is required for this path to exist. -->
+    <DefineConstants>$(DefineConstants);PublishDir=..\SimpleDeFence\bin\$(Configuration)\net10.0-windows10.0.19041.0\win-x64\publish</DefineConstants>
+    <!-- ICE03 validates column data across the whole package; it is disabled only because its
+         language table is older than the payload, not because anything here is wrong.
+
+         The Windows App SDK ships Microsoft.ui.xaml.dll and Microsoft.UI.Xaml.Phone.dll localized
+         into ~100 locales. ICE03 rejects the gd-GB, mi-NZ and ug-CN .mui satellites as "Invalid
+         Language Id" (LGHT0204, a hard error) because those LCIDs postdate its table, and warns
+         that the two base DLLs list more languages in their version resource than the File table's
+         20-character Language column holds. All eight files are legitimate.
+
+         There is no narrower lever: File/@DefaultLanguage applies only to unversioned files, so it
+         leaves these errors in place while adding a LGHT1102 warning for the ~500 files that do not
+         need it. The alternative - dropping those three locales from the harvest - would silently
+         degrade the UI language coverage of a shipping product to satisfy a stale validator.
+
+         Low risk to leave off: MSI consults File.Language only for language-specific file
+         versioning during an upgrade, and Product.wxs schedules RemoveExistingProducts early, so
+         an upgrade removes the previous component set wholesale rather than comparing files. -->
+    <SuppressIces>ICE03</SuppressIces>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
+	<OutputName>$(OutputName)_x86</OutputName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x64' ">
+	<OutputName>$(OutputName)_x64</OutputName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'arm64' ">
+	<OutputName>$(OutputName)_arm64</OutputName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>$(DefineConstants);Debug</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DefineConstants>$(DefineConstants);Debug</DefineConstants>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|arm64' ">
+		<DefineConstants>$(DefineConstants);Debug</DefineConstants>
+		<OutputPath>bin\$(Configuration)\</OutputPath>
+		<IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|arm64' ">
+		<OutputPath>bin\$(Configuration)\</OutputPath>
+		<IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+    <Compile Include="CustomWelcomeDlg.wxs" />
+    <!-- Generated, not hand-edited. Regenerate after every publish with the heat.exe command
+         documented in HarvestPublishDir.xslt. -->
+    <Compile Include="Dependencies.wxs" />
+    <Compile Include="RemoteWarnDlg.wxs" />
+    <Compile Include="Product.wxs" />
+    <Compile Include="WixUI_InstallDir_Custom.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+  <!-- Dependencies.wxs is heat-generated and deliberately not checked in, so a clean clone would
+       otherwise fail here with a bare "file not found" on a path that never existed. Fail early
+       with the command that produces it instead. -->
+  <Target Name="EnsureDependenciesHarvested" BeforeTargets="Build">
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)\Dependencies.wxs')"
+           Text="Dependencies.wxs is missing: it is generated by heat.exe, not checked in. Publish first, from the repository root: dotnet publish SimpleDeFence/SimpleDeFence.csproj -c Release -r win-x64 -p:SelfContained=true -o SimpleDeFence/bin/Release/net10.0-windows10.0.19041.0/win-x64/publish - then run the heat.exe harvest command documented in the header comment of MsiSetup\HarvestPublishDir.xslt, and build this project again." />
+  </Target>
+  <!--
+	To modify your build process, add your task inside one of the targets below and uncomment it.
+	Other similar extension points exist, see Wix.targets.
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+</Project>

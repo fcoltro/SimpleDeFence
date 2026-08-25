@@ -1,0 +1,187 @@
+﻿<Window
+    x:Class="SimpleDeFence.UI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:loc="using:SimpleDeFence.UI.Localization">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop Kind="BaseAlt"/>
+    </Window.SystemBackdrop>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Drag region for the extended title bar. -->
+        <Grid x:Name="AppTitleBar" Grid.Row="0" Height="40" Padding="16,0"
+              ColumnSpacing="12" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <!-- The same AppIcon.ico the exe carries as its Win32 icon, so the title bar, the
+                 taskbar and Explorer cannot show three different marks. ms-appx works unpackaged
+                 here for the same reason TrayIconService uses it for the tray artwork. -->
+            <Image Grid.Column="0" Source="ms-appx:///Assets/AppIcon.ico"
+                   Width="16" Height="16" VerticalAlignment="Center"
+                   AutomationProperties.AccessibilityView="Raw"/>
+            <TextBlock Grid.Column="1" Text="{loc:Loc Key=app.name}" VerticalAlignment="Center"
+                       Style="{StaticResource CaptionTextBlockStyle}"/>
+        </Grid>
+
+        <!-- The pane toggle stays visible. Below roughly 640px NavigationView collapses the pane
+             into an overlay, and with no toggle button there is no way to open it - which would
+             make the mode chip unreachable at narrow widths and break the "status is always
+             visible" premise the chip exists for.
+
+             ExpandedModeThresholdWidth is set equal to CompactModeThresholdWidth's default (641)
+             so Auto's icon-only Compact rail is never chosen: below 641px the pane is Minimal
+             (reachable via the toggle above), at or above it the pane jumps straight to the fully
+             expanded state. Without this, windows between ~641-1007px landed in Compact, where the
+             pane column is too narrow to show the mode chip's text at all - hiding status at very
+             ordinary window sizes, not just narrow ones. -->
+        <NavigationView x:Name="Nav" Grid.Row="1"
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="False"
+                        PaneDisplayMode="Auto"
+                        CompactModeThresholdWidth="641"
+                        ExpandedModeThresholdWidth="641"
+                        IsPaneToggleButtonVisible="True"
+                        OpenPaneLength="220"
+                        SelectionChanged="Nav_SelectionChanged"
+                        DisplayModeChanged="Nav_DisplayModeChanged"
+                        PaneOpening="Nav_PaneOpening"
+                        PaneClosing="Nav_PaneClosing"
+                        PaneOpened="Nav_PaneOpened"
+                        PaneClosed="Nav_PaneClosed">
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="{loc:Loc Key=connections.title}" Tag="connections" IsSelected="True">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="{loc:Loc Key=nav.rules}" Tag="rules">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D5;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="{loc:Loc Key=nav.settings}" Tag="settings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE713;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <!-- Mode chip: status is ambient, not a destination. Colour + icon + word, never
+                 colour alone. Whenever the pane is closed - by the toggle button at any width, or
+                 by the window being below ExpandedModeThresholdWidth - NavigationView renders it
+                 as a 48px icon rail, and this footer is a plain Button we authored ourselves, so
+                 it does not get the compact treatment NavigationViewItem gets for free: left
+                 alone it clips its full-width content down to an empty rounded-rectangle husk
+                 (measured: 24px wide by 69px tall, the whole text stack still laid out inside).
+                 MainWindow.xaml.cs's UpdateChipLayout drops the text and squares the button off
+                 on IsPaneOpen so the rail shows a centred, legible indicator instead.
+
+                 The colour lives in ChipAccent, a 4px bar down the leading edge, rather than in
+                 a dot beside the glyph. On the rail a dot plus a glyph is two competing marks in
+                 44px of usable width and sat visibly off-centre; an edge bar is not competing for
+                 that space at all, reads at a glance in both layouts, and lets the compact chip be
+                 an actual centred square. Padding therefore lives on ChipBody, not on the Button -
+                 the accent has to meet the Button's own edge, and its left corner radius matches
+                 the default 4px control radius so it follows the rounding instead of poking
+                 through it. -->
+            <NavigationView.PaneFooter>
+                <!-- VerticalContentAlignment="Stretch": Button centres its content by default, so
+                     ChipContent was only as tall as the glyph and ChipAccent - which stretches
+                     within it - stopped short of the button's own top and bottom edges instead of
+                     running the full height of the chip. -->
+                <Button x:Name="ModeChip" Margin="12,8,12,16" Padding="0"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        Click="ModeChip_Click"
+                        AutomationProperties.Name="{loc:Loc Key=nav.modeChip}">
+                    <Grid x:Name="ChipContent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Not "Converter={StaticResource ModeStateToBrush}": on this WinAppSDK
+                             version, an x:Bind converter lookup at a <Window> root fails to build
+                             (CS1503 in generated code - SetConverterLookupRoot needs a
+                             FrameworkElement, which Window is not). Calling the same converter as
+                             a bound function keeps it compiled x:Bind and reuses the converter and
+                             its brushes without hitting that codegen path. -->
+                        <Border x:Name="ChipAccent" Grid.Column="0" Width="4"
+                                CornerRadius="4,0,0,4"
+                                Background="{x:Bind ModeStateToBrush(Shell.ModeStateKey), Mode=OneWay}"/>
+
+                        <!-- Grid, not the horizontal StackPanel this used to be: a horizontal
+                             StackPanel measures its children with infinite available width, so the
+                             status TextBlock below never got a width to wrap against and every
+                             attempt to give it one by hand (MaxWidth=150, then Width=150) was a
+                             guess that disagreed with the width it was actually painted into -
+                             which is what dropped whole words at the wrap boundary. A "*" column is
+                             a real, layout-derived constraint: the text wraps against whatever the
+                             pane actually leaves it, at any OpenPaneLength, in any language. -->
+                        <Grid x:Name="ChipBody" Grid.Column="1" Padding="12,8" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon x:Name="ChipGlyph" Grid.Column="0" FontSize="14"
+                                      VerticalAlignment="Center"
+                                      Glyph="{x:Bind Shell.ModeGlyph, Mode=OneWay}"/>
+                            <StackPanel x:Name="ChipTextStack" Grid.Column="1">
+                                <TextBlock Text="{x:Bind Shell.ModeLabel, Mode=OneWay}"
+                                           Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <!-- StatusLine can be an arbitrary-length exception message (see
+                                     FirewallClient.LastError), not just short mode descriptions -
+                                     the full text is already shown in each page's own InfoBar, so
+                                     this compact footer chip only needs to hint at it. No explicit
+                                     Width, deliberately: any hard width here measured wrong and
+                                     silently dropped whole words instead of wrapping them ("Is it"
+                                     vanished from "...service. Is it installed..." at MaxWidth=150;
+                                     "as" vanished from "The firewall is operating as recommended."
+                                     at Width=150), verified both times against a UIA dump showing
+                                     the bound Text itself complete and correct. Three lines, not
+                                     two: the chip sizes to its content and the footer has the room,
+                                     and a two-line cap was truncating the stock mode descriptions
+                                     themselves. Genuinely long text still elides, which is what the
+                                     cap is for. -->
+                                <TextBlock Text="{x:Bind Shell.StatusLine, Mode=OneWay}"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Opacity="0.7" TextWrapping="Wrap" MaxLines="3"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Button>
+            </NavigationView.PaneFooter>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Above the page rather than on any one of them: a service that is running but
+                     not enforcing what it was told to is a fact about the whole app, and the mode
+                     chip below cannot say it - a firewall that failed to install its rules still
+                     reports the mode it was asked for. -->
+                <InfoBar Grid.Row="0" Severity="Warning" Margin="24,16,24,0"
+                         IsOpen="{x:Bind Shell.IsDegraded, Mode=OneWay}"
+                         IsClosable="False"
+                         Title="{loc:Loc Key=status.degraded.title}"
+                         Message="{x:Bind Shell.DegradedMessage, Mode=OneWay}"/>
+
+                <Frame x:Name="ContentFrame" Grid.Row="1"/>
+            </Grid>
+        </NavigationView>
+    </Grid>
+</Window>

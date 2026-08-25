@@ -1,0 +1,34 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SimpleDeFence.UI.Themes">
+
+    <!-- One explicit status palette, shared by light and dark, instead of the WinUI system
+         semantic colours these used to bind to.
+
+         Those system colours are deliberately different per theme: the light variants are darkened
+         hard for contrast against white (SystemFillColorSuccess is #6CCB5F in dark but #0F7B0F in
+         light). That is the right call for text, but these roles are never text - they are the mode
+         chip's accent bar - so the only visible effect was that the same firewall state looked like
+         a different colour in each theme, light reading as muddy beside dark's vivid one.
+
+         Mid-tone values rather than dark's brighter set copied across: dark's caution yellow
+         (#FCE100) and critical pink (#FF99A4) all but vanish on a light card, so lifting light to
+         match dark exactly would have traded one imbalance for a worse one. These carry the same
+         hue in both themes and stay legible on a near-white card and a near-black one alike.
+
+         Defined at the dictionary root, not in ThemeDictionaries, because ModeStateToBrushConverter
+         resolves them with a flat Application.Current.Resources lookup - which consults the *app's*
+         theme, not the element's RequestedTheme, and so could hand back the wrong theme's brush
+         whenever the user picks a theme that differs from the OS. With one palette that mismatch
+         cannot happen at all. The cost is that high-contrast modes now get these fixed colours
+         rather than the user's system colours; acceptable here only because status is never
+         signalled by colour alone - the chip always carries a glyph and a word as well. -->
+    <SolidColorBrush x:Key="StatusSuccessBrush"     Color="#3DA45D"/>
+    <SolidColorBrush x:Key="StatusCautionBrush"     Color="#E0A106"/>
+    <SolidColorBrush x:Key="StatusInformationBrush" Color="#E5484D"/>
+    <SolidColorBrush x:Key="StatusNeutralBrush"     Color="#9A9A9A"/>
+    <SolidColorBrush x:Key="StatusAccentAltBrush"   Color="#4C9BE8"/>
+
+    <local:ModeStateToBrushConverter x:Key="ModeStateToBrush"/>
+</ResourceDictionary>

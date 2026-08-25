@@ -1,0 +1,408 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+  "nav": {
+    "rules": "Kurallar",
+    "settings": "Ayarlar",
+    "modeChip": "Güvenlik duvarı kipi"
+  },
+  "common": {
+    "ok": "Tamam",
+    "cancel": "İptal",
+    "on": "Açık",
+    "off": "Kapalı",
+    "refresh": "Yenile",
+    "loading": "Yükleniyor...",
+    "connecting": "Bağlanılıyor...",
+    "unknown": "Bilinmiyor",
+    "anotherDialogOpenDetail": "Başka bir iletişim kutusu zaten açık. Lütfen yeniden deneyin."
+  },
+  "status": {
+    "notConnected": "Bağlı değil",
+    "notConnectedDetail": "SimpleDeFence hizmetine ulaşılamadı. Kurulu ve çalışıyor mu?",
+    "locked": "Yapılandırma kilitli",
+    "lockedDetail": "Kipi değiştirmeden önce yapılandırmanın kilidini açın.",
+    "connected": "Bağlı",
+    "degraded": {
+      "title": "Güvenlik duvarı ayarlandığı her şeyi yapmıyor",
+      "initFailed": "Başlatma tamamlanmadı; yürürlükteki kurallar önceki bir oturumdan kalmış olabilir.",
+      "databaseUnavailable": "Uygulama veritabanı yüklenemedi; engelleme listeleri ve uygulama profilleri hiçbir kural üretmiyor.",
+      "rulesIncomplete": "Windows bazı güvenlik duvarı kurallarını reddetti; kurulu küme yapılandırılan küme değil.",
+      "hostsUnavailable": "Hosts engelleme listesi açık ancak kurulu değil."
+    }
+  },
+  "mode": {
+    "normal": {
+      "label": "Normal",
+      "description": "Güvenlik duvarı önerildiği gibi çalışıyor."
+    },
+    "blockAll": {
+      "label": "Tümünü engelle",
+      "description": "Güvenlik duvarı tüm gelen ve giden trafiği engelliyor."
+    },
+    "allowOutgoing": {
+      "label": "Gidene izin ver",
+      "description": "Güvenlik duvarı giden bağlantılara izin veriyor."
+    },
+    "disabled": {
+      "label": "Devre dışı",
+      "description": "Güvenlik duvarı devre dışı."
+    },
+    "learning": {
+      "label": "Otomatik öğrenme",
+      "description": "Güvenlik duvarı tüm trafiği geçirirken öğreniyor."
+    },
+    "switchFailed": {
+      "lockedTitle": "SimpleDeFence şu anda kilitli",
+      "comErrorTitle": "Hizmetle iletişim başarısız oldu",
+      "comErrorDetail": "Kip değiştirilmedi.",
+      "genericTitle": "İşlem başarısız oldu",
+      "genericDetail": "Hizmet {0} döndürdü. Kip değiştirilmedi.",
+      "unreachableTitle": "Hizmete ulaşılamadı"
+    },
+    "learningConfirm": {
+      "title": "Otomatik öğrenme başlatılsın mı?",
+      "body": "Otomatik öğrenme kipinde SimpleDeFence tüm trafiğe izin verir ve hangi uygulamaların ağı kullandığını hatırlar, kipten çıktığınızda da onlar için ayrıcalık ekler. Özel ayrıcalıklar için kural öğrenilemez.\n\nBunu yalnızca kötü amaçlı yazılım içermediğinden emin olduğunuz bir sistemde kullanın.",
+      "confirm": "Öğrenme kipine gir"
+    }
+  },
+  "applications": {
+    "title": "Uygulamalar",
+    "filterPlaceholder": "Ada veya yola göre süz",
+    "summary": "\"{1}\" profilinde {0} ayrıcalık",
+    "summaryOne": "\"{0}\" profilinde 1 ayrıcalık",
+    "empty": "Henüz uygulama ayrıcalığı yok."
+  },
+  "connections": {
+    "title": "Bağlantılar",
+    "section": {
+      "blocked": "Engellenen",
+      "connected": "Bağlı",
+      "open": "Açık",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "Son 5 dakikada hiçbir şey engellenmedi.",
+      "connected": "Kurulmuş bağlantı yok.",
+      "open": "Dinleyen bağlantı noktası yok.",
+      "filtered": "Geçerli süzgeçle eşleşen bir şey yok."
+    },
+    "filterPlaceholder": "Uygulama adına göre süz",
+    "autoRefresh": "Otomatik yenileme",
+    "allow": "Bu uygulamaya izin ver",
+    "allowSuccess": {
+      "title": "Ayrıcalık eklendi",
+      "body": "{0} artık bağlanabilir."
+    },
+    "allowFailed": {
+      "title": "Ayrıcalık eklenemedi",
+      "lockedDetail": "Ayrıcalık eklemeden önce yapılandırmanın kilidini açın.",
+      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ayrıcalık eklenmedi. Lütfen yeniden deneyin.",
+      "genericDetail": "Hizmet {0} döndürdü. Ayrıcalık eklenmedi.",
+      "unidentified": "Uygulama tanımlanamadı (ne yol ne de paket var), bu yüzden hiçbir ayrıcalık eklenmedi."
+    },
+    "gatherFailed": {
+      "title": "Bağlantı verileri okunamadı"
+    },
+    "blocked": {
+      "attempts": "{0} deneme, {1} adres",
+      "attemptsOneAddress": "{0} deneme",
+      "attemptsHeader": "Engellenen denemeler"
+    },
+    "showAll": "Tümünü göster",
+    "truncated": "En son {0} tanesi gösteriliyor.",
+    "connected": {
+      "summary": "{0} bağlantı",
+      "header": "Kurulmuş bağlantılar"
+    },
+    "open": {
+      "summary": "{0} dinleyen bağlantı noktası",
+      "header": "Dinleyen bağlantı noktaları"
+    },
+    "legend": {
+      "local": "Vurgulanan satırlar yerel ağınızın içinde kaldı"
+    }
+  },
+  "subject": {
+    "executable": "Çalıştırılabilir dosya",
+    "service": "Hizmet",
+    "uwpPackage": "UWP paketi",
+    "global": "Genel",
+    "allApplications": "Tüm uygulamalar"
+  },
+  "policy": {
+    "blocked": "Engellendi",
+    "unrestricted": "Kısıtlamasız",
+    "unrestrictedLan": "Kısıtlamasız (yalnızca yerel ağ)",
+    "noPorts": "İzin verilen bağlantı noktası yok",
+    "lanOnlySuffix": "{0} (yalnızca yerel ağ)",
+    "customRuleOne": "1 özel kural",
+    "customRuleMany": "{0} özel kural",
+    "tcpOut": "TCP giden",
+    "udpOut": "UDP giden",
+    "tcpIn": "TCP gelen",
+    "udpIn": "UDP gelen",
+    "allPorts": "tümü"
+  },
+  "rules": {
+    "specialKind": "Özel ayrıcalık",
+    "specialPolicy": "Önceden tanımlı",
+    "title": "Kurallar",
+    "section": {
+      "applications": "Uygulamalar",
+      "specialRecommended": "Özel (önerilen)",
+      "specialOptional": "Özel (isteğe bağlı)"
+    },
+    "filterPlaceholder": "Ada veya yola göre süz",
+    "empty": {
+      "applications": "Henüz uygulama ayrıcalığı yok.",
+      "special": "Kullanılabilir özel ayrıcalık yok.",
+      "filtered": "Geçerli süzgeçle eşleşen bir şey yok."
+    },
+    "remove": "Kaldır",
+    "removeConfirm": {
+      "title": "Ayrıcalıklar kaldırılsın mı?",
+      "body": "{0} ayrıcalık kaldırılsın mı? Etkilenen uygulamalar yeniden engellenecek."
+    },
+    "removeSuccess": {
+      "title": "Ayrıcalıklar kaldırıldı",
+      "body": "{0} ayrıcalık kaldırıldı."
+    },
+    "removeFailed": {
+      "title": "Ayrıcalıklar kaldırılamadı",
+      "lockedDetail": "Ayrıcalıkları kaldırmadan önce yapılandırmanın kilidini açın.",
+      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ayrıcalıklar kaldırılmadı. Lütfen yeniden deneyin.",
+      "genericDetail": "Hizmet {0} döndürdü. Ayrıcalıklar kaldırılmadı."
+    },
+    "specialToggleFailed": {
+      "title": "Özel ayrıcalık değiştirilemedi",
+      "lockedDetail": "Bu ayrıcalığı değiştirmeden önce yapılandırmanın kilidini açın.",
+      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ayrıcalık değiştirilmedi. Lütfen yeniden deneyin.",
+      "genericDetail": "Hizmet {0} döndürdü. Ayrıcalık değiştirilmedi."
+    },
+    "add": "Ekle",
+    "addPickExecutable": "Çalıştırılabilir dosya...",
+    "addPickProcess": "Çalışan işlem...",
+    "addPickWindow": "Pencere...",
+    "addPickUwp": "UWP uygulaması...",
+    "addPickFolder": "Klasör seç...",
+    "pickUwpTitle": "Bir UWP uygulaması seçin",
+    "pickProcessTitle": "Çalışan bir işlem seçin",
+    "pickWindowTitle": "Bir pencere seçin",
+    "pickEmpty": "Eşleşen girdi yok.",
+    "detail": {
+      "title": "Kural",
+      "policyBlocked": "Engellendi",
+      "policyUnrestricted": "Kısıtlamasız",
+      "policyUnrestrictedLan": "Kısıtlamasız (yalnızca yerel ağ)",
+      "policyTcpUdp": "Yalnızca TCP/UDP",
+      "tcpOut": "TCP giden",
+      "udpOut": "UDP giden",
+      "tcpIn": "TCP gelen",
+      "udpIn": "UDP gelen",
+      "lanOnly": "Yalnızca yerel ağ",
+      "apply": "Uygula",
+      "customRulesReadOnly": "Özel kural listeleri burada henüz düzenlenemiyor.",
+      "applySuccess": "İlke güncellendi.",
+      "applyFailed": {
+        "title": "İlke güncellenemedi",
+        "lockedDetail": "Bu kuralı değiştirmeden önce yapılandırmanın kilidini açın.",
+        "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ilke değiştirilmedi. Lütfen yeniden deneyin.",
+        "genericDetail": "Hizmet {0} döndürdü. İlke değiştirilmedi."
+      }
+    },
+    "multiSelectHint": "{0} kural seçili. Kaldır hepsini siler; düzenlemek için tek bir kural seçin."
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "section": {
+      "general": "Genel",
+      "protection": "Koruma",
+      "blocklists": "Engelleme listeleri",
+      "security": "Güvenlik",
+      "updates": "Güncelleştirmeler",
+      "maintenance": "Bakım",
+      "about": "Hakkında",
+      "logging": "Günlük tutma"
+    },
+    "commitFailed": {
+      "title": "Ayar kaydedilemedi",
+      "lockedDetail": "Ayarları değiştirmeden önce yapılandırmanın kilidini açın.",
+      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ayar değiştirilmedi. Lütfen yeniden deneyin.",
+      "genericDetail": "Hizmet {0} döndürdü. Ayar değiştirilmedi."
+    },
+    "localSaveFailed": {
+      "title": "Bu ayar yeniden başlatmadan sonra kalmayacak",
+      "detail": "Değişiklik şu anda etkin, ancak diske yazılamadı; bu yüzden SimpleDeFence bir sonraki başlatmada onu unutacak. {0}"
+    },
+    "general": {
+      "theme": "Uygulama teması",
+      "themeDescription": "Hemen uygulanır.",
+      "themeAuto": "Sistem ayarını kullan",
+      "themeLight": "Açık",
+      "themeDark": "Koyu",
+      "language": "Dil",
+      "languageDescription": "SimpleDeFence'in kendi arayüzü için sistem dilini geçersiz kılar.",
+      "languageAuto": "Sistem ayarını kullan",
+      "languageRestartTitle": "Dil değişikliğini tamamlamak için yeniden başlatın",
+      "languageRestartDetail": "Ekrandaki bazı metinler, SimpleDeFence yeniden başlatılana kadar önceki dilde kalır.",
+      "askForExceptionDetails": "Tek bir ayrıcalık eklerken ayrıntıları sor",
+      "askForExceptionDetailsDescription": "Bildirim alanındaki hızlı ekleme kısayollarıyla tek bir ayrıcalık eklemeden önce düzenlenebilir bir onay gösterir. Toplu eklemeler (örneğin bütün bir klasör) hiçbir zaman sormaz.",
+      "enableHotkeys": "Genel klavye kısayollarını etkinleştir",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W her yerden anında bir çalıştırılabilir dosyaya, işleme veya pencereye izin verir.",
+      "autoRefreshInterval": "Otomatik yenileme aralığı",
+      "autoRefreshIntervalDescription": "Bağlantılar sayfasının otomatik yenileme anahtarı açıkken ne sıklıkta yeniden denetlediği. Değişiklikleri ona kimse iletmez, dolayısıyla bu bir yoklama aralığıdır; kısa olması daha tazedir ve daha maliyetlidir."
+    },
+    "protection": {
+      "allowLocalSubnet": "Yerel ağa izin ver",
+      "allowLocalSubnetDescription": "Yerel ağınızdaki diğer aygıtlara giden ve onlardan gelen trafiğe her zaman izin ver.",
+      "displayOffBlock": "Ekran kapalıyken ağı engelle",
+      "displayOffBlockDescription": "Ekran kapalıyken tüm ağ trafiğini engeller."
+    },
+    "blocklists": {
+      "enable": "Engelleme listelerini etkinleştir",
+      "enableDescription": "Kötü amaçlı olduğu bilinen sunuculara ve bağlantı noktalarına giden trafiği engeller.",
+      "hosts": "Kötü amaçlı sunucuları engelle",
+      "ports": "Kötü amaçlı bağlantı noktalarını engelle"
+    },
+    "security": {
+      "lockHostsFile": "hosts dosyasını kilitle",
+      "lockHostsFileDescription": "Diğer programların hosts dosyasını değiştirmesini engeller.",
+      "passwordSet": "Bir parola ayarlanmış.",
+      "passwordNotSet": "Ayarlanmış bir parola yok.",
+      "passwordNotSetDetail": "Bir parola belirleyene kadar bu bilgisayarda oturum açabilen herkes bu ayarları değiştirebilir.",
+      "newPassword": "Yeni parola",
+      "confirmPassword": "Parolayı doğrula",
+      "setPassword": "Parolayı ayarla",
+      "removePassword": "Parolayı kaldır",
+      "passwordMismatch": {
+        "title": "Parolalar eşleşmiyor",
+        "detail": "Her iki alana da aynı parolayı yazın."
+      },
+      "passwordUpdated": {
+        "title": "Parola güncellendi",
+        "body": "Yapılandırma parolası değiştirildi."
+      },
+      "passwordRemoved": {
+        "body": "Yapılandırma parolası kaldırıldı."
+      },
+      "passwordUpdateFailed": {
+        "title": "Parola güncellenemedi"
+      },
+      "lockedStatus": "Yapılandırma kilitli.",
+      "unlockedStatus": "Yapılandırma kilitli değil.",
+      "lockNow": "Şimdi kilitle",
+      "lockFailed": {
+        "title": "Yapılandırma kilitlenemedi"
+      },
+      "unlockPasswordPlaceholder": "Parola",
+      "unlock": "Kilidi aç",
+      "unlockFailed": {
+        "title": "Yapılandırmanın kilidi açılamadı",
+        "detail": "Parola kabul edilmedi."
+      }
+    },
+    "updates": {
+      "autoCheck": "Güncelleştirmeleri otomatik denetle",
+      "autoCheckDescription": "SimpleDeFence düzenli aralıklarla yeni sürümleri denetler.",
+      "checkNow": "Güncelleştirmeleri şimdi denetle",
+      "checkingTitle": "Güncelleştirmeler denetleniyor...",
+      "checkFailedTitle": "Güncelleştirme denetimi başarısız oldu",
+      "noneAvailable": "En son sürümü kullanıyorsunuz.",
+      "available": "{0} sürümü kullanılabilir. Şimdi indirilip kurulsun mu?",
+      "downloading": "Güncelleştirme indiriliyor...",
+      "verificationFailed": "İndirilen dosya bu sürüm için yayımlanan sağlama toplamıyla eşleşmediğinden çalıştırılmadı. Hiçbir şey kurulmadı."
+    },
+    "maintenance": {
+      "import": "Yapılandırmayı içe aktar...",
+      "export": "Yapılandırmayı dışa aktar...",
+      "filePickerName": "SimpleDeFence ayarları",
+      "importConfirm": {
+        "title": "Yapılandırma içe aktarılsın mı?",
+        "body": "Bu işlem geçerli yapılandırmadaki her kuralı ve her ayarı değiştirir. Geri alınamaz.",
+        "confirm": "İçe aktar"
+      },
+      "importSuccess": {
+        "title": "Yapılandırma içe aktarıldı",
+        "body": "{0} içe aktarıldı."
+      },
+      "importFailed": {
+        "title": "Yapılandırma içe aktarılamadı"
+      },
+      "exportSuccess": {
+        "title": "Yapılandırma dışa aktarıldı",
+        "body": "{0} konumuna kaydedildi."
+      },
+      "exportFailed": {
+        "title": "Yapılandırma dışa aktarılamadı"
+      }
+    },
+    "about": {
+      "version": "Sürüm {0}",
+      "homepage": "Proje ana sayfası",
+      "license": "Lisans",
+      "attributions": "Üçüncü taraf bileşenler",
+      "linkFailed": {
+        "title": "Açılamadı"
+      },
+      "tagline": "Özgür ve hafif bir Windows güvenlik duvarı.",
+      "basedOn": "TinyWall temel alınmıştır",
+      "basedOnDetail": "Karoly Pados tarafından. Özgün projeyi GitHub'da açar.",
+      "licenseDetail": "GNU Genel Kamu Lisansı, sürüm 3",
+      "attributionsDetail": "SimpleDeFence'in neyin üzerine kurulduğu ve neyi ödünç aldığı",
+      "homepageDetail": "github.com/fcoltro/SimpleDeFence adresini açar",
+      "readFailed": "Bu metin okunamadı."
+    },
+    "logging": {
+      "enabled": "Bağlantı günlüğü tut",
+      "enabledDescription": "Engellenen denemeleri ve kurulmuş bağlantıları, bunları hangi programın yaptığı bilgisiyle birlikte bir CSV dosyasına kaydeder. Öntanımlı olarak kapalıdır.",
+      "path": "Günlük dosyası",
+      "pathDescription": "Yerel uygulama verilerinizin altındaki öntanımlı konumu kullanmak için boş bırakın.",
+      "pathPlaceholder": "Öntanımlı konum",
+      "interval": "Günlük denetim aralığı",
+      "intervalDescription": "Günlüğün ne sıklıkta güncellendiği. Günlük tutma yoklamayla çalışır, bu yüzden bir aralıktan daha kısa ömürlü her şey gözden kaçabilir.",
+      "maxSize": "En büyük günlük boyutu",
+      "maxSizeDescription": "Megabayt cinsinden. Günlük bu boyuta ulaştığında adı .1 olarak değiştirilir ve yenisi başlatılır; yalnızca bir önceki dosya saklanır.",
+      "openFolder": "Günlük klasörünü aç",
+      "writeFailedTitle": "Bağlantı günlüğü yazılamadı"
+    }
+  },
+  "tray": {
+    "mode": {
+      "normal": "Normal",
+      "blockAll": "Tümünü Engelle",
+      "allowOutgoing": "Gidene İzin Ver",
+      "disabled": "Devre Dışı",
+      "learning": "Öğreniyor"
+    },
+    "manage": "Yönet...",
+    "connections": "Bağlantılar...",
+    "lock": "Kilitle",
+    "elevate": "Yönetici olarak çalıştır",
+    "allowLocalSubnet": "Yerel Alt Ağa İzin Ver",
+    "enableHostsBlocklist": "Sunucu Engelleme Listesini Etkinleştir",
+    "whitelistByExecutable": "Çalıştırılabilir dosyaya izin ver...",
+    "whitelistByProcess": "Çalışan işleme izin ver...",
+    "whitelistByWindow": "Pencereye göre izin ver...",
+    "quit": "Çık",
+    "unlock": {
+      "title": "SimpleDeFence kilidini aç",
+      "passwordPlaceholder": "Parola",
+      "button": "Kilidi aç",
+      "failedTitle": "Yanlış parola"
+    },
+    "quickAdd": {
+      "confirmTitle": "Ayrıcalık eklensin mi?",
+      "confirmBody": "\"{0}\" güvenlik duvarından geçsin mi?",
+      "confirmAdd": "Ekle"
+    },
+    "elevateFailed": {
+      "title": "Yönetici ayrıcalıklarıyla yeniden başlatılamadı"
+    },
+    "stillRunning": {
+      "title": "SimpleDeFence hâlâ çalışıyor",
+      "body": "Pencereyi kapatmak güvenlik duvarını durdurmaz. Durdurmak için bu menüdeki Çık'ı kullanın."
+    }
+  }
+}

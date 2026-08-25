@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <!-- Restore-only. Every project here targets net10.0-windows*, and restoring a
+    Windows-targeting project on a non-Windows host fails NETSDK1100 without this - which is
+    what GitHub's dependency submission does, on Linux runners. It does not make anything
+    buildable off Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <RootNamespace>SimpleDeFence</RootNamespace>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Product>SimpleDeFence.Core</Product>
+    <AssemblyTitle>SimpleDeFence.Core</AssemblyTitle>
+    <Company>fcoltro</Company>
+    <Description>Protocol, IPC, and shared config/rule model for SimpleDeFence - used by the WinUI 3 GUI and the service.</Description>
+    <Copyright>Copyright © 2011 Károly Pados, Copyright © 2026 fcoltro</Copyright>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- One file per language holds every string in the app. Embedded rather than shipped loose so
+         a translation cannot go missing at runtime. WithCulture="false" is required: MSBuild's
+         culture-detection heuristic (the same one that builds Foo.en.resx into a satellite
+         resources.dll) matches "Strings.en.json" too, silently rerouting it into a satellite
+         assembly under a different logical name than the one below - Loc.Load then finds nothing
+         and every locale silently falls back to English. LogicalName pins the exact name Loc.cs
+         looks up: SimpleDeFence.Localization.Strings.<culture>.json -->
+    <EmbeddedResource Include="Localization\Strings.*.json" WithCulture="false"
+                       LogicalName="SimpleDeFence.Localization.%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Lets LocTests read Loc.Load(culture) directly, to check key parity per-locale without
+         mutating the shared static culture that Loc.SetCulture affects process-wide. -->
+    <InternalsVisibleTo Include="SimpleDeFence.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleDeFence.Windows\SimpleDeFence.Windows.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- DPAPI, used by ConfigProtection to wrap the per-installation config key. Not in the shared
+         framework on .NET. It briefly looked unnecessary - the SDK flagged it NU1510 - but that was
+         only true while UseWindowsForms dragged it in transitively; with WinForms gone the build
+         fails without it. -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>

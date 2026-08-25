@@ -1,0 +1,408 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+  "nav": {
+    "rules": "ルール",
+    "settings": "設定",
+    "modeChip": "ファイアウォールのモード"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "キャンセル",
+    "on": "オン",
+    "off": "オフ",
+    "refresh": "更新",
+    "loading": "読み込み中...",
+    "connecting": "接続中...",
+    "unknown": "不明",
+    "anotherDialogOpenDetail": "別のダイアログが既に開いています。もう一度お試しください。"
+  },
+  "status": {
+    "notConnected": "未接続",
+    "notConnectedDetail": "SimpleDeFence サービスに接続できませんでした。インストールされ、実行中ですか？",
+    "locked": "構成はロックされています",
+    "lockedDetail": "モードを変更する前に構成のロックを解除してください。",
+    "connected": "接続済み",
+    "degraded": {
+      "title": "ファイアウォールは設定どおりに動作していません",
+      "initFailed": "起動が完了しなかったため、有効な規則は以前のセッションのものである可能性があります。",
+      "databaseUnavailable": "アプリケーション データベースを読み込めなかったため、ブロックリストとアプリケーション プロファイルは規則を生成しません。",
+      "rulesIncomplete": "Windows が一部のファイアウォール規則を拒否したため、適用されている規則は設定したものと異なります。",
+      "hostsUnavailable": "hosts ブロックリストは有効ですが、インストールされていません。"
+    }
+  },
+  "mode": {
+    "normal": {
+      "label": "標準",
+      "description": "ファイアウォールは推奨どおりに動作しています。"
+    },
+    "blockAll": {
+      "label": "すべてブロック",
+      "description": "ファイアウォールは受信と送信のすべての通信をブロックしています。"
+    },
+    "allowOutgoing": {
+      "label": "送信を許可",
+      "description": "ファイアウォールは送信接続を許可します。"
+    },
+    "disabled": {
+      "label": "無効",
+      "description": "ファイアウォールは無効です。"
+    },
+    "learning": {
+      "label": "自動学習",
+      "description": "ファイアウォールはすべての通信を通しながら学習しています。"
+    },
+    "switchFailed": {
+      "lockedTitle": "SimpleDeFence は現在ロックされています",
+      "comErrorTitle": "サービスとの通信に失敗しました",
+      "comErrorDetail": "モードは変更されませんでした。",
+      "genericTitle": "操作に失敗しました",
+      "genericDetail": "サービスが {0} を返しました。モードは変更されませんでした。",
+      "unreachableTitle": "サービスに接続できませんでした"
+    },
+    "learningConfirm": {
+      "title": "自動学習を開始しますか？",
+      "body": "自動学習モードでは、SimpleDeFence はすべての通信を許可し、どのアプリケーションがネットワークを使ったかを記憶して、モードを終了するときにそれらの例外を追加します。特別な例外についてはルールを学習できません。\n\nマルウェアに感染していないと確信できるシステムでのみ使用してください。",
+      "confirm": "学習モードを開始"
+    }
+  },
+  "applications": {
+    "title": "アプリケーション",
+    "filterPlaceholder": "名前またはパスで絞り込み",
+    "summary": "プロファイル「{1}」内の {0} 件の例外",
+    "summaryOne": "プロファイル「{0}」内の 1 件の例外",
+    "empty": "アプリケーションの例外はまだありません。"
+  },
+  "connections": {
+    "title": "接続",
+    "section": {
+      "blocked": "ブロック済み",
+      "connected": "接続済み",
+      "open": "待ち受け中",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "過去 5 分間にブロックされたものはありません。",
+      "connected": "確立された接続はありません。",
+      "open": "待ち受け中のポートはありません。",
+      "filtered": "現在の絞り込み条件に一致するものはありません。"
+    },
+    "filterPlaceholder": "アプリケーション名で絞り込み",
+    "autoRefresh": "自動更新",
+    "allow": "このアプリケーションを許可",
+    "allowSuccess": {
+      "title": "例外を追加しました",
+      "body": "{0} は接続できるようになりました。"
+    },
+    "allowFailed": {
+      "title": "例外を追加できませんでした",
+      "lockedDetail": "例外を追加する前に構成のロックを解除してください。",
+      "staleDetail": "構成が今しがた別の場所で変更されました。例外は追加されていません。もう一度お試しください。",
+      "genericDetail": "サービスが {0} を返しました。例外は追加されていません。",
+      "unidentified": "アプリケーションを特定できなかったため（パスもパッケージもありません）、例外は追加されませんでした。"
+    },
+    "gatherFailed": {
+      "title": "接続データを読み取れませんでした"
+    },
+    "blocked": {
+      "attempts": "{0} 回の試行、{1} 個のアドレス",
+      "attemptsOneAddress": "{0} 回の試行",
+      "attemptsHeader": "ブロックされた試行"
+    },
+    "showAll": "すべて表示",
+    "truncated": "最新の {0} 件を表示しています。",
+    "connected": {
+      "summary": "{0} 件の接続",
+      "header": "確立された接続"
+    },
+    "open": {
+      "summary": "{0} 個の待ち受けポート",
+      "header": "待ち受けポート"
+    },
+    "legend": {
+      "local": "強調表示された行はローカルネットワーク内にとどまりました"
+    }
+  },
+  "subject": {
+    "executable": "実行可能ファイル",
+    "service": "サービス",
+    "uwpPackage": "UWP パッケージ",
+    "global": "グローバル",
+    "allApplications": "すべてのアプリケーション"
+  },
+  "policy": {
+    "blocked": "ブロック",
+    "unrestricted": "制限なし",
+    "unrestrictedLan": "制限なし（LAN のみ）",
+    "noPorts": "許可されたポートなし",
+    "lanOnlySuffix": "{0}（LAN のみ）",
+    "customRuleOne": "カスタムルール 1 件",
+    "customRuleMany": "カスタムルール {0} 件",
+    "tcpOut": "TCP 送信",
+    "udpOut": "UDP 送信",
+    "tcpIn": "TCP 受信",
+    "udpIn": "UDP 受信",
+    "allPorts": "すべて"
+  },
+  "rules": {
+    "specialKind": "特別な例外",
+    "specialPolicy": "定義済み",
+    "title": "ルール",
+    "section": {
+      "applications": "アプリケーション",
+      "specialRecommended": "特別（推奨）",
+      "specialOptional": "特別（任意）"
+    },
+    "filterPlaceholder": "名前またはパスで絞り込み",
+    "empty": {
+      "applications": "アプリケーションの例外はまだありません。",
+      "special": "利用できる特別な例外はありません。",
+      "filtered": "現在の絞り込み条件に一致するものはありません。"
+    },
+    "remove": "削除",
+    "removeConfirm": {
+      "title": "例外を削除しますか？",
+      "body": "{0} 件の例外を削除しますか？対象のアプリケーションは再びブロックされます。"
+    },
+    "removeSuccess": {
+      "title": "例外を削除しました",
+      "body": "{0} 件の例外を削除しました。"
+    },
+    "removeFailed": {
+      "title": "例外を削除できませんでした",
+      "lockedDetail": "例外を削除する前に構成のロックを解除してください。",
+      "staleDetail": "構成が今しがた別の場所で変更されました。例外は削除されていません。もう一度お試しください。",
+      "genericDetail": "サービスが {0} を返しました。例外は削除されていません。"
+    },
+    "specialToggleFailed": {
+      "title": "特別な例外を変更できませんでした",
+      "lockedDetail": "この例外を変更する前に構成のロックを解除してください。",
+      "staleDetail": "構成が今しがた別の場所で変更されました。例外は変更されていません。もう一度お試しください。",
+      "genericDetail": "サービスが {0} を返しました。例外は変更されていません。"
+    },
+    "add": "追加",
+    "addPickExecutable": "実行可能ファイル...",
+    "addPickProcess": "実行中のプロセス...",
+    "addPickWindow": "ウィンドウ...",
+    "addPickUwp": "UWP アプリ...",
+    "addPickFolder": "フォルダーを選択...",
+    "pickUwpTitle": "UWP アプリを選択",
+    "pickProcessTitle": "実行中のプロセスを選択",
+    "pickWindowTitle": "ウィンドウを選択",
+    "pickEmpty": "一致する項目はありません。",
+    "detail": {
+      "title": "ルール",
+      "policyBlocked": "ブロック",
+      "policyUnrestricted": "制限なし",
+      "policyUnrestrictedLan": "制限なし（LAN のみ）",
+      "policyTcpUdp": "TCP/UDP のみ",
+      "tcpOut": "TCP 送信",
+      "udpOut": "UDP 送信",
+      "tcpIn": "TCP 受信",
+      "udpIn": "UDP 受信",
+      "lanOnly": "LAN のみ",
+      "apply": "適用",
+      "customRulesReadOnly": "カスタムルールの一覧はまだここでは編集できません。",
+      "applySuccess": "ポリシーを更新しました。",
+      "applyFailed": {
+        "title": "ポリシーを更新できませんでした",
+        "lockedDetail": "このルールを変更する前に構成のロックを解除してください。",
+        "staleDetail": "構成が今しがた別の場所で変更されました。ポリシーは変更されていません。もう一度お試しください。",
+        "genericDetail": "サービスが {0} を返しました。ポリシーは変更されていません。"
+      }
+    },
+    "multiSelectHint": "{0} 件のルールを選択中です。「削除」はそのすべてを消します。編集するにはルールを 1 件だけ選択してください。"
+  },
+  "settings": {
+    "title": "設定",
+    "section": {
+      "general": "全般",
+      "protection": "保護",
+      "blocklists": "ブロックリスト",
+      "security": "セキュリティ",
+      "updates": "更新",
+      "maintenance": "メンテナンス",
+      "about": "このアプリについて",
+      "logging": "ログ"
+    },
+    "commitFailed": {
+      "title": "設定を保存できませんでした",
+      "lockedDetail": "設定を変更する前に構成のロックを解除してください。",
+      "staleDetail": "構成が今しがた別の場所で変更されました。設定は変更されていません。もう一度お試しください。",
+      "genericDetail": "サービスが {0} を返しました。設定は変更されていません。"
+    },
+    "localSaveFailed": {
+      "title": "この設定は再起動後に失われます",
+      "detail": "変更は今は有効ですが、ディスクに書き込めなかったため、SimpleDeFence は次回起動時にこれを忘れます。{0}"
+    },
+    "general": {
+      "theme": "アプリのテーマ",
+      "themeDescription": "すぐに適用されます。",
+      "themeAuto": "システム設定を使用",
+      "themeLight": "ライト",
+      "themeDark": "ダーク",
+      "language": "言語",
+      "languageDescription": "SimpleDeFence 自身の画面についてシステムの言語設定を上書きします。",
+      "languageAuto": "システム設定を使用",
+      "languageRestartTitle": "言語の切り替えを完了するには再起動してください",
+      "languageRestartDetail": "画面上の一部のテキストは、SimpleDeFence を再起動するまで以前の言語のままです。",
+      "askForExceptionDetails": "例外を 1 件追加するときに詳細を確認する",
+      "askForExceptionDetailsDescription": "通知領域のクイック追加から例外を 1 件追加する前に、編集可能な確認画面を表示します。一括追加（フォルダー全体など）では確認しません。",
+      "enableHotkeys": "グローバルキーボードショートカットを有効にする",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W でどこからでも実行可能ファイル、プロセス、ウィンドウを即座に許可します。",
+      "autoRefreshInterval": "自動更新の間隔",
+      "autoRefreshIntervalDescription": "「接続」ページの自動更新スイッチがオンの間、再確認する頻度です。変更が通知されることはないためこれはポーリング間隔であり、短いほど新しい情報が得られる代わりに負荷が増えます。"
+    },
+    "protection": {
+      "allowLocalSubnet": "ローカルネットワークを許可",
+      "allowLocalSubnetDescription": "ローカルネットワーク上の他のデバイスとの通信を常に許可します。",
+      "displayOffBlock": "ディスプレイがオフのときにネットワークをブロック",
+      "displayOffBlockDescription": "画面がオフの間、すべてのネットワーク通信をブロックします。"
+    },
+    "blocklists": {
+      "enable": "ブロックリストを有効にする",
+      "enableDescription": "悪意があると知られているホストやポートへの通信をブロックします。",
+      "hosts": "悪意のあるホストをブロック",
+      "ports": "悪意のあるポートをブロック"
+    },
+    "security": {
+      "lockHostsFile": "hosts ファイルをロック",
+      "lockHostsFileDescription": "他のプログラムが hosts ファイルを変更できないようにします。",
+      "passwordSet": "パスワードが設定されています。",
+      "passwordNotSet": "パスワードは設定されていません。",
+      "passwordNotSetDetail": "パスワードを設定するまで、この PC にサインインできる人は誰でもこれらの設定を変更できます。",
+      "newPassword": "新しいパスワード",
+      "confirmPassword": "パスワードの確認",
+      "setPassword": "パスワードを設定",
+      "removePassword": "パスワードを削除",
+      "passwordMismatch": {
+        "title": "パスワードが一致しません",
+        "detail": "両方の欄に同じパスワードを入力してください。"
+      },
+      "passwordUpdated": {
+        "title": "パスワードを更新しました",
+        "body": "構成のパスワードを変更しました。"
+      },
+      "passwordRemoved": {
+        "body": "構成のパスワードを削除しました。"
+      },
+      "passwordUpdateFailed": {
+        "title": "パスワードを更新できませんでした"
+      },
+      "lockedStatus": "構成はロックされています。",
+      "unlockedStatus": "構成はロックされていません。",
+      "lockNow": "今すぐロック",
+      "lockFailed": {
+        "title": "構成をロックできませんでした"
+      },
+      "unlockPasswordPlaceholder": "パスワード",
+      "unlock": "ロック解除",
+      "unlockFailed": {
+        "title": "構成のロックを解除できませんでした",
+        "detail": "パスワードが受け付けられませんでした。"
+      }
+    },
+    "updates": {
+      "autoCheck": "更新を自動的に確認する",
+      "autoCheckDescription": "SimpleDeFence は定期的に新しいバージョンを確認します。",
+      "checkNow": "今すぐ更新を確認",
+      "checkingTitle": "更新を確認しています...",
+      "checkFailedTitle": "更新の確認に失敗しました",
+      "noneAvailable": "最新バージョンを使用しています。",
+      "available": "バージョン {0} が利用できます。今すぐダウンロードしてインストールしますか？",
+      "downloading": "更新をダウンロードしています...",
+      "verificationFailed": "ダウンロードしたファイルがこのリリースで公開されているチェックサムと一致しなかったため、実行されませんでした。何もインストールされていません。"
+    },
+    "maintenance": {
+      "import": "構成をインポート...",
+      "export": "構成をエクスポート...",
+      "filePickerName": "SimpleDeFence の設定",
+      "importConfirm": {
+        "title": "構成をインポートしますか？",
+        "body": "現在の構成のすべてのルールと設定が置き換えられます。この操作は元に戻せません。",
+        "confirm": "インポート"
+      },
+      "importSuccess": {
+        "title": "構成をインポートしました",
+        "body": "{0} をインポートしました。"
+      },
+      "importFailed": {
+        "title": "構成をインポートできませんでした"
+      },
+      "exportSuccess": {
+        "title": "構成をエクスポートしました",
+        "body": "{0} に保存しました。"
+      },
+      "exportFailed": {
+        "title": "構成をエクスポートできませんでした"
+      }
+    },
+    "about": {
+      "version": "バージョン {0}",
+      "homepage": "プロジェクトのホームページ",
+      "license": "ライセンス",
+      "attributions": "サードパーティ製コンポーネント",
+      "linkFailed": {
+        "title": "開けませんでした"
+      },
+      "tagline": "自由で軽量な Windows ファイアウォール。",
+      "basedOn": "TinyWall がベース",
+      "basedOnDetail": "作者 Karoly Pados。GitHub で元のプロジェクトを開きます。",
+      "licenseDetail": "GNU 一般公衆利用許諾契約書 バージョン 3",
+      "attributionsDetail": "SimpleDeFence が何の上に作られ、何を借りているか",
+      "homepageDetail": "github.com/fcoltro/SimpleDeFence を開きます",
+      "readFailed": "このテキストを読み取れませんでした。"
+    },
+    "logging": {
+      "enabled": "接続ログを保存する",
+      "enabledDescription": "ブロックされた試行と確立された接続を、それを行ったプログラムとともに CSV ファイルに記録します。既定ではオフです。",
+      "path": "ログファイル",
+      "pathDescription": "空のままにすると、ローカルアプリデータ内の既定の場所を使用します。",
+      "pathPlaceholder": "既定の場所",
+      "interval": "ログの確認間隔",
+      "intervalDescription": "ログが更新される頻度です。ログはポーリングで動作するため、1 回の間隔より短命なものは見逃されることがあります。",
+      "maxSize": "ログの最大サイズ",
+      "maxSizeDescription": "メガバイト単位。ログがこのサイズに達すると .1 に名前が変更され、新しいログが始まります。保持されるのは直前の 1 ファイルだけです。",
+      "openFolder": "ログフォルダーを開く",
+      "writeFailedTitle": "接続ログを書き込めませんでした"
+    }
+  },
+  "tray": {
+    "mode": {
+      "normal": "標準",
+      "blockAll": "すべてブロック",
+      "allowOutgoing": "送信を許可",
+      "disabled": "無効",
+      "learning": "学習中"
+    },
+    "manage": "管理...",
+    "connections": "接続...",
+    "lock": "ロック",
+    "elevate": "管理者として実行",
+    "allowLocalSubnet": "ローカルサブネットを許可",
+    "enableHostsBlocklist": "ホストのブロックリストを有効にする",
+    "whitelistByExecutable": "実行可能ファイルを許可...",
+    "whitelistByProcess": "実行中のプロセスを許可...",
+    "whitelistByWindow": "ウィンドウから許可...",
+    "quit": "終了",
+    "unlock": {
+      "title": "SimpleDeFence のロックを解除",
+      "passwordPlaceholder": "パスワード",
+      "button": "ロック解除",
+      "failedTitle": "パスワードが正しくありません"
+    },
+    "quickAdd": {
+      "confirmTitle": "例外を追加しますか？",
+      "confirmBody": "「{0}」のファイアウォール通過を許可しますか？",
+      "confirmAdd": "追加"
+    },
+    "elevateFailed": {
+      "title": "管理者権限で再起動できませんでした"
+    },
+    "stillRunning": {
+      "title": "SimpleDeFence は実行中です",
+      "body": "ウィンドウを閉じてもファイアウォールは停止しません。停止するにはこのメニューの「終了」を使用してください。"
+    }
+  }
+}

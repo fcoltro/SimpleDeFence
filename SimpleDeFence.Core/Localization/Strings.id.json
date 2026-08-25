@@ -1,0 +1,408 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+  "nav": {
+    "rules": "Aturan",
+    "settings": "Pengaturan",
+    "modeChip": "Mode firewall"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Batal",
+    "on": "Aktif",
+    "off": "Nonaktif",
+    "refresh": "Segarkan",
+    "loading": "Memuat...",
+    "connecting": "Menghubungkan...",
+    "unknown": "Tidak diketahui",
+    "anotherDialogOpenDetail": "Dialog lain sudah terbuka. Silakan coba lagi."
+  },
+  "status": {
+    "notConnected": "Tidak terhubung",
+    "notConnectedDetail": "Tidak dapat menghubungi layanan SimpleDeFence. Apakah layanan tersebut terpasang dan berjalan?",
+    "locked": "Konfigurasi terkunci",
+    "lockedDetail": "Buka kunci konfigurasi sebelum mengubah mode.",
+    "connected": "Terhubung",
+    "degraded": {
+      "title": "Firewall tidak menjalankan semua yang diatur",
+      "initFailed": "Proses mulai tidak selesai, sehingga aturan yang berlaku mungkin berasal dari sesi sebelumnya.",
+      "databaseUnavailable": "Basis data aplikasi tidak dapat dimuat, sehingga daftar blokir dan profil aplikasi tidak menghasilkan aturan.",
+      "rulesIncomplete": "Windows menolak sebagian aturan firewall, sehingga kumpulan yang terpasang bukan yang dikonfigurasi.",
+      "hostsUnavailable": "Daftar blokir hosts aktif tetapi tidak terpasang."
+    }
+  },
+  "mode": {
+    "normal": {
+      "label": "Normal",
+      "description": "Firewall bekerja sesuai anjuran."
+    },
+    "blockAll": {
+      "label": "Blokir semua",
+      "description": "Firewall memblokir seluruh lalu lintas masuk dan keluar."
+    },
+    "allowOutgoing": {
+      "label": "Izinkan keluar",
+      "description": "Firewall mengizinkan koneksi keluar."
+    },
+    "disabled": {
+      "label": "Nonaktif",
+      "description": "Firewall dinonaktifkan."
+    },
+    "learning": {
+      "label": "Belajar otomatis",
+      "description": "Firewall belajar sambil meloloskan seluruh lalu lintas."
+    },
+    "switchFailed": {
+      "lockedTitle": "SimpleDeFence sedang terkunci",
+      "comErrorTitle": "Komunikasi dengan layanan gagal",
+      "comErrorDetail": "Mode tidak diubah.",
+      "genericTitle": "Operasi gagal",
+      "genericDetail": "Layanan mengembalikan {0}. Mode tidak diubah.",
+      "unreachableTitle": "Tidak dapat menghubungi layanan"
+    },
+    "learningConfirm": {
+      "title": "Mulai pembelajaran otomatis?",
+      "body": "Dalam mode pembelajaran otomatis, SimpleDeFence mengizinkan seluruh lalu lintas dan mengingat aplikasi mana yang memakai jaringan, lalu menambahkan pengecualian untuk aplikasi tersebut saat Anda keluar dari mode ini. Aturan tidak dapat dipelajari untuk Pengecualian Khusus.\n\nGunakan ini hanya pada sistem yang Anda yakini bebas dari malware.",
+      "confirm": "Masuk mode pembelajaran"
+    }
+  },
+  "applications": {
+    "title": "Aplikasi",
+    "filterPlaceholder": "Saring menurut nama atau jalur",
+    "summary": "{0} pengecualian dalam profil \"{1}\"",
+    "summaryOne": "1 pengecualian dalam profil \"{0}\"",
+    "empty": "Belum ada pengecualian aplikasi."
+  },
+  "connections": {
+    "title": "Koneksi",
+    "section": {
+      "blocked": "Diblokir",
+      "connected": "Terhubung",
+      "open": "Terbuka",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "Tidak ada yang diblokir dalam 5 menit terakhir.",
+      "connected": "Tidak ada koneksi yang terbentuk.",
+      "open": "Tidak ada porta yang mendengarkan.",
+      "filtered": "Tidak ada yang cocok dengan saringan saat ini."
+    },
+    "filterPlaceholder": "Saring menurut nama aplikasi",
+    "autoRefresh": "Segarkan otomatis",
+    "allow": "Izinkan aplikasi ini",
+    "allowSuccess": {
+      "title": "Pengecualian ditambahkan",
+      "body": "{0} kini dapat terhubung."
+    },
+    "allowFailed": {
+      "title": "Tidak dapat menambahkan pengecualian",
+      "lockedDetail": "Buka kunci konfigurasi sebelum menambahkan pengecualian.",
+      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; pengecualian tidak ditambahkan. Silakan coba lagi.",
+      "genericDetail": "Layanan mengembalikan {0}. Pengecualian tidak ditambahkan.",
+      "unidentified": "Aplikasi tidak dapat dikenali (tanpa jalur maupun paket), sehingga tidak ada pengecualian yang ditambahkan."
+    },
+    "gatherFailed": {
+      "title": "Tidak dapat membaca data koneksi"
+    },
+    "blocked": {
+      "attempts": "{0} percobaan, {1} alamat",
+      "attemptsOneAddress": "{0} percobaan",
+      "attemptsHeader": "Percobaan yang diblokir"
+    },
+    "showAll": "Tampilkan semua",
+    "truncated": "Menampilkan {0} yang terbaru.",
+    "connected": {
+      "summary": "{0} koneksi",
+      "header": "Koneksi yang terbentuk"
+    },
+    "open": {
+      "summary": "{0} porta yang mendengarkan",
+      "header": "Porta yang mendengarkan"
+    },
+    "legend": {
+      "local": "Baris yang disorot tetap berada di jaringan lokal Anda"
+    }
+  },
+  "subject": {
+    "executable": "Berkas eksekusi",
+    "service": "Layanan",
+    "uwpPackage": "Paket UWP",
+    "global": "Global",
+    "allApplications": "Semua aplikasi"
+  },
+  "policy": {
+    "blocked": "Diblokir",
+    "unrestricted": "Tanpa batas",
+    "unrestrictedLan": "Tanpa batas (hanya LAN)",
+    "noPorts": "Tidak ada porta yang diizinkan",
+    "lanOnlySuffix": "{0} (hanya LAN)",
+    "customRuleOne": "1 aturan khusus",
+    "customRuleMany": "{0} aturan khusus",
+    "tcpOut": "TCP keluar",
+    "udpOut": "UDP keluar",
+    "tcpIn": "TCP masuk",
+    "udpIn": "UDP masuk",
+    "allPorts": "semua"
+  },
+  "rules": {
+    "specialKind": "Pengecualian khusus",
+    "specialPolicy": "Bawaan",
+    "title": "Aturan",
+    "section": {
+      "applications": "Aplikasi",
+      "specialRecommended": "Khusus (dianjurkan)",
+      "specialOptional": "Khusus (opsional)"
+    },
+    "filterPlaceholder": "Saring menurut nama atau jalur",
+    "empty": {
+      "applications": "Belum ada pengecualian aplikasi.",
+      "special": "Tidak ada pengecualian khusus yang tersedia.",
+      "filtered": "Tidak ada yang cocok dengan saringan saat ini."
+    },
+    "remove": "Hapus",
+    "removeConfirm": {
+      "title": "Hapus pengecualian?",
+      "body": "Hapus {0} pengecualian? Aplikasi yang terdampak akan diblokir kembali."
+    },
+    "removeSuccess": {
+      "title": "Pengecualian dihapus",
+      "body": "{0} pengecualian telah dihapus."
+    },
+    "removeFailed": {
+      "title": "Tidak dapat menghapus pengecualian",
+      "lockedDetail": "Buka kunci konfigurasi sebelum menghapus pengecualian.",
+      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; pengecualian tidak dihapus. Silakan coba lagi.",
+      "genericDetail": "Layanan mengembalikan {0}. Pengecualian tidak dihapus."
+    },
+    "specialToggleFailed": {
+      "title": "Tidak dapat mengubah pengecualian khusus",
+      "lockedDetail": "Buka kunci konfigurasi sebelum mengubah pengecualian ini.",
+      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; pengecualian tidak diubah. Silakan coba lagi.",
+      "genericDetail": "Layanan mengembalikan {0}. Pengecualian tidak diubah."
+    },
+    "add": "Tambah",
+    "addPickExecutable": "Berkas eksekusi...",
+    "addPickProcess": "Proses yang berjalan...",
+    "addPickWindow": "Jendela...",
+    "addPickUwp": "Aplikasi UWP...",
+    "addPickFolder": "Pilih folder...",
+    "pickUwpTitle": "Pilih aplikasi UWP",
+    "pickProcessTitle": "Pilih proses yang berjalan",
+    "pickWindowTitle": "Pilih jendela",
+    "pickEmpty": "Tidak ada entri yang cocok.",
+    "detail": {
+      "title": "Aturan",
+      "policyBlocked": "Diblokir",
+      "policyUnrestricted": "Tanpa batas",
+      "policyUnrestrictedLan": "Tanpa batas (hanya LAN)",
+      "policyTcpUdp": "Hanya TCP/UDP",
+      "tcpOut": "TCP keluar",
+      "udpOut": "UDP keluar",
+      "tcpIn": "TCP masuk",
+      "udpIn": "UDP masuk",
+      "lanOnly": "Hanya LAN",
+      "apply": "Terapkan",
+      "customRulesReadOnly": "Daftar aturan khusus belum dapat disunting di sini.",
+      "applySuccess": "Kebijakan diperbarui.",
+      "applyFailed": {
+        "title": "Tidak dapat memperbarui kebijakan",
+        "lockedDetail": "Buka kunci konfigurasi sebelum mengubah aturan ini.",
+        "staleDetail": "Konfigurasi baru saja berubah di tempat lain; kebijakan tidak diubah. Silakan coba lagi.",
+        "genericDetail": "Layanan mengembalikan {0}. Kebijakan tidak diubah."
+      }
+    },
+    "multiSelectHint": "{0} aturan dipilih. Hapus akan menghapus semuanya; pilih satu aturan saja untuk menyuntingnya."
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "section": {
+      "general": "Umum",
+      "protection": "Perlindungan",
+      "blocklists": "Daftar blokir",
+      "security": "Keamanan",
+      "updates": "Pembaruan",
+      "maintenance": "Pemeliharaan",
+      "about": "Tentang",
+      "logging": "Pencatatan"
+    },
+    "commitFailed": {
+      "title": "Tidak dapat menyimpan pengaturan",
+      "lockedDetail": "Buka kunci konfigurasi sebelum mengubah pengaturan.",
+      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; pengaturan tidak diubah. Silakan coba lagi.",
+      "genericDetail": "Layanan mengembalikan {0}. Pengaturan tidak diubah."
+    },
+    "localSaveFailed": {
+      "title": "Pengaturan ini tidak akan bertahan setelah mulai ulang",
+      "detail": "Perubahan aktif sekarang, tetapi tidak dapat ditulis ke diska, sehingga SimpleDeFence akan melupakannya saat berikutnya dijalankan. {0}"
+    },
+    "general": {
+      "theme": "Tema aplikasi",
+      "themeDescription": "Berlaku segera.",
+      "themeAuto": "Gunakan pengaturan sistem",
+      "themeLight": "Terang",
+      "themeDark": "Gelap",
+      "language": "Bahasa",
+      "languageDescription": "Menimpa bahasa sistem untuk antarmuka SimpleDeFence sendiri.",
+      "languageAuto": "Gunakan pengaturan sistem",
+      "languageRestartTitle": "Mulai ulang untuk menyelesaikan penggantian bahasa",
+      "languageRestartDetail": "Sebagian teks di layar tetap menggunakan bahasa sebelumnya hingga SimpleDeFence dimulai ulang.",
+      "askForExceptionDetails": "Tanyakan detail saat menambahkan satu pengecualian",
+      "askForExceptionDetailsDescription": "Menampilkan konfirmasi yang dapat disunting sebelum menambahkan satu pengecualian lewat pintasan tambah-cepat pada baki sistem. Penambahan massal (misalnya satu folder penuh) tidak pernah menanyakan.",
+      "enableHotkeys": "Aktifkan pintasan papan tik global",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W langsung mengizinkan sebuah berkas eksekusi, proses, atau jendela dari mana saja.",
+      "autoRefreshInterval": "Selang penyegaran otomatis",
+      "autoRefreshIntervalDescription": "Seberapa sering halaman Koneksi memeriksa ulang selagi sakelar Segarkan otomatisnya menyala. Tidak ada yang mengirimkan perubahan kepadanya, jadi ini adalah selang penjajakan; makin singkat makin segar dan makin mahal."
+    },
+    "protection": {
+      "allowLocalSubnet": "Izinkan jaringan lokal",
+      "allowLocalSubnetDescription": "Selalu izinkan lalu lintas dari dan ke perangkat lain di jaringan lokal Anda.",
+      "displayOffBlock": "Blokir jaringan saat layar mati",
+      "displayOffBlockDescription": "Memblokir seluruh lalu lintas jaringan selagi layar mati."
+    },
+    "blocklists": {
+      "enable": "Aktifkan daftar blokir",
+      "enableDescription": "Memblokir lalu lintas ke hos dan porta yang diketahui berbahaya.",
+      "hosts": "Blokir hos berbahaya",
+      "ports": "Blokir porta berbahaya"
+    },
+    "security": {
+      "lockHostsFile": "Kunci berkas hosts",
+      "lockHostsFileDescription": "Mencegah program lain mengubah berkas hosts.",
+      "passwordSet": "Kata sandi telah disetel.",
+      "passwordNotSet": "Tidak ada kata sandi yang disetel.",
+      "passwordNotSetDetail": "Siapa pun yang dapat masuk ke PC ini dapat mengubah pengaturan ini sampai Anda menetapkan kata sandi.",
+      "newPassword": "Kata sandi baru",
+      "confirmPassword": "Konfirmasi kata sandi",
+      "setPassword": "Setel kata sandi",
+      "removePassword": "Hapus kata sandi",
+      "passwordMismatch": {
+        "title": "Kata sandi tidak cocok",
+        "detail": "Ketik kata sandi yang sama di kedua ruas."
+      },
+      "passwordUpdated": {
+        "title": "Kata sandi diperbarui",
+        "body": "Kata sandi konfigurasi telah diubah."
+      },
+      "passwordRemoved": {
+        "body": "Kata sandi konfigurasi telah dihapus."
+      },
+      "passwordUpdateFailed": {
+        "title": "Tidak dapat memperbarui kata sandi"
+      },
+      "lockedStatus": "Konfigurasi terkunci.",
+      "unlockedStatus": "Konfigurasi tidak terkunci.",
+      "lockNow": "Kunci sekarang",
+      "lockFailed": {
+        "title": "Tidak dapat mengunci konfigurasi"
+      },
+      "unlockPasswordPlaceholder": "Kata sandi",
+      "unlock": "Buka kunci",
+      "unlockFailed": {
+        "title": "Tidak dapat membuka kunci konfigurasi",
+        "detail": "Kata sandi tidak diterima."
+      }
+    },
+    "updates": {
+      "autoCheck": "Periksa pembaruan secara otomatis",
+      "autoCheckDescription": "SimpleDeFence memeriksa versi baru secara berkala.",
+      "checkNow": "Periksa pembaruan sekarang",
+      "checkingTitle": "Memeriksa pembaruan...",
+      "checkFailedTitle": "Pemeriksaan pembaruan gagal",
+      "noneAvailable": "Anda menjalankan versi terbaru.",
+      "available": "Versi {0} tersedia. Unduh dan pasang sekarang?",
+      "downloading": "Mengunduh pembaruan...",
+      "verificationFailed": "Unduhan tidak cocok dengan checksum yang diterbitkan untuk rilis ini, sehingga tidak dijalankan. Tidak ada yang dipasang."
+    },
+    "maintenance": {
+      "import": "Impor konfigurasi...",
+      "export": "Ekspor konfigurasi...",
+      "filePickerName": "Pengaturan SimpleDeFence",
+      "importConfirm": {
+        "title": "Impor konfigurasi?",
+        "body": "Ini mengganti setiap aturan dan pengaturan dalam konfigurasi saat ini. Tindakan ini tidak dapat dibatalkan.",
+        "confirm": "Impor"
+      },
+      "importSuccess": {
+        "title": "Konfigurasi diimpor",
+        "body": "{0} telah diimpor."
+      },
+      "importFailed": {
+        "title": "Tidak dapat mengimpor konfigurasi"
+      },
+      "exportSuccess": {
+        "title": "Konfigurasi diekspor",
+        "body": "Disimpan ke {0}."
+      },
+      "exportFailed": {
+        "title": "Tidak dapat mengekspor konfigurasi"
+      }
+    },
+    "about": {
+      "version": "Versi {0}",
+      "homepage": "Beranda proyek",
+      "license": "Lisensi",
+      "attributions": "Komponen pihak ketiga",
+      "linkFailed": {
+        "title": "Tidak dapat membuka"
+      },
+      "tagline": "Firewall Windows yang bebas dan ringan.",
+      "basedOn": "Berbasis TinyWall",
+      "basedOnDetail": "Oleh Karoly Pados. Membuka proyek aslinya di GitHub.",
+      "licenseDetail": "GNU General Public License, versi 3",
+      "attributionsDetail": "Di atas apa SimpleDeFence dibangun, dan apa yang dipinjamnya",
+      "homepageDetail": "Membuka github.com/fcoltro/SimpleDeFence",
+      "readFailed": "Teks ini tidak dapat dibaca."
+    },
+    "logging": {
+      "enabled": "Simpan log koneksi",
+      "enabledDescription": "Mencatat percobaan yang diblokir dan koneksi yang terbentuk ke sebuah berkas CSV, termasuk program yang melakukannya. Nonaktif secara baku.",
+      "path": "Berkas log",
+      "pathDescription": "Biarkan kosong untuk memakai lokasi baku di dalam data aplikasi lokal Anda.",
+      "pathPlaceholder": "Lokasi baku",
+      "interval": "Selang pemeriksaan log",
+      "intervalDescription": "Seberapa sering log diperbarui. Pencatatan menjajaki, jadi apa pun yang berumur lebih pendek dari satu selang bisa terlewat.",
+      "maxSize": "Ukuran log maksimum",
+      "maxSizeDescription": "Dalam megabita. Ketika log mencapai ukuran ini, namanya diubah menjadi .1 dan log baru dimulai; hanya satu berkas sebelumnya yang disimpan.",
+      "openFolder": "Buka folder log",
+      "writeFailedTitle": "Log koneksi tidak dapat ditulis"
+    }
+  },
+  "tray": {
+    "mode": {
+      "normal": "Normal",
+      "blockAll": "Blokir Semua",
+      "allowOutgoing": "Izinkan Keluar",
+      "disabled": "Nonaktif",
+      "learning": "Belajar"
+    },
+    "manage": "Kelola...",
+    "connections": "Koneksi...",
+    "lock": "Kunci",
+    "elevate": "Jalankan sebagai Administrator",
+    "allowLocalSubnet": "Izinkan Subnet Lokal",
+    "enableHostsBlocklist": "Aktifkan Daftar Blokir Hos",
+    "whitelistByExecutable": "Izinkan berkas eksekusi...",
+    "whitelistByProcess": "Izinkan proses yang berjalan...",
+    "whitelistByWindow": "Izinkan lewat jendela...",
+    "quit": "Keluar",
+    "unlock": {
+      "title": "Buka kunci SimpleDeFence",
+      "passwordPlaceholder": "Kata sandi",
+      "button": "Buka kunci",
+      "failedTitle": "Kata sandi salah"
+    },
+    "quickAdd": {
+      "confirmTitle": "Tambahkan pengecualian?",
+      "confirmBody": "Izinkan \"{0}\" melewati firewall?",
+      "confirmAdd": "Tambah"
+    },
+    "elevateFailed": {
+      "title": "Tidak dapat memulai ulang dengan hak administrator"
+    },
+    "stillRunning": {
+      "title": "SimpleDeFence masih berjalan",
+      "body": "Menutup jendela tidak menghentikan firewall. Gunakan Keluar pada menu ini untuk menghentikannya."
+    }
+  }
+}

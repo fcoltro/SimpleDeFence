@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <!-- Restore-only. Every project here targets net10.0-windows*, and restoring a
+    Windows-targeting project on a non-Windows host fails NETSDK1100 without this - which is
+    what GitHub's dependency submission does, on Linux runners. It does not make anything
+    buildable off Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <RootNamespace>SimpleDeFence.Utilities</RootNamespace>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Product>SimpleDeFence.Utilities</Product>
+    <AssemblyTitle>SimpleDeFence.Utilities</AssemblyTitle>
+    <Company>Károly Pados</Company>
+    <Copyright>Copyright © 2021 Károly Pados</Copyright>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+</Project>

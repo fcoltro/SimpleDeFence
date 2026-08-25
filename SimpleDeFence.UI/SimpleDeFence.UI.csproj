@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <!-- Restore-only. Every project here targets net10.0-windows*, and restoring a
+    Windows-targeting project on a non-Windows host fails NETSDK1100 without this - which is
+    what GitHub's dependency submission does, on Linux runners. It does not make anything
+    buildable off Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <RootNamespace>SimpleDeFence.UI</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Same mark used by the MSI/installer icon and the web favicon set (SimpleDeFence.Assets).
+         Unpackaged WinUI 3 apps (WindowsPackageType=None, no appxmanifest logos) get their
+         window/taskbar icon from the exe's embedded Win32 icon resource, which this sets. -->
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <UseWinUI>true</UseWinUI>
+    <Nullable>enable</Nullable>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Product>SimpleDeFence</Product>
+    <AssemblyTitle>SimpleDeFence</AssemblyTitle>
+    <Company>fcoltro</Company>
+    <Description>SimpleDeFence GUI (WinUI 3) - modern shell talking to the existing SimpleDeFence service.</Description>
+    <Copyright>Copyright © 2011 Károly Pados, Copyright © 2026 fcoltro</Copyright>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+  <!-- Shown by the About section, in-app. Embedded rather than copied beside the exe: the
+       previous About opened License.rtf and Attributions.txt from the application directory,
+       and neither has been part of the publish output since the MSI stopped being assembled
+       from a hand-copied file tree - so both buttons failed for every user who clicked them.
+       An embedded resource cannot go missing. LICENSE.txt is linked from the repository root so
+       the text shown in the app is literally the licence the project ships under, not a copy of
+       it that can drift. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\LICENSE.txt" LogicalName="SimpleDeFence.UI.License.txt" />
+    <EmbeddedResource Include="Assets\ThirdParty.txt" LogicalName="SimpleDeFence.UI.ThirdParty.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+    <!-- Tray icon. WinUI 3 has no NotifyIcon of its own (the WinForms GUI's System.Windows.Forms.
+         NotifyIcon has no counterpart), so TrayIconService is built on this. -->
+    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleDeFence.Core\SimpleDeFence.Core.csproj" />
+    <ProjectReference Include="..\SimpleDeFence.Windows.Services\SimpleDeFence.Windows.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+</Project>

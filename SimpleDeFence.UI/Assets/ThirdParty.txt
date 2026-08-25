@@ -1,0 +1,33 @@
+SimpleDeFence is a fork of TinyWall by Karoly Pados.
+
+    Copyright (c) 2011 Karoly Pados
+    Copyright (c) 2026 fcoltro
+
+    https://github.com/pylorak/TinyWall
+
+Both are distributed under the GNU General Public License, version 3. The full
+text is available from the Licence entry in this section.
+
+
+COMPONENTS
+------------------------------------------------------------
+Windows App SDK / WinUI 3
+    Microsoft - MIT
+
+CommunityToolkit.WinUI.Controls.SettingsControls
+    .NET Foundation and Contributors - MIT
+
+H.NotifyIcon.WinUI
+    Konstantin S. - MIT
+
+System.Management
+System.Security.Cryptography.ProtectedData
+System.ServiceProcess.ServiceController
+    Microsoft - MIT
+
+
+ARTWORK
+------------------------------------------------------------
+Interface icons are Segoe Fluent Icons, supplied by Windows.
+
+The application icon and the tray artwork are original to this project.

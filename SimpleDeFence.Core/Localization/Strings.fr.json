@@ -1,0 +1,408 @@
+{
+  "app": {
+    "name": "SimpleDeFence"
+  },
+  "nav": {
+    "rules": "Règles",
+    "settings": "Paramètres",
+    "modeChip": "Mode du pare-feu"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Annuler",
+    "on": "Activé",
+    "off": "Désactivé",
+    "refresh": "Actualiser",
+    "loading": "Chargement...",
+    "connecting": "Connexion...",
+    "unknown": "Inconnu",
+    "anotherDialogOpenDetail": "Une autre boîte de dialogue est déjà ouverte. Veuillez réessayer."
+  },
+  "status": {
+    "notConnected": "Non connecté",
+    "notConnectedDetail": "Impossible de joindre le service SimpleDeFence. Est-il installé et en cours d'exécution ?",
+    "locked": "La configuration est verrouillée",
+    "lockedDetail": "Déverrouillez la configuration avant de changer de mode.",
+    "connected": "Connecté",
+    "degraded": {
+      "title": "Le pare-feu n'applique pas tout ce qui est configuré",
+      "initFailed": "Le démarrage ne s'est pas terminé ; les règles en vigueur peuvent dater d'une session antérieure.",
+      "databaseUnavailable": "La base de données des applications n'a pas pu être chargée : les listes de blocage et les profils d'application ne produisent aucune règle.",
+      "rulesIncomplete": "Windows a refusé certaines règles du pare-feu ; l'ensemble installé n'est pas celui qui a été configuré.",
+      "hostsUnavailable": "La liste de blocage hosts est activée mais n'est pas installée."
+    }
+  },
+  "mode": {
+    "normal": {
+      "label": "Normal",
+      "description": "Le pare-feu fonctionne comme recommandé."
+    },
+    "blockAll": {
+      "label": "Tout bloquer",
+      "description": "Le pare-feu bloque tout le trafic entrant et sortant."
+    },
+    "allowOutgoing": {
+      "label": "Autoriser le sortant",
+      "description": "Le pare-feu autorise les connexions sortantes."
+    },
+    "disabled": {
+      "label": "Désactivé",
+      "description": "Le pare-feu est désactivé."
+    },
+    "learning": {
+      "label": "Apprentissage automatique",
+      "description": "Le pare-feu apprend tout en laissant passer l'ensemble du trafic."
+    },
+    "switchFailed": {
+      "lockedTitle": "SimpleDeFence est actuellement verrouillé",
+      "comErrorTitle": "La communication avec le service a échoué",
+      "comErrorDetail": "Le mode n'a pas été changé.",
+      "genericTitle": "L'opération a échoué",
+      "genericDetail": "Le service a renvoyé {0}. Le mode n'a pas été changé.",
+      "unreachableTitle": "Impossible de joindre le service"
+    },
+    "learningConfirm": {
+      "title": "Démarrer l'apprentissage automatique ?",
+      "body": "En mode d'apprentissage automatique, SimpleDeFence autorise tout le trafic et retient quelles applications ont utilisé le réseau, puis ajoute des exceptions pour elles à la sortie du mode. Aucune règle ne peut être apprise pour les exceptions spéciales.\n\nN'utilisez ceci que sur un système dont vous êtes certain qu'il est exempt de logiciels malveillants.",
+      "confirm": "Passer en mode apprentissage"
+    }
+  },
+  "applications": {
+    "title": "Applications",
+    "filterPlaceholder": "Filtrer par nom ou chemin",
+    "summary": "{0} exceptions dans le profil « {1} »",
+    "summaryOne": "1 exception dans le profil « {0} »",
+    "empty": "Aucune exception d'application pour l'instant."
+  },
+  "connections": {
+    "title": "Connexions",
+    "section": {
+      "blocked": "Bloquées",
+      "connected": "Connectées",
+      "open": "Ouvertes",
+      "count": "({0})"
+    },
+    "empty": {
+      "blocked": "Rien de bloqué au cours des 5 dernières minutes.",
+      "connected": "Aucune connexion établie.",
+      "open": "Aucun port en écoute.",
+      "filtered": "Rien ne correspond au filtre actuel."
+    },
+    "filterPlaceholder": "Filtrer par nom d'application",
+    "autoRefresh": "Actualisation automatique",
+    "allow": "Autoriser cette application",
+    "allowSuccess": {
+      "title": "Exception ajoutée",
+      "body": "{0} peut désormais se connecter."
+    },
+    "allowFailed": {
+      "title": "Impossible d'ajouter l'exception",
+      "lockedDetail": "Déverrouillez la configuration avant d'ajouter une exception.",
+      "staleDetail": "La configuration vient d'être modifiée ailleurs ; l'exception n'a pas été ajoutée. Veuillez réessayer.",
+      "genericDetail": "Le service a renvoyé {0}. L'exception n'a pas été ajoutée.",
+      "unidentified": "L'application n'a pas pu être identifiée (ni chemin ni paquet), aucune exception n'a donc été ajoutée."
+    },
+    "gatherFailed": {
+      "title": "Impossible de lire les données de connexion"
+    },
+    "blocked": {
+      "attempts": "{0} tentatives, {1} adresses",
+      "attemptsOneAddress": "{0} tentatives",
+      "attemptsHeader": "Tentatives bloquées"
+    },
+    "showAll": "Tout afficher",
+    "truncated": "Affichage des {0} plus récentes.",
+    "connected": {
+      "summary": "{0} connexions",
+      "header": "Connexions établies"
+    },
+    "open": {
+      "summary": "{0} ports en écoute",
+      "header": "Ports en écoute"
+    },
+    "legend": {
+      "local": "Les lignes surlignées sont restées sur votre réseau local"
+    }
+  },
+  "subject": {
+    "executable": "Exécutable",
+    "service": "Service",
+    "uwpPackage": "Paquet UWP",
+    "global": "Global",
+    "allApplications": "Toutes les applications"
+  },
+  "policy": {
+    "blocked": "Bloqué",
+    "unrestricted": "Sans restriction",
+    "unrestrictedLan": "Sans restriction (LAN uniquement)",
+    "noPorts": "Aucun port autorisé",
+    "lanOnlySuffix": "{0} (LAN uniquement)",
+    "customRuleOne": "1 règle personnalisée",
+    "customRuleMany": "{0} règles personnalisées",
+    "tcpOut": "TCP sortant",
+    "udpOut": "UDP sortant",
+    "tcpIn": "TCP entrant",
+    "udpIn": "UDP entrant",
+    "allPorts": "tous"
+  },
+  "rules": {
+    "specialKind": "Exception spéciale",
+    "specialPolicy": "Prédéfinie",
+    "title": "Règles",
+    "section": {
+      "applications": "Applications",
+      "specialRecommended": "Spéciales (recommandées)",
+      "specialOptional": "Spéciales (facultatives)"
+    },
+    "filterPlaceholder": "Filtrer par nom ou chemin",
+    "empty": {
+      "applications": "Aucune exception d'application pour l'instant.",
+      "special": "Aucune exception spéciale disponible.",
+      "filtered": "Rien ne correspond au filtre actuel."
+    },
+    "remove": "Supprimer",
+    "removeConfirm": {
+      "title": "Supprimer les exceptions ?",
+      "body": "Supprimer {0} exception(s) ? Les applications concernées seront de nouveau bloquées."
+    },
+    "removeSuccess": {
+      "title": "Exceptions supprimées",
+      "body": "{0} exception(s) ont été supprimées."
+    },
+    "removeFailed": {
+      "title": "Impossible de supprimer les exceptions",
+      "lockedDetail": "Déverrouillez la configuration avant de supprimer des exceptions.",
+      "staleDetail": "La configuration vient d'être modifiée ailleurs ; les exceptions n'ont pas été supprimées. Veuillez réessayer.",
+      "genericDetail": "Le service a renvoyé {0}. Les exceptions n'ont pas été supprimées."
+    },
+    "specialToggleFailed": {
+      "title": "Impossible de modifier l'exception spéciale",
+      "lockedDetail": "Déverrouillez la configuration avant de modifier cette exception.",
+      "staleDetail": "La configuration vient d'être modifiée ailleurs ; l'exception n'a pas été modifiée. Veuillez réessayer.",
+      "genericDetail": "Le service a renvoyé {0}. L'exception n'a pas été modifiée."
+    },
+    "add": "Ajouter",
+    "addPickExecutable": "Fichier exécutable...",
+    "addPickProcess": "Processus en cours...",
+    "addPickWindow": "Fenêtre...",
+    "addPickUwp": "Application UWP...",
+    "addPickFolder": "Choisir un dossier...",
+    "pickUwpTitle": "Choisissez une application UWP",
+    "pickProcessTitle": "Choisissez un processus en cours",
+    "pickWindowTitle": "Choisissez une fenêtre",
+    "pickEmpty": "Aucune entrée correspondante.",
+    "detail": {
+      "title": "Règle",
+      "policyBlocked": "Bloqué",
+      "policyUnrestricted": "Sans restriction",
+      "policyUnrestrictedLan": "Sans restriction (LAN uniquement)",
+      "policyTcpUdp": "TCP/UDP uniquement",
+      "tcpOut": "TCP sortant",
+      "udpOut": "UDP sortant",
+      "tcpIn": "TCP entrant",
+      "udpIn": "UDP entrant",
+      "lanOnly": "LAN uniquement",
+      "apply": "Appliquer",
+      "customRulesReadOnly": "Les listes de règles personnalisées ne sont pas encore modifiables ici.",
+      "applySuccess": "Stratégie mise à jour.",
+      "applyFailed": {
+        "title": "Impossible de mettre à jour la stratégie",
+        "lockedDetail": "Déverrouillez la configuration avant de modifier cette règle.",
+        "staleDetail": "La configuration vient d'être modifiée ailleurs ; la stratégie n'a pas été modifiée. Veuillez réessayer.",
+        "genericDetail": "Le service a renvoyé {0}. La stratégie n'a pas été modifiée."
+      }
+    },
+    "multiSelectHint": "{0} règles sélectionnées. Supprimer les efface toutes ; sélectionnez une seule règle pour la modifier."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "section": {
+      "general": "Général",
+      "protection": "Protection",
+      "blocklists": "Listes de blocage",
+      "security": "Sécurité",
+      "updates": "Mises à jour",
+      "maintenance": "Maintenance",
+      "about": "À propos",
+      "logging": "Journalisation"
+    },
+    "commitFailed": {
+      "title": "Impossible d'enregistrer le paramètre",
+      "lockedDetail": "Déverrouillez la configuration avant de modifier les paramètres.",
+      "staleDetail": "La configuration vient d'être modifiée ailleurs ; le paramètre n'a pas été modifié. Veuillez réessayer.",
+      "genericDetail": "Le service a renvoyé {0}. Le paramètre n'a pas été modifié."
+    },
+    "localSaveFailed": {
+      "title": "Ce paramètre ne survivra pas à un redémarrage",
+      "detail": "La modification est active maintenant, mais elle n'a pas pu être écrite sur le disque : SimpleDeFence l'oubliera au prochain démarrage. {0}"
+    },
+    "general": {
+      "theme": "Thème de l'application",
+      "themeDescription": "S'applique immédiatement.",
+      "themeAuto": "Utiliser le paramètre système",
+      "themeLight": "Clair",
+      "themeDark": "Sombre",
+      "language": "Langue",
+      "languageDescription": "Remplace la langue du système pour l'interface de SimpleDeFence.",
+      "languageAuto": "Utiliser le paramètre système",
+      "languageRestartTitle": "Redémarrez pour terminer le changement de langue",
+      "languageRestartDetail": "Une partie du texte à l'écran conserve la langue précédente jusqu'au redémarrage de SimpleDeFence.",
+      "askForExceptionDetails": "Demander des détails lors de l'ajout d'une seule exception",
+      "askForExceptionDetailsDescription": "Affiche une confirmation modifiable avant d'ajouter une exception via les raccourcis rapides de la zone de notification. Les ajouts groupés (un dossier entier, par exemple) ne demandent jamais.",
+      "enableHotkeys": "Activer les raccourcis clavier globaux",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W autorisent instantanément un exécutable, un processus ou une fenêtre depuis n'importe où.",
+      "autoRefreshInterval": "Intervalle d'actualisation automatique",
+      "autoRefreshIntervalDescription": "À quelle fréquence la page Connexions se met à jour tant que son interrupteur d'actualisation automatique est activé. Rien ne lui envoie de changements : c'est donc un intervalle d'interrogation ; plus il est court, plus les données sont fraîches et plus cela coûte."
+    },
+    "protection": {
+      "allowLocalSubnet": "Autoriser le réseau local",
+      "allowLocalSubnetDescription": "Toujours autoriser le trafic vers et depuis les autres appareils de votre réseau local.",
+      "displayOffBlock": "Bloquer le réseau quand l'écran est éteint",
+      "displayOffBlockDescription": "Bloque tout le trafic réseau tant que l'écran est éteint."
+    },
+    "blocklists": {
+      "enable": "Activer les listes de blocage",
+      "enableDescription": "Bloque le trafic vers les hôtes et les ports connus comme malveillants.",
+      "hosts": "Bloquer les hôtes malveillants",
+      "ports": "Bloquer les ports malveillants"
+    },
+    "security": {
+      "lockHostsFile": "Verrouiller le fichier hosts",
+      "lockHostsFileDescription": "Empêche d'autres programmes de modifier le fichier hosts.",
+      "passwordSet": "Un mot de passe est défini.",
+      "passwordNotSet": "Aucun mot de passe n'est défini.",
+      "passwordNotSetDetail": "Tant qu'aucun mot de passe n'est défini, toute personne pouvant se connecter à ce PC peut modifier ces paramètres.",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "setPassword": "Définir le mot de passe",
+      "removePassword": "Supprimer le mot de passe",
+      "passwordMismatch": {
+        "title": "Les mots de passe ne correspondent pas",
+        "detail": "Saisissez le même mot de passe dans les deux champs."
+      },
+      "passwordUpdated": {
+        "title": "Mot de passe mis à jour",
+        "body": "Le mot de passe de la configuration a été changé."
+      },
+      "passwordRemoved": {
+        "body": "Le mot de passe de la configuration a été supprimé."
+      },
+      "passwordUpdateFailed": {
+        "title": "Impossible de mettre à jour le mot de passe"
+      },
+      "lockedStatus": "La configuration est verrouillée.",
+      "unlockedStatus": "La configuration n'est pas verrouillée.",
+      "lockNow": "Verrouiller maintenant",
+      "lockFailed": {
+        "title": "Impossible de verrouiller la configuration"
+      },
+      "unlockPasswordPlaceholder": "Mot de passe",
+      "unlock": "Déverrouiller",
+      "unlockFailed": {
+        "title": "Impossible de déverrouiller la configuration",
+        "detail": "Le mot de passe n'a pas été accepté."
+      }
+    },
+    "updates": {
+      "autoCheck": "Rechercher les mises à jour automatiquement",
+      "autoCheckDescription": "SimpleDeFence recherche régulièrement de nouvelles versions.",
+      "checkNow": "Rechercher les mises à jour maintenant",
+      "checkingTitle": "Recherche de mises à jour...",
+      "checkFailedTitle": "La recherche de mises à jour a échoué",
+      "noneAvailable": "Vous utilisez la dernière version.",
+      "available": "La version {0} est disponible. La télécharger et l'installer maintenant ?",
+      "downloading": "Téléchargement de la mise à jour...",
+      "verificationFailed": "Le téléchargement ne correspondait pas à la somme de contrôle publiée pour cette version : il n'a donc pas été exécuté. Rien n'a été installé."
+    },
+    "maintenance": {
+      "import": "Importer la configuration...",
+      "export": "Exporter la configuration...",
+      "filePickerName": "Paramètres SimpleDeFence",
+      "importConfirm": {
+        "title": "Importer la configuration ?",
+        "body": "Cela remplace toutes les règles et tous les paramètres de la configuration actuelle. Cette action est irréversible.",
+        "confirm": "Importer"
+      },
+      "importSuccess": {
+        "title": "Configuration importée",
+        "body": "{0} a été importé."
+      },
+      "importFailed": {
+        "title": "Impossible d'importer la configuration"
+      },
+      "exportSuccess": {
+        "title": "Configuration exportée",
+        "body": "Enregistrée dans {0}."
+      },
+      "exportFailed": {
+        "title": "Impossible d'exporter la configuration"
+      }
+    },
+    "about": {
+      "version": "Version {0}",
+      "homepage": "Page du projet",
+      "license": "Licence",
+      "attributions": "Composants tiers",
+      "linkFailed": {
+        "title": "Impossible d'ouvrir"
+      },
+      "tagline": "Un pare-feu Windows libre et léger.",
+      "basedOn": "Basé sur TinyWall",
+      "basedOnDetail": "Par Karoly Pados. Ouvre le projet d'origine sur GitHub.",
+      "licenseDetail": "Licence publique générale GNU, version 3",
+      "attributionsDetail": "Ce sur quoi SimpleDeFence est bâti, et ce qu'il emprunte",
+      "homepageDetail": "Ouvre github.com/fcoltro/SimpleDeFence",
+      "readFailed": "Ce texte n'a pas pu être lu."
+    },
+    "logging": {
+      "enabled": "Enregistrer un journal des connexions",
+      "enabledDescription": "Consigne les tentatives bloquées et les connexions établies dans un fichier CSV, avec le programme à leur origine. Désactivé par défaut.",
+      "path": "Fichier journal",
+      "pathDescription": "Laissez vide pour utiliser l'emplacement par défaut dans vos données d'application locales.",
+      "pathPlaceholder": "Emplacement par défaut",
+      "interval": "Intervalle de vérification du journal",
+      "intervalDescription": "À quelle fréquence le journal est mis à jour. La journalisation interroge : tout ce qui dure moins d'un intervalle peut être manqué.",
+      "maxSize": "Taille maximale du journal",
+      "maxSizeDescription": "En mégaoctets. Quand le journal atteint cette taille, il est renommé en .1 et un nouveau commence ; seul le fichier précédent est conservé.",
+      "openFolder": "Ouvrir le dossier du journal",
+      "writeFailedTitle": "Le journal des connexions n'a pas pu être écrit"
+    }
+  },
+  "tray": {
+    "mode": {
+      "normal": "Normal",
+      "blockAll": "Tout bloquer",
+      "allowOutgoing": "Autoriser le sortant",
+      "disabled": "Désactivé",
+      "learning": "Apprentissage"
+    },
+    "manage": "Gérer...",
+    "connections": "Connexions...",
+    "lock": "Verrouiller",
+    "elevate": "Exécuter en tant qu'administrateur",
+    "allowLocalSubnet": "Autoriser le sous-réseau local",
+    "enableHostsBlocklist": "Activer la liste de blocage des hôtes",
+    "whitelistByExecutable": "Autoriser un exécutable...",
+    "whitelistByProcess": "Autoriser un processus en cours...",
+    "whitelistByWindow": "Autoriser par fenêtre...",
+    "quit": "Quitter",
+    "unlock": {
+      "title": "Déverrouiller SimpleDeFence",
+      "passwordPlaceholder": "Mot de passe",
+      "button": "Déverrouiller",
+      "failedTitle": "Mot de passe incorrect"
+    },
+    "quickAdd": {
+      "confirmTitle": "Ajouter l'exception ?",
+      "confirmBody": "Autoriser « {0} » à traverser le pare-feu ?",
+      "confirmAdd": "Ajouter"
+    },
+    "elevateFailed": {
+      "title": "Impossible de redémarrer avec les privilèges d'administrateur"
+    },
+    "stillRunning": {
+      "title": "SimpleDeFence est toujours en cours d'exécution",
+      "body": "Fermer la fenêtre n'arrête pas le pare-feu. Utilisez Quitter dans ce menu pour l'arrêter."
+    }
+  }
+}

@@ -1,0 +1,56 @@
+<Window
+    x:Class="SimpleDeFence.UI.DevelToolWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <TabView x:Name="Tabs" IsAddTabButtonVisible="False">
+        <TabViewItem Header="Associations" IsClosable="False">
+            <StackPanel Padding="12" Spacing="8">
+                <TextBox x:Name="AssocExePath" PlaceholderText="Executable path"/>
+                <Button Content="Browse..." Click="AssocBrowse_Click"/>
+                <Button Content="Create" Click="AssocCreate_Click"/>
+                <TextBox x:Name="AssocResult" AcceptsReturn="True" TextWrapping="Wrap" Height="200" IsReadOnly="True"/>
+            </StackPanel>
+        </TabViewItem>
+        <TabViewItem Header="Collections" IsClosable="False">
+            <StackPanel Padding="12" Spacing="8">
+                <TextBox x:Name="DbFolderPath" PlaceholderText="Input database folder"/>
+                <Button Content="Browse..." Click="ProfileFolderBrowse_Click"/>
+                <TextBox x:Name="AssocOutputPath" PlaceholderText="Output folder"/>
+                <Button Content="Browse..." Click="AssocOutputBrowse_Click"/>
+                <Button Content="Create collections" Click="CollectionsCreate_Click"/>
+            </StackPanel>
+        </TabViewItem>
+        <TabViewItem Header="Update package" IsClosable="False">
+            <StackPanel Padding="12" Spacing="8">
+                <TextBox x:Name="UpdateInstallerProjectDir" PlaceholderText="Installer project directory"/>
+                <Button Content="Browse..." Click="UpdateInstallerBrowse_Click"/>
+                <TextBox x:Name="UpdateOutput" PlaceholderText="Output folder"/>
+                <Button Content="Browse..." Click="UpdateOutputBrowse_Click"/>
+                <TextBox x:Name="UpdateURL" PlaceholderText="Update base URL"/>
+                <Button Content="Create update package" Click="UpdateCreate_Click"/>
+            </StackPanel>
+        </TabViewItem>
+        <TabViewItem Header="Resx optimizer" IsClosable="False">
+            <StackPanel Padding="12" Spacing="8">
+                <Button Content="Add primaries..." Click="AddPrimaries_Click"/>
+                <Button Content="Clear" Click="Clear_Click"/>
+                <ListView x:Name="ListPrimaries" SelectionChanged="ListPrimaries_SelectionChanged" Height="150"/>
+                <ListView x:Name="ListSatellites" Height="150"/>
+                <TextBox x:Name="OptimizeOutputPath" PlaceholderText="Output folder"/>
+                <Button Content="Optimize" Click="Optimize_Click"/>
+            </StackPanel>
+        </TabViewItem>
+        <TabViewItem Header="Batch sign" IsClosable="False">
+            <StackPanel Padding="12" Spacing="8">
+                <TextBox x:Name="CertPath" PlaceholderText="Certificate path"/>
+                <Button Content="Browse..." Click="CertBrowse_Click"/>
+                <TextBox x:Name="SignDirPath" PlaceholderText="Directory to sign"/>
+                <Button Content="Browse..." Click="SignDirBrowse_Click"/>
+                <TextBox x:Name="SigntoolPath" PlaceholderText="signtool.exe path"/>
+                <Button Content="Browse..." Click="SigntoolBrowse_Click"/>
+                <TextBox x:Name="TimestampServer" PlaceholderText="Timestamp server URL"/>
+                <Button x:Name="BatchSignButton" Content="Sign" Click="BatchSign_Click"/>
+            </StackPanel>
+        </TabViewItem>
+    </TabView>
+</Window>
