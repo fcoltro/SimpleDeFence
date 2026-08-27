@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "未连接",
     "notConnectedDetail": "无法连接到 SimpleDeFence 服务。它是否已安装并正在运行？",
+    "notConnectedNeedsAdmin": "SimpleDeFence 未以管理员身份运行，因此无法控制防火墙。请在托盘菜单中使用“以管理员身份运行”。",
     "locked": "配置已锁定",
     "lockedDetail": "更改模式前请先解锁配置。",
     "connected": "已连接",

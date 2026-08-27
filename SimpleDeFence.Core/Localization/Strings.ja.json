@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "未接続",
     "notConnectedDetail": "SimpleDeFence サービスに接続できませんでした。インストールされ、実行中ですか？",
+    "notConnectedNeedsAdmin": "SimpleDeFence は管理者として実行されていないため、ファイアウォールを制御できません。タスクバーのメニューから「管理者として実行」を使用してください。",
     "locked": "構成はロックされています",
     "lockedDetail": "モードを変更する前に構成のロックを解除してください。",
     "connected": "接続済み",

@@ -230,7 +230,7 @@ namespace SimpleDeFence.UI.Services
             // deleted because it is the manifest, not this file, that decides - softening the
             // level to highestAvailable brings the item straight back, and a menu that quietly
             // omitted the only way to elevate would be the wrong failure.
-            if (!IsRunningAsAdministrator())
+            if (!Elevation.IsElevated)
             {
                 var elevate = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Elevate), MinWidth = TrayMenuItemMinWidth };
                 elevate.Click += (_, _) => _ = ElevateSelfAsync();
@@ -417,25 +417,6 @@ namespace SimpleDeFence.UI.Services
             => await Pages.RulesPage.QuickAddWindowAsync(AskForExceptionDetails());
 
         private static bool AskForExceptionDetails() => ClientSettings.Load().AskForExceptionDetails;
-
-        /// <summary>Whether this process holds the Administrators role. The same check
-        /// SimpleDeFence's own Utils.RunningAsAdmin makes, duplicated because that one lives in the
-        /// SimpleDeFence assembly, which references this one and not the other way round.</summary>
-        private static bool IsRunningAsAdministrator()
-        {
-            try
-            {
-                using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
-                return new System.Security.Principal.WindowsPrincipal(identity)
-                    .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
-            }
-            catch
-            {
-                // Cannot tell - keep the item, since offering a way to elevate is the recoverable
-                // side of being wrong.
-                return false;
-            }
-        }
 
         private static void ShowAndNavigate(Type pageType)
         {

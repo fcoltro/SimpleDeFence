@@ -31,11 +31,18 @@
              LocalSystem and never consults requestedExecutionLevel, so /install, /uninstall and the
              service host itself are unchanged. It only governs interactive starts of the GUI.
 
-             requireAdministrator, not highestAvailable: on a standard user account
-             highestAvailable silently returns the unprivileged token, which is the ambiguity being
-             removed here. requireAdministrator prompts for administrator credentials instead, so
-             the GUI is either running as administrator or not running. -->
-        <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
+             highestAvailable, not requireAdministrator. requireAdministrator was tried first and
+             strands standard users: the logon task launches through CreateProcess, which does not
+             elevate, so the tray icon simply never appears on a non-administrator account - no
+             prompt, no error, nothing the user could act on.
+
+             highestAvailable elevates for anyone who can elevate, which is every account that can
+             meaningfully administer a firewall, and runs unprivileged for the rest instead of
+             refusing to start. An unelevated instance cannot command the service - the control
+             pipe's DACL admits Administrators and SYSTEM only - so it says so plainly and offers
+             the tray's "run as administrator" item, rather than presenting itself as connected.
+             See ShellViewModel.Update. -->
+        <requestedExecutionLevel level="highestAvailable" uiAccess="false" />
       </requestedPrivileges>
     </security>
   </trustInfo>

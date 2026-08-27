@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "Not connected",
     "notConnectedDetail": "Could not reach the SimpleDeFence service. Is it installed and running?",
+    "notConnectedNeedsAdmin": "SimpleDeFence is not running as administrator, so it cannot control the firewall. Use “Run as administrator” in the tray menu.",
     "locked": "Configuration is locked",
     "lockedDetail": "Unlock the configuration before changing the mode.",
     "connected": "Connected",

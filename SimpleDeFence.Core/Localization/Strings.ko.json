@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "연결되지 않음",
     "notConnectedDetail": "SimpleDeFence 서비스에 연결할 수 없습니다. 설치되어 실행 중인가요?",
+    "notConnectedNeedsAdmin": "SimpleDeFence가 관리자 권한으로 실행되지 않아 방화벽을 제어할 수 없습니다. 트레이 메뉴에서 “관리자 권한으로 실행”을 사용하세요.",
     "locked": "구성이 잠겨 있습니다",
     "lockedDetail": "모드를 변경하기 전에 구성을 잠금 해제하세요.",
     "connected": "연결됨",

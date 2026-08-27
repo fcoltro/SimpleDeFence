@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "Tidak terhubung",
     "notConnectedDetail": "Tidak dapat menghubungi layanan SimpleDeFence. Apakah layanan tersebut terpasang dan berjalan?",
+    "notConnectedNeedsAdmin": "SimpleDeFence tidak berjalan sebagai administrator, sehingga tidak dapat mengendalikan firewall. Gunakan “Jalankan sebagai administrator” di menu baki sistem.",
     "locked": "Konfigurasi terkunci",
     "lockedDetail": "Buka kunci konfigurasi sebelum mengubah mode.",
     "connected": "Terhubung",

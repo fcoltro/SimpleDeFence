@@ -45,6 +45,11 @@
         {
             public const string NotConnected = "status.notConnected";
             public const string NotConnectedDetail = "status.notConnectedDetail";
+
+            /// <summary>Replaces NotConnectedDetail when the reason the service is unreachable is
+            /// that this window is not elevated. "Is it installed and running?" is a misleading
+            /// question to ask someone whose service is running perfectly well.</summary>
+            public const string NotConnectedNeedsAdmin = "status.notConnectedNeedsAdmin";
             public const string Locked = "status.locked";
             public const string LockedDetail = "status.lockedDetail";
             public const string Connected = "status.connected";

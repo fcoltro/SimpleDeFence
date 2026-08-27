@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "غير متصل",
     "notConnectedDetail": "تعذّر الوصول إلى خدمة SimpleDeFence. هل هي مثبّتة وقيد التشغيل؟",
+    "notConnectedNeedsAdmin": "لا يعمل SimpleDeFence بصلاحيات المسؤول، لذا لا يمكنه التحكم في جدار الحماية. استخدم «تشغيل كمسؤول» من قائمة شريط المهام.",
     "locked": "الإعدادات مقفلة",
     "lockedDetail": "افتح قفل الإعدادات قبل تغيير الوضع.",
     "connected": "متصل",

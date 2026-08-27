@@ -138,7 +138,17 @@ namespace SimpleDeFence.UI.ViewModels
                 ModeLabel = Loc.T(LocKeys.Status.NotConnected);
                 ModeGlyph = "";       // Segoe Fluent: Error
                 ModeStateKey = "Neutral";
-                StatusLine = _client.LastError ?? string.Empty;
+
+                // An unelevated instance is told apart from a genuinely absent service. The control
+                // pipe admits Administrators and SYSTEM only, so running without elevation - which
+                // app.manifest's highestAvailable permits, rather than refusing to start - produces
+                // exactly the same connection failure as the service being stopped, and LastError
+                // would offer the user an access-denied message they can do nothing with. Naming
+                // the real cause, and the tray item that resolves it, is the difference between a
+                // dead end and an instruction.
+                StatusLine = Services.Elevation.IsElevated
+                    ? (_client.LastError ?? string.Empty)
+                    : Loc.T(LocKeys.Status.NotConnectedNeedsAdmin);
             }
             else
             {

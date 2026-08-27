@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "Nicht verbunden",
     "notConnectedDetail": "Der SimpleDeFence-Dienst war nicht erreichbar. Ist er installiert und gestartet?",
+    "notConnectedNeedsAdmin": "SimpleDeFence wird nicht als Administrator ausgeführt und kann die Firewall daher nicht steuern. Verwenden Sie „Als Administrator ausführen“ im Infobereichsmenü.",
     "locked": "Die Konfiguration ist gesperrt",
     "lockedDetail": "Entsperre die Konfiguration, bevor du den Modus änderst.",
     "connected": "Verbunden",

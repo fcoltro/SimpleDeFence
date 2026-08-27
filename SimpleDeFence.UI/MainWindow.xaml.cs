@@ -283,7 +283,12 @@ namespace SimpleDeFence.UI
                     Shell.IsConnected ? Loc.T(LocKeys.Status.Locked) : Loc.T(LocKeys.Status.NotConnected),
                     Shell.IsConnected
                         ? Loc.T(LocKeys.Status.LockedDetail)
-                        : Loc.T(LocKeys.Status.NotConnectedDetail));
+                        // Same distinction the shell's status line makes: not elevated is a
+                        // different problem from the service being absent, and only one of the two
+                        // is something the user can act on. See ShellViewModel.Update.
+                        : Loc.T(Services.Elevation.IsElevated
+                            ? LocKeys.Status.NotConnectedDetail
+                            : LocKeys.Status.NotConnectedNeedsAdmin));
                 return;
             }
 

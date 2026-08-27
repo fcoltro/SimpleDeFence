@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "Non connecté",
     "notConnectedDetail": "Impossible de joindre le service SimpleDeFence. Est-il installé et en cours d'exécution ?",
+    "notConnectedNeedsAdmin": "SimpleDeFence ne s’exécute pas en tant qu’administrateur et ne peut donc pas contrôler le pare-feu. Utilisez « Exécuter en tant qu’administrateur » dans le menu de la zone de notification.",
     "locked": "La configuration est verrouillée",
     "lockedDetail": "Déverrouillez la configuration avant de changer de mode.",
     "connected": "Connecté",

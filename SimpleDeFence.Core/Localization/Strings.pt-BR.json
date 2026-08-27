@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "Sem conexão",
     "notConnectedDetail": "Não foi possível acessar o serviço do SimpleDeFence. Ele está instalado e em execução?",
+    "notConnectedNeedsAdmin": "O SimpleDeFence não está sendo executado como administrador, portanto não pode controlar o firewall. Use “Executar como administrador” no menu da bandeja.",
     "locked": "Configuração bloqueada",
     "lockedDetail": "Desbloqueie a configuração antes de alterar o modo.",
     "connected": "Conectado",

@@ -21,6 +21,7 @@
   "status": {
     "notConnected": "Bağlı değil",
     "notConnectedDetail": "SimpleDeFence hizmetine ulaşılamadı. Kurulu ve çalışıyor mu?",
+    "notConnectedNeedsAdmin": "SimpleDeFence yönetici olarak çalışmıyor, bu yüzden güvenlik duvarını denetleyemiyor. Sistem tepsisi menüsünden “Yönetici olarak çalıştır” seçeneğini kullanın.",
     "locked": "Yapılandırma kilitli",
     "lockedDetail": "Kipi değiştirmeden önce yapılandırmanın kilidini açın.",
     "connected": "Bağlı",
