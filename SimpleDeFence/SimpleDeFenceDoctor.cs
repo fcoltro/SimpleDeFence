@@ -198,14 +198,59 @@ namespace SimpleDeFence
                     }
 
                     // Stop server
-                    twController.RequestServerStop();
-                    DateTime startTs = DateTime.Now;
-                    while (!IsServiceStopped() && ((DateTime.Now - startTs) < TimeSpan.FromSeconds(15)))
-                        System.Threading.Thread.Sleep(200);
+                    //
+                    // Ask over the control pipe first, so the service can shut down in an orderly
+                    // way, and fall back to the SCM if that does not take. This action runs as
+                    // LocalSystem, so it has the rights to stop the service directly.
+                    //
+                    // The fallback matters because of what the failure path used to cost.
+                    // UninstallCustom is Return='check', so returning -1 here fails the whole
+                    // transaction and Windows Installer rolls the uninstall back mid-progress -
+                    // the product stays registered and half removed, which is the state that
+                    // needs a hand-built stub exe to escape. In 0.1.1 a single broken pipe put
+                    // every machine there: the service refused all control traffic, the stop
+                    // request went nowhere, and the only way to uninstall was to stop the service
+                    // by hand in services.msc first.
+                    bool stopAccepted = twController.RequestServerStop() != MessageType.COM_ERROR;
+
+                    if (stopAccepted)
+                    {
+                        // Give it time to wind down on its own.
+                        DateTime startTs = DateTime.Now;
+                        while (!IsServiceStopped() && ((DateTime.Now - startTs) < TimeSpan.FromSeconds(15)))
+                            System.Threading.Thread.Sleep(200);
+                    }
+                    else
+                    {
+                        // No point waiting out the grace period for a request we know was refused.
+                        Utils.Log("The service did not accept the stop request over the control pipe; falling back to the SCM.", Utils.LOG_ID_INSTALLER);
+                    }
+
                     if (!IsServiceStopped())
                     {
-                        Utils.Log("Failed to stop service during uninstall.", Utils.LOG_ID_INSTALLER);
-                        return -1;
+                        try
+                        {
+                            using var sc = new ServiceController(SimpleDeFenceService.SERVICE_NAME);
+                            if (sc.Status != ServiceControllerStatus.Stopped)
+                            {
+                                sc.Stop();
+                                sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(15));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Utils.LogException(e, Utils.LOG_ID_INSTALLER);
+                        }
+                    }
+
+                    if (!IsServiceStopped())
+                    {
+                        // Carry on rather than roll the uninstall back. The process termination
+                        // below takes down a wedged service host, DeleteWfpObjects removes the
+                        // filters it left behind, and DeleteService marks the service for removal.
+                        // A product that uninstalls untidily is recoverable; one that refuses to
+                        // uninstall at all is not.
+                        Utils.Log("Could not stop the service during uninstall; continuing with removal anyway.", Utils.LOG_ID_INSTALLER);
                     }
                 }
             }

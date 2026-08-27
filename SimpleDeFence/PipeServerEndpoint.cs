@@ -130,9 +130,28 @@ namespace SimpleDeFence
                         pipeServer.WaitForConnection();
                         pipeServer.ReadMode = PipeTransmissionMode.Message;
 
+                        // The request is read BEFORE the caller is authorized, because Windows
+                        // requires that order. ImpersonateNamedPipeClient - which is how the
+                        // Administrators check in AuthAsServer establishes who is calling - fails
+                        // with "Unable to impersonate using a named pipe until data has been read
+                        // from that pipe" until the server has read from the connection.
+                        //
+                        // Authorizing first therefore threw on every single request, and
+                        // CallerIsAdministrator treats a failure to impersonate as a refusal, so the
+                        // service refused 100% of control traffic while still reporting itself as
+                        // Running to the SCM. The GUI showed "cannot connect - is the service
+                        // installed and running?", and the MSI uninstall could not stop the service
+                        // and rolled back mid-progress.
+                        //
+                        // Reading first is safe. The DACL already restricts connections to
+                        // Administrators and SYSTEM, the deserializer is bounded by a timeout and
+                        // yields TwMessageComError on anything malformed, and authorization still
+                        // gates everything that acts on the message: an unauthorized caller's
+                        // request is never dispatched to m_RcvCallback and never gets a response.
+                        var req = SerializationHelper.DeserializeFromPipe<TwMessage>(pipeServer, 3000, TwMessageComError.Instance);
+
                         if (AuthAsServer(pipeServer))
                         {
-                            var req = SerializationHelper.DeserializeFromPipe<TwMessage>(pipeServer, 3000, TwMessageComError.Instance);
                             var resp = m_RcvCallback(req);
                             SerializationHelper.SerializeToPipe(pipeServer, resp);
                         }
