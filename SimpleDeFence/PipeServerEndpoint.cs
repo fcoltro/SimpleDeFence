@@ -66,11 +66,29 @@ namespace SimpleDeFence
 
         private void PipeServerWorker()
         {
-            // Allow authenticated users access to the pipe
-            SecurityIdentifier AuthenticatedSID = new(WellKnownSidType.AuthenticatedUserSid, null);
-            PipeAccessRule par = new(AuthenticatedSID, PipeAccessRights.ReadWrite, System.Security.AccessControl.AccessControlType.Allow);
+            // Administrators and SYSTEM only.
+            //
+            // This used to admit Authenticated Users, which is every account that can log on -
+            // standard users, remote desktop sessions, and any service running as NETWORK SERVICE
+            // or a compromised worker process. The only thing standing between such a caller and
+            // MODE_SWITCH, PUT_SETTINGS or STOP_SERVICE was AuthAsServer's image-path comparison,
+            // which every copy of the GUI satisfies by construction because the GUI and the service
+            // are the same executable.
+            //
+            // Narrowing it is possible now that app.manifest requests requireAdministrator: the GUI
+            // is elevated whenever it is running at all, so it holds Administrators in its token and
+            // still connects. SYSTEM is listed explicitly because a DACL without it would lock the
+            // service out of its own pipe - PipeServerEndpoint.Dispose connects a dummy client to
+            // wake the worker, and that client is this process.
+            //
+            // A non-elevated caller is now refused by the operating system before a single byte is
+            // read, which is a stronger boundary than any check this code could make afterwards.
+            var adminsSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+            var systemSid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+
             PipeSecurity ps = new();
-            ps.AddAccessRule(par);
+            ps.AddAccessRule(new PipeAccessRule(adminsSid, PipeAccessRights.ReadWrite, System.Security.AccessControl.AccessControlType.Allow));
+            ps.AddAccessRule(new PipeAccessRule(systemSid, PipeAccessRights.FullControl, System.Security.AccessControl.AccessControlType.Allow));
 
             // Created ONCE, before the loop, and kept for the life of the service.
             //
@@ -142,18 +160,68 @@ namespace SimpleDeFence
             }
         }
 
-        private static bool AuthAsServer(PipeStream stream)
+        /// <summary>
+        /// Decides whether the connected client may issue commands.
+        ///
+        /// Two independent conditions, both required. The image-path comparison was here already;
+        /// on its own it was never an authorization decision, because the GUI and the service are
+        /// the same executable since the WinUI merge - so "the caller runs the same file we do" is
+        /// satisfied by any copy of the shipped GUI, launched by anyone. It is kept as a cheap way
+        /// to turn away an unrelated process, not as the boundary.
+        ///
+        /// The boundary is the second condition: impersonate the caller and require the
+        /// Administrators role. That is deliberately evaluated against the caller's *effective*
+        /// token, so an administrator running unelevated - whose Administrators membership is
+        /// present but deny-only - is refused exactly like a standard user. The pipe's DACL already
+        /// rejects both before they get this far; this is the check that does not depend on the
+        /// DACL having been applied as intended.
+        ///
+        /// A failure to impersonate is a refusal. Not being able to establish who is calling is the
+        /// case this exists to catch.
+        /// </summary>
+        private static bool AuthAsServer(NamedPipeServerStream stream)
         {
 #if !DEBUG
             if (!Utils.SafeNativeMethods.GetNamedPipeClientProcessId(stream.SafePipeHandle.DangerousGetHandle(), out ulong clientPid))
                 return false;
 
             string clientFilePath = Utils.GetPathOfProcess((uint)clientPid);
+            if (!clientFilePath.Equals(SimpleDeFence.Windows.ProcessManager.ExecutablePath, StringComparison.OrdinalIgnoreCase))
+                return false;
 
-            return clientFilePath.Equals(SimpleDeFence.Windows.ProcessManager.ExecutablePath, StringComparison.OrdinalIgnoreCase);
+            return CallerIsAdministrator(stream);
 #else
             return true;
 #endif
+        }
+
+        private static bool CallerIsAdministrator(NamedPipeServerStream stream)
+        {
+            try
+            {
+                bool isAdmin = false;
+
+                // RunAsClient impersonates the connected client on this thread for the duration of
+                // the callback. The service runs as LocalSystem, which holds SeImpersonatePrivilege,
+                // so this is available to it.
+                stream.RunAsClient(() =>
+                {
+                    using var identity = WindowsIdentity.GetCurrent();
+                    isAdmin = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
+                });
+
+                if (!isAdmin)
+                    Utils.Log("Refused a control request from a caller that is not running elevated.", Utils.LOG_ID_SERVICE);
+
+                return isAdmin;
+            }
+            catch (Exception e)
+            {
+                Utils.Log("Refused a control request: the caller could not be impersonated. "
+                    + "For details see the next log entry.", Utils.LOG_ID_SERVICE);
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                return false;
+            }
         }
     }
 }
