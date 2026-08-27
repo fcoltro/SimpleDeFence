@@ -88,6 +88,12 @@ namespace SimpleDeFence.UI.Pages
         public string? AppPath { get; init; }
         public string? PackageId { get; init; }
 
+        /// <summary>The key this row's attempts were grouped under, carried rather than recomputed.
+        /// Recomputing it from this object would not be safe: AppName here is substituted with
+        /// "Unknown" when the log had no name, so a key derived from it could differ from the one
+        /// the group was actually built with.</summary>
+        public string SubjectKey { get; init; } = string.Empty;
+
         /// <summary>Hover text for the row - see ConnectionListItem.TooltipText for why the row
         /// needs one at all. Falls back to the package identity for a store app, which has no
         /// executable path of its own and would otherwise be the one kind of row that could never
@@ -299,14 +305,41 @@ namespace SimpleDeFence.UI.Pages
         /// present the same name, and merging those would put one app's attempts behind another's
         /// "Allow this app" button. Rows with neither - the ones Allow already refuses as
         /// unidentified - are keyed by name so they still collapse, but only among themselves.</summary>
+        /// <summary>
+        /// Identifies an app across the Blocked list and the allow-suppression map below. Both
+        /// callers use this one method so a row can never be grouped under one key and suppressed
+        /// under another.
+        /// </summary>
+        private static string SubjectKeyOf(string? appPath, string? packageId, string? appName)
+            => !string.IsNullOrEmpty(appPath) ? "path:" + appPath!.ToUpperInvariant()
+             : !string.IsNullOrEmpty(packageId) ? "pkg:" + packageId!.ToUpperInvariant()
+             : "name:" + (appName ?? string.Empty).ToUpperInvariant();
+
+        /// <summary>
+        /// When each app was allowed from this page, and therefore how far back its blocked history
+        /// should stop being shown.
+        ///
+        /// The Blocked list is a rolling five-minute window over the firewall log, so allowing an
+        /// app did nothing to the attempts it had already made: the row sat there afterwards,
+        /// looking exactly like it had before, for as long as it took those entries to age out. For
+        /// an app that had been retrying in a loop - which is the usual reason it is in this list at
+        /// all - that reads as the Allow having silently failed, while Rules shows the new rule
+        /// sitting there perfectly.
+        ///
+        /// Only entries older than the moment the rule was written are hidden. A block recorded
+        /// *after* it is real and stays: an app allowed on the local network only will keep being
+        /// blocked on its way to the internet, and that is exactly the thing the user needs to see
+        /// rather than something to tidy away.
+        /// </summary>
+        private readonly Dictionary<string, DateTime> _allowedAt = new();
+
         private void RebuildBlocked(IEnumerable<BlockedRow> rows)
         {
             _blocked.Clear();
 
-            var groups = rows.GroupBy(r =>
-                !string.IsNullOrEmpty(r.AppPath) ? "path:" + r.AppPath!.ToUpperInvariant()
-                : !string.IsNullOrEmpty(r.PackageId) ? "pkg:" + r.PackageId!.ToUpperInvariant()
-                : "name:" + (r.AppName ?? string.Empty).ToUpperInvariant());
+            var groups = rows
+                .Where(r => !SuppressedByAllow(r))
+                .GroupBy(r => SubjectKeyOf(r.AppPath, r.PackageId, r.AppName));
 
             foreach (var group in groups)
             {
@@ -337,6 +370,7 @@ namespace SimpleDeFence.UI.Pages
 
                 var item = new BlockedListItem
                 {
+                    SubjectKey = group.Key,
                     AppName = string.IsNullOrEmpty(newest.AppName) ? Loc.T(LocKeys.Common.Unknown) : newest.AppName,
                     Protocol = CommonProtocol(ordered.Select(r => r.Protocol)),
                     // Green only when the whole group stayed local. One attempt out to the internet
@@ -425,6 +459,12 @@ namespace SimpleDeFence.UI.Pages
                 var body = policy is HardBlockPolicy
                     ? Loc.T(LocKeys.Rules.DetailApplySuccess)
                     : Loc.T(LocKeys.Connections.AllowSuccessBody, item.AppName);
+
+                // Before the refresh, so the rebuild it triggers already hides the attempts this
+                // rule was written in response to. Recorded whichever policy was chosen: picking
+                // Blocked is also a decision about this app, and leaving its backlog on the list
+                // afterwards would be the same "did that do anything?" as allowing it.
+                MarkAllowed(item);
 
                 await ShowAllowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle), body);
                 await RefreshAsync();
@@ -634,6 +674,36 @@ namespace SimpleDeFence.UI.Pages
                 });
             }
         }
+
+        /// <summary>True for a blocked attempt that happened before this app was allowed, and so
+        /// describes a state that no longer exists. See _allowedAt.</summary>
+        private bool SuppressedByAllow(BlockedRow row)
+            => _allowedAt.TryGetValue(SubjectKeyOf(row.AppPath, row.PackageId, row.AppName), out var allowedAt)
+               && row.Timestamp <= allowedAt;
+
+        /// <summary>Records that an app was just allowed, so its earlier attempts stop being listed.
+        ///
+        /// Keys are dropped once they are older than the window the Blocked list covers, with a
+        /// margin: past that point every entry they could suppress has aged out of the log anyway,
+        /// and keeping them would slowly turn a page that is open for days into a leak.</summary>
+        private void MarkAllowed(BlockedListItem item)
+        {
+            var now = DateTime.Now;
+            _allowedAt[item.SubjectKey] = now;
+
+            var stale = _allowedAt
+                .Where(kv => now - kv.Value > BlockedHistoryWindow + TimeSpan.FromMinutes(1))
+                .Select(kv => kv.Key)
+                .ToList();
+
+            foreach (var key in stale)
+                _allowedAt.Remove(key);
+        }
+
+        /// <summary>How far back the Blocked list reaches. Must match the window FirewallClient
+        /// passes to ConnectionActivity.RecentBlocked; it is only used here to decide when a
+        /// suppression key can be forgotten.</summary>
+        private static readonly TimeSpan BlockedHistoryWindow = TimeSpan.FromMinutes(5);
 
         /// <summary>FlyoutBase.Opening for the "Show all" flyouts in the row templates. See
         /// App.ApplyShellStyling: a flyout's presenter is created in the popup root, so it inherits

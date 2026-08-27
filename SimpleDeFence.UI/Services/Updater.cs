@@ -76,10 +76,15 @@ namespace SimpleDeFence.UI.Services
             // the fetch above, so a malformed descriptor did not degrade the update check, it threw
             // out of it. Treating unparseable as "nothing on offer" fails the way the rest of this
             // path already fails: quietly, leaving the user on the build they have.
-            if (!Version.TryParse(updateModule?.ComponentVersion, out var newVersion))
-                newVersion = oldVersion;
-
-            if (newVersion <= oldVersion)
+            //
+            // The three ways there is nothing to offer are one branch: no module published for
+            // this architecture, a version that cannot be read, and a version no newer than what
+            // is already installed. Written this way the compiler can also see that updateModule
+            // is not null past this point, which is what actually guarantees the download below
+            // has something to download - rather than a "!" asserting it.
+            if (updateModule is null
+                || !Version.TryParse(updateModule.ComponentVersion, out var newVersion)
+                || newVersion <= oldVersion)
             {
                 await ShowMessageAsync(xamlRoot, Loc.T(LocKeys.Settings.UpdatesCheckNow), Loc.T(LocKeys.Settings.UpdatesNoneAvailable));
                 return;
@@ -91,7 +96,11 @@ namespace SimpleDeFence.UI.Services
                 FlowDirection = App.UiFlowDirection,
                 RequestedTheme = App.UiElementTheme,
                 Title = Loc.T(LocKeys.Settings.UpdatesCheckNow),
-                Content = Loc.T(LocKeys.Settings.UpdatesAvailable, updateModule!.ComponentVersion),
+                // newVersion, not the raw ComponentVersion string: this is the value that was
+                // actually parsed and compared, so the number offered to the user cannot differ
+                // from the one the decision was made on - and it is non-null, which the descriptor
+                // field is not.
+                Content = Loc.T(LocKeys.Settings.UpdatesAvailable, newVersion.ToString()),
                 PrimaryButtonText = Loc.T(LocKeys.Common.Ok),
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
             };
