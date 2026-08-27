@@ -1,0 +1,114 @@
+<!--
+  Repository-wide build customisation. Imported automatically by MSBuild into every project below
+  this directory, after the project body - which is what these targets need, since they override
+  behaviour contributed by NuGet package targets.
+-->
+<Project>
+
+  <!-- Drop the Windows App SDK components this app does not use a single type from: .AI (on-device
+       generative text, imaging, OCR, content safety, semantic search), .ML (the ONNX + DirectML
+       inference runtime) and .Widgets (the Windows widgets board). Nothing in this repository
+       references any of them - a grep for Windows.AI / OnnxRuntime / DirectML / Widgets across
+       every .cs, .xaml and .csproj returns nothing - but they shipped anyway, because
+       WindowsAppSDKSelfContained lays the entire SDK down beside the exe: roughly 60 files and
+       48 MB of the install directory, onnxruntime.dll (21 MB) and DirectML.dll (19 MB) among
+       them. A firewall has no business installing an inference engine, and those files are most
+       of what makes the install directory unreadable next to the ~30 the app itself owns.
+
+       Why this filters the payload rather than fixing the package references: the
+       Microsoft.WindowsAppSDK meta-package is *only* a list of dependencies, and referencing its
+       sub-packages directly (Base/Foundation/InteractiveExperiences/WinUI/DWrite/Runtime, minus
+       AI/ML/Widgets) does work in isolation - but H.NotifyIcon.WinUI and every
+       CommunityToolkit.WinUI.* package in the graph declare their own dependency on the
+       meta-package, so NuGet resolves it back in transitively and all three components return.
+       Tried, measured, reverted. NuGet has no supported way to prune a transitive dependency.
+
+       Why this lives here and not in SimpleDeFence.csproj: Microsoft.WindowsAppSDK.SelfContained
+       .targets appends its payload target to GetCopyToOutputDirectoryItemsDependsOn, so when
+       SimpleDeFence builds and asks SimpleDeFence.UI for its copy-local items, the UI project runs
+       that target in *its own* evaluation and hands the full, unfiltered payload up the
+       ProjectReference. Filtering in the publishing project alone therefore removed nothing; both
+       projects have to be filtered, and a Directory.Build.targets is how they stay in step.
+
+       Two removals are needed, because the three components deploy through two mechanisms:
+
+       1. WindowsAppSdkComponentPackages. Each SDK sub-package's .props adds its own directory to
+          this item, and Microsoft.WindowsAppSDK.SelfContained.targets globs every entry's
+          runtimes-framework\win-<arch>\native payload into the output. Removing the three entries
+          before that target runs drops their DLLs and .winmds *and* their package.appxfragment,
+          which is what feeds the regfree-WinRT activatableClass registrations merged into
+          SimpleDeFence.exe's embedded manifest - so the manifest stops advertising classes whose
+          DLLs are no longer present, rather than the two drifting apart.
+
+       2. Ordinary lib\ and runtimes\ assets, which step 1 does not touch because they are not part
+          of the runtimes-framework payload: Microsoft.Windows.AI.MachineLearning (a conventional
+          NuGet package that .ML depends on, carrying onnxruntime.dll, DirectML.dll and
+          Microsoft.ML.OnnxRuntime.dll - 40 MB of the total on its own), and the eight small C#/WinRT
+          projection assemblies in the .AI and .Widgets packages' own lib\ folders. These are
+          filtered by NuGetPackageId - the same metadata, and for the MachineLearning package the
+          same package name, that Microsoft.WindowsAppSDK.ML.targets itself matches on in
+          _SuppressWindowsMLNativeCopyLocal when the runtime is deployed as a framework package
+          instead. The projections stay resolvable at compile time; they are simply not deployed,
+          which is correct for assemblies no code path loads.
+
+       Guarded on WindowsAppSDKSelfContained so the targets are inert in the library and test
+       projects, which never see any of these items. -->
+
+  <Target Name="RemoveUnusedWindowsAppSdkComponents"
+          Condition="'$(WindowsAppSDKSelfContained)' == 'true'"
+          BeforeTargets="AddMicrosoftWindowsAppSDKPayloadFilesFromComponents">
+    <ItemGroup>
+      <!-- Identity is the package's own directory, e.g. ...\microsoft.windowsappsdk.ai\2.3.4\
+           buildTransitive\..\ - lowercased before matching because the path casing comes from the
+           NuGet cache on disk, not from anything this repository controls. One Remove per
+           component rather than one batched over a list item: batching an ItemGroup Remove over a
+           second item type produces a cartesian pass in which the condition is not evaluated per
+           candidate the way it reads, and the removal silently does nothing. -->
+      <WindowsAppSdkComponentPackages Remove="@(WindowsAppSdkComponentPackages)"
+        Condition="$([System.String]::Copy('%(Identity)').ToLowerInvariant().Contains('microsoft.windowsappsdk.ai'))" />
+      <WindowsAppSdkComponentPackages Remove="@(WindowsAppSdkComponentPackages)"
+        Condition="$([System.String]::Copy('%(Identity)').ToLowerInvariant().Contains('microsoft.windowsappsdk.ml'))" />
+      <WindowsAppSdkComponentPackages Remove="@(WindowsAppSdkComponentPackages)"
+        Condition="$([System.String]::Copy('%(Identity)').ToLowerInvariant().Contains('microsoft.windowsappsdk.widgets'))" />
+    </ItemGroup>
+  </Target>
+
+  <!-- The four package IDs are spelled out per item type rather than hoisted into a shared
+       property: %(NuGetPackageId) is item metadata, and a property holding it is expanded before
+       any batching context exists, so MSBuild fails the condition with MSB4113 rather than
+       matching anything. AssetType='native' is deliberately not part of the match, unlike
+       Microsoft's own version of this filter - the managed Microsoft.ML.OnnxRuntime.dll and the
+       projection assemblies are as unused as the natives. -->
+
+  <!-- Build output, so `dotnet build` and `dotnet publish` agree on what the app directory holds. -->
+  <Target Name="RemoveUnusedWindowsAppSdkCopyLocal"
+          Condition="'$(WindowsAppSDKSelfContained)' == 'true'"
+          AfterTargets="ResolveLockFileCopyLocalFiles"
+          BeforeTargets="_CopyFilesMarkedCopyLocal">
+    <ItemGroup>
+      <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)"
+        Condition="'%(NativeCopyLocalItems.NuGetPackageId)' == 'Microsoft.Windows.AI.MachineLearning'
+                or '%(NativeCopyLocalItems.NuGetPackageId)' == 'Microsoft.WindowsAppSDK.AI'
+                or '%(NativeCopyLocalItems.NuGetPackageId)' == 'Microsoft.WindowsAppSDK.ML'
+                or '%(NativeCopyLocalItems.NuGetPackageId)' == 'Microsoft.WindowsAppSDK.Widgets'" />
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+        Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.Windows.AI.MachineLearning'
+                or '%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.WindowsAppSDK.AI'
+                or '%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.WindowsAppSDK.ML'
+                or '%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.WindowsAppSDK.Widgets'" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RemoveUnusedWindowsAppSdkFromPublish"
+          Condition="'$(WindowsAppSDKSelfContained)' == 'true'"
+          AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+        Condition="'%(ResolvedFileToPublish.NuGetPackageId)' == 'Microsoft.Windows.AI.MachineLearning'
+                or '%(ResolvedFileToPublish.NuGetPackageId)' == 'Microsoft.WindowsAppSDK.AI'
+                or '%(ResolvedFileToPublish.NuGetPackageId)' == 'Microsoft.WindowsAppSDK.ML'
+                or '%(ResolvedFileToPublish.NuGetPackageId)' == 'Microsoft.WindowsAppSDK.Widgets'" />
+    </ItemGroup>
+  </Target>
+
+</Project>

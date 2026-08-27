@@ -91,6 +91,10 @@
     "filterPlaceholder": "Filter by app name",
     "autoRefresh": "Auto-refresh",
     "allow": "Allow this app",
+    "allowDialog": {
+      "title": "Allow this app",
+      "body": "Choose how {0} may use the network."
+    },
     "allowSuccess": {
       "title": "Exception added",
       "body": "{0} can now connect."

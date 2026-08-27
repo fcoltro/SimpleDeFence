@@ -523,6 +523,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = confirmTitle,
                 Content = confirmBody,
                 PrimaryButtonText = Loc.T(LocKeys.Settings.MaintenanceImportConfirmConfirm),
@@ -831,6 +832,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = title,
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),
                 Content = new ScrollViewer
@@ -905,6 +907,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = title,
                 Content = body,
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),

@@ -91,6 +91,10 @@
     "filterPlaceholder": "Filtrar por nome do aplicativo",
     "autoRefresh": "Atualização automática",
     "allow": "Permitir este aplicativo",
+    "allowDialog": {
+      "title": "Permitir este aplicativo",
+      "body": "Escolha como {0} pode usar a rede."
+    },
     "allowSuccess": {
       "title": "Exceção adicionada",
       "body": "{0} agora pode se conectar."

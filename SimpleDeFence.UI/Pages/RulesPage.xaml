@@ -5,6 +5,12 @@
     xmlns:local="using:SimpleDeFence.UI.Pages"
     xmlns:loc="using:SimpleDeFence.UI.Localization">
 
+    <Page.Resources>
+        <!-- Shared by DetailPane and MultiSelectHint, which swap in the same grid cell. See the
+             comment at their declaration. -->
+        <x:Double x:Key="RulesDetailPaneWidth">360</x:Double>
+    </Page.Resources>
+
     <Grid Padding="28" RowSpacing="14">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -29,7 +35,10 @@
                      TextChanged="FilterBox_TextChanged" MaxWidth="360" HorizontalAlignment="Left"/>
             <SplitButton Grid.Column="1" x:Name="AddButton" Content="{loc:Loc Key=rules.add}">
                 <SplitButton.Flyout>
-                    <MenuFlyout Placement="Bottom">
+                    <!-- Opening, not a one-off in the constructor: the presenter's Style has to be
+                         rebuilt from the current theme every time, because a Style seals once
+                         applied. See App.ApplyShellStyling. -->
+                    <MenuFlyout Placement="Bottom" Opening="Flyout_Opening">
                         <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickExecutable}" Click="AddPickExecutable_Click"/>
                         <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickProcess}" Click="AddPickProcess_Click"/>
                         <MenuFlyoutItem Text="{loc:Loc Key=rules.addPickWindow}" Click="AddPickWindow_Click"/>
@@ -61,7 +70,7 @@
                              third of the row area open for nothing, and starving the rule rows'
                              own "*" Detail column down to a couple of dozen pixels at ordinary
                              window sizes. Auto collapses to zero while the pane is hidden and sizes
-                             to the pane's own MinWidth once it is shown. -->
+                             to the pane's own fixed width once it is shown. -->
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -76,7 +85,7 @@
                                     <DataTemplate x:DataType="local:RuleListItem">
                                         <!-- TextWrapping="NoWrap" on every cell below. These row
                                              templates use fixed 220/110px columns plus a "*" column,
-                                             so once the pane and the 320px-minimum detail pane have
+                                             so once the pane and the 360px detail pane have
                                              taken their share the "*" column collapses to a few
                                              pixels at ordinary window sizes. The Fluent TextBlock
                                              styles wrap by default, and TextTrimming only trims the
@@ -105,12 +114,21 @@
                             </ListView>
                         </StackPanel>
 
-                        <!-- Occupies the same column as DetailPane and is shown in its place when
-                             more than one rule is checked. Checking several rows does do something
-                             - Remove deletes them all in one commit - but nothing said so, and the
-                             detail pane simply vanishing on the second check reads as the selection
-                             having broken rather than having switched to a bulk action. -->
-                        <Border x:Name="MultiSelectHint" Grid.Column="1" Visibility="Collapsed" MinWidth="320"
+                        <!-- Width, not MinWidth, on both panes below.
+
+                             MinWidth in an Auto column means "size to content, but not below this",
+                             so the pane was as wide as whatever the selected rule happened to
+                             contain: a rule for C:\Program Files\...\some.exe made it wide, the next
+                             rule for a short path made it narrow again, and the rule list in column
+                             0 was re-laid-out to whatever was left over each time. Selecting rules
+                             one after another made the whole page breathe in and out.
+
+                             A fixed width pins both panes and, with them, the "*" column beside
+                             them, so switching rules changes only what the pane says. The two must
+                             stay the same width - they occupy the same grid cell and swap - so the
+                             value lives in one resource rather than being typed twice. -->
+                        <Border x:Name="MultiSelectHint" Grid.Column="1" Visibility="Collapsed"
+                                Width="{StaticResource RulesDetailPaneWidth}"
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
                                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 CornerRadius="4" Padding="16" VerticalAlignment="Top">
@@ -118,7 +136,18 @@
                                        Style="{StaticResource BodyTextBlockStyle}" Opacity="0.8"/>
                         </Border>
 
-                        <Border x:Name="DetailPane" Grid.Column="1" Visibility="Collapsed" MinWidth="320"
+                        <!-- MinHeight for the vertical half of the same problem, though only
+                             partly: a read-only rule hides the whole editor (DetailEditorFields,
+                             see SeedDetailPane) and puts a one-line note in its place, so the pane
+                             collapsed to a stub and sprang back on the next selection. The floor is
+                             sized to roughly what the editor occupies at default text size, which
+                             makes that jump small instead of dramatic - it is not exact, and a
+                             longer translation or a larger system font will still push the editable
+                             state past it. Selecting one editable rule after another, which is the
+                             case the user actually hits, is now completely still: those differ only
+                             by how far the subject path wraps. -->
+                        <Border x:Name="DetailPane" Grid.Column="1" Visibility="Collapsed"
+                                Width="{StaticResource RulesDetailPaneWidth}" MinHeight="560"
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
                                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 CornerRadius="4" Padding="16" VerticalAlignment="Top">

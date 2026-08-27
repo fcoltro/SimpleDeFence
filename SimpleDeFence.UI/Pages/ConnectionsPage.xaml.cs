@@ -34,6 +34,18 @@ namespace SimpleDeFence.UI.Pages
         public string RemoteEndpoint { get; init; } = string.Empty;
         public string State { get; init; } = string.Empty;
 
+        /// <summary>Full path of the binary behind this group, already used as the grouping key in
+        /// RebuildConnections but not previously carried onto the item.</summary>
+        public string? AppPath { get; init; }
+
+        /// <summary>Hover text for the row: the app's full path. The name column is capped at 260px
+        /// and ellipsed, so on any real install it shows a bare file name and nothing about which
+        /// copy of it this is - two binaries can present the same name, which is exactly why the
+        /// grouping is keyed on the path rather than the name. Null rather than empty when there is
+        /// no path to show: ToolTipService treats null as "no tooltip", where an empty string still
+        /// pops an empty box.</summary>
+        public string? TooltipText => string.IsNullOrEmpty(AppPath) ? null : AppPath;
+
         public string FlyoutHeader { get; init; } = string.Empty;
         public IReadOnlyList<ConnectionLine> Lines { get; init; } = Array.Empty<ConnectionLine>();
 
@@ -75,6 +87,15 @@ namespace SimpleDeFence.UI.Pages
         public string When { get; init; } = string.Empty;
         public string? AppPath { get; init; }
         public string? PackageId { get; init; }
+
+        /// <summary>Hover text for the row - see ConnectionListItem.TooltipText for why the row
+        /// needs one at all. Falls back to the package identity for a store app, which has no
+        /// executable path of its own and would otherwise be the one kind of row that could never
+        /// tell you what it actually is.</summary>
+        public string? TooltipText
+            => !string.IsNullOrEmpty(AppPath) ? AppPath
+             : !string.IsNullOrEmpty(PackageId) ? PackageId
+             : null;
 
         public IReadOnlyList<BlockedAttempt> Attempts { get; init; } = Array.Empty<BlockedAttempt>();
 
@@ -373,10 +394,21 @@ namespace SimpleDeFence.UI.Pages
                 return;
             }
 
+            // Ask before writing. This button used to commit TcpUdpPolicy(unrestricted: true) the
+            // instant it was clicked - every TCP and UDP port, inbound as well as outbound, with no
+            // local-network restriction - and only then put up a dialog, which named the app but was
+            // reporting a rule that already existed. The widest policy the app can grant should not
+            // be the one a single click applies silently, and the Rules page already offers exactly
+            // these choices for the same rule after the fact; this just moves them to the point of
+            // decision.
+            var policy = await AskAllowPolicyAsync(item);
+            if (policy is null)
+                return;
+
             MessageType resp;
             try
             {
-                resp = await App.Firewall.AllowAsync(subject, new TcpUdpPolicy(true));
+                resp = await App.Firewall.AllowAsync(subject, policy);
             }
             catch (Exception ex)
             {
@@ -386,8 +418,15 @@ namespace SimpleDeFence.UI.Pages
 
             if (resp == MessageType.PUT_SETTINGS)
             {
-                await ShowAllowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle),
-                    Loc.T(LocKeys.Connections.AllowSuccessBody, item.AppName));
+                // "{0} can now connect" is only true of the two allowing policies. Picking Blocked
+                // in the dialog above also writes a rule and also succeeds, and telling the user it
+                // had let the app through would be the one report a firewall must never get wrong -
+                // so that case borrows the Rules page's neutral wording instead.
+                var body = policy is HardBlockPolicy
+                    ? Loc.T(LocKeys.Rules.DetailApplySuccess)
+                    : Loc.T(LocKeys.Connections.AllowSuccessBody, item.AppName);
+
+                await ShowAllowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle), body);
                 await RefreshAsync();
             }
             else
@@ -402,12 +441,114 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
+        /// <summary>
+        /// Puts the policy choice in front of the user before anything is committed, and returns
+        /// what they picked - or null if they cancelled, in which case nothing is written.
+        ///
+        /// The three options are the ones that need no further input, and each builds exactly the
+        /// policy the Rules detail pane's radio button of the same name builds (see
+        /// RulesPage.BuildPolicyFromEditor), so the two screens cannot come to mean different things
+        /// by the same word. The port-list policy is deliberately not offered here: it needs four
+        /// text fields to be worth anything, and a rule that specific belongs on the Rules page
+        /// rather than in a dialog raised from a blocked-connection row.
+        ///
+        /// Unrestricted is preselected, so clicking straight through still allows the app. Note that
+        /// it is not identical to what the button used to commit without asking - that was
+        /// TcpUdpPolicy(unrestricted: true), every TCP and UDP port, where UnrestrictedPolicy also
+        /// covers the other IP protocols. The wider grant is the deliberate one to preselect, now
+        /// that it is named on screen and confirmed rather than applied behind the click.
+        /// </summary>
+        private async Task<ExceptionPolicy?> AskAllowPolicyAsync(BlockedListItem item)
+        {
+            var unrestricted = new RadioButton
+            {
+                Content = Loc.T(LocKeys.Policy.Unrestricted),
+                IsChecked = true,
+                GroupName = "ConnectionsAllowPolicy",
+            };
+            var unrestrictedLan = new RadioButton
+            {
+                Content = Loc.T(LocKeys.Policy.UnrestrictedLan),
+                GroupName = "ConnectionsAllowPolicy",
+            };
+            var blocked = new RadioButton
+            {
+                Content = Loc.T(LocKeys.Policy.Blocked),
+                GroupName = "ConnectionsAllowPolicy",
+            };
+
+            var panel = new StackPanel { Spacing = 4, MinWidth = 320 };
+            panel.Children.Add(new TextBlock
+            {
+                Text = Loc.T(LocKeys.Connections.AllowDialogBody, item.AppName),
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 8),
+            });
+
+            // The path, verbatim and selectable, for the same reason the row now carries it as a
+            // tooltip: the name alone does not say which copy of a binary this is, and this dialog
+            // is the last point at which that can still be checked before a rule is written.
+            if (item.TooltipText is { Length: > 0 } identity)
+            {
+                panel.Children.Add(new TextBlock
+                {
+                    Text = identity,
+                    TextWrapping = TextWrapping.Wrap,
+                    IsTextSelectionEnabled = true,
+                    Opacity = 0.8,
+                    Margin = new Thickness(0, 0, 0, 12),
+                    Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"],
+                });
+            }
+
+            panel.Children.Add(unrestricted);
+            panel.Children.Add(unrestrictedLan);
+            panel.Children.Add(blocked);
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
+                Title = Loc.T(LocKeys.Connections.AllowDialogTitle),
+                Content = panel,
+                PrimaryButtonText = Loc.T(LocKeys.Rules.DetailApply),
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                DefaultButton = ContentDialogButton.Primary,
+            };
+
+            ContentDialogResult result;
+            try
+            {
+                result = await dialog.ShowAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // Only one ContentDialog can be open per XamlRoot. Unlike the result dialog, there
+                // is no falling back to the InfoBar here - this dialog *is* the consent, so if it
+                // cannot be shown the rule must not be written.
+                ShowNotice(InfoBarSeverity.Informational,
+                    Loc.T(LocKeys.Connections.AllowDialogTitle),
+                    Loc.T(LocKeys.Common.AnotherDialogOpenDetail));
+                return null;
+            }
+
+            if (result != ContentDialogResult.Primary)
+                return null;
+
+            if (blocked.IsChecked == true)
+                return new HardBlockPolicy();
+
+            return new UnrestrictedPolicy { LocalNetworkOnly = unrestrictedLan.IsChecked == true };
+        }
+
         private async Task ShowAllowResultAsync(string title, string body)
         {
             var dialog = new ContentDialog
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = title,
                 Content = body,
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),
@@ -475,6 +616,8 @@ namespace SimpleDeFence.UI.Pages
                 target.Add(new ConnectionListItem
                 {
                     AppName = string.IsNullOrEmpty(first.AppName) ? Loc.T(LocKeys.Common.Unknown) : first.AppName,
+                    // Every row in the group shares this by construction - it is the grouping key.
+                    AppPath = first.AppPath,
                     Protocol = protocol,
                     // For Connected this asks where the traffic is going; for Open, whether the
                     // socket is confined to this machine or listening on every interface.
@@ -490,6 +633,16 @@ namespace SimpleDeFence.UI.Pages
                         : string.Empty,
                 });
             }
+        }
+
+        /// <summary>FlyoutBase.Opening for the "Show all" flyouts in the row templates. See
+        /// App.ApplyShellStyling: a flyout's presenter is created in the popup root, so it inherits
+        /// neither the theme nor the flow direction the shell applies to the window content, and
+        /// the Style that carries them has to be rebuilt each time the flyout opens.</summary>
+        private void Flyout_Opening(object sender, object e)
+        {
+            if (sender is Microsoft.UI.Xaml.Controls.Primitives.FlyoutBase flyout)
+                App.ApplyShellStyling(flyout);
         }
 
         private void SetBusy(bool busy)

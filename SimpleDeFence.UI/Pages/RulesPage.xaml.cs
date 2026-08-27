@@ -344,6 +344,16 @@ namespace SimpleDeFence.UI.Pages
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
 
+        /// <summary>FlyoutBase.Opening for the Add menu. See App.ApplyShellStyling: a flyout's
+        /// presenter is created in the popup root, so it inherits neither the theme nor the flow
+        /// direction the shell applies to the window content, and the Style that carries them has
+        /// to be rebuilt each time the flyout opens.</summary>
+        private void Flyout_Opening(object sender, object e)
+        {
+            if (sender is Microsoft.UI.Xaml.Controls.Primitives.FlyoutBase flyout)
+                App.ApplyShellStyling(flyout);
+        }
+
         /// <summary>MenuFlyoutItem.Click - a plain top-level Click, the same safe shape
         /// RemoveButton_Click/ApplyButton_Click already use, so committing and showing a result
         /// dialog directly from here is fine per the Task 4 reentrancy rule.</summary>
@@ -652,6 +662,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = pickTitle,
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
                 Content = panel,
@@ -806,6 +817,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 XamlRoot = xamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = title,
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
                 Content = panel,
@@ -996,6 +1008,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 XamlRoot = xamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = Loc.T(LocKeys.Tray.QuickAddConfirmTitle),
                 Content = Loc.T(LocKeys.Tray.QuickAddConfirmBody, displayName),
                 PrimaryButtonText = Loc.T(LocKeys.Tray.QuickAddConfirmAdd),
@@ -1014,6 +1027,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 XamlRoot = xamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = title,
                 Content = body,
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),
@@ -1034,6 +1048,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = confirmTitle,
                 Content = confirmBody,
                 PrimaryButtonText = Loc.T(LocKeys.Rules.Remove),
@@ -1216,6 +1231,7 @@ namespace SimpleDeFence.UI.Pages
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = title,
                 Content = body,
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),

@@ -91,6 +91,10 @@
     "filterPlaceholder": "Uygulama adına göre süz",
     "autoRefresh": "Otomatik yenileme",
     "allow": "Bu uygulamaya izin ver",
+    "allowDialog": {
+      "title": "Bu uygulamaya izin ver",
+      "body": "{0} uygulamasının ağı nasıl kullanabileceğini seçin."
+    },
     "allowSuccess": {
       "title": "Ayrıcalık eklendi",
       "body": "{0} artık bağlanabilir."

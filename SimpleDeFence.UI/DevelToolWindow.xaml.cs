@@ -209,11 +209,11 @@ namespace SimpleDeFence.UI
             const string HOSTS_OUT_NAME = "hosts.def";
             const string DESCRIPTOR_NAME = "update.json";
             const string DESCRIPTOR_TEMPLATE_NAME = "update_template.json";
-            const string MSI_FILENAME_X86 = "SimpleDeFence_x86.msi";
+            const string MSI_FILENAME_X64 = "SimpleDeFence_x64.msi";
             const string MSI_FILENAME_ARM64 = "SimpleDeFence_arm64.msi";
 
             string projectDir = UpdateInstallerProjectDir.Text;
-            string msiX86Path = Path.Combine(projectDir, @"bin\Release\" + MSI_FILENAME_X86);
+            string msiX64Path = Path.Combine(projectDir, @"bin\Release\" + MSI_FILENAME_X64);
             string msiArm64Path = Path.Combine(projectDir, @"bin\Release\" + MSI_FILENAME_ARM64);
             string hostsPath = Path.Combine(projectDir, @"Sources\CommonAppData\SimpleDeFence\hosts.bck");
             string profilesPath = Path.Combine(projectDir, @"Sources\CommonAppData\SimpleDeFence\profiles.json");
@@ -248,19 +248,39 @@ namespace SimpleDeFence.UI
 
                 var version_info = FileVersionInfo.GetVersionInfo(twAssemblyPath).ProductVersion!.Trim();
                 var timestamp = DateTime.UtcNow.ToString("O");
-                var update = new UpdateDescriptor
+                // x64 is required and arm64 is taken only if it happens to be there. The list used
+                // to be a fixed four with x86 and arm64 both mandatory, which meant prepare_module
+                // threw FileNotFoundException on the very first entry: SimpleDeFence.csproj
+                // hard-codes RuntimeIdentifier=win-x64, so neither of those MSIs has ever been
+                // produced by this repository and building an update descriptor could not succeed
+                // at all. Sniffing for the optional one keeps the door open for an arm64 build
+                // without pinning the tool to an installer that does not exist yet.
+                var modules = new List<UpdateModule>
                 {
-                    Modules = new UpdateModule[4]
-                    {
-                        prepare_module("SimpleDeFence_x86", msiX86Path, MSI_FILENAME_X86, version_info, false),
-                        prepare_module("SimpleDeFence_arm64", msiArm64Path, MSI_FILENAME_ARM64, version_info, false),
-                        prepare_module("Database", profilesPath, DB_OUT_NAME, timestamp, true),
-                        prepare_module("HostsFile", hostsPath, HOSTS_OUT_NAME, timestamp, true)
-                    }
+                    prepare_module(UpdateDescriptor.MODULE_NAME_MAINBIN_X64, msiX64Path, MSI_FILENAME_X64, version_info, false),
                 };
 
+                if (File.Exists(msiArm64Path))
+                    modules.Add(prepare_module(UpdateDescriptor.MODULE_NAME_MAINBIN_ARM64, msiArm64Path, MSI_FILENAME_ARM64, version_info, false));
+
+                modules.Add(prepare_module(UpdateDescriptor.MODULE_NAME_DATABASE, profilesPath, DB_OUT_NAME, timestamp, true));
+                modules.Add(prepare_module(UpdateDescriptor.MODULE_NAME_HOSTS, hostsPath, HOSTS_OUT_NAME, timestamp, true));
+
+                var update = new UpdateDescriptor { Modules = modules.ToArray() };
+
                 SerializationHelper.SerializeToFile(update, Path.Combine(UpdateOutput.Text, DESCRIPTOR_NAME));
-                update.Modules[3].DownloadHash = "[HOSTS_SHA256_PLACEHOLDER]";
+
+                // Found by name, not by position. This was update.Modules[3], which was only ever
+                // right while the array was a fixed four in a fixed order - the arm64 module is now
+                // present or absent depending on whether that installer was built, so an index here
+                // would silently stamp the placeholder onto the hosts file's hash or the database's,
+                // or throw. The template is the descriptor with the hosts hash blanked for the
+                // release pipeline to fill in, so writing it to the wrong module publishes a
+                // descriptor whose hash never matches and every client rejects the download.
+                var hostsModule = Array.Find(update.Modules, m => m.Component == UpdateDescriptor.MODULE_NAME_HOSTS)
+                    ?? throw new InvalidOperationException("The hosts module is missing from the descriptor just built.");
+                hostsModule.DownloadHash = "[HOSTS_SHA256_PLACEHOLDER]";
+
                 SerializationHelper.SerializeToFile(update, Path.Combine(UpdateOutput.Text, DESCRIPTOR_TEMPLATE_NAME));
             }
             catch (FileNotFoundException ex)

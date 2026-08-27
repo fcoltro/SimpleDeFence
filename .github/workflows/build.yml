@@ -112,9 +112,10 @@ jobs:
 
     # x64, matching the payload. The publish is win-x64 self-contained and the harvest above
     # runs -platform x64, which marks every generated component 64-bit; authoring those into an
-    # x86 package fails ICE validation and would target 32-bit Program Files. Note this is a
-    # separate axis from UpdateDescriptor.ISTALLER_ARCH_SUFFIX, which deliberately maps X64 to
-    # the "x86" module name - that name is only a lookup key for the descriptor, not a filename.
+    # x86 package fails ICE validation and would target 32-bit Program Files.
+    # UpdateDescriptor.ISTALLER_ARCH_SUFFIX now agrees with this and resolves to "x64" as well;
+    # it used to map X64 to "x86", which this note described as deliberate. It was not - it meant
+    # every client asked the update server for a module name nothing has ever published.
     - name: Build MSI
       if: matrix.configuration == 'Release'
       run: msbuild MsiSetup/MsiSetup.wixproj /p:Configuration=Release /p:Platform=x64

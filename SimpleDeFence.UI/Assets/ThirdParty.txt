@@ -17,9 +17,6 @@ Windows App SDK / WinUI 3
 CommunityToolkit.WinUI.Controls.SettingsControls
     .NET Foundation and Contributors - MIT
 
-H.NotifyIcon.WinUI
-    Konstantin S. - MIT
-
 System.Management
 System.Security.Cryptography.ProtectedData
 System.ServiceProcess.ServiceController

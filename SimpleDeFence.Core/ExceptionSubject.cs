@@ -295,7 +295,16 @@ namespace SimpleDeFence
             if (other is null)
                 return false;
 
-            if (other is ExecutableSubject o)
+            // GetType(), not "other is ExecutableSubject": ServiceSubject derives from this class,
+            // so the type test alone made a plain executable exception equal to a service-scoped one
+            // on path alone, while ServiceSubject.Equals - which additionally demands a matching
+            // ServiceName - answered false in the other direction. Equality that disagrees with
+            // itself depending on which operand is on the left is not a contract violation in the
+            // abstract here: ServerConfiguration.AddExceptions calls oldEx.Subject.Equals(newEx
+            // .Subject), so whether an exe-wide rule for svchost.exe silently absorbed - and
+            // deleted - the "Windows DNS Client" service rule came down to which of the two the
+            // configuration happened to hold already.
+            if (other.GetType() == GetType() && other is ExecutableSubject o)
                 return string.Equals(ExecutablePath, o.ExecutablePath, StringComparison.OrdinalIgnoreCase);
             else
                 return false;
@@ -308,9 +317,13 @@ namespace SimpleDeFence
                 const int OFFSET_BASIS = unchecked((int)2166136261u);
                 const int FNV_PRIME = 16777619;
 
+                // Hashed case-insensitively, to match the OrdinalIgnoreCase comparison in Equals.
+                // string.GetHashCode() is case-sensitive, so two subjects that Equals called equal
+                // could land in different buckets - harmless while nothing hashes these, and a
+                // silent dedup failure the day anything does.
                 int hash = OFFSET_BASIS;
                 if (null != ExecutablePath)
-                    hash = (hash ^ ExecutablePath.GetHashCode()) * FNV_PRIME;
+                    hash = (hash ^ StringComparer.OrdinalIgnoreCase.GetHashCode(ExecutablePath)) * FNV_PRIME;
 
                 return hash;
             }
@@ -374,11 +387,12 @@ namespace SimpleDeFence
                 const int OFFSET_BASIS = unchecked((int)2166136261u);
                 const int FNV_PRIME = 16777619;
 
+                // Case-insensitive, to match Equals - see ExecutableSubject.GetHashCode.
                 int hash = OFFSET_BASIS;
                 if (null != ExecutablePath)
-                    hash = (hash ^ ExecutablePath.GetHashCode()) * FNV_PRIME;
+                    hash = (hash ^ StringComparer.OrdinalIgnoreCase.GetHashCode(ExecutablePath)) * FNV_PRIME;
                 if (null != ServiceName)
-                    hash = (hash ^ ServiceName.GetHashCode()) * FNV_PRIME;
+                    hash = (hash ^ StringComparer.OrdinalIgnoreCase.GetHashCode(ServiceName)) * FNV_PRIME;
 
                 return hash;
             }

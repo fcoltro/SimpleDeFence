@@ -91,6 +91,10 @@
     "filterPlaceholder": "Filtrer par nom d'application",
     "autoRefresh": "Actualisation automatique",
     "allow": "Autoriser cette application",
+    "allowDialog": {
+      "title": "Autoriser cette application",
+      "body": "Choisissez comment {0} peut utiliser le réseau."
+    },
     "allowSuccess": {
       "title": "Exception ajoutée",
       "body": "{0} peut désormais se connecter."

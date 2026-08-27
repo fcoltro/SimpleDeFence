@@ -26,11 +26,27 @@ namespace SimpleDeFence
         public static readonly string ISTALLER_ARCH_SUFFIX = RuntimeInformation.ProcessArchitecture switch
         {
             Architecture.X86 => "x86",
-            Architecture.X64 => "x86",   // Selects the 32-bit installer even on x64. This is intentional as long as Win32 is supported.
+            // Was "x86", carried over from TinyWall with the note "selects the 32-bit installer
+            // even on x64, intentional as long as Win32 is supported". Nothing about that is true
+            // here: SimpleDeFence.csproj hard-codes RuntimeIdentifier=win-x64, the only installer
+            // the build produces is SimpleDeFence_x64.msi, and there is no 32-bit build to select.
+            // The effect was that the one architecture this product actually ships for asked the
+            // update server for a module named SimpleDeFence_x86, which nothing ever publishes -
+            // so the updater could never find an update, on every machine, silently.
+            Architecture.X64 => "x64",
             Architecture.Arm64 => "arm64",
             _ => throw new PlatformNotSupportedException()
         };
+        /// <summary>The module this running build asks the update server for.</summary>
         public static readonly string MODULE_NAME_MAINBIN = "SimpleDeFence_" + ISTALLER_ARCH_SUFFIX;
+
+        /// <summary>The module names an update descriptor may publish. They live here, beside the
+        /// suffix that consumes them, because they used to be typed as bare literals in
+        /// DevelToolWindow while the consumer built its name from ISTALLER_ARCH_SUFFIX - and the
+        /// two halves drifted apart without anything failing to compile.</summary>
+        public const string MODULE_NAME_MAINBIN_X64 = "SimpleDeFence_x64";
+        public const string MODULE_NAME_MAINBIN_ARM64 = "SimpleDeFence_arm64";
+
         public const string MODULE_NAME_HOSTS = "HostsFile";
         public const string MODULE_NAME_DATABASE = "Database";
 

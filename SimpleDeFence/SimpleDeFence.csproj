@@ -48,7 +48,12 @@
     <Company>fcoltro</Company>
     <Description>A free, lightweight and non-intrusive firewall. Fork of TinyWall.</Description>
     <Copyright>Copyright © 2011 Károly Pados, Copyright © 2026 fcoltro</Copyright>
-    <Version>0.1.0</Version>
+    <!-- Numeric, deliberately, with no "-beta" in it. FileVersionInfo.ProductVersion is what
+         DevelToolWindow writes into an update descriptor's ComponentVersion, and every client
+         parses that with Version.TryParse to decide whether an update is on offer - a suffix here
+         would publish a descriptor no client could read. The beta designation lives in the release
+         tag and the notes instead. -->
+    <Version>0.1.1</Version>
 
     <!-- Ship one language of satellite resources. The 34 localized .resx files this project
          inherited from TinyWall are gone, but NuGet packages carry their own satellites and
@@ -137,8 +142,19 @@
       <_FullPublishDir>$([System.IO.Path]::GetFullPath('$(PublishDir)'))</_FullPublishDir>
     </PropertyGroup>
     <ItemGroup>
-      <_XamlResourceToCopy Include="$(_FullOutDir)**\*.xbf" />
-      <_XamlResourceToCopy Include="$(_FullOutDir)**\*.pri" />
+      <!-- Excluding the publish directory itself matters, and is not theoretical: PublishDir
+           defaults to $(OutDir)publish\, so a plain `dotnet publish` with no -o makes the publish
+           output a subdirectory of the very tree these globs recurse through. The copy then puts
+           publish\*.pri into publish\publish\, and the next publish carries that forward into
+           publish\publish\publish\ - 11 MB of nested duplicate .pri files after a handful of
+           builds, all of it faithfully harvested into the MSI by heat.exe. Both forms are
+           excluded: $(_FullPublishDir) covers wherever -o points this time, and the literal
+           OutDir\publish covers a stale tree left behind by an earlier -o-less publish, which the
+           first exclusion would miss. -->
+      <_XamlResourceToCopy Include="$(_FullOutDir)**\*.xbf"
+                           Exclude="$(_FullPublishDir)**;$(_FullOutDir)publish\**" />
+      <_XamlResourceToCopy Include="$(_FullOutDir)**\*.pri"
+                           Exclude="$(_FullPublishDir)**;$(_FullOutDir)publish\**" />
       <_XamlResourceToCopy Include="$(_FullOutDir)Assets\**\*.*" />
       <_XamlResourceToCopy Include="$(_FullOutDir)Themes\**\*.*" />
     </ItemGroup>
@@ -172,6 +188,31 @@
        only, so the other 85 localize strings nobody using it will see, and WinUI falls back to
        en-us when a culture has no .mui of its own. Worth doing for the install directory as much
        as the ~4 MB: 86 folders of someone else's resources makes the folder unreadable. -->
+  <!-- Drop SimpleDeFence.UI's own apphost and its host config files.
+
+       SimpleDeFence.UI.csproj is OutputType=WinExe - UseWinUI's XAML compilation keys off it, and
+       switching it to Library changes how the .pri and the generated entry point are produced - so
+       it emits a SimpleDeFence.UI.exe of its own, which the ProjectReference then copies here. It
+       shipped in the install directory beside SimpleDeFence.exe, within a kilobyte of the same
+       size, and it is not inert: App.g.i.cs generates a Main, so double-clicking it in Program
+       Files starts the WinUI shell directly, skipping everything SimpleDeFence.exe does before
+       handing over. A second, half-initialised instance of a firewall's UI is a worse thing to
+       leave lying around than 0.6 MB.
+
+       Filtered rather than switched off at the source: UseAppHost=false is the obvious fix and the
+       SDK rejects it outright (NETSDK1067 - a self-contained app must have an apphost), and that
+       project is self-contained because WindowsAppSDKSelfContained needs it to be. The .deps.json
+       and .runtimeconfig.json go with it; both exist only to start that exe, and the app reads
+       SimpleDeFence.deps.json instead. -->
+  <Target Name="RemoveUiApphostFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+        Condition="'%(RelativePath)' == 'SimpleDeFence.UI.exe'
+                or '%(RelativePath)' == 'SimpleDeFence.UI.deps.json'
+                or '%(RelativePath)' == 'SimpleDeFence.UI.runtimeconfig.json'" />
+    </ItemGroup>
+  </Target>
+
   <Target Name="TrimWinUiMuiLanguages" AfterTargets="ComputeResolvedFilesToPublishList">
     <ItemGroup>
       <ResolvedFileToPublish

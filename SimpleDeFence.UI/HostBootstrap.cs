@@ -114,7 +114,7 @@ namespace SimpleDeFence.UI
                 void OnRootLoaded(object sender, RoutedEventArgs e)
                 {
                     root.Loaded -= OnRootLoaded;
-                    _ = ShowAsync(window, new PasswordPromptDialog { XamlRoot = root.XamlRoot, FlowDirection = App.UiFlowDirection });
+                    _ = ShowAsync(window, new PasswordPromptDialog { XamlRoot = root.XamlRoot, FlowDirection = App.UiFlowDirection, RequestedTheme = App.UiElementTheme });
                 }
                 root.Loaded += OnRootLoaded;
                 window.Content = root;

@@ -109,6 +109,8 @@
             public const string FilterPlaceholder = "connections.filterPlaceholder";
             public const string AutoRefresh = "connections.autoRefresh";
             public const string Allow = "connections.allow";
+            public const string AllowDialogTitle = "connections.allowDialog.title";
+            public const string AllowDialogBody = "connections.allowDialog.body";
             public const string AllowSuccessTitle = "connections.allowSuccess.title";
             public const string AllowSuccessBody = "connections.allowSuccess.body";
             public const string AllowFailedTitle = "connections.allowFailed.title";

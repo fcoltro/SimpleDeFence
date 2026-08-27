@@ -2164,10 +2164,27 @@ namespace SimpleDeFence
                 return;
             }
 
-            // Certain things we don't want to whitelist
+            // Certain things we don't want to whitelist.
+            //
+            // The svchost test is on the file name, not on the whole path. It used to compare
+            // entry.AppPath - a full Win32 path by this point, ConvertPathIgnoreErrors then
+            // GetExactPath in FirewallLogWatcher.ParseLogEntry - against the bare string
+            // "svchost.exe", which is never equal to "C:\Windows\System32\svchost.exe". The guard
+            // has therefore never fired, and the one binary it exists to keep out is the one that
+            // hosts most of Windows' services: a single Learning-mode session whitelisted svchost
+            // with AppDatabase's fallback policy, TcpUdpPolicy(unrestricted: true) - every TCP and
+            // UDP port, inbound and outbound - and CommitLearnedRules made it permanent. Every
+            // service sharing that host, RemoteRegistry and WinRM included, inherited it.
+            //
+            // "System" is left comparing the whole value on purpose: for kernel traffic AppPath is
+            // literally the string "System", not a path, so there is no file name to take.
+            var appFileName = string.IsNullOrEmpty(entry.AppPath)
+                ? string.Empty
+                : System.IO.Path.GetFileName(entry.AppPath);
+
             if (string.IsNullOrEmpty(entry.AppPath)
                 || string.Equals(entry.AppPath, "System", StringComparison.InvariantCultureIgnoreCase)
-                || string.Equals(entry.AppPath, "svchost.exe", StringComparison.InvariantCultureIgnoreCase)
+                || string.Equals(appFileName, "svchost.exe", StringComparison.InvariantCultureIgnoreCase)
                 )
                 return;
 

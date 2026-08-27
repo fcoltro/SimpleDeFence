@@ -1,7 +1,5 @@
-﻿using H.NotifyIcon;
-using Microsoft.UI.Dispatching;
+﻿using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
 using SimpleDeFence.Localization;
 using System;
 using System.Threading.Tasks;
@@ -15,7 +13,9 @@ namespace SimpleDeFence.UI.Services
     /// </summary>
     internal sealed class TrayIconService : IDisposable
     {
-        private readonly TaskbarIcon _icon;
+        private readonly NotifyIcon _icon;
+        private readonly TrayMenuHost _menuHost;
+        private readonly MenuFlyout _menu;
         private readonly WindowHotkeys _hotkeys;
         private readonly DispatcherQueue _dispatcher;
         private readonly ToggleMenuFlyoutItem _allowLocalSubnetItem;
@@ -23,8 +23,8 @@ namespace SimpleDeFence.UI.Services
 
         /// <summary>The mode the icon and tooltip currently show. IFirewallClient.Changed fires on
         /// every refresh - including ConnectionsPage's periodic auto-refresh - so without this the
-        /// icon would be rebuilt (a BitmapImage plus the HICON H.NotifyIcon derives from it) every
-        /// few seconds for a mode that has not moved.</summary>
+        /// icon would be reloaded from disk (a LoadImage plus the DestroyIcon of the one it
+        /// replaces) every few seconds for a mode that has not moved.</summary>
         private FirewallMode _shownMode = (FirewallMode)(-1);
 
         /// <summary>Which artwork variant is on screen. Paired with _shownMode in the early-out
@@ -50,31 +50,33 @@ namespace SimpleDeFence.UI.Services
 
             _dispatcher = window.DispatcherQueue;
 
-            _icon = new TaskbarIcon
-            {
-                // SecondWindow, not the PopupMenu default: PopupMenu mode renders the flyout as a
-                // native Win32 menu, which cannot host WinUI's MenuFlyoutSubItem (the mode
-                // submenu) or ToggleMenuFlyoutItem checkmarks.
-                ContextMenuMode = ContextMenuMode.SecondWindow,
-            };
-
             _allowLocalSubnetItem = new ToggleMenuFlyoutItem { Text = Loc.T(LocKeys.Tray.AllowLocalSubnet), MinWidth = TrayMenuItemMinWidth };
             _hostsBlocklistItem = new ToggleMenuFlyoutItem { Text = Loc.T(LocKeys.Tray.EnableHostsBlocklist), MinWidth = TrayMenuItemMinWidth };
 
-            _icon.ContextFlyout = BuildMenu();
+            _menu = BuildMenu();
+            _menuHost = new TrayMenuHost();
+            // The host window has to come down once the menu it was propping up is gone, or a
+            // transparent always-on-top pixel stays at the corner of the screen holding foreground.
+            _menu.Closed += (_, _) => _menuHost.Hide();
 
+            // WindowHotkeys owns the main window's only WndProc subclass, and the notification
+            // icon needs to receive its callback message through that same subclass - so it is
+            // constructed before the icon rather than after, unlike the order this used to run in.
+            _hotkeys = new WindowHotkeys(window);
+            _hotkeys.SystemColorsChanged += OnSystemColorsChanged;
+
+            _icon = new NotifyIcon(_hotkeys.Handle, _hotkeys);
             // Closing the window now hides it rather than quitting, so the icon has to be a way
             // back and not just a menu host - clicking a tray icon and having nothing happen is
             // how an app looks broken.
-            _icon.LeftClickCommand = new DelegateCommand(ShowMainWindow);
-            // Nothing puts a TaskbarIcon into the visual tree here (it is created in code, not
-            // declared in XAML), so it never gets a Loaded pass of its own to create the icon.
-            // enablesEfficiencyMode: false because this app has a real, visible main window -
-            // ForceCreate's default puts the process into EcoQoS, which is for tray-only apps.
-            _icon.ForceCreate(enablesEfficiencyMode: false);
+            _icon.Selected += ShowMainWindow;
+            _icon.ContextMenuRequested += ShowTrayMenu;
 
-            _hotkeys = new WindowHotkeys(window);
-            _hotkeys.SystemColorsChanged += OnSystemColorsChanged;
+            // Icon and tooltip before Create, so the icon never appears in the notification area
+            // blank and then fills in.
+            UpdateModeIcon();
+            _icon.Create();
+
             ApplyHotkeySetting(ClientSettings.Load().EnableGlobalHotkeys);
 
             App.Firewall.Changed += OnFirewallChanged;
@@ -114,15 +116,14 @@ namespace SimpleDeFence.UI.Services
                 window.ShowFromTray();
         }
 
-        /// <summary>Just enough ICommand for the tray icon; there is no MVVM framework here to
-        /// borrow one from.</summary>
-        private sealed class DelegateCommand : System.Windows.Input.ICommand
+        /// <summary>Right click on the icon. The shell hands over the point it wants the menu
+        /// anchored at, in physical screen pixels; TrayMenuHost takes it from there.</summary>
+        private void ShowTrayMenu(int screenX, int screenY)
         {
-            private readonly Action _execute;
-            public DelegateCommand(Action execute) => _execute = execute;
-            public event EventHandler? CanExecuteChanged { add { } remove { } }
-            public bool CanExecute(object? parameter) => true;
-            public void Execute(object? parameter) => _execute();
+            if (_disposed)
+                return;
+
+            _menuHost.Show(_menu, screenX, screenY);
         }
 
         /// <summary>Called from the Settings page when the user flips "Enable global hotkeys" -
@@ -179,6 +180,13 @@ namespace SimpleDeFence.UI.Services
         private MenuFlyout BuildMenu()
         {
             var menu = new MenuFlyout();
+
+            // On Opening, not once here: this menu is built a single time and parked on
+            // ContextFlyout for the life of the process, so a theme chosen later on the Settings
+            // page would never reach a style applied at construction. It matters more here than
+            // anywhere else - TrayMenuHost puts this menu in a window of its own, with a
+            // XamlRoot that shares nothing with the shell.
+            menu.Opening += (_, _) => App.ApplyShellStyling(menu);
 
             var modeNormal = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.ModeNormal), MinWidth = TrayMenuItemMinWidth };
             modeNormal.Click += (_, _) => _ = SwitchModeAsync(FirewallMode.Normal);
@@ -245,7 +253,7 @@ namespace SimpleDeFence.UI.Services
 
             var quit = new MenuFlyoutItem { Text = Loc.T(LocKeys.Tray.Quit), MinWidth = TrayMenuItemMinWidth };
             // Dispose before Exit, the same order mnuQuit_Click uses (Tray.Visible = false, then
-            // ExitThread): process teardown is not guaranteed to run TaskbarIcon's finalizer, and an
+            // ExitThread): process teardown is not guaranteed to run NotifyIcon's finalizer, and an
             // icon left in the notification area after the app is gone is a ghost the user has to
             // hover over to clear.
             quit.Click += (_, _) =>
@@ -311,12 +319,17 @@ namespace SimpleDeFence.UI.Services
             // theme-aware assets, while ours is an HICON the shell blits unchanged. A light taskbar
             // needs the dark artwork and vice versa.
             var variant = lightTaskbar ? "lighttheme" : "darktheme";
-            var iconUri = $"ms-appx:///Assets/TrayIcons/trayicon_{colour}_{variant}.ico";
 
-            _icon.IconSource = new BitmapImage(new Uri(iconUri));
+            // A path on disk, not the ms-appx:/// URI this used to pass to a BitmapImage: LoadImage
+            // reads files, and this app is unpackaged, so there is no package to resolve ms-appx
+            // against - BaseDirectory is the same Assets\TrayIcons the URI was pointing at anyway.
+            var iconPath = System.IO.Path.Combine(
+                AppContext.BaseDirectory, "Assets", "TrayIcons", $"trayicon_{colour}_{variant}.ico");
+
+            _icon.SetIcon(iconPath);
             // Same two-line shape as WinForms' Tray.Text: the product name, then which mode it is
             // in - the whole point of a per-mode icon is knowing the mode without opening anything.
-            _icon.ToolTipText = $"SimpleDeFence\n{Loc.T(LocKeys.Nav.ModeChip)}: {Loc.T(labelKey)}";
+            _icon.SetTooltip($"SimpleDeFence\n{Loc.T(LocKeys.Nav.ModeChip)}: {Loc.T(labelKey)}");
             _shownMode = mode;
             _shownLightTheme = lightTaskbar;
         }
@@ -345,7 +358,7 @@ namespace SimpleDeFence.UI.Services
         ///
         /// Instance method, not static: the success path needs to Dispose() this TrayIconService
         /// before exiting, the same reason the Quit handler does - process teardown is not
-        /// guaranteed to run TaskbarIcon's finalizer, and relaunching elevated is at least as common
+        /// guaranteed to run NotifyIcon's finalizer, and relaunching elevated is at least as common
         /// an exit path as Quit, so it must not risk a ghost icon either.</summary>
         private async Task ElevateSelfAsync()
         {
@@ -414,6 +427,7 @@ namespace SimpleDeFence.UI.Services
             {
                 XamlRoot = xamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = title,
                 Content = body,
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),
@@ -436,8 +450,16 @@ namespace SimpleDeFence.UI.Services
 
             App.Firewall.Changed -= OnFirewallChanged;
             _hotkeys.SystemColorsChanged -= OnSystemColorsChanged;
-            _hotkeys.Dispose();
+            _icon.Selected -= ShowMainWindow;
+            _icon.ContextMenuRequested -= ShowTrayMenu;
+
+            // The icon first, and before the WndProc subclass it sends its callback through is
+            // unhooked: NIM_DELETE is what actually takes the icon out of the notification area,
+            // and an icon left behind is the ghost the Quit and Elevate paths already go out of
+            // their way to avoid.
             _icon.Dispose();
+            _menuHost.Dispose();
+            _hotkeys.Dispose();
         }
     }
 }

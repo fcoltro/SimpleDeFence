@@ -91,6 +91,10 @@
     "filterPlaceholder": "按应用程序名称筛选",
     "autoRefresh": "自动刷新",
     "allow": "允许此应用程序",
+    "allowDialog": {
+      "title": "允许此应用",
+      "body": "选择 {0} 可以如何使用网络。"
+    },
     "allowSuccess": {
       "title": "已添加例外",
       "body": "{0} 现在可以连接了。"

@@ -91,6 +91,10 @@
     "filterPlaceholder": "Saring menurut nama aplikasi",
     "autoRefresh": "Segarkan otomatis",
     "allow": "Izinkan aplikasi ini",
+    "allowDialog": {
+      "title": "Izinkan aplikasi ini",
+      "body": "Pilih bagaimana {0} boleh menggunakan jaringan."
+    },
     "allowSuccess": {
       "title": "Pengecualian ditambahkan",
       "body": "{0} kini dapat terhubung."

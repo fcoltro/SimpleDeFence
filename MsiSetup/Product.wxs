@@ -75,14 +75,11 @@
       <ComponentRef Id='ProgramMenuDir' />
       <ComponentRef Id='RemoveAppDataDir' />
       <ComponentRef Id='RegistryKeys' />
-      <ComponentRef Id='License' />
-      <ComponentRef Id='Attributions' />
       <ComponentRef Id='Database' />
       <ComponentRef Id='hosts' />
       <!-- Everything under the publish root - runtime, app DLL, satellite resource assemblies,
            .deps.json/.runtimeconfig.json - comes from the heat-harvested group in Dependencies.wxs. -->
       <ComponentGroupRef Id='PublishedDependencies' />
-      <ComponentGroupRef Id='Documentation' />
     </Feature>
 
     <!-- Search for older versions -->
@@ -176,12 +173,21 @@
           <!-- MainExecutableConfig removed: SimpleDeFence.exe.config is a .NET Framework convention.
                The net10 equivalent (SimpleDeFence.dll.config, from app.config) plus .deps.json and
                .runtimeconfig.json all sit in the publish root and are picked up by the harvest. -->
-          <Component Id="License" Guid="{205DCF42-A705-401A-9868-015BA855B5DB}" Win64="$(var.Win64)">
-            <File Id="LicenseRTF" Source="Sources\ProgramFiles\SimpleDeFence\License.rtf" KeyPath="yes" />
-          </Component>
-          <Component Id="Attributions" Guid="{2FE1A628-B97D-4C67-B240-F1A0971310EB}" Win64="$(var.Win64)">
-            <File Id="AttributionsTXT" Source="Sources\ProgramFiles\SimpleDeFence\Attributions.txt" KeyPath="yes" />
-          </Component>
+          <!-- The License and Attributions components are gone: both dropped a file into the
+               program directory that nothing read.
+
+               About used to open License.rtf and Attributions.txt from beside the exe. It no longer
+               does - SimpleDeFence.UI.csproj embeds the repository's own LICENSE.txt and
+               Assets\ThirdParty.txt as resources instead, precisely so the buttons cannot fail on a
+               missing file - so these two were dead weight from that change onwards. Attributions
+               .txt was also stale on its own terms: it credited translators for the 34 localized
+               .resx files this fork deleted, and icon authors for WinForms bitmaps the WinUI shell
+               replaced with Segoe Fluent glyphs.
+
+               Sources\ProgramFiles\SimpleDeFence\License.rtf itself stays where it is. It is still
+               live as the WixUILicenseRtf variable below - the licence page the installer shows
+               before the user agrees - which is a different job from shipping a copy on disk. -->
+
           <!-- The 17 hand-authored LOCDIR_* satellite-assembly components that used to live here
                were removed for the same reason as the Dependencies group below: `dotnet publish`
                emits every SimpleDeFence.resources.dll into <publish>\<lang>\, so the harvest already
@@ -190,19 +196,13 @@
                The harvest is also strictly broader than this list was - it additionally carries the
                WinForms runtime's own zh-Hans/zh-Hant resource assemblies, which the hand-authored
                list never covered. -->
-          <Directory Id="DOCDIR" Name="doc">
-            <Component Id="DocFAQComp" Win64="$(var.Win64)">
-              <File Id="DocFAQFile" Source="Sources\ProgramFiles\SimpleDeFence\doc\faq.html" Vital="yes" KeyPath="yes" Checksum="yes" />
-            </Component>
-            <Directory Id="DOCCSSDIR" Name="css">
-              <Component Id="DocCss00Comp" Win64="$(var.Win64)">
-                <File Id="DocCss00File" Source="Sources\ProgramFiles\SimpleDeFence\doc\css\1140.css" Vital="yes" KeyPath="yes" Checksum="yes" />
-              </Component>
-              <Component Id="DocCss02Comp" Win64="$(var.Win64)">
-                <File Id="DocCss02File" Source="Sources\ProgramFiles\SimpleDeFence\doc\css\style.css" Vital="yes" KeyPath="yes" Checksum="yes" />
-              </Component>
-            </Directory>
-          </Directory>
+          <!-- The doc\ directory and its faq.html + css\ are gone. The FAQ was TinyWall's, shipped
+               verbatim and never rewritten: its title, its answers and its links all described a
+               different product, told the reader they could get the source from pylorak/TinyWall,
+               and pointed at tinywall.pados.hu for older builds. A Start Menu entry named "FAQ"
+               led straight to it. Nothing about it was true of this app, so it is removed rather
+               than left to mislead; the Website and Release Notes shortcuts still point at this
+               project's own pages. -->
         </Directory>
       </Directory>
       
@@ -239,7 +239,6 @@
               <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 12" Value="1" />                         <!-- System.AppUserModel.StartPinOption, http://support.microsoft.com/kb/2745126/en-us -->
               <ShortcutProperty Key="{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}, 8" Value="1" />                          <!-- System.AppUserModel.ExcludeFromShowInNewInstall -->
             </Shortcut>
-            <Shortcut Id="FAQShortcut" Directory="ProgramMenuDir" Name="FAQ" Target="[INSTALLDIR]doc\faq.html"/>
             <util:InternetShortcut Id="WebsiteShortcut" Name="Website" Target="$(var.ProductURL)"/>
             <util:InternetShortcut Id="ReleaseNotesShortcut" Name="Release Notes" Target="$(var.ReleaseNotesURL)"/>
             <!-- <Shortcut Id="UninstallProduct"
@@ -272,13 +271,9 @@
     <!-- Localization groupping - likewise harvested; see the note where the LOCDIR_* directories
          used to be. -->
 
-    <!-- Documentation groupping -->
-    <ComponentGroup Id="Documentation">
-      <ComponentRef Id="DocFAQComp"/>
-      <ComponentRef Id="DocCss00Comp"/>
-      <ComponentRef Id="DocCss02Comp"/>
-    </ComponentGroup>
-    
+    <!-- The Documentation ComponentGroup is gone with the doc\ directory it carried; see the note
+         where DOCDIR used to be. -->
+
   </Fragment>
 
 </Wix>

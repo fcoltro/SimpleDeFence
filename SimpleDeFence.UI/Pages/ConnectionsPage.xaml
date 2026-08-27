@@ -5,6 +5,76 @@
     xmlns:local="using:SimpleDeFence.UI.Pages"
     xmlns:loc="using:SimpleDeFence.UI.Localization">
     <Page.Resources>
+        <!-- Hover highlight for the three lists.
+
+             The rows had none. The default ListViewItem paints its pointer-over backplate behind
+             the content presenter, and every row template here starts with an opaque Border filling
+             the whole row - the red/yellow classification fill - so the backplate was painted and
+             then covered by it, on every row that had a fill. Nothing about the pointer was visible,
+             which on a list where each row carries its own action reads as the list being inert.
+
+             So the wash moves on top of the content instead of behind it, which is the one thing the
+             stock template cannot be talked into doing through Setters alone. It is
+             SubtleFillColorSecondaryBrush - the same low-alpha brush Fluent uses for hover - so the
+             classification fill still reads through it rather than being replaced.
+
+             Selection states are deliberately absent: all three lists are SelectionMode="None" and
+             there is nothing to select. Padding is zeroed because the row templates bring their own
+             (12,8). -->
+        <Style x:Key="ConnectionRowContainerStyle" TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <!-- Background="Transparent" is load-bearing, not decoration. A Panel with a
+                             null Background takes no part in hit testing in WinUI, so pointer events
+                             over it fall straight through and the item never enters PointerOver.
+                             Every row template paints its classification fill with a Border that is
+                             Collapsed when it does not apply, and the Connected and Open rows carry
+                             only the local-network one - so on any ordinary internet connection the
+                             whole row was blank, unhittable, and the hover this Style exists to add
+                             never appeared. It worked on the Blocked list only because those rows
+                             carry two complementary Borders and so always paint one.
+
+                             Setting it here rather than on each of the six templates puts the
+                             hit-test surface on the container, where it covers the row's full width
+                             including the gaps between cells. -->
+                        <Grid Background="Transparent">
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              ContentTransitions="{TemplateBinding ContentTransitions}"
+                                              Padding="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <!-- IsHitTestVisible="False" so the wash never intercepts a click meant
+                                 for the Allow or "Show all" button underneath it. -->
+                            <Rectangle x:Name="HoverOverlay"
+                                       Fill="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                       Opacity="0" IsHitTestVisible="False"/>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="HoverOverlay.Opacity" Value="1"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="HoverOverlay.Opacity" Value="1"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Two templates per list, wide and folded, generated from one definition so they
              cannot drift apart. Below 1000px the page swaps every list to the folded
              pair: the detail, "Show all" and the timestamp drop to a second line under the app
@@ -16,7 +86,7 @@
              groups are only evaluated on a control template root - so the first attempt at
              this simply did nothing. -->
         <DataTemplate x:Key="BlockedRowWide" x:DataType="local:BlockedListItem">
-            <Grid>
+            <Grid ToolTipService.ToolTip="{x:Bind TooltipText}">
                 <!-- Row fills. Yellow means every address on this row stayed on the local network;
                      the legend above the lists says so. -->
                 <Border Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" Visibility="{x:Bind RemoteVisibility}"/>
@@ -54,7 +124,7 @@
                     <Button Grid.Row="0" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
                             Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
                         <Button.Flyout>
-                            <Flyout>
+                            <Flyout Opening="Flyout_Opening">
                                 <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
                                     <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
                                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
@@ -96,7 +166,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="BlockedRowNarrow" x:DataType="local:BlockedListItem">
-            <Grid>
+            <Grid ToolTipService.ToolTip="{x:Bind TooltipText}">
                 <!-- Row fills. Yellow means every address on this row stayed on the local network;
                      the legend above the lists says so. -->
                 <Border Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" Visibility="{x:Bind RemoteVisibility}"/>
@@ -134,7 +204,7 @@
                     <Button Grid.Row="1" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
                             Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
                         <Button.Flyout>
-                            <Flyout>
+                            <Flyout Opening="Flyout_Opening">
                                 <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
                                     <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
                                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
@@ -176,7 +246,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ConnectedRowWide" x:DataType="local:ConnectionListItem">
-            <Grid>
+            <Grid ToolTipService.ToolTip="{x:Bind TooltipText}">
                 <!-- Row fills. Yellow means every address on this row stayed on the local network;
                      the legend above the lists says so. -->
                 <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
@@ -210,7 +280,7 @@
                     <Button Grid.Row="0" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
                             Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
                         <Button.Flyout>
-                            <Flyout>
+                            <Flyout Opening="Flyout_Opening">
                                 <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
                                     <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
                                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
@@ -248,7 +318,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ConnectedRowNarrow" x:DataType="local:ConnectionListItem">
-            <Grid>
+            <Grid ToolTipService.ToolTip="{x:Bind TooltipText}">
                 <!-- Row fills. Yellow means every address on this row stayed on the local network;
                      the legend above the lists says so. -->
                 <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
@@ -282,7 +352,7 @@
                     <Button Grid.Row="1" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
                             Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
                         <Button.Flyout>
-                            <Flyout>
+                            <Flyout Opening="Flyout_Opening">
                                 <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
                                     <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
                                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
@@ -320,7 +390,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="OpenRowWide" x:DataType="local:ConnectionListItem">
-            <Grid>
+            <Grid ToolTipService.ToolTip="{x:Bind TooltipText}">
                 <!-- Row fills. Yellow means every address on this row stayed on the local network;
                      the legend above the lists says so. -->
                 <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
@@ -354,7 +424,7 @@
                     <Button Grid.Row="0" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
                             Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
                         <Button.Flyout>
-                            <Flyout>
+                            <Flyout Opening="Flyout_Opening">
                                 <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
                                     <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
                                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
@@ -388,7 +458,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="OpenRowNarrow" x:DataType="local:ConnectionListItem">
-            <Grid>
+            <Grid ToolTipService.ToolTip="{x:Bind TooltipText}">
                 <!-- Row fills. Yellow means every address on this row stayed on the local network;
                      the legend above the lists says so. -->
                 <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" Visibility="{x:Bind LocalVisibility}"/>
@@ -422,7 +492,7 @@
                     <Button Grid.Row="1" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
                             Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
                         <Button.Flyout>
-                            <Flyout>
+                            <Flyout Opening="Flyout_Opening">
                                 <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
                                     <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
                                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
@@ -534,6 +604,7 @@
                         <TextBlock x:Name="BlockedEmpty" Text="{loc:Loc Key=connections.empty.blocked}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
                         <ListView x:Name="BlockedList" SelectionMode="None"
+                                  ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource BlockedRowWide}"/>
                     </StackPanel>
                 </Expander>
@@ -549,6 +620,7 @@
                         <TextBlock x:Name="ConnectedEmpty" Text="{loc:Loc Key=connections.empty.connected}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
                         <ListView x:Name="ConnectedList" SelectionMode="None"
+                                  ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource ConnectedRowWide}"/>
                     </StackPanel>
                 </Expander>
@@ -564,6 +636,7 @@
                         <TextBlock x:Name="OpenEmpty" Text="{loc:Loc Key=connections.empty.open}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
                         <ListView x:Name="OpenList" SelectionMode="None"
+                                  ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource OpenRowWide}"/>
                     </StackPanel>
                 </Expander>

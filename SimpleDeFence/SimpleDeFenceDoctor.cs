@@ -326,7 +326,24 @@ namespace SimpleDeFence
                 // The new inherited set does not displace an explicit entry already on a child, and
                 // an explicit full-control entry is exactly what a pre-created file carries. Strip
                 // them so the directory's rules are the only ones in play.
-                foreach (var child in root.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
+                //
+                // AttributesToSkip carries the ReparsePoint bit, and that is the whole security of
+                // this loop. SearchOption.AllDirectories - which this used to pass - walks *through*
+                // junctions, and everything below runs as LocalSystem stripping explicit ACEs and
+                // re-enabling inheritance. The "logs" grant further down hands Users the Modify
+                // right on a directory inside this tree, so an unprivileged user can drop a junction
+                // in it pointing at, say, C:\Users; this method runs again on the next service
+                // start, walks into it, and strips the explicit ACEs off every profile directory it
+                // finds - handing the attacker whatever C:\Users inherits down onto every other
+                // user's profile. Skipping reparse points leaves the junction itself untouched and
+                // never follows it. The default AttributesToSkip (Hidden|System) is deliberately
+                // dropped: a hidden or system file in our own data directory still needs cleaning.
+                var walk = new EnumerationOptions
+                {
+                    RecurseSubdirectories = true,
+                    AttributesToSkip = FileAttributes.ReparsePoint,
+                };
+                foreach (var child in root.EnumerateFileSystemInfos("*", walk))
                     ClearExplicitAccessRules(child, logContext);
 
                 // One exception, carved as narrowly as it can be: the tray icon and GUI run as the

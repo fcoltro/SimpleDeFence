@@ -91,6 +91,10 @@
     "filterPlaceholder": "Nach Anwendungsnamen filtern",
     "autoRefresh": "Automatisch aktualisieren",
     "allow": "Diese Anwendung erlauben",
+    "allowDialog": {
+      "title": "Diese App zulassen",
+      "body": "Wählen Sie, wie {0} das Netzwerk nutzen darf."
+    },
     "allowSuccess": {
       "title": "Ausnahme hinzugefügt",
       "body": "{0} kann sich jetzt verbinden."

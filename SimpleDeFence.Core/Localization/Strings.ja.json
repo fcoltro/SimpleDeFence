@@ -91,6 +91,10 @@
     "filterPlaceholder": "アプリケーション名で絞り込み",
     "autoRefresh": "自動更新",
     "allow": "このアプリケーションを許可",
+    "allowDialog": {
+      "title": "このアプリを許可",
+      "body": "{0} がネットワークをどのように使用できるかを選択します。"
+    },
     "allowSuccess": {
       "title": "例外を追加しました",
       "body": "{0} は接続できるようになりました。"

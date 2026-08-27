@@ -43,6 +43,28 @@ namespace SimpleDeFence
             }
         }
 
+        /// <summary>FileMatchesHash against an already-open stream, so a caller can verify and then
+        /// use the very bytes it verified. The path-based overload cannot promise that: it opens the
+        /// file, hashes it, closes it, and whatever happens to the file afterwards is not covered by
+        /// the answer it gave. Same refusal semantics - no published hash means no.</summary>
+        public static bool StreamMatchesHash(Stream stream, string? expectedHash)
+        {
+            if (string.IsNullOrWhiteSpace(expectedHash))
+                return false;
+
+            try
+            {
+                if (stream.CanSeek)
+                    stream.Position = 0;
+
+                return HashStream(stream).Equals(expectedHash, System.StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static string HashFileSha1(string filePath)
         {
             using FileStream fs = new(filePath, FileMode.Open, FileAccess.Read);

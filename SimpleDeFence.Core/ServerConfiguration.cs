@@ -74,11 +74,21 @@ namespace SimpleDeFence
             {
                 foreach (var newEx in newList)
                 {
+                    // Both arms below break out of the inner loop, because both consume oldEx: once
+                    // it has been removed from AppExceptions there is nothing left to match against,
+                    // and the loop used to carry on offering it to every remaining newEx. When two
+                    // entries in newList shared a subject - which is ordinary, GetExceptionsForApp
+                    // returns several components of one application - the same old policy was merged
+                    // into each of them in turn, and the second Remove was a silent no-op. One
+                    // exception went in and several came out, each carrying the old policy's union
+                    // and a freshly regenerated Id, so nothing downstream could tell they were
+                    // duplicates and every rule install emitted duplicate WFP filters for them.
                     if (oldEx.Id.Equals(newEx.Id))
                     {
                         // With equal exception IDs, keep only the newer one.
                         // Two exceptions can have the same IDs if the user just edited one.
                         AppExceptions.Remove(oldEx);
+                        break;
                     }
                     else if (oldEx.Subject.Equals(newEx.Subject)
                         && (oldEx.Timer == AppExceptionTimer.Permanent)
@@ -92,6 +102,7 @@ namespace SimpleDeFence
                             AppExceptions.Remove(oldEx);
                             newEx.Policy = newPolicy;
                             newEx.RegenerateId();
+                            break;
                         }
                     }
                 }

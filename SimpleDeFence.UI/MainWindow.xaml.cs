@@ -287,9 +287,6 @@ namespace SimpleDeFence.UI
                 return;
             }
 
-            // No FlowDirection here: FlyoutBase does not expose one, and its presenter takes the
-            // direction from the element it is shown at - the mode chip, which is inside the
-            // flipped root.
             var menu = new MenuFlyout();
             foreach (var info in FirewallModes.Selectable)
             {
@@ -299,6 +296,11 @@ namespace SimpleDeFence.UI
                 menu.Items.Add(item);
             }
 
+            // FlyoutBase exposes neither FlowDirection nor RequestedTheme, so the presenter is
+            // styled instead - see App.ApplyShellStyling. The direction did arrive on its own, from
+            // the chip this is shown at; the theme does not, because the presenter lives in the
+            // popup root rather than under the flipped-and-themed window content.
+            App.ApplyShellStyling(menu);
             menu.ShowAt(ModeChip);
         }
 
@@ -346,6 +348,7 @@ namespace SimpleDeFence.UI
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = Loc.T(LocKeys.Mode.LearningConfirmTitle),
                 Content = Loc.T(LocKeys.Mode.LearningConfirmBody),
                 PrimaryButtonText = Loc.T(LocKeys.Mode.LearningConfirmConfirm),
@@ -362,6 +365,7 @@ namespace SimpleDeFence.UI
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
                 Title = title,
                 Content = body,
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),

@@ -91,6 +91,10 @@
     "filterPlaceholder": "Filtra per nome dell'applicazione",
     "autoRefresh": "Aggiornamento automatico",
     "allow": "Consenti questa applicazione",
+    "allowDialog": {
+      "title": "Consenti questa app",
+      "body": "Scegli come {0} può usare la rete."
+    },
     "allowSuccess": {
       "title": "Eccezione aggiunta",
       "body": "Ora {0} può connettersi."

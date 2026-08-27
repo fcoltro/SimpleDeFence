@@ -71,6 +71,23 @@ namespace SimpleDeFence.UI
         internal static FlowDirection UiFlowDirection
             => Loc.IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
+        /// <summary>
+        /// The theme every popup has to be told, for exactly the reason <see cref="UiFlowDirection"/>
+        /// documents above: a ContentDialog, a Flyout and a MenuFlyout are all parented to the
+        /// XamlRoot's popup root, which is a sibling of the window content rather than a descendant
+        /// of it, so the RequestedTheme <see cref="ApplyTheme"/> sets on that content never reaches
+        /// them. Switching the app to Dark left every dialog and menu rendering light - the flip
+        /// side of the RTL bug that was already fixed here, and missed because the two travel
+        /// through the same hole in the tree.
+        ///
+        /// Kept as stored state rather than recomputed, because "auto" has to resolve against the
+        /// window's *actual* theme - ElementTheme.Default on a popup resolves against the popup
+        /// root, which follows the OS and not the app's own setting, so handing Default straight
+        /// through would reintroduce the bug for every user who leaves the theme on auto.
+        /// </summary>
+        internal static Microsoft.UI.Xaml.ElementTheme UiElementTheme { get; private set; }
+            = Microsoft.UI.Xaml.ElementTheme.Default;
+
         /// <summary>Applies a persisted "auto"/"light"/"dark" theme string to the window's root
         /// element. Called at launch (this file) and immediately on change from the Settings page
         /// (Task 4's General group), so both share one mapping from the stored string to
@@ -87,6 +104,12 @@ namespace SimpleDeFence.UI
                 _ => Microsoft.UI.Xaml.ElementTheme.Default,
             };
 
+            // Resolved, not copied: see UiElementTheme. ActualTheme is read after RequestedTheme is
+            // assigned so "auto" lands on whatever the OS is currently giving the window, and the
+            // ActualThemeChanged subscription below keeps it current when the OS flips underneath a
+            // running app.
+            UiElementTheme = root.ActualTheme;
+
             // RequestedTheme only reaches the XAML tree. The minimise/maximise/close glyphs are not
             // in it - with ExtendsContentIntoTitleBar the caption buttons are drawn by
             // AppWindowTitleBar, which keeps whatever colours it was given and does not follow an
@@ -95,14 +118,52 @@ namespace SimpleDeFence.UI
             ApplyCaptionButtonColors(root);
 
             // "auto" resolves against the OS theme, which can change while the app is running, and
-            // ActualTheme is also what ApplyCaptionButtonColors reads - so the buttons have to be
-            // recoloured again whenever the effective theme moves under us. Subscribed once;
+            // ActualTheme is also what ApplyCaptionButtonColors and UiElementTheme read - so both
+            // have to be redone whenever the effective theme moves under us. Subscribed once;
             // ApplyTheme runs on every settings change and at launch.
             if (!_actualThemeHooked)
             {
                 _actualThemeHooked = true;
-                root.ActualThemeChanged += (sender, _) => ApplyCaptionButtonColors(sender);
+                root.ActualThemeChanged += (sender, _) =>
+                {
+                    UiElementTheme = sender.ActualTheme;
+                    ApplyCaptionButtonColors(sender);
+                };
             }
+        }
+
+        /// <summary>
+        /// Gives a flyout the shell's flow direction and theme. A ContentDialog takes the two
+        /// properties directly, in its initializer; a flyout cannot, because FlyoutBase is a plain
+        /// DependencyObject with neither property, and the presenter that does have them is
+        /// generated only when the flyout opens. A Style is the only handle onto it, and it is
+        /// built fresh on each call because Styles seal once applied and so cannot be updated in
+        /// place when the theme changes - which means this has to be called at open time, not once
+        /// at construction.
+        /// </summary>
+        internal static void ApplyShellStyling(Microsoft.UI.Xaml.Controls.Primitives.FlyoutBase flyout)
+        {
+            switch (flyout)
+            {
+                case Microsoft.UI.Xaml.Controls.MenuFlyout menu:
+                    menu.MenuFlyoutPresenterStyle =
+                        BuildPresenterStyle(typeof(Microsoft.UI.Xaml.Controls.MenuFlyoutPresenter));
+                    break;
+                case Microsoft.UI.Xaml.Controls.Flyout plain:
+                    plain.FlyoutPresenterStyle =
+                        BuildPresenterStyle(typeof(Microsoft.UI.Xaml.Controls.FlyoutPresenter));
+                    break;
+            }
+        }
+
+        private static Microsoft.UI.Xaml.Style BuildPresenterStyle(Type presenterType)
+        {
+            var style = new Microsoft.UI.Xaml.Style(presenterType);
+            style.Setters.Add(new Microsoft.UI.Xaml.Setter(
+                Microsoft.UI.Xaml.FrameworkElement.RequestedThemeProperty, UiElementTheme));
+            style.Setters.Add(new Microsoft.UI.Xaml.Setter(
+                Microsoft.UI.Xaml.FrameworkElement.FlowDirectionProperty, UiFlowDirection));
+            return style;
         }
 
         private static bool _actualThemeHooked;
