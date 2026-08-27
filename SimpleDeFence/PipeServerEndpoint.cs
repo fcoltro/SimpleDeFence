@@ -24,9 +24,19 @@ namespace SimpleDeFence
             m_Run = false;
 
             // Create a dummy connection so that worker thread gets out of the infinite WaitForConnection()
-            using (var npcs = new NamedPipeClientStream(m_PipeName))
+            //
+            // Guarded, because this can legitimately fail and must not throw out of Dispose during
+            // service shutdown. The single instance is now permanent rather than recreated per
+            // request, so if the worker happens to be mid-request when this runs, the instance is
+            // busy and Connect times out instead of connecting. The Join below still bounds the
+            // wait, and the worker leaves on its own once m_Run is false.
+            try
             {
+                using var npcs = new NamedPipeClientStream(m_PipeName);
                 npcs.Connect(500);
+            }
+            catch
+            {
             }
 
             if (disposing)
@@ -62,30 +72,74 @@ namespace SimpleDeFence
             PipeSecurity ps = new();
             ps.AddAccessRule(par);
 
-            while (m_Run)
+            // Created ONCE, before the loop, and kept for the life of the service.
+            //
+            // This used to be created inside the loop under a `using`, with a single allowed
+            // instance - so the pipe was destroyed and rebuilt for every request, and between the
+            // dispose at the bottom of one iteration and the create at the top of the next, the
+            // name \\.\pipe\SimpleDeFenceController belonged to nobody. Any local process could
+            // claim it in that gap, and the 200 ms sleep on the error path - which ran with the
+            // instance already disposed - widened the gap from microseconds to something trivially
+            // winnable by a polling loop. Whoever won it received the GUI's next message, and the
+            // unlock message carries the configuration passphrase in cleartext.
+            //
+            // FirstPipeInstance is the other half: it makes creation fail outright if the name is
+            // already taken, rather than quietly joining someone else's pipe as a second instance.
+            // If that happens at startup, something is already squatting the name and the only safe
+            // thing to do is refuse to serve rather than compete for connections.
+            NamedPipeServerStream pipeServer;
+            try
             {
-                try
+                pipeServer = NamedPipeServerStreamAcl.Create(
+                    m_PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message,
+                    PipeOptions.WriteThrough | PipeOptions.FirstPipeInstance,
+                    2048 * 10, 2048 * 10, ps);
+            }
+            catch (Exception e)
+            {
+                Utils.Log($"Could not create the control pipe '{m_PipeName}'. Another process is already holding that name, "
+                    + "so no client requests will be served. For details see the next log entry.", Utils.LOG_ID_SERVICE);
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                return;
+            }
+
+            using (pipeServer)
+            {
+                while (m_Run)
                 {
-                    // Create pipe server
-                    using var pipeServer = NamedPipeServerStreamAcl.Create(m_PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.WriteThrough, 2048 * 10, 2048 * 10, ps);
-                    if (!pipeServer.IsConnected)
+                    try
                     {
                         pipeServer.WaitForConnection();
                         pipeServer.ReadMode = PipeTransmissionMode.Message;
 
-                        if (!AuthAsServer(pipeServer))
-                            throw new InvalidOperationException("Client authentication failed.");
+                        if (AuthAsServer(pipeServer))
+                        {
+                            var req = SerializationHelper.DeserializeFromPipe<TwMessage>(pipeServer, 3000, TwMessageComError.Instance);
+                            var resp = m_RcvCallback(req);
+                            SerializationHelper.SerializeToPipe(pipeServer, resp);
+                        }
                     }
-
-                    var req = SerializationHelper.DeserializeFromPipe<TwMessage>(pipeServer, 3000, TwMessageComError.Instance);
-                    var resp = m_RcvCallback(req);
-                    SerializationHelper.SerializeToPipe(pipeServer, resp);
-                }
-                catch
-                {
-                    Thread.Sleep(200);
-                }
-            } //while
+                    catch
+                    {
+                        // No sleep here any more. It existed to space out retries of the create
+                        // above, which no longer happens - and because the instance now survives
+                        // the error, sleeping would only delay the next legitimate client while
+                        // holding the name we already own.
+                    }
+                    finally
+                    {
+                        // Back to listening on the same instance, without ever releasing the name.
+                        try
+                        {
+                            if (pipeServer.IsConnected)
+                                pipeServer.Disconnect();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                } //while
+            }
         }
 
         private static bool AuthAsServer(PipeStream stream)

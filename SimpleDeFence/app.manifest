@@ -16,7 +16,26 @@
             Wenn Sie Datei- und Registrierungsvirtualisierung für Abwärts- 
             kompatibilität verwenden möchten, löschen Sie den requestedExecutionLevel-Knoten.
         -->
-        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+        <!-- The GUI runs as administrator, and Windows asks for consent when it is started any
+             other way than by the logon task.
+
+             It was asInvoker, which made the privilege level depend on how the app happened to be
+             launched. The autostart task SimpleDeFenceDoctor registers already sets
+             RunLevel = Highest with an InteractiveToken principal, so at logon the tray came up
+             elevated and silently; the Start Menu shortcut, and the installer's own StartController
+             action, came up unprivileged. Same executable, same user, two different privilege
+             levels depending on the route in - and everything that talks to the service was written
+             not knowing which it would get.
+
+             This has no effect on the service. SCM starts services with CreateProcess as
+             LocalSystem and never consults requestedExecutionLevel, so /install, /uninstall and the
+             service host itself are unchanged. It only governs interactive starts of the GUI.
+
+             requireAdministrator, not highestAvailable: on a standard user account
+             highestAvailable silently returns the unprivileged token, which is the ambiguity being
+             removed here. requireAdministrator prompts for administrator credentials instead, so
+             the GUI is either running as administrator or not running. -->
+        <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
       </requestedPrivileges>
     </security>
   </trustInfo>
