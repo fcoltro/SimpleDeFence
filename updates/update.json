@@ -3,7 +3,7 @@
   "Modules": [
     {
       "Component": "SimpleDeFence_x64",
-      "ComponentVersion": "0.1.0",
+      "ComponentVersion": "0.1.2",
       "DownloadHash": "",
       "UpdateURL": "https://github.com/fcoltro/SimpleDeFence/releases"
     }
