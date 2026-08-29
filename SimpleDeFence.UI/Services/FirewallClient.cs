@@ -114,23 +114,51 @@ namespace SimpleDeFence.UI.Services
         {
             return Task.Run(() =>
             {
-                // Fire the log request first so it overlaps the local NetStat/service-table
-                // gathering below, the same overlap ConnectionsForm already relies on.
-                var logRequest = _controller.BeginReadFwLog();
+                // The firewall log is the one input here that has to come from the service, so it
+                // is only asked for when the last refresh could reach it - see ResolvePath for
+                // what a request to a service that is not answering costs. Null means "not asked",
+                // which the Blocked section below treats the same as an empty log.
+                var logRequest = Connected ? _controller.BeginReadFwLog() : null;
 
                 var uwp = new UwpPackageList();
-                var servicePids = new ServicePidMap();
 
+                // Both of these only put better names on rows - a UWP package's display name, a
+                // svchost's service names - so neither is allowed to decide whether there are any
+                // rows at all. UwpPackageList already falls back to an empty list internally;
+                // CreateOrEmpty gives ServicePidMap the same property.
+                var servicePids = ServicePidMap.CreateOrEmpty();
+
+                // The three sections are gathered independently, because they have nothing in
+                // common but this method. Connected and Open come from GetExtendedTcpTable /
+                // GetExtendedUdpTable, which are local calls that do not involve the service at
+                // all; Blocked comes from the service's event log over the pipe. Gathered in one
+                // unguarded block - as this was - any single failure threw out of Task.Run, and
+                // ConnectionsPage.RefreshAsync's catch turned that into an empty snapshot, so a
+                // problem reading the firewall log emptied the two lists built from local data
+                // too, and vice versa. Whatever could be collected is now returned.
+                //
+                // Same reasoning, and the same "an empty list is a normal state, not a crash"
+                // handling, that GetRunningProcessesAsync and GetTopLevelWindowsAsync below
+                // already apply to their own interop.
                 var connected = new List<ConnectionRow>();
                 var open = new List<ConnectionRow>();
-                CollectTcp(NetStat.GetExtendedTcp4Table(false), uwp, servicePids, connected, open);
-                CollectTcp(NetStat.GetExtendedTcp6Table(false), uwp, servicePids, connected, open);
-                CollectUdp(NetStat.GetExtendedUdp4Table(false), uwp, servicePids, open);
-                CollectUdp(NetStat.GetExtendedUdp6Table(false), uwp, servicePids, open);
+                CollectSafely(() => CollectTcp(NetStat.GetExtendedTcp4Table(false), uwp, servicePids, connected, open), "TCP/IPv4");
+                CollectSafely(() => CollectTcp(NetStat.GetExtendedTcp6Table(false), uwp, servicePids, connected, open), "TCP/IPv6");
+                CollectSafely(() => CollectUdp(NetStat.GetExtendedUdp4Table(false), uwp, servicePids, open), "UDP/IPv4");
+                CollectSafely(() => CollectUdp(NetStat.GetExtendedUdp6Table(false), uwp, servicePids, open), "UDP/IPv6");
 
-                var rawLog = Controller.EndReadFwLog(logRequest.Response);
-                var recentBlocked = ConnectionActivity.RecentBlocked(rawLog, DateTime.Now, TimeSpan.FromMinutes(5));
-                var blocked = recentBlocked.Select(entry => BlockedRowFrom(entry, uwp, servicePids)).ToList();
+                var blocked = new List<BlockedRow>();
+                if (logRequest is not null)
+                {
+                    CollectSafely(() =>
+                    {
+                        var rawLog = Controller.EndReadFwLog(logRequest.Response);
+                        var recentBlocked = ConnectionActivity.RecentBlocked(
+                            rawLog, DateTime.Now, ClientSettings.Load().BlockedHistoryWindow);
+                        foreach (var entry in recentBlocked)
+                            blocked.Add(BlockedRowFrom(entry, uwp, servicePids));
+                    }, "Blocked");
+                }
 
                 return new ConnectionsSnapshot
                 {
@@ -277,7 +305,52 @@ namespace SimpleDeFence.UI.Services
             });
         }
 
-        private string ResolvePath(uint pid) => _controller.TryGetProcessPath(pid);
+        /// <summary>
+        /// The executable behind a pid, asked of the service, or empty when there is no point
+        /// asking.
+        ///
+        /// This is one full pipe round-trip per connection row, and a round-trip to a service that
+        /// is not answering is not cheap: PipeClientEndpoint retries once, so it costs two
+        /// Connect(1000) timeouts plus the 200 ms sleep between them - about 2.2 seconds - before
+        /// returning the empty string it was always going to return. A machine with a few hundred
+        /// open sockets would spend minutes on a gather whose path column comes back empty either
+        /// way, and the auto-refresh timer would queue up behind it.
+        ///
+        /// So when the last refresh could not reach the service, do not ask. Rows are still built
+        /// and still listed - named by their UWP package or hosted services where those are known,
+        /// and shown as "Unknown" where they are not, which is exactly what the name column
+        /// already does for a path the service declines to resolve.
+        /// </summary>
+        private string ResolvePath(uint pid) => Connected ? _controller.TryGetProcessPath(pid) : string.Empty;
+
+        /// <summary>
+        /// Runs one section of the connections gather, letting it fail on its own.
+        ///
+        /// Deliberately catches everything: the callers are P/Invoke into the IP helper API,
+        /// per-process token reads, and pipe I/O, none of which has a documented exception set
+        /// worth enumerating, and the correct response to any of them is identical - that section
+        /// contributes what it managed to collect and the rest of the screen is unaffected.
+        /// Swallowing is safe here precisely because it is scoped to one section: the user is not
+        /// told a lie, they are shown fewer rows, and the section's own empty state says so.
+        /// </summary>
+        private static void CollectSafely(Action collect, string section)
+        {
+            try
+            {
+                collect();
+            }
+            catch (Exception e)
+            {
+                // Traced rather than silently dropped. The screen deliberately carries on with
+                // whatever the other sections produced, but a section that keeps coming back
+                // empty is otherwise indistinguishable from one that genuinely has nothing in
+                // it - which is exactly the confusion that made the original all-or-nothing
+                // gather so hard to diagnose. Same channel PipeClientEndpoint traces its own
+                // refusals on.
+                System.Diagnostics.Debug.WriteLine(
+                    $"Connections gather: the {section} section failed and was left as far as it got. {e.GetType().Name}: {e.Message}");
+            }
+        }
 
         private void CollectTcp(TcpTable table, UwpPackageList uwp, ServicePidMap servicePids,
             List<ConnectionRow> connected, List<ConnectionRow> open)

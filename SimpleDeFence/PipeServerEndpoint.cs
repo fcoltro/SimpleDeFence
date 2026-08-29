@@ -75,11 +75,18 @@ namespace SimpleDeFence
             // which every copy of the GUI satisfies by construction because the GUI and the service
             // are the same executable.
             //
-            // Narrowing it is possible now that app.manifest requests requireAdministrator: the GUI
-            // is elevated whenever it is running at all, so it holds Administrators in its token and
-            // still connects. SYSTEM is listed explicitly because a DACL without it would lock the
-            // service out of its own pipe - PipeServerEndpoint.Dispose connects a dummy client to
-            // wake the worker, and that client is this process.
+            // Narrowing it is possible because the shipped executable's app.manifest requests
+            // highestAvailable: an administrator's copy of the GUI runs elevated and holds
+            // Administrators in its token, so it still connects. (It said requireAdministrator when
+            // this was written; that was relaxed later, and highestAvailable is what ships - see
+            // SimpleDeFence/app.manifest, which is the manifest that reaches the binary, and
+            // Elevation.cs for what the GUI does when it finds itself without the group.) A
+            // standard user's copy therefore cannot reach the service at all, which is deliberate
+            // and is what Elevation.IsElevated exists to explain to them.
+            //
+            // SYSTEM is listed explicitly because a DACL without it would lock the service out of
+            // its own pipe - PipeServerEndpoint.Dispose connects a dummy client to wake the
+            // worker, and that client is this process.
             //
             // A non-elevated caller is now refused by the operating system before a single byte is
             // read, which is a stronger boundary than any check this code could make afterwards.

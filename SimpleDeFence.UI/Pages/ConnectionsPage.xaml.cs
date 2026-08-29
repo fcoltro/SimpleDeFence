@@ -206,16 +206,23 @@ namespace SimpleDeFence.UI.Pages
             {
                 await App.Firewall.RefreshAsync();
 
+                // Gathered either way. Only the Blocked section is the service's to answer for -
+                // it is built from the firewall's event log, which arrives over the pipe. Connected
+                // and Open come from GetExtendedTcpTable/GetExtendedUdpTable, which are local calls
+                // that work whether or not the service can be reached.
+                //
+                // This used to replace the snapshot with an empty one whenever the service was
+                // unreachable, which threw away two lists that had never needed it and left the
+                // whole screen blank behind an error - the reading being "SimpleDeFence can see
+                // nothing", when what was true is "SimpleDeFence cannot tell you what it blocked".
+                // The notice still says the service is unreachable, so the empty Blocked list is
+                // not mistaken for an all-clear.
                 if (!App.Firewall.Connected)
-                {
                     ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Status.NotConnected), App.Firewall.LastError ?? string.Empty);
-                    _snapshot = new ConnectionsSnapshot();
-                }
                 else
-                {
                     Notice.IsOpen = false;
-                    _snapshot = await App.Firewall.GetConnectionsAsync();
-                }
+
+                _snapshot = await App.Firewall.GetConnectionsAsync();
             }
             catch (Exception ex)
             {
@@ -700,10 +707,11 @@ namespace SimpleDeFence.UI.Pages
                 _allowedAt.Remove(key);
         }
 
-        /// <summary>How far back the Blocked list reaches. Must match the window FirewallClient
-        /// passes to ConnectionActivity.RecentBlocked; it is only used here to decide when a
-        /// suppression key can be forgotten.</summary>
-        private static readonly TimeSpan BlockedHistoryWindow = TimeSpan.FromMinutes(5);
+        /// <summary>How far back the Blocked list reaches, used here only to decide when a
+        /// suppression key can be forgotten. Read from the same setting the gather uses rather
+        /// than restated as a constant: the two were separate literals that a comment asked
+        /// readers to keep in step, which is the kind of pairing that silently drifts.</summary>
+        private static TimeSpan BlockedHistoryWindow => ClientSettings.Load().BlockedHistoryWindow;
 
         /// <summary>FlyoutBase.Opening for the "Show all" flyouts in the row templates. See
         /// App.ApplyShellStyling: a flyout's presenter is created in the popup root, so it inherits
