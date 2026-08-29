@@ -30,7 +30,8 @@
       "initFailed": "启动未完成，当前生效的规则可能来自上一次会话。",
       "databaseUnavailable": "无法加载应用程序数据库，因此阻止列表和应用程序配置不会生成任何规则。",
       "rulesIncomplete": "Windows 拒绝了部分防火墙规则，已安装的规则集与配置的并不一致。",
-      "hostsUnavailable": "hosts 阻止列表已开启，但尚未安装。"
+      "hostsUnavailable": "hosts 阻止列表已开启，但尚未安装。",
+      "configUnreadable": "存在已保存的配置，但它已被拒绝，因此防火墙正在使用默认设置，而不是您的设置。"
     }
   },
   "mode": {

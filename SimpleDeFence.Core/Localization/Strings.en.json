@@ -30,7 +30,8 @@
       "initFailed": "Startup did not finish, so the rules in force may be from an earlier session.",
       "databaseUnavailable": "The application database could not be loaded, so blocklists and application profiles produce no rules.",
       "rulesIncomplete": "Windows refused some of the firewall rules, so the installed set is not the one that was configured.",
-      "hostsUnavailable": "The hosts blocklist is switched on but is not installed."
+      "hostsUnavailable": "The hosts blocklist is switched on but is not installed.",
+      "configUnreadable": "A saved configuration is present but was refused, so the firewall is running on default settings rather than yours."
     }
   },
   "mode": {

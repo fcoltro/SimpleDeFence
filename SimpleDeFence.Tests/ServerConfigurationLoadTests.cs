@@ -58,6 +58,33 @@ namespace SimpleDeFence.Tests
         }
 
         [Fact]
+        public void Load_of_a_missing_file_reports_Missing()
+        {
+            ServerConfiguration.Load(Path.Combine(_dir, "config"), out var outcome);
+
+            Assert.Equal(ConfigLoadOutcome.Missing, outcome);
+        }
+
+        [Fact]
+        public void Load_of_a_tampered_config_reports_it_rather_than_looking_like_a_first_run()
+        {
+            // Both endings produce a config naming no profile, and the service builds defaults
+            // from either. Only the outcome separates "there was nothing here" from "there was
+            // something here and it did not authenticate" - which is what reaches the user as a
+            // degraded-state warning instead of a silent reset.
+            var path = Path.Combine(_dir, "config");
+            new ServerConfiguration { ActiveProfileName = "Default" }.Save(path);
+            var bytes = File.ReadAllBytes(path);
+            bytes[bytes.Length - 1] ^= 0xFF;
+            File.WriteAllBytes(path, bytes);
+
+            var cfg = ServerConfiguration.Load(path, out var outcome);
+
+            Assert.Equal(ConfigLoadOutcome.Unauthenticated, outcome);
+            Assert.True(string.IsNullOrEmpty(cfg.ActiveProfileName));
+        }
+
+        [Fact]
         public void A_config_that_names_a_profile_is_usable_and_round_trips()
         {
             var path = Path.Combine(_dir, "config");

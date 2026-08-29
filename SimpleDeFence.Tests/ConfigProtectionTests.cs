@@ -187,6 +187,92 @@ namespace SimpleDeFence.Tests
             Assert.Equal(42, restored.ConnectionsAutoRefreshSeconds);
         }
 
+        // The outcome the reader reports alongside what it returns. Every one of the refusals
+        // below hands back the same default instance a first run gets, so without this the caller
+        // cannot tell "nothing was configured yet" from "your configuration was rejected".
+
+        [Fact]
+        public void A_missing_file_reports_Missing()
+        {
+            SerializationHelper.DeserializeFromEncryptedFile(
+                _configPath, "unused", "unused", new ClientSettings(), out var outcome);
+
+            Assert.Equal(ConfigLoadOutcome.Missing, outcome);
+        }
+
+        [Fact]
+        public void A_file_in_the_current_format_reports_Loaded()
+        {
+            SerializationHelper.SerializeToEncryptedFile(
+                new ClientSettings { UiTheme = "dark" }, _configPath, "unused", "unused");
+
+            SerializationHelper.DeserializeFromEncryptedFile(
+                _configPath, "unused", "unused", new ClientSettings(), out var outcome);
+
+            Assert.Equal(ConfigLoadOutcome.Loaded, outcome);
+        }
+
+        [Fact]
+        public void A_legacy_file_reports_Migrated()
+        {
+            const string key = "0123456789abcdef";
+            const string iv = "fedcba9876543210";
+            WriteLegacyCbcFile(new ClientSettings { UiTheme = "dark" }, _configPath, key, iv);
+
+            SerializationHelper.DeserializeFromEncryptedFile(
+                _configPath, key, iv, new ClientSettings(), out var outcome);
+
+            Assert.Equal(ConfigLoadOutcome.Migrated, outcome);
+        }
+
+        [Fact]
+        public void A_corrupt_authenticated_file_reports_Unauthenticated()
+        {
+            SerializationHelper.SerializeToEncryptedFile(
+                new ClientSettings { UiTheme = "dark" }, _configPath, "unused", "unused");
+            var bytes = File.ReadAllBytes(_configPath);
+            bytes[bytes.Length - 1] ^= 0xFF;
+            File.WriteAllBytes(_configPath, bytes);
+
+            SerializationHelper.DeserializeFromEncryptedFile(
+                _configPath, "unused", "unused", new ClientSettings(), out var outcome);
+
+            Assert.Equal(ConfigLoadOutcome.Unauthenticated, outcome);
+        }
+
+        [Fact]
+        public void A_refused_downgrade_reports_DowngradeRefused()
+        {
+            const string key = "0123456789abcdef";
+            const string iv = "fedcba9876543210";
+            SerializationHelper.SerializeToEncryptedFile(
+                new ClientSettings { UiTheme = "dark" }, _configPath, key, iv);
+            WriteLegacyCbcFile(new ClientSettings { UiTheme = "light" }, _configPath, key, iv);
+
+            SerializationHelper.DeserializeFromEncryptedFile(
+                _configPath, key, iv, new ClientSettings(), out var outcome);
+
+            Assert.Equal(ConfigLoadOutcome.DowngradeRefused, outcome);
+        }
+
+        [Fact]
+        public void A_file_that_cannot_be_opened_reports_Unreadable_not_Missing()
+        {
+            // The distinction that matters to the service: an ACL or a sharing violation leaves a
+            // perfectly good configuration on disk that it is not honouring, which is nothing like
+            // a first run.
+            SerializationHelper.SerializeToEncryptedFile(
+                new ClientSettings { UiTheme = "dark" }, _configPath, "unused", "unused");
+
+            using (new FileStream(_configPath, FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                SerializationHelper.DeserializeFromEncryptedFile(
+                    _configPath, "unused", "unused", new ClientSettings(), out var outcome);
+
+                Assert.Equal(ConfigLoadOutcome.Unreadable, outcome);
+            }
+        }
+
         private static void WriteLegacyCbcFile<T>(T obj, string path, string key, string iv)
             where T : ISerializable<T>
         {

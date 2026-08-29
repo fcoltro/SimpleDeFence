@@ -30,7 +30,8 @@
       "initFailed": "El inicio no se completó, por lo que las reglas vigentes pueden ser de una sesión anterior.",
       "databaseUnavailable": "No se pudo cargar la base de datos de aplicaciones, por lo que las listas de bloqueo y los perfiles de aplicación no generan reglas.",
       "rulesIncomplete": "Windows rechazó algunas reglas del firewall, por lo que el conjunto instalado no es el configurado.",
-      "hostsUnavailable": "La lista de bloqueo de hosts está activada pero no está instalada."
+      "hostsUnavailable": "La lista de bloqueo de hosts está activada pero no está instalada.",
+      "configUnreadable": "Hay una configuración guardada, pero se rechazó, por lo que el firewall funciona con la configuración predeterminada en lugar de la suya."
     }
   },
   "mode": {

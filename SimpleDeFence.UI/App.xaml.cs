@@ -217,6 +217,7 @@ namespace SimpleDeFence.UI
             // never be seen before a user saw it.
             var degraded = HasSwitch("--sample-degraded")
                 ? ServiceDegradation.RulesIncomplete | ServiceDegradation.AppDatabaseUnavailable
+                    | ServiceDegradation.ConfigurationUnreadable
                 : ServiceDegradation.None;
 
             if (locked || degraded != ServiceDegradation.None || HasSwitch("--sample-data"))

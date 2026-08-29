@@ -229,8 +229,16 @@ namespace SimpleDeFence
 
         public static ServerConfiguration Load(string filePath)
         {
+            return Load(filePath, out _);
+        }
+
+        /// <summary>Loads, and says whether what was on disk was read, absent, or refused. The
+        /// service needs that difference: a refused config leaves it enforcing a default rule set
+        /// while the user's own one sits on disk, which is not something to discover later.</summary>
+        public static ServerConfiguration Load(string filePath, out ConfigLoadOutcome outcome)
+        {
             string key = Hasher.HashString(ENC_SALT).Substring(0, 16);
-            return SerializationHelper.DeserializeFromEncryptedFile(filePath, key, ENC_IV, new ServerConfiguration());
+            return SerializationHelper.DeserializeFromEncryptedFile(filePath, key, ENC_IV, new ServerConfiguration(), out outcome);
         }
 
         public void Normalize()

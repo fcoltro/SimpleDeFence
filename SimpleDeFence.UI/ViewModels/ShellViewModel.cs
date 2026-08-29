@@ -176,10 +176,12 @@ namespace SimpleDeFence.UI.ViewModels
             if (degraded == ServiceDegradation.None)
                 return string.Empty;
 
-            var reasons = new List<string>(4);
+            var reasons = new List<string>(5);
 
             if ((degraded & ServiceDegradation.InitializationFailed) != 0)
                 reasons.Add(Loc.T(LocKeys.Status.Degraded.InitFailed));
+            if ((degraded & ServiceDegradation.ConfigurationUnreadable) != 0)
+                reasons.Add(Loc.T(LocKeys.Status.Degraded.ConfigUnreadable));
             if ((degraded & ServiceDegradation.RulesIncomplete) != 0)
                 reasons.Add(Loc.T(LocKeys.Status.Degraded.RulesIncomplete));
             if ((degraded & ServiceDegradation.AppDatabaseUnavailable) != 0)

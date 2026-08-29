@@ -30,7 +30,8 @@
       "initFailed": "Le démarrage ne s'est pas terminé ; les règles en vigueur peuvent dater d'une session antérieure.",
       "databaseUnavailable": "La base de données des applications n'a pas pu être chargée : les listes de blocage et les profils d'application ne produisent aucune règle.",
       "rulesIncomplete": "Windows a refusé certaines règles du pare-feu ; l'ensemble installé n'est pas celui qui a été configuré.",
-      "hostsUnavailable": "La liste de blocage hosts est activée mais n'est pas installée."
+      "hostsUnavailable": "La liste de blocage hosts est activée mais n'est pas installée.",
+      "configUnreadable": "Une configuration enregistrée est présente mais a été refusée ; le pare-feu fonctionne donc avec les paramètres par défaut et non les vôtres."
     }
   },
   "mode": {

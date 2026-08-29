@@ -97,6 +97,12 @@ namespace SimpleDeFence
 
         /// <summary>The hosts blocklist is switched on in the configuration but is not installed.</summary>
         HostsBlocklistUnavailable = 8,
+
+        /// <summary>A configuration file is present but was refused - it failed its authentication
+        /// tag, it arrived in the superseded format after this installation had already migrated,
+        /// or it could not be read at all - so the firewall in force was built from defaults
+        /// rather than from it.</summary>
+        ConfigurationUnreadable = 16,
     }
 
     public class ServerState : ISerializable<ServerState>

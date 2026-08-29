@@ -63,6 +63,7 @@
                 public const string DatabaseUnavailable = "status.degraded.databaseUnavailable";
                 public const string RulesIncomplete = "status.degraded.rulesIncomplete";
                 public const string HostsUnavailable = "status.degraded.hostsUnavailable";
+                public const string ConfigUnreadable = "status.degraded.configUnreadable";
             }
         }
 

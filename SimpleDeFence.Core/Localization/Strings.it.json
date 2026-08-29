@@ -30,7 +30,8 @@
       "initFailed": "L'avvio non è stato completato: le regole in vigore potrebbero risalire a una sessione precedente.",
       "databaseUnavailable": "Non è stato possibile caricare il database delle applicazioni, quindi elenchi di blocco e profili applicativi non producono regole.",
       "rulesIncomplete": "Windows ha rifiutato alcune regole del firewall: l'insieme installato non è quello configurato.",
-      "hostsUnavailable": "L'elenco di blocco hosts è attivo ma non è installato."
+      "hostsUnavailable": "L'elenco di blocco hosts è attivo ma non è installato.",
+      "configUnreadable": "È presente una configurazione salvata, ma è stata rifiutata: il firewall funziona con le impostazioni predefinite anziché con le tue."
     }
   },
   "mode": {

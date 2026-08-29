@@ -30,7 +30,8 @@
       "initFailed": "Başlatma tamamlanmadı; yürürlükteki kurallar önceki bir oturumdan kalmış olabilir.",
       "databaseUnavailable": "Uygulama veritabanı yüklenemedi; engelleme listeleri ve uygulama profilleri hiçbir kural üretmiyor.",
       "rulesIncomplete": "Windows bazı güvenlik duvarı kurallarını reddetti; kurulu küme yapılandırılan küme değil.",
-      "hostsUnavailable": "Hosts engelleme listesi açık ancak kurulu değil."
+      "hostsUnavailable": "Hosts engelleme listesi açık ancak kurulu değil.",
+      "configUnreadable": "Kayıtlı bir yapılandırma var ancak reddedildi; bu nedenle güvenlik duvarı sizinkiler yerine varsayılan ayarlarla çalışıyor."
     }
   },
   "mode": {

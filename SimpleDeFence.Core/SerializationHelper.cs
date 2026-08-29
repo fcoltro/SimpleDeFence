@@ -62,6 +62,37 @@ namespace SimpleDeFence
     {
     }
 
+    /// <summary>
+    /// Which of the five endings <see cref="SerializationHelper.DeserializeFromEncryptedFile{T}"/>
+    /// reached. Three of them hand back the default instance for reasons that are nothing like
+    /// "there was no file": the configuration was there and the reader refused it. A caller that
+    /// cannot tell those apart - and until this existed, none could - builds the firewall from a
+    /// configuration nobody chose while reporting itself healthy.
+    /// </summary>
+    public enum ConfigLoadOutcome
+    {
+        /// <summary>Read under the current authenticated format.</summary>
+        Loaded,
+
+        /// <summary>Nothing on disk to read. A first run.</summary>
+        Missing,
+
+        /// <summary>A file is there but this process could not read its bytes - a sharing
+        /// violation, or an ACL that no longer lets the service at its own config.</summary>
+        Unreadable,
+
+        /// <summary>Carries the current marker but failed its authentication tag: altered,
+        /// truncated, or written under a different key.</summary>
+        Unauthenticated,
+
+        /// <summary>Marker-less, on an installation that has already migrated - i.e. a file that
+        /// went backwards to the format whose key ships in every copy of the binary.</summary>
+        DowngradeRefused,
+
+        /// <summary>Read under one of the older formats and rewritten under the current one.</summary>
+        Migrated,
+    }
+
     public static class SerializationHelper
     {
         public static byte[] Serialize<T>(T obj) where T : ISerializable<T>
@@ -169,6 +200,15 @@ namespace SimpleDeFence
         /// only when the one before it says "this is not my format".</summary>
         public static T DeserializeFromEncryptedFile<T>(string filepath, string key, string iv, T defInst) where T : ISerializable<T>
         {
+            return DeserializeFromEncryptedFile(filepath, key, iv, defInst, out _);
+        }
+
+        /// <summary>The same read, reporting which ending it reached. See
+        /// <see cref="ConfigLoadOutcome"/> for why the distinction is worth carrying: every branch
+        /// below that returns <paramref name="defInst"/> looks identical to the caller otherwise,
+        /// including the three that mean "a configuration is present and was refused".</summary>
+        public static T DeserializeFromEncryptedFile<T>(string filepath, string key, string iv, T defInst, out ConfigLoadOutcome outcome) where T : ISerializable<T>
+        {
             byte[] fileBytes;
             try
             {
@@ -176,6 +216,7 @@ namespace SimpleDeFence
             }
             catch
             {
+                outcome = File.Exists(filepath) ? ConfigLoadOutcome.Unreadable : ConfigLoadOutcome.Missing;
                 return defInst;
             }
 
@@ -184,6 +225,7 @@ namespace SimpleDeFence
             if (ConfigProtection.TryUnprotect(fileBytes, filepath, out plaintext))
             {
                 using var plainStream = new MemoryStream(plaintext, false);
+                outcome = ConfigLoadOutcome.Loaded;
                 return Deserialize<T>(plainStream, defInst);
             }
 
@@ -192,7 +234,10 @@ namespace SimpleDeFence
             // key. Falling through to the legacy readers would be pointless, and rewriting it would
             // destroy whatever is actually there, so leave it alone and start from defaults.
             if (ConfigProtection.HasMagic(fileBytes))
+            {
+                outcome = ConfigLoadOutcome.Unauthenticated;
                 return defInst;
+            }
 
             // No marker at all means a file from before the migration, and the only reader for it is
             // the legacy one below - AES-CBC under a key derived from a compile-time constant that
@@ -207,7 +252,10 @@ namespace SimpleDeFence
             // downgrade to refuse, and the answer is the same as for a failed tag: start from
             // defaults and leave the file alone.
             if (File.Exists(ConfigProtection.KeyFilePath(filepath)))
+            {
+                outcome = ConfigLoadOutcome.DowngradeRefused;
                 return defInst;
+            }
 
             T ret;
             try
@@ -234,6 +282,7 @@ namespace SimpleDeFence
             try { SerializeToEncryptedFile(ret, filepath, key, iv); }
             catch { }
 
+            outcome = ConfigLoadOutcome.Migrated;
             return ret;
         }
 

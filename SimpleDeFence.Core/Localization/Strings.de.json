@@ -30,7 +30,8 @@
       "initFailed": "Der Start wurde nicht abgeschlossen; die geltenden Regeln stammen möglicherweise aus einer früheren Sitzung.",
       "databaseUnavailable": "Die Anwendungsdatenbank konnte nicht geladen werden, daher erzeugen Sperrlisten und Anwendungsprofile keine Regeln.",
       "rulesIncomplete": "Windows hat einige Firewallregeln abgelehnt; der installierte Regelsatz entspricht nicht dem konfigurierten.",
-      "hostsUnavailable": "Die Hosts-Sperrliste ist eingeschaltet, aber nicht installiert."
+      "hostsUnavailable": "Die Hosts-Sperrliste ist eingeschaltet, aber nicht installiert.",
+      "configUnreadable": "Eine gespeicherte Konfiguration ist vorhanden, wurde aber abgelehnt; die Firewall läuft daher mit Standardeinstellungen statt mit Ihren."
     }
   },
   "mode": {

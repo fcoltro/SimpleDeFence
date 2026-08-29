@@ -1088,11 +1088,12 @@ namespace SimpleDeFence
             }
         }
 
-        private static ServerConfiguration LoadServerConfig()
+        private static ServerConfiguration LoadServerConfig(out ConfigLoadOutcome outcome)
         {
+            outcome = ConfigLoadOutcome.Missing;
             try
             {
-                var loaded = ServerConfiguration.Load(ConfigSavePath);
+                var loaded = ServerConfiguration.Load(ConfigSavePath, out outcome);
 
                 // Load() does not throw when there is no config file. It goes through
                 // SerializationHelper.DeserializeFromEncryptedFile, which returns the default
@@ -1107,7 +1108,15 @@ namespace SimpleDeFence
                 if (!string.IsNullOrEmpty(loaded.ActiveProfileName))
                     return loaded;
             }
-            catch { }
+            catch (Exception e)
+            {
+                // Reading can throw rather than fall back to defaults - the pre-3.0 XML reader
+                // does exactly that for a file it cannot make sense of. A file that is present and
+                // unusable is still a configuration this service is failing to honour, so it is
+                // reported as one instead of being swallowed here.
+                outcome = File.Exists(ConfigSavePath) ? ConfigLoadOutcome.Unreadable : ConfigLoadOutcome.Missing;
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+            }
 
             // No config on disk, or nothing usable in it: prepare a default instead
             var ret = new ServerConfiguration { ActiveProfileName = Resources.Messages.Default };
@@ -1123,6 +1132,35 @@ namespace SimpleDeFence
             }
 
             return ret;
+        }
+
+        /// <summary>
+        /// Turns the reason a config load ended up on defaults into something outside this method
+        /// can see. Missing is a first run and says nothing; the other three all mean a file is
+        /// sitting in AppData that the service declined to trust, and the firewall it then built
+        /// is the default one rather than the user's. That case used to be indistinguishable from
+        /// a clean first start - no log line, no flag, a UI reporting the mode as if the
+        /// configuration behind it were the configured one.
+        /// </summary>
+        private void ReportConfigOutcome(ConfigLoadOutcome outcome)
+        {
+            switch (outcome)
+            {
+                case ConfigLoadOutcome.Unreadable:
+                    Utils.Log("The configuration file is present but could not be read. Running on default settings; the file has been left alone.", Utils.LOG_ID_SERVICE);
+                    break;
+                case ConfigLoadOutcome.Unauthenticated:
+                    Utils.Log("The configuration file failed its authentication check - it was altered, truncated, or written under a different key. Running on default settings; the file has been left alone.", Utils.LOG_ID_SERVICE);
+                    break;
+                case ConfigLoadOutcome.DowngradeRefused:
+                    Utils.Log("The configuration file is in the superseded format, which this installation has already migrated away from, so it was refused as a downgrade. Running on default settings; the file has been left alone.", Utils.LOG_ID_SERVICE);
+                    break;
+                default:
+                    VisibleState.Degraded &= ~ServiceDegradation.ConfigurationUnreadable;
+                    return;
+            }
+
+            VisibleState.Degraded |= ServiceDegradation.ConfigurationUnreadable;
         }
 
         // This method completely reinitializes the firewall.
@@ -1162,7 +1200,8 @@ namespace SimpleDeFence
             else
                 VisibleState.Degraded |= ServiceDegradation.AppDatabaseUnavailable;
 
-            ActiveConfig.Service = LoadServerConfig();
+            ActiveConfig.Service = LoadServerConfig(out var configOutcome);
+            ReportConfigOutcome(configOutcome);
             VisibleState.Mode = ActiveConfig.Service.StartupMode;
             GlobalInstances.ServerChangeset = Guid.NewGuid();
 

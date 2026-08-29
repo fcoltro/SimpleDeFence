@@ -30,7 +30,8 @@
       "initFailed": "Proses mulai tidak selesai, sehingga aturan yang berlaku mungkin berasal dari sesi sebelumnya.",
       "databaseUnavailable": "Basis data aplikasi tidak dapat dimuat, sehingga daftar blokir dan profil aplikasi tidak menghasilkan aturan.",
       "rulesIncomplete": "Windows menolak sebagian aturan firewall, sehingga kumpulan yang terpasang bukan yang dikonfigurasi.",
-      "hostsUnavailable": "Daftar blokir hosts aktif tetapi tidak terpasang."
+      "hostsUnavailable": "Daftar blokir hosts aktif tetapi tidak terpasang.",
+      "configUnreadable": "Ada konfigurasi tersimpan, tetapi ditolak, sehingga firewall berjalan dengan pengaturan bawaan, bukan milik Anda."
     }
   },
   "mode": {
