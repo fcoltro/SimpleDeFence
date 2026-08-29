@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "name": "SimpleDeFence"
   },
@@ -85,7 +85,8 @@
       "count": "({0})"
     },
     "empty": {
-      "blocked": "Son 5 dakikada hiçbir şey engellenmedi.",
+      "blocked": "Son zamanlarda hiçbir şey engellenmedi.",
+      "blockedUnavailable": "Engellenen girişim listesi güvenlik duvarı hizmetinden okunamadı.",
       "connected": "Kurulmuş bağlantı yok.",
       "open": "Dinleyen bağlantı noktası yok.",
       "filtered": "Geçerli süzgeçle eşleşen bir şey yok."

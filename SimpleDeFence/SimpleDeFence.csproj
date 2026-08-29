@@ -53,7 +53,7 @@
          parses that with Version.TryParse to decide whether an update is on offer - a suffix here
          would publish a descriptor no client could read. The beta designation lives in the release
          tag and the notes instead. -->
-    <Version>0.1.4</Version>
+    <Version>0.1.6</Version>
 
     <!-- Ship one language of satellite resources. The 34 localized .resx files this project
          inherited from TinyWall are gone, but NuGet packages carry their own satellites and

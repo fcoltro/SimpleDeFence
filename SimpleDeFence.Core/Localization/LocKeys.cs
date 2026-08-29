@@ -109,6 +109,9 @@
             public const string SectionOpen = "connections.section.open";
             public const string SectionCount = "connections.section.count";
             public const string EmptyBlocked = "connections.empty.blocked";
+            /// <summary>Shown instead of EmptyBlocked when the firewall log could not be read, so
+            /// that "nothing was blocked" is never said about a list we could not fetch.</summary>
+            public const string BlockedUnavailable = "connections.empty.blockedUnavailable";
             public const string EmptyConnected = "connections.empty.connected";
             public const string EmptyOpen = "connections.empty.open";
             public const string EmptyFiltered = "connections.empty.filtered";

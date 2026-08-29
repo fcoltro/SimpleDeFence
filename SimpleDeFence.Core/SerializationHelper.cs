@@ -127,6 +127,9 @@ namespace SimpleDeFence
             pipe.Flush();
         }
 
+        /// <summary>How long to wait for each further chunk once a message has begun arriving.</summary>
+        private const int ContinuationReadTimeoutMs = 10000;
+
         public static T DeserializeFromPipe<T>(PipeStream pipe, int timeout_ms, T defInstance) where T : ISerializable<T>
         {
             bool pipeClosed = false;
@@ -157,7 +160,16 @@ namespace SimpleDeFence
                     throw new IOException("Pipe closed.");
 
                 memoryStream.Write(buf, 0, len);
-                timeout_ms = 1000;
+
+                // Continuation chunks of a message that has already started arriving. This was one
+                // second, which is a short deadline for a reply that can run to hundreds of 4 KB
+                // reads: READ_FW_LOG carries the whole event ring in a single message, and the far
+                // end is a service that is busy precisely when there is a lot to report. One slow
+                // chunk anywhere in that sequence failed the whole read, and the caller could not
+                // tell that from an empty log. The peer has already committed to the message by
+                // this point, so waiting longer costs nothing on a healthy pipe and only delays
+                // giving up on a stalled one.
+                timeout_ms = ContinuationReadTimeoutMs;
             } while (!pipe.IsMessageComplete);
 
             memoryStream.Flush();

@@ -240,7 +240,18 @@ namespace SimpleDeFence.UI.Pages
                 SetBusy(false);
             }
 
-            ApplyFilter();
+            // Inside a guard of its own. This used to run after the try/catch, where a throw from
+            // the rebuild escaped into the async void handlers that call this and was reported
+            // nowhere - and RebuildBlocked clears its collection before it repopulates it, so the
+            // visible result was a section that emptied itself with no error to explain it.
+            try
+            {
+                ApplyFilter();
+            }
+            catch (Exception ex)
+            {
+                ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Connections.GatherFailedTitle), ex.Message);
+            }
         }
 
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilter();
@@ -269,7 +280,14 @@ namespace SimpleDeFence.UI.Pages
             var filtered = Loc.T(LocKeys.Connections.EmptyFiltered);
             SetEmptyState(ConnectedEmpty, _connected.Count, LocKeys.Connections.EmptyConnected, term, filtered);
             SetEmptyState(OpenEmpty, _open.Count, LocKeys.Connections.EmptyOpen, term, filtered);
-            SetEmptyState(BlockedEmpty, _blocked.Count, LocKeys.Connections.EmptyBlocked, term, filtered);
+
+            // "Nothing blocked" is the reassuring reading, and it must only ever be said about a
+            // log we actually read. When the log did not arrive, the section says so instead -
+            // the distinction the Blocked list exists to make, on the screen whose whole job is
+            // letting the user release what was blocked.
+            SetEmptyState(BlockedEmpty, _blocked.Count,
+                _snapshot.BlockedUnavailable ? LocKeys.Connections.BlockedUnavailable : LocKeys.Connections.EmptyBlocked,
+                term, filtered);
         }
 
         private static void SetEmptyState(TextBlock target, int count, string emptyKey, string term, string filteredText)

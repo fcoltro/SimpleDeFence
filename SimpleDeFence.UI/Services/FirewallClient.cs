@@ -148,21 +148,32 @@ namespace SimpleDeFence.UI.Services
                 CollectSafely(() => CollectUdp(NetStat.GetExtendedUdp6Table(false), uwp, servicePids, open), "UDP/IPv6");
 
                 var blocked = new List<BlockedRow>();
+
+                // Unavailable until a log actually comes back. Not being able to ask (the service
+                // was unreachable at the last refresh), a reply that is not a log, and a gather
+                // that throws are all "we do not know what was blocked" - never "nothing was".
+                var blockedUnavailable = true;
                 if (logRequest is not null)
                 {
                     CollectSafely(() =>
                     {
                         var rawLog = Controller.EndReadFwLog(logRequest.Response);
+                        if (rawLog is null)
+                            return;
+
                         var recentBlocked = ConnectionActivity.RecentBlocked(
                             rawLog, DateTime.Now, ClientSettings.Load().BlockedHistoryWindow);
                         foreach (var entry in recentBlocked)
                             blocked.Add(BlockedRowFrom(entry, uwp, servicePids));
+
+                        blockedUnavailable = false;
                     }, "Blocked");
                 }
 
                 return new ConnectionsSnapshot
                 {
                     Blocked = blocked,
+                    BlockedUnavailable = blockedUnavailable,
                     Connected = connected.OrderBy(r => r.AppName, StringComparer.CurrentCultureIgnoreCase).ToList(),
                     Open = open.OrderBy(r => r.AppName, StringComparer.CurrentCultureIgnoreCase).ToList(),
                 };

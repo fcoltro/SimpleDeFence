@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "name": "SimpleDeFence"
   },
@@ -85,7 +85,8 @@
       "count": "({0})"
     },
     "empty": {
-      "blocked": "过去 5 分钟内没有阻止任何内容。",
+      "blocked": "最近没有任何内容被阻止。",
+      "blockedUnavailable": "无法从防火墙服务读取被阻止的尝试列表。",
       "connected": "没有已建立的连接。",
       "open": "没有正在侦听的端口。",
       "filtered": "没有符合当前筛选条件的内容。"
