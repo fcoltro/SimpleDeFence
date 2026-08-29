@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SimpleDeFence.UI.Services
@@ -52,6 +52,18 @@ namespace SimpleDeFence.UI.Services
     internal sealed class ConnectionsSnapshot
     {
         public IReadOnlyList<BlockedRow> Blocked { get; init; } = Array.Empty<BlockedRow>();
+
+        /// <summary>
+        /// True when the firewall log could not be read, so <see cref="Blocked"/> being empty says
+        /// nothing about whether anything was blocked.
+        ///
+        /// An empty Blocked list is the reassuring outcome on a firewall, and the screen words it
+        /// that way. It must therefore never be shown for a log that simply did not arrive, which
+        /// is what happened whenever the READ_FW_LOG reply failed: the failure was indistinguishable
+        /// from a quiet firewall, on a screen whose entire purpose is to let the user release what
+        /// was blocked.
+        /// </summary>
+        public bool BlockedUnavailable { get; init; }
         public IReadOnlyList<ConnectionRow> Connected { get; init; } = Array.Empty<ConnectionRow>();
         public IReadOnlyList<ConnectionRow> Open { get; init; } = Array.Empty<ConnectionRow>();
     }

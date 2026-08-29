@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "name": "SimpleDeFence"
   },
@@ -85,7 +85,8 @@
       "count": "({0})"
     },
     "empty": {
-      "blocked": "Tidak ada yang diblokir dalam 5 menit terakhir.",
+      "blocked": "Tidak ada yang diblokir baru-baru ini.",
+      "blockedUnavailable": "Daftar upaya yang diblokir tidak dapat dibaca dari layanan firewall.",
       "connected": "Tidak ada koneksi yang terbentuk.",
       "open": "Tidak ada porta yang mendengarkan.",
       "filtered": "Tidak ada yang cocok dengan saringan saat ini."

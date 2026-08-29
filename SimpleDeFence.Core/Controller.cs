@@ -48,13 +48,25 @@ namespace SimpleDeFence
             return Endpoint.QueueMessage(TwMessageReadFwLog.CreateRequest());
         }
 
-        public static FirewallLogEntry[] EndReadFwLog(TwMessage twResp)
+        /// <summary>
+        /// The firewall log from a READ_FW_LOG reply, or null when the service did not return one.
+        ///
+        /// Null rather than an empty array, because the difference is the whole meaning of the
+        /// Blocked list. This used to answer both cases with Array.Empty and a TODO asking whether
+        /// the user should be told; the Connections screen therefore rendered "nothing blocked" -
+        /// the reassuring reading - whenever the log could not be fetched at all. A response that
+        /// times out, or a pipe error, looked exactly like a quiet firewall.
+        ///
+        /// That is not theoretical: the reply carries the entire event ring as one pipe message,
+        /// and a large enough ring stops arriving within the read timeout, silently and for ever.
+        /// Callers must tell the two apart.
+        /// </summary>
+        public static FirewallLogEntry[]? EndReadFwLog(TwMessage twResp)
         {
             if (twResp is TwMessageReadFwLog fwLog)
                 return fwLog.Entries;
-            else
-                // TODO: Do we want to show an error to the user?
-                return Array.Empty<FirewallLogEntry>();
+
+            return null;
         }
 
         public MessageType SwitchFirewallMode(FirewallMode mode)

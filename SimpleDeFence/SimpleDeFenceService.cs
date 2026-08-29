@@ -41,15 +41,26 @@ namespace SimpleDeFence
         /// The firewall's recent event ring, and the only thing the Connections screen's Blocked
         /// list is built from.
         ///
-        /// Raised from 500. Every classify event goes in here, allowed and dropped alike, and the
-        /// inbound broadcast/multicast drops that EventMatchAnyKeywords asks for arrive constantly
-        /// on an ordinary network - so on a busy machine 500 entries could represent well under a
-        /// minute, and the outbound application block the user actually went looking for had been
-        /// evicted long before they opened the window. The GUI's window over this is now an hour
-        /// by default (ClientSettings.BlockedHistoryWindow), which the old depth could not have
-        /// filled. An entry is a handful of fields; this is a few hundred kilobytes.
+        /// The depth is bounded by what READ_FW_LOG can actually deliver, not by how much history
+        /// would be nice to have. The whole ring is serialised into a single pipe message on every
+        /// read, as indented JSON, and the client reads it back in 4 KB chunks with a one-second
+        /// timeout on each chunk after the first. Measured: 500 entries is ~176 KB and 42 chunks;
+        /// 5000 is ~1.7 MB and 429. Raising it to 5000 pushed the response past what that read
+        /// reliably completes while the service is busy logging, and the failure is silent -
+        /// Controller.EndReadFwLog turns any non-ReadFwLog reply into an empty array, which the
+        /// Connections screen renders as "nothing blocked". The symptom was a Blocked list that
+        /// worked for the first few seconds after the service started, while the ring was still
+        /// nearly empty, and was empty for ever afterwards. Do not raise this without also fixing
+        /// how the log is transported.
+        ///
+        /// Only drops are kept, which is what makes 500 go further than it used to. Every
+        /// consumer of this ring - GetFwLog, READ_FW_LOG, ConnectionActivity.RecentBlocked -
+        /// discards the allowed events anyway, so carrying them only spent the depth that the
+        /// blocked entries needed: on an ordinary network the inbound broadcast and multicast
+        /// traffic that EventMatchAnyKeywords asks for arrives constantly, and it was evicting the
+        /// outbound application blocks the user opened the screen to find.
         /// </summary>
-        private readonly CircularBuffer<FirewallLogEntry> FirewallLogEntries = new(5000);
+        private readonly CircularBuffer<FirewallLogEntry> FirewallLogEntries = new(500);
         private readonly FileLocker FileLocker = new();
         private readonly HostsFileManager HostsFileManager = new();
         private DateTime LastControllerCommandTime = DateTime.Now;
@@ -2206,9 +2217,15 @@ namespace SimpleDeFence
             if (string.IsNullOrEmpty(entry.LocalIp))
                 entry.LocalIp = "::";
 
-            lock (FirewallLogEntries)
+            // Drops only - see FirewallLogEntries. An allowed event is discarded by every reader
+            // of this ring, so keeping it would only evict a blocked one that somebody is going to
+            // go looking for.
+            if (eventType == EventLogEvent.BLOCKED)
             {
-                FirewallLogEntries.Enqueue(entry);
+                lock (FirewallLogEntries)
+                {
+                    FirewallLogEntries.Enqueue(entry);
+                }
             }
         }
 

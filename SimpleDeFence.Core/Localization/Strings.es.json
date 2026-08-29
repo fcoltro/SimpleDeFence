@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "name": "SimpleDeFence"
   },
@@ -85,7 +85,8 @@
       "count": "({0})"
     },
     "empty": {
-      "blocked": "Nada bloqueado en los últimos 5 minutos.",
+      "blocked": "No se ha bloqueado nada recientemente.",
+      "blockedUnavailable": "No se pudo leer la lista de intentos bloqueados del servicio de firewall.",
       "connected": "No hay conexiones establecidas.",
       "open": "No hay puertos a la escucha.",
       "filtered": "Nada coincide con el filtro actual."
