@@ -4,8 +4,8 @@
     {
       "Component": "SimpleDeFence_x64",
       "ComponentVersion": "0.1.2",
-      "DownloadHash": "",
-      "UpdateURL": "https://github.com/fcoltro/SimpleDeFence/releases"
+      "DownloadHash": "6ed9cccc2d4e30fd331a1e9ad0a61ed39cc9ba81b4c7aa902b645d0380ad653a",
+      "UpdateURL": "https://github.com/fcoltro/SimpleDeFence/releases/download/v0.1.2-beta/SimpleDeFence_x64.msi"
     }
   ]
 }
