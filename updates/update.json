@@ -3,9 +3,9 @@
   "Modules": [
     {
       "Component": "SimpleDeFence_x64",
-      "ComponentVersion": "0.1.2",
-      "DownloadHash": "6ed9cccc2d4e30fd331a1e9ad0a61ed39cc9ba81b4c7aa902b645d0380ad653a",
-      "UpdateURL": "https://github.com/fcoltro/SimpleDeFence/releases/download/v0.1.2-beta/SimpleDeFence_x64.msi"
+      "ComponentVersion": "0.1.3",
+      "DownloadHash": "8163166ba4b6c85b4ad936a4d5eebd8ef413f02c8fa4747390b1f601baf97d86",
+      "UpdateURL": "https://github.com/fcoltro/SimpleDeFence/releases/download/v0.1.3-beta/SimpleDeFence_x64.msi"
     }
   ]
 }
