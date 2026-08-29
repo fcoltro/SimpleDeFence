@@ -30,8 +30,10 @@ namespace SimpleDeFence
             // Release unmanaged resources.
             // Set large fields to null.
             // Call Dispose on your base class.
-
-            DisableLogging();
+            //
+            // Deliberately does NOT touch the audit policy any more - see AuditPolicy below.
+            // The service owns it for its whole lifetime, and tearing it down from here would
+            // switch off the Blocked list's data source.
 
             base.Dispose(disposing);
         }
@@ -55,15 +57,15 @@ namespace SimpleDeFence
 
             set
             {
+                // Only the Security-log subscription that feeds auto-learn. It used to switch the
+                // system audit policy on and off alongside itself, which conflated two unrelated
+                // lifetimes: this watcher is wanted in Learning mode only, while the audit policy
+                // is what makes WFP raise the classify-drop events the Blocked list is built from,
+                // and that is wanted whenever the service runs. Leaving Learning mode therefore
+                // turned off the Blocked list's only data source. AuditPolicy is now the service's
+                // to own - see SimpleDeFenceService.Run.
                 if (value != LogWatcher.Enabled)
-                {
-                    if (value)
-                        EnableLogging();
-                    else
-                        DisableLogging();
-
                     LogWatcher.Enabled = value;
-                }
             }
         }
 
@@ -192,6 +194,27 @@ namespace SimpleDeFence
 
             if (!NativeMethods.AuditSetSystemPolicy(ref pol, 1))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        /// <summary>
+        /// The two Windows audit subcategories that make the Filtering Platform report what it
+        /// dropped and what it let through: "Filtering Platform Packet Drop" and "Filtering
+        /// Platform Connection".
+        ///
+        /// These gate the events the whole Blocked section is built from, so they belong to the
+        /// service's lifetime rather than to any one firewall mode. They used to be switched on
+        /// and off by FirewallLogWatcher.Enabled, which is set from
+        /// `LogWatcher.Enabled = (FirewallMode.Learning == newMode)` and nowhere else - so on an
+        /// installation that never entered Learning mode they were never enabled at all, and on
+        /// one that left Learning mode they were switched back off. Either way the WFP net-event
+        /// callback stopped being called, FirewallLogEntries stayed empty, and the Connections
+        /// screen's Blocked list was empty for ever - with no error anywhere, because nothing had
+        /// failed.
+        /// </summary>
+        internal static class AuditPolicy
+        {
+            internal static void Enable() => EnableLogging();
+            internal static void Disable() => DisableLogging();
         }
 
         private static void EnableLogging()

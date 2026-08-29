@@ -37,7 +37,19 @@ namespace SimpleDeFence
         private readonly PipeServerEndpoint ServerPipe;
         private readonly Timer MinuteTimer;
 
-        private readonly CircularBuffer<FirewallLogEntry> FirewallLogEntries = new(500);
+        /// <summary>
+        /// The firewall's recent event ring, and the only thing the Connections screen's Blocked
+        /// list is built from.
+        ///
+        /// Raised from 500. Every classify event goes in here, allowed and dropped alike, and the
+        /// inbound broadcast/multicast drops that EventMatchAnyKeywords asks for arrive constantly
+        /// on an ordinary network - so on a busy machine 500 entries could represent well under a
+        /// minute, and the outbound application block the user actually went looking for had been
+        /// evicted long before they opened the window. The GUI's window over this is now an hour
+        /// by default (ClientSettings.BlockedHistoryWindow), which the old depth could not have
+        /// filled. An entry is a handful of fields; this is a few hundred kilobytes.
+        /// </summary>
+        private readonly CircularBuffer<FirewallLogEntry> FirewallLogEntries = new(5000);
         private readonly FileLocker FileLocker = new();
         private readonly HostsFileManager HostsFileManager = new();
         private DateTime LastControllerCommandTime = DateTime.Now;
@@ -2021,8 +2033,19 @@ namespace SimpleDeFence
             using var DeviceNotification = SafeHandleDeviceNotification.Create(service.ServiceHandle, DeviceInterfaceClass.GUID_DEVINTERFACE_VOLUME, DeviceNotifFlags.DEVICE_NOTIFY_SERVICE_HANDLE);
             using var MountPointsWatcher = new RegistryWatcher(@"HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices", true);
 
+            // Enabling net-event collection on the engine is only half of what makes the Filtering
+            // Platform report a drop: the matching Windows audit subcategories have to be on as
+            // well, or the callback below is simply never called and FirewallLogEntries stays
+            // empty. That was the state on any installation that had not been put into Learning
+            // mode, because FirewallLogWatcher.Enabled - set from the mode switch and nowhere else
+            // - was what used to turn them on, and it turned them back off on the way out.
+            //
+            // Paired with the collection option and released the same way, so the machine is left
+            // as it was found when the service stops.
             WfpEngine.CollectNetEvents = true;
             using var NetEventCollection = new CallbackOnDispose(() => { try { WfpEngine.CollectNetEvents = false; } catch { } });
+            FirewallLogWatcher.AuditPolicy.Enable();
+            using var NetEventAuditing = new CallbackOnDispose(() => { try { FirewallLogWatcher.AuditPolicy.Disable(); } catch { } });
             WfpEngine.EventMatchAnyKeywords = InboundEventMatchKeyword.FWPM_NET_EVENT_KEYWORD_INBOUND_BCAST | InboundEventMatchKeyword.FWPM_NET_EVENT_KEYWORD_INBOUND_MCAST;
             using var WfpEvent = WfpEngine.SubscribeNetEvent(WfpNetEventCallback);
 

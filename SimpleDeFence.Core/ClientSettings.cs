@@ -99,6 +99,33 @@ namespace SimpleDeFence
                 MinAutoRefreshSeconds,
                 MaxAutoRefreshSeconds));
 
+        /// <summary>How far back the Connections page's Blocked list reaches.
+        ///
+        /// This was a hard-coded five minutes, duplicated in two places that a comment asked
+        /// future readers to keep in step by hand. Five minutes is shorter than the way the list
+        /// is actually used: an app stops working, the user goes looking for why, and by the time
+        /// they have the window open the attempts that explain it have aged out - leaving nothing
+        /// to press Allow on, which is the one thing the section exists for. The service keeps its
+        /// last several hundred events regardless, so a longer window costs nothing and only shows
+        /// more of what is already there.
+        ///
+        /// Read through <see cref="BlockedHistoryWindow"/>, which clamps it.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public int BlockedHistoryMinutes { get; set; } = DefaultBlockedHistoryMinutes;
+
+        public const int DefaultBlockedHistoryMinutes = 60;
+        public const int MinBlockedHistoryMinutes = 1;
+        public const int MaxBlockedHistoryMinutes = 1440;
+
+        /// <summary>The single source of truth for the Blocked window: both the gather that builds
+        /// the list and the page that prunes its allow-suppression keys read this one value, so
+        /// they cannot drift apart.</summary>
+        public TimeSpan BlockedHistoryWindow =>
+            TimeSpan.FromMinutes(Math.Clamp(
+                BlockedHistoryMinutes == 0 ? DefaultBlockedHistoryMinutes : BlockedHistoryMinutes,
+                MinBlockedHistoryMinutes,
+                MaxBlockedHistoryMinutes));
+
         private static string FilePath
         {
             get

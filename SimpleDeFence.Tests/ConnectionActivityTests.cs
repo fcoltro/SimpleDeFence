@@ -1,4 +1,4 @@
-using SimpleDeFence;
+﻿using SimpleDeFence;
 using System;
 using Xunit;
 
@@ -119,6 +119,31 @@ namespace SimpleDeFence.Tests
             Assert.Equal("Contoso App", ConnectionActivity.DisplayName(@"C:\app.exe", "Contoso App", new[] { "SomeSvc" }));
             Assert.Equal("DoSvc, UsoSvc", ConnectionActivity.DisplayName(@"C:\Windows\System32\svchost.exe", null, new[] { "DoSvc", "UsoSvc" }));
             Assert.Equal("app.exe", ConnectionActivity.DisplayName(@"C:\Program Files\app.exe", null, null));
+        }
+
+        [Fact]
+        public void RecentBlocked_keeps_an_entry_stamped_slightly_ahead_of_now()
+        {
+            // The service stamps entries from the WFP event header and the GUI compares them
+            // against its own clock, so an entry can land a moment "in the future". It is still a
+            // real block, and a block that is not listed is one the user cannot release.
+            var now = DateTime.Now;
+            var entries = new[] { Entry(EventLogEvent.BLOCKED_CONNECTION, now.AddSeconds(2)) };
+
+            var result = ConnectionActivity.RecentBlocked(entries, now, TimeSpan.FromMinutes(5));
+
+            Assert.Single(result);
+        }
+
+        [Fact]
+        public void RecentBlocked_still_discards_an_entry_from_a_badly_wrong_clock()
+        {
+            var now = DateTime.Now;
+            var entries = new[] { Entry(EventLogEvent.BLOCKED_CONNECTION, now.AddDays(7)) };
+
+            var result = ConnectionActivity.RecentBlocked(entries, now, TimeSpan.FromMinutes(5));
+
+            Assert.Empty(result);
         }
 
         [Fact]
