@@ -161,6 +161,22 @@ namespace SimpleDeFence
                         {
                             var resp = m_RcvCallback(req);
                             SerializationHelper.SerializeToPipe(pipeServer, resp);
+
+                            // Wait for the client to actually take the response before the finally
+                            // below disconnects. Disconnect() discards whatever is still sitting in
+                            // the pipe unread, and Flush() does not help: it pushes the bytes to the
+                            // kernel buffer, which is 20 KB here, and then returns. Anything past
+                            // that is still in flight when the disconnect throws it away.
+                            //
+                            // Small replies won the race and looked fine, which is why this stood
+                            // for so long. READ_FW_LOG does not: the whole event ring goes in one
+                            // message, ~176 KB for 500 entries, so the client reliably received a
+                            // truncated message, failed to deserialize it, and - because a failed
+                            // fetch used to be indistinguishable from an empty log - the Connections
+                            // screen reported a firewall with nothing to report. The bigger the
+                            // firewall log, the more certain it was to be the one message that never
+                            // arrived.
+                            pipeServer.WaitForPipeDrain();
                         }
                     }
                     catch
