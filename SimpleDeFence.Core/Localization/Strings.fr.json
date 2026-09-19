@@ -167,6 +167,7 @@
       "special": "Aucune exception spéciale disponible.",
       "filtered": "Rien ne correspond au filtre actuel."
     },
+    "appMissing": "Le fichier de cette application n'existe plus sur le disque - elle a peut-être été désinstallée.",
     "remove": "Supprimer",
     "removeConfirm": {
       "title": "Supprimer les exceptions ?",

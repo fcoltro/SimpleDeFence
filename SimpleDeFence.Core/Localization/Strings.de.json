@@ -167,6 +167,7 @@
       "special": "Keine Sonderausnahmen verfügbar.",
       "filtered": "Nichts entspricht dem aktuellen Filter."
     },
+    "appMissing": "Die Datei dieser Anwendung existiert nicht mehr auf der Festplatte - sie wurde möglicherweise deinstalliert.",
     "remove": "Entfernen",
     "removeConfirm": {
       "title": "Ausnahmen entfernen?",

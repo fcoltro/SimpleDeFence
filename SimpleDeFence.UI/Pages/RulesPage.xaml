@@ -104,7 +104,22 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                            <Grid Grid.Column="0">
+                                                <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
+                                                           Visibility="{x:Bind NormalNameVisibility}"/>
+                                                <!-- Struck through in red when the rule's executable/service
+                                                     no longer exists on disk (IsMissing) - a separate
+                                                     TextBlock, not a Foreground swap from code-behind, so the
+                                                     ThemeResource below resolves against this element's own
+                                                     ActualTheme. See RuleListItem.MissingNameVisibility. -->
+                                                <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
+                                                           TextDecorations="Strikethrough"
+                                                           Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                                           Visibility="{x:Bind MissingNameVisibility}"
+                                                           ToolTipService.ToolTip="{loc:Loc Key=rules.appMissing}"/>
+                                            </Grid>
                                             <TextBlock Grid.Column="1" Text="{x:Bind Kind}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextWrapping="NoWrap"/>
                                             <TextBlock Grid.Column="2" Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
                                             <TextBlock Grid.Column="3" Text="{x:Bind Policy}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextWrapping="NoWrap"/>

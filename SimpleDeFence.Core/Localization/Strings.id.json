@@ -167,6 +167,7 @@
       "special": "Tidak ada pengecualian khusus yang tersedia.",
       "filtered": "Tidak ada yang cocok dengan saringan saat ini."
     },
+    "appMissing": "File aplikasi ini sudah tidak ada lagi di disk - mungkin telah dihapus instalannya.",
     "remove": "Hapus",
     "removeConfirm": {
       "title": "Hapus pengecualian?",

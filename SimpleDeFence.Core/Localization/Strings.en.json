@@ -167,6 +167,7 @@
       "special": "No special exceptions available.",
       "filtered": "Nothing matches the current filter."
     },
+    "appMissing": "This application's file no longer exists on disk - it may have been uninstalled.",
     "remove": "Remove",
     "removeConfirm": {
       "title": "Remove exceptions?",
