@@ -1,0 +1,93 @@
+name: Bug report
+description: Something SimpleDeFence did, or failed to do
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. The most valuable reports on this project are
+        "an application would not connect and here is why" — those are what a
+        whitelist firewall gets wrong in the field.
+
+        **Found a security problem?** Do not use this form. Report it privately at
+        [Security → Advisories](https://github.com/fcoltro/SimpleDeFence/security/advisories/new).
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did the firewall do, or fail to do?
+      placeholder: Application X could not reach the network even though I had allowed it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Set mode to Normal
+        2. Allow X from the Connections screen
+        3. Start X
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: SimpleDeFence version
+      description: Settings → About
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: Run `winver`, or Settings → System → About
+      placeholder: "Windows 11 24H2, build 26100.1742"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Which mode was the firewall in?
+      options:
+        - Normal
+        - Block all
+        - Allow outgoing
+        - Learning
+        - Disabled
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: learning
+    attributes:
+      label: Has this installation ever been in Learning mode?
+      description: This changes which rules exist, so it is worth knowing.
+      options:
+        - "Yes"
+        - "No"
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, if any
+      description: |
+        From `C:\ProgramData\SimpleDeFence\logs`. Note `service.log` is only written when the
+        service has thrown — if it is not there at all, say so, because that is informative too.
+      render: text
