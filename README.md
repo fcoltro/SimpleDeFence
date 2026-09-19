@@ -95,6 +95,7 @@ back. If it is useful to you and you would like to help it keep going:
 
 <a href="https://ko-fi.com/fcoltro"><img src="https://img.shields.io/badge/Ko--fi-support-ff5e5b?style=flat-square&logo=ko-fi&logoColor=white" alt="Support on Ko-fi" /></a>
 <a href="https://github.com/sponsors/fcoltro"><img src="https://img.shields.io/badge/GitHub-sponsor-ea4aaa?style=flat-square&logo=github-sponsors&logoColor=white" alt="Sponsor on GitHub" /></a>
+<a href="https://buymeacoffee.com/fcoltro"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-ffdd00?style=flat-square&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee" /></a>
 
 The nearest thing to a goal is a code-signing certificate, so Windows stops warning about the
 installer — which for a firewall costs more trust than it would for most software.

@@ -184,15 +184,11 @@ These are what convert a visitor into a user once a post sends them your way.
 
 ## 5. Donations
 
-Ko-fi (`ko-fi.com/fcoltro`) and the GitHub Sponsor button are live via `.github/FUNDING.yml`.
-Two things still need you:
+All three channels are live via `.github/FUNDING.yml`: Ko-fi (`ko-fi.com/fcoltro`), Buy Me a
+Coffee (`buymeacoffee.com/fcoltro`) and the GitHub Sponsor button.
 
-1. **Enrol in GitHub Sponsors** at <https://github.com/sponsors> — the `github: fcoltro` entry does
-   nothing until the account exists.
-2. **Register the Buy Me a Coffee handle**, then uncomment that line in
-   `.github/FUNDING.yml`. It is deliberately commented out: an unregistered handle may already
-   belong to someone else, and a funding link that resolves to a stranger sends your donations to
-   them.
+One thing still needs you: **enrol in GitHub Sponsors** at <https://github.com/sponsors>. The
+`github: fcoltro` entry does nothing until that account exists — the other two already resolve.
 
 What actually works for a project like this, in rough order:
 
