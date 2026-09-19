@@ -82,8 +82,14 @@ The project has diverged substantially from the code base it started out on:
 
 ## Support the project
 
-SimpleDeFence is free and GPLv3, and it stays that way. If it is useful to you and you would like
-to help it keep going, the Sponsor button at the top of this repository is the most direct way.
+SimpleDeFence is free and GPLv3, and it stays that way — no paid tier, no upsell, nothing held
+back. If it is useful to you and you would like to help it keep going:
+
+<a href="https://ko-fi.com/fcoltro"><img src="https://img.shields.io/badge/Ko--fi-support-ff5e5b?style=flat-square&logo=ko-fi&logoColor=white" alt="Support on Ko-fi" /></a>
+<a href="https://github.com/sponsors/fcoltro"><img src="https://img.shields.io/badge/GitHub-sponsor-ea4aaa?style=flat-square&logo=github-sponsors&logoColor=white" alt="Sponsor on GitHub" /></a>
+
+The nearest thing to a goal is a code-signing certificate, so Windows stops warning about the
+installer — which for a firewall costs more trust than it would for most software.
 
 Contributions of time are just as welcome as money — bug reports from real installs are genuinely
 the most valuable thing this project receives, particularly reports of an application that would
