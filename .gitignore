@@ -9,10 +9,19 @@
 /.worktrees/
 /.superpowers/
 
-# Plans and design specs the SDD workflow writes here. The folder was deleted; this
-# keeps a future run from committing a new one. Git history already records how each
-# change was arrived at.
-/docs/
+# Plans and design specs the SDD workflow writes here, which are not worth committing -
+# git history already records how each change was arrived at.
+#
+# Everything under /docs/ is ignored and then two paths are named back in: the release
+# notes each release is published from, and the launch plan. It is written as
+# ignore-the-contents rather than ignore-the-folder because git will not look inside an
+# excluded directory at all, so a bare `/docs/` makes the exceptions below unreachable -
+# and un-ignoring the folder outright would let the next SDD run commit a spec.
+/docs/*
+!/docs/PROMOTION.md
+!/docs/release-notes/
+/docs/release-notes/*
+!/docs/release-notes/*.md
 
 # Local agent/tool state. Each of these currently carries its own self-ignoring
 # .gitignore; naming them here means deleting that file cannot leak them into a commit.
