@@ -8,6 +8,13 @@
     <br />
     Built on <a href="https://github.com/pylorak/TinyWall">TinyWall</a> as its original code base.
   </p>
+
+  <p>
+    <a href="https://github.com/fcoltro/SimpleDeFence/releases/latest"><img src="https://img.shields.io/github/v/release/fcoltro/SimpleDeFence?label=download&style=flat-square" alt="Latest release" /></a>
+    <a href="https://github.com/fcoltro/SimpleDeFence/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/fcoltro/SimpleDeFence/build.yml?branch=main&style=flat-square" alt="Build status" /></a>
+    <a href="LICENSE.txt"><img src="https://img.shields.io/github/license/fcoltro/SimpleDeFence?style=flat-square" alt="GPLv3" /></a>
+    <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4?style=flat-square" alt="Windows 10 and 11" />
+  </p>
 </div>
 
 ## About
@@ -22,7 +29,23 @@ Filtering Platform by a background service running as LocalSystem; the interface
 process that talks to it over a named pipe. Nothing in the GUI has to run elevated for the
 firewall to keep working, and closing the window does not stop protection.
 
-### What it does
+## Install
+
+Download the installer from the [latest release](https://github.com/fcoltro/SimpleDeFence/releases/latest)
+and run it. It is a single self-contained MSI — there is no .NET runtime to install first, and no
+kernel driver.
+
+- **Windows 10 version 2004 (build 19041) or newer, and Windows 11**, 64-bit
+- **A ~55 MB installer**, self-contained; no background network traffic except the update check,
+  which can be switched off
+- The application asks for administrator rights, because programming the Windows Filtering
+  Platform requires them
+
+Updates are offered in-app and verified against a SHA-256 published in this repository before
+anything is run, so an installer that does not match what was published is refused rather than
+executed.
+
+## What it does
 
 - **Five modes**, switchable from the tray or the window:
   - **Normal** — everything blocked except what you have allowed
@@ -32,25 +55,39 @@ firewall to keep working, and closing the window does not stop protection.
   - **Disabled** — the firewall stops filtering
 - **Application rules** with a built-in database of known programs, so common software can be
   allowed without hunting for executables by hand.
-- **A live connections view**, with a configurable auto-refresh interval and optional logging of
-  connections to disk.
+- **A live connections view** showing what is connected, what is listening, and what was blocked —
+  with a configurable refresh interval and optional logging of connections to disk.
 - **Password protection** — the running configuration can be locked so it cannot be changed
   without the password, including by anything running as you.
 - **Hosts-file blocklists**, updated on request.
 - **Global hotkeys** for allowing an executable, a running process or a visible window.
-- **English and Brazilian Portuguese** interfaces.
+- **Sixteen languages**: Arabic, Bengali, Chinese (Simplified), English, Farsi, French, German,
+  Hindi, Indonesian, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Spanish and Turkish —
+  with right-to-left layout where the language calls for it.
 
-### Current state
+## How it is built
 
 The project has diverged substantially from the code base it started out on:
 
 | | |
 |---|---|
-| Interface | WinUI 3 on the Windows App SDK, replacing the original WinForms UI - light/dark aware, including theme-adaptive tray icons |
+| Interface | WinUI 3 on the Windows App SDK, replacing the original WinForms UI — light/dark aware, including theme-adaptive tray icons |
 | Runtime | .NET 10, self-contained x64; no framework install required |
-| Configuration at rest | AES-GCM with a per-installation key wrapped by DPAPI, replacing the previous CBC scheme |
+| Enforcement | Windows Filtering Platform, via a LocalSystem service; no kernel driver |
+| Control channel | A named pipe restricted to Administrators and SYSTEM, with the caller's token checked by impersonation on every request |
+| Configuration at rest | AES-GCM with a per-installation key wrapped by DPAPI |
 | Password storage | PBKDF2-HMAC-SHA256, 600,000 iterations, in a versioned self-describing format that upgrades older records on next unlock |
+| Update integrity | Every downloaded payload is SHA-256 verified against the published descriptor before it is run |
 | Packaging | A single self-contained MSI, built and published by CI on every push |
+
+## Support the project
+
+SimpleDeFence is free and GPLv3, and it stays that way. If it is useful to you and you would like
+to help it keep going, the Sponsor button at the top of this repository is the most direct way.
+
+Contributions of time are just as welcome as money — bug reports from real installs are genuinely
+the most valuable thing this project receives, particularly reports of an application that would
+not connect and why.
 
 ## How to build
 
@@ -92,6 +129,16 @@ rather than maintained by hand.
 
 `.github/workflows/build.yml` runs exactly these steps, so it is the reference if any of the above
 drifts.
+
+### To run the tests
+
+```
+dotnet test SimpleDeFence.Tests/SimpleDeFence.Tests.csproj
+```
+
+Several tests pin the behaviour of blocking APIs — named pipes, service control — and are written
+to fail fast rather than hang. If you add one that touches those, add
+`--blame-hang --blame-hang-timeout 60s` while you develop it.
 
 ### To update the database of known applications
 

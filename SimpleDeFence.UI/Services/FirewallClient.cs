@@ -122,6 +122,18 @@ namespace SimpleDeFence.UI.Services
 
                 var uwp = new UwpPackageList();
 
+                // One lookup per process, not one per row.
+                //
+                // Both of the per-row lookups below are keyed on the pid and are far more expensive
+                // than they look. ResolvePath is a full blocking pipe round-trip - connect, owner
+                // check, write, hand-off to the service's single worker thread, read - and
+                // FindPackageForProcess is a process-token read plus a linear scan of every
+                // installed package. Rows, though, are per *socket*: one browser holds dozens of
+                // connections, and each one used to repeat both lookups for the same pid. A few
+                // hundred open sockets meant a few hundred serialized round-trips against a page
+                // that re-gathers every five seconds by default.
+                var gather = new GatherCache(ResolvePath, uwp);
+
                 // Both of these only put better names on rows - a UWP package's display name, a
                 // svchost's service names - so neither is allowed to decide whether there are any
                 // rows at all. UwpPackageList already falls back to an empty list internally;
@@ -142,10 +154,10 @@ namespace SimpleDeFence.UI.Services
                 // already apply to their own interop.
                 var connected = new List<ConnectionRow>();
                 var open = new List<ConnectionRow>();
-                CollectSafely(() => CollectTcp(NetStat.GetExtendedTcp4Table(false), uwp, servicePids, connected, open), "TCP/IPv4");
-                CollectSafely(() => CollectTcp(NetStat.GetExtendedTcp6Table(false), uwp, servicePids, connected, open), "TCP/IPv6");
-                CollectSafely(() => CollectUdp(NetStat.GetExtendedUdp4Table(false), uwp, servicePids, open), "UDP/IPv4");
-                CollectSafely(() => CollectUdp(NetStat.GetExtendedUdp6Table(false), uwp, servicePids, open), "UDP/IPv6");
+                CollectSafely(() => CollectTcp(NetStat.GetExtendedTcp4Table(false), gather, servicePids, connected, open), "TCP/IPv4");
+                CollectSafely(() => CollectTcp(NetStat.GetExtendedTcp6Table(false), gather, servicePids, connected, open), "TCP/IPv6");
+                CollectSafely(() => CollectUdp(NetStat.GetExtendedUdp4Table(false), gather, servicePids, open), "UDP/IPv4");
+                CollectSafely(() => CollectUdp(NetStat.GetExtendedUdp6Table(false), gather, servicePids, open), "UDP/IPv6");
 
                 var blocked = new List<BlockedRow>();
 
@@ -164,7 +176,7 @@ namespace SimpleDeFence.UI.Services
                         var recentBlocked = ConnectionActivity.RecentBlocked(
                             rawLog, DateTime.Now, ClientSettings.Load().BlockedHistoryWindow);
                         foreach (var entry in recentBlocked)
-                            blocked.Add(BlockedRowFrom(entry, uwp, servicePids));
+                            blocked.Add(BlockedRowFrom(entry, gather, servicePids));
 
                         blockedUnavailable = false;
                     }, "Blocked");
@@ -363,13 +375,59 @@ namespace SimpleDeFence.UI.Services
             }
         }
 
-        private void CollectTcp(TcpTable table, UwpPackageList uwp, ServicePidMap servicePids,
+        /// <summary>
+        /// Per-pid memoization for one connections gather, thrown away when it ends.
+        ///
+        /// Scoped to the gather rather than kept on the client on purpose: a pid can be reused by a
+        /// different process, and a stale path would put the wrong application's name on a row -
+        /// which on this screen is what someone decides to press Allow on. Within a single gather
+        /// the snapshot is already a point in time, so caching changes nothing that was true.
+        /// </summary>
+        private sealed class GatherCache
+        {
+            private readonly Func<uint, string> _resolvePath;
+            private readonly UwpPackageList _uwp;
+            private readonly Dictionary<uint, string> _paths = new();
+            private readonly Dictionary<uint, UwpPackageList.Package?> _packages = new();
+
+            public GatherCache(Func<uint, string> resolvePath, UwpPackageList uwp)
+            {
+                _resolvePath = resolvePath;
+                _uwp = uwp;
+            }
+
+            public string Path(uint pid)
+            {
+                if (!_paths.TryGetValue(pid, out var path))
+                {
+                    path = _resolvePath(pid);
+                    _paths[pid] = path;
+                }
+                return path;
+            }
+
+            public UwpPackageList.Package? PackageForProcess(uint pid)
+            {
+                if (!_packages.TryGetValue(pid, out var package))
+                {
+                    package = _uwp.FindPackageForProcess(pid);
+                    _packages[pid] = package;
+                }
+                return package;
+            }
+
+            /// <summary>Blocked rows carry the package SID from the log, so they look the package up
+            /// by identity rather than by pid - the process behind the block may be long gone.</summary>
+            public UwpPackageList.Package? PackageById(string? packageId) => _uwp.FindPackage(packageId);
+        }
+
+        private void CollectTcp(TcpTable table, GatherCache gather, ServicePidMap servicePids,
             List<ConnectionRow> connected, List<ConnectionRow> open)
         {
             foreach (var row in table)
             {
-                var path = ResolvePath(row.ProcessId);
-                var info = ProcessInfo.Create(row.ProcessId, path, uwp, servicePids);
+                var info = new ProcessInfo(row.ProcessId, gather.Path(row.ProcessId),
+                    gather.PackageForProcess(row.ProcessId), servicePids.GetServicesInPid(row.ProcessId));
                 var connectionRow = new ConnectionRow
                 {
                     ProcessId = row.ProcessId,
@@ -387,12 +445,12 @@ namespace SimpleDeFence.UI.Services
             }
         }
 
-        private void CollectUdp(UdpTable table, UwpPackageList uwp, ServicePidMap servicePids, List<ConnectionRow> open)
+        private void CollectUdp(UdpTable table, GatherCache gather, ServicePidMap servicePids, List<ConnectionRow> open)
         {
             foreach (var row in table)
             {
-                var path = ResolvePath(row.ProcessId);
-                var info = ProcessInfo.Create(row.ProcessId, path, uwp, servicePids);
+                var info = new ProcessInfo(row.ProcessId, gather.Path(row.ProcessId),
+                    gather.PackageForProcess(row.ProcessId), servicePids.GetServicesInPid(row.ProcessId));
 
                 // UDP has no connection state; a bound socket is always "listening" in the sense
                 // this screen cares about.
@@ -411,10 +469,11 @@ namespace SimpleDeFence.UI.Services
             }
         }
 
-        private BlockedRow BlockedRowFrom(FirewallLogEntry entry, UwpPackageList uwp, ServicePidMap servicePids)
+        private static BlockedRow BlockedRowFrom(FirewallLogEntry entry, GatherCache gather, ServicePidMap servicePids)
         {
-            var path = entry.AppPath ?? ResolvePath(entry.ProcessId);
-            var info = ProcessInfo.Create(entry.ProcessId, path, entry.PackageId, uwp, servicePids);
+            var path = entry.AppPath ?? gather.Path(entry.ProcessId);
+            var info = new ProcessInfo(entry.ProcessId, path,
+                gather.PackageById(entry.PackageId), servicePids.GetServicesInPid(entry.ProcessId));
 
             return new BlockedRow
             {

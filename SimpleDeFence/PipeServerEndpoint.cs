@@ -160,23 +160,7 @@ namespace SimpleDeFence
                         if (AuthAsServer(pipeServer))
                         {
                             var resp = m_RcvCallback(req);
-                            SerializationHelper.SerializeToPipe(pipeServer, resp);
-
-                            // Wait for the client to actually take the response before the finally
-                            // below disconnects. Disconnect() discards whatever is still sitting in
-                            // the pipe unread, and Flush() does not help: it pushes the bytes to the
-                            // kernel buffer, which is 20 KB here, and then returns. Anything past
-                            // that is still in flight when the disconnect throws it away.
-                            //
-                            // Small replies won the race and looked fine, which is why this stood
-                            // for so long. READ_FW_LOG does not: the whole event ring goes in one
-                            // message, ~176 KB for 500 entries, so the client reliably received a
-                            // truncated message, failed to deserialize it, and - because a failed
-                            // fetch used to be indistinguishable from an empty log - the Connections
-                            // screen reported a firewall with nothing to report. The bigger the
-                            // firewall log, the more certain it was to be the one message that never
-                            // arrived.
-                            pipeServer.WaitForPipeDrain();
+                            SendResponse(pipeServer, resp);
                         }
                     }
                     catch
@@ -199,6 +183,56 @@ namespace SimpleDeFence
                         }
                     }
                 } //while
+            }
+        }
+
+        /// <summary>How long a client gets to take its reply before the server gives up and
+        /// disconnects it. Far beyond what a healthy client needs for even the largest reply
+        /// (READ_FW_LOG's ~176 KB); past this the client is simply not reading.</summary>
+        private const int ResponseDeliveryTimeoutMs = 10000;
+
+        /// <summary>
+        /// Writes the reply and waits for the client to take it - bounded, so one client cannot
+        /// park the service's only pipe worker for good.
+        ///
+        /// Both halves have to be inside the bound, which is the part that is easy to get wrong.
+        /// WaitForPipeDrain is the obvious blocker and has no timeout of its own, but Write blocks
+        /// too: the pipe's kernel buffer is 20 KB, so a reply larger than that cannot even be
+        /// handed over until the client starts reading. Bounding only the drain would still leave
+        /// a client that never reads holding the worker inside Write - which is every reply that
+        /// matters here, since READ_FW_LOG is the big one.
+        ///
+        /// The work runs on a pool thread so this thread can stop waiting on it. Abandoning that
+        /// thread is safe and brief: the caller's <c>finally</c> disconnects the pipe, which makes
+        /// the pending Write or WaitForPipeDrain throw and the task finish immediately after.
+        ///
+        /// Why the wait exists at all: Disconnect() discards whatever the client has not read yet,
+        /// and Flush() does not stand in for waiting - it pushes bytes as far as the kernel buffer
+        /// and returns. Small replies won that race and made the control pipe look healthy;
+        /// READ_FW_LOG carries the whole event ring in one message and lost it every time, which
+        /// is how the Connections screen came to report a firewall with nothing to report.
+        /// </summary>
+        private static void SendResponse(NamedPipeServerStream pipeServer, TwMessage resp)
+        {
+            var delivery = System.Threading.Tasks.Task.Run(() =>
+            {
+                try
+                {
+                    SerializationHelper.SerializeToPipe(pipeServer, resp);
+                    pipeServer.WaitForPipeDrain();
+                }
+                catch
+                {
+                    // Disconnected under us, or the client went away mid-write. Either way there is
+                    // nothing left to deliver and the loop below has already moved on.
+                }
+            });
+
+            if (!delivery.Wait(ResponseDeliveryTimeoutMs))
+            {
+                Utils.Log($"A control client did not read its reply within {ResponseDeliveryTimeoutMs} ms; "
+                    + "disconnecting it so the control pipe stays available to other clients.",
+                    Utils.LOG_ID_SERVICE);
             }
         }
 

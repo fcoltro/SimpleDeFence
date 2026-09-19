@@ -1,0 +1,12 @@
+# Drives the "Sponsor" button GitHub shows on the repository page.
+#
+# github: is live. Ko-fi and Buy Me a Coffee are left commented until the handles
+# are registered and confirmed - an unclaimed name on those services may already
+# belong to somebody else, and a funding link that resolves to a stranger sends
+# donations to them. Uncomment each line once the account exists under that exact
+# name; no other change is needed.
+
+github: fcoltro
+
+# ko_fi: fcoltro
+# custom: ["https://www.buymeacoffee.com/fcoltro"]

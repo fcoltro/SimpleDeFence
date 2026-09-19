@@ -10,7 +10,10 @@ namespace SimpleDeFence.Windows.Services
         public UwpPackageList.Package? Package;
         public HashSet<string> Services;
 
-        private ProcessInfo(uint pid, string path, UwpPackageList.Package? package, HashSet<string> services)
+        /// <summary>Public so a caller that has already resolved these - for instance one
+        /// memoizing the expensive per-pid lookups across many rows - can build the record without
+        /// going through the Create overloads and repeating that work.</summary>
+        public ProcessInfo(uint pid, string path, UwpPackageList.Package? package, HashSet<string> services)
         {
             Pid = pid;
             Path = path;

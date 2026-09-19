@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Runtime.InteropServices;
@@ -170,6 +171,13 @@ namespace SimpleDeFence
             [DllImport("advapi32", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.U1)]
             internal static extern bool AuditSetSystemPolicy([In] ref AUDIT_POLICY_INFORMATION pAuditPolicy, uint policyCount);
+
+            [DllImport("advapi32", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.U1)]
+            internal static extern bool AuditQuerySystemPolicy([In] ref Guid pSubCategoryGuids, uint policyCount, out IntPtr ppAuditPolicy);
+
+            [DllImport("advapi32")]
+            internal static extern void AuditFree(IntPtr buffer);
         }
 
         private static readonly Guid PACKET_LOGGING_AUDIT_SUBCAT = new("{0CCE9225-69AE-11D9-BED3-505054503030}");
@@ -196,6 +204,32 @@ namespace SimpleDeFence
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
+        /// <summary>What a subcategory was set to before we touched it, so it can be put back
+        /// exactly rather than switched off. Null when it could not be read.</summary>
+        internal readonly record struct AuditSetting(bool Success, bool Failure);
+
+        private static AuditSetting? AuditQuerySystemPolicy(Guid guid)
+        {
+            var subcat = guid;
+            if (!NativeMethods.AuditQuerySystemPolicy(ref subcat, 1, out IntPtr buffer))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+
+            if (buffer == IntPtr.Zero)
+                return null;
+
+            try
+            {
+                var pol = Marshal.PtrToStructure<NativeMethods.AUDIT_POLICY_INFORMATION>(buffer);
+                return new AuditSetting(
+                    (pol.AuditingInformation & NativeMethods.AuditingInformationEnum.POLICY_AUDIT_EVENT_SUCCESS) != 0,
+                    (pol.AuditingInformation & NativeMethods.AuditingInformationEnum.POLICY_AUDIT_EVENT_FAILURE) != 0);
+            }
+            finally
+            {
+                NativeMethods.AuditFree(buffer);
+            }
+        }
+
         /// <summary>
         /// The two Windows audit subcategories that make the Filtering Platform report what it
         /// dropped and what it let through: "Filtering Platform Packet Drop" and "Filtering
@@ -213,9 +247,40 @@ namespace SimpleDeFence
         /// </summary>
         internal static class AuditPolicy
         {
+            /// <summary>
+            /// What each subcategory was set to before <see cref="Enable"/> changed it.
+            ///
+            /// Disable used to force both subcategories to "no auditing" unconditionally, having
+            /// never read what they were. On a machine where an administrator or a Group Policy had
+            /// switched Filtering Platform auditing on for their own reasons, stopping or
+            /// uninstalling this service silently turned that off and never put it back - while the
+            /// comment at the call site claimed the machine was left as it was found. These are
+            /// machine-wide audit settings we are borrowing, not ours to reset.
+            ///
+            /// Empty when the query failed, in which case Disable leaves the policy alone rather
+            /// than guessing: not knowing what it was is a reason to touch nothing, not a reason to
+            /// switch it off.
+            /// </summary>
+            private static readonly Dictionary<Guid, AuditSetting> PreviousSettings = new();
+
             internal static void Enable() => EnableLogging();
             internal static void Disable() => DisableLogging();
+
+            internal static void RememberPrevious(Guid subcategory, AuditSetting? setting)
+            {
+                if (setting.HasValue)
+                    PreviousSettings[subcategory] = setting.Value;
+            }
+
+            internal static bool TryGetPrevious(Guid subcategory, out AuditSetting setting)
+                => PreviousSettings.TryGetValue(subcategory, out setting);
         }
+
+        private static readonly Guid[] LoggingAuditSubcategories =
+        {
+            PACKET_LOGGING_AUDIT_SUBCAT,
+            CONNECTION_LOGGING_AUDIT_SUBCAT,
+        };
 
         private static void EnableLogging()
         {
@@ -223,8 +288,16 @@ namespace SimpleDeFence
             {
                 Privilege.RunWithPrivilege(Privilege.Security, true, delegate (object? state)
                 {
-                    AuditSetSystemPolicy(PACKET_LOGGING_AUDIT_SUBCAT, true, true);
-                    AuditSetSystemPolicy(CONNECTION_LOGGING_AUDIT_SUBCAT, true, true);
+                    foreach (var subcat in LoggingAuditSubcategories)
+                    {
+                        // Read before writing, so Disable has something to put back. A failure to
+                        // read is recorded as "unknown" and makes Disable leave this subcategory
+                        // alone; enabling still goes ahead, because the Blocked list depends on it.
+                        try { AuditPolicy.RememberPrevious(subcat, AuditQuerySystemPolicy(subcat)); }
+                        catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_SERVICE); }
+
+                        AuditSetSystemPolicy(subcat, true, true);
+                    }
                 }, null);
             }
             catch { }
@@ -236,8 +309,13 @@ namespace SimpleDeFence
             {
                 Privilege.RunWithPrivilege(Privilege.Security, true, delegate (object? state)
                 {
-                    AuditSetSystemPolicy(PACKET_LOGGING_AUDIT_SUBCAT, false, false);
-                    AuditSetSystemPolicy(CONNECTION_LOGGING_AUDIT_SUBCAT, false, false);
+                    foreach (var subcat in LoggingAuditSubcategories)
+                    {
+                        if (!AuditPolicy.TryGetPrevious(subcat, out var previous))
+                            continue;
+
+                        AuditSetSystemPolicy(subcat, previous.Success, previous.Failure);
+                    }
                 }, null);
             }
             catch { }

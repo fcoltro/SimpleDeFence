@@ -142,7 +142,16 @@ namespace SimpleDeFence
 
             try
             {
-                InstallHostsFile(HOSTS_BACKUP);
+                // No blocklist on disk is a failure to enable, not a quiet success. The MSI ships
+                // hosts.bck, so reaching this means it was removed or the download never landed -
+                // either way the user's hosts file is untouched and the setting must not report
+                // itself as in force.
+                if (!InstallHostsFile(HOSTS_BACKUP))
+                {
+                    Utils.Log("The hosts blocklist is enabled in the configuration but no blocklist file is present; nothing was installed.", Utils.LOG_ID_SERVICE);
+                    return false;
+                }
+
                 FlushDNSCache();
                 return true;
             }
@@ -155,11 +164,32 @@ namespace SimpleDeFence
             }
         }
 
+        /// <summary>Puts the user's own hosts file back. False when it could not be - which,
+        /// crucially, includes having no saved original to put back while our blocklist is the file
+        /// in force.</summary>
         public bool DisableHostsFile()
         {
             try
             {
-                InstallHostsFile(HOSTS_ORIGINAL);
+                if (!InstallHostsFile(HOSTS_ORIGINAL))
+                {
+                    // Nothing was restored. If what is installed is our own blocklist, the machine
+                    // is left with it as its permanent hosts file and there is no copy of the
+                    // user's anywhere - so this is the last moment anyone can be told. Reported
+                    // rather than returned quietly because the uninstaller calls this, and a
+                    // product that removes itself and leaves a blocklist behind has no later
+                    // opportunity to explain where it came from.
+                    if (CurrentHostsIsOurBlocklist())
+                    {
+                        Utils.Log("The hosts blocklist is still installed and no copy of the original hosts file remains. "
+                            + $"The current hosts file is SimpleDeFence's blocklist; replace it by hand from a known-good copy. Path: {HOSTS_PATH}",
+                            Utils.LOG_ID_SERVICE);
+                        return false;
+                    }
+
+                    // Otherwise the hosts file in force is not ours and there was nothing to undo.
+                    return true;
+                }
 
                 // Delete backup of original so that it can be
                 // recreated next time we install a custom hosts.
@@ -192,15 +222,27 @@ namespace SimpleDeFence
             }
         }
 
-        private void InstallHostsFile(string sourcePath)
+        /// <summary>
+        /// Copies <paramref name="sourcePath"/> over the system hosts file. False when there was no
+        /// source to copy, in which case nothing was installed.
+        ///
+        /// The result is the point. This used to return void and treat a missing source as nothing
+        /// worth mentioning, so both callers reported success for work that never happened: an
+        /// enable with no blocklist on disk left the settings page asserting the blocklist was
+        /// active, and - the one that outlives the product - a disable with no saved original left
+        /// our blocklist installed as the machine's hosts file and told the uninstaller it had been
+        /// put back.
+        /// </summary>
+        private bool InstallHostsFile(string sourcePath)
         {
             try
             {
-                if (File.Exists(sourcePath))
-                {
-                    FileLocker.Unlock(HOSTS_PATH);
-                    File.Copy(sourcePath, HOSTS_PATH, true);
-                }
+                if (!File.Exists(sourcePath))
+                    return false;
+
+                FileLocker.Unlock(HOSTS_PATH);
+                File.Copy(sourcePath, HOSTS_PATH, true);
+                return true;
             }
             finally
             {
