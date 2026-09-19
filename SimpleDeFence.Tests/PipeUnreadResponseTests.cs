@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,18 +46,25 @@ namespace SimpleDeFence.Tests
                 $"The server did not give up on a non-reading client within {TimeoutMs} ms, "
                 + "which means the response delivery is unbounded and one client can wedge the pipe.");
 
-            var elapsedMs = scenario.GetAwaiter().GetResult();
+            bool deliveryCompleted = scenario.GetAwaiter().GetResult();
 
-            // It must actually have waited - a delivery that returns instantly would be the old
-            // truncation bug, not a bounded wait.
-            Assert.True(elapsedMs >= DeliveryTimeoutMs,
-                $"Delivery returned after {elapsedMs} ms, before the {DeliveryTimeoutMs} ms bound; "
-                + "the server is not waiting for the client to read at all.");
+            // The delivery must NOT have completed: the client never read, so the only way out was
+            // the bound. A completed delivery would mean the write and drain did not block at all,
+            // and this test would no longer be exercising what it claims to.
+            //
+            // Asserted as a boolean rather than by timing the wait. The obvious form - measure the
+            // elapsed time and require it to reach the bound - fails intermittently, because
+            // Task.Wait(timeout) is allowed to return just before the timeout it was given
+            // (observed at 990 ms against a 1000 ms bound on a CI runner). The property under test
+            // is "it gave up rather than finishing", and that is exactly what the return value says.
+            Assert.False(deliveryCompleted,
+                "The response delivery completed even though the client never read it, so this test "
+                + "is no longer exercising a blocked delivery and would not catch an unbounded one.");
         }
 
         /// <summary>Runs one request/response against a client that connects, asks, and then never
-        /// reads. Returns how long the bounded delivery took.</summary>
-        private static long DeliverToSilentClient()
+        /// reads. True if the delivery somehow completed; false if the bound is what ended it.</summary>
+        private static bool DeliverToSilentClient()
         {
             string name = "SimpleDeFenceTest_" + Guid.NewGuid().ToString("N");
 
@@ -87,9 +93,7 @@ namespace SimpleDeFence.Tests
             server.ReadMode = PipeTransmissionMode.Message;
             SerializationHelper.DeserializeFromPipe<TwMessage>(server, TimeoutMs, TwMessageComError.Instance);
 
-            var stopwatch = Stopwatch.StartNew();
-            SendResponseBounded(server, new TwMessageReadFwLog(BuildLog()));
-            stopwatch.Stop();
+            bool deliveryCompleted = SendResponseBounded(server, new TwMessageReadFwLog(BuildLog()));
 
             releaseClient.Set();
 
@@ -99,12 +103,13 @@ namespace SimpleDeFence.Tests
             Assert.True(client.Wait(TimeoutMs), "The client task did not finish in time.");
             client.GetAwaiter().GetResult();
 
-            return stopwatch.ElapsedMilliseconds;
+            return deliveryCompleted;
         }
 
         /// <summary>Mirrors PipeServerEndpoint.SendResponse, the same way the other pipe tests
-        /// mirror the server loop rather than reaching into the service assembly.</summary>
-        private static void SendResponseBounded(NamedPipeServerStream pipeServer, TwMessage resp)
+        /// mirror the server loop rather than reaching into the service assembly. Returns whether
+        /// the delivery finished on its own, as opposed to being cut short by the bound.</summary>
+        private static bool SendResponseBounded(NamedPipeServerStream pipeServer, TwMessage resp)
         {
             var delivery = Task.Run(() =>
             {
@@ -119,7 +124,7 @@ namespace SimpleDeFence.Tests
                 }
             });
 
-            delivery.Wait(DeliveryTimeoutMs);
+            return delivery.Wait(DeliveryTimeoutMs);
         }
 
         private static FirewallLogEntry[] BuildLog()
