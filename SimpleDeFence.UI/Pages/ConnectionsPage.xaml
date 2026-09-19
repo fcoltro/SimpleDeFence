@@ -18,6 +18,16 @@
              SubtleFillColorSecondaryBrush - the same low-alpha brush Fluent uses for hover - so the
              classification fill still reads through it rather than being replaced.
 
+             None of that was enough on its own, and the template below was not the reason. A
+             ListView whose SelectionMode is None and whose IsItemClickEnabled is False - the
+             default - treats its items as display-only: WinUI never puts them into PointerOver at
+             all, so this template's PointerOver arm was dead code and no wash of any strength could
+             have shown. Measured rather than assumed: capturing the window with the pointer parked
+             away from the list and again with it held over a row produced two byte-identical
+             images. The three lists therefore set IsItemClickEnabled="True", which is what makes an
+             item interactive; SelectionMode stays None, so a click raises ItemClick, nothing
+             handles it, and nothing gets selected.
+
              Selection states are deliberately absent: all three lists are SelectionMode="None" and
              there is nothing to select. Padding is zeroed because the row templates bring their own
              (12,8). -->
@@ -608,7 +618,7 @@
                     <StackPanel>
                         <TextBlock x:Name="BlockedEmpty" Text="{loc:Loc Key=connections.empty.blocked}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
-                        <ListView x:Name="BlockedList" SelectionMode="None"
+                        <ListView x:Name="BlockedList" SelectionMode="None" IsItemClickEnabled="True"
                                   ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource BlockedRowWide}"/>
                     </StackPanel>
@@ -624,7 +634,7 @@
                     <StackPanel>
                         <TextBlock x:Name="ConnectedEmpty" Text="{loc:Loc Key=connections.empty.connected}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
-                        <ListView x:Name="ConnectedList" SelectionMode="None"
+                        <ListView x:Name="ConnectedList" SelectionMode="None" IsItemClickEnabled="True"
                                   ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource ConnectedRowWide}"/>
                     </StackPanel>
@@ -640,7 +650,7 @@
                     <StackPanel>
                         <TextBlock x:Name="OpenEmpty" Text="{loc:Loc Key=connections.empty.open}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
-                        <ListView x:Name="OpenList" SelectionMode="None"
+                        <ListView x:Name="OpenList" SelectionMode="None" IsItemClickEnabled="True"
                                   ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource OpenRowWide}"/>
                     </StackPanel>
