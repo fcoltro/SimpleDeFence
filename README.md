@@ -29,6 +29,14 @@ Filtering Platform by a background service running as LocalSystem; the interface
 process that talks to it over a named pipe. Nothing in the GUI has to run elevated for the
 firewall to keep working, and closing the window does not stop protection.
 
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="SimpleDeFence.Assets/screenshots/connections-dark.png" />
+    <img src="SimpleDeFence.Assets/screenshots/connections-light.png" alt="The Connections screen: blocked attempts with a one-click Allow, alongside current connections and listening ports" width="820" />
+  </picture>
+  <p><em>The Connections screen — what was blocked, what is connected, what is listening. One click allows anything in the list.</em></p>
+</div>
+
 ## Install
 
 Download the installer from the [latest release](https://github.com/fcoltro/SimpleDeFence/releases/latest)
