@@ -311,9 +311,19 @@ namespace SimpleDeFence
 
             try
             {
-                // Put back the user's original hosts file
+                // Put back the user's original hosts file.
+                //
+                // The result is checked rather than discarded: a false here means our blocklist is
+                // still the machine's hosts file and the saved original is gone. The uninstall
+                // carries on regardless - refusing to uninstall is worse - but this is the last
+                // moment the fact can be recorded anywhere, and after this the product that
+                // installed it no longer exists to be asked.
                 using HostsFileManager hosts = new();
-                hosts.DisableHostsFile();
+                if (!hosts.DisableHostsFile())
+                {
+                    Utils.Log("The original hosts file could not be restored during uninstall; see the service log for what was left in place.",
+                        Utils.LOG_ID_INSTALLER);
+                }
             }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_INSTALLER); }
 

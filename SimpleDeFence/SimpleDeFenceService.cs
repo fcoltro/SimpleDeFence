@@ -1416,6 +1416,18 @@ namespace SimpleDeFence
                 HostsFileManager.EnableHostsFile();
             }
         }
+        /// <summary>
+        /// Set when a database update has landed and the firewall has to be rebuilt on top of it.
+        /// Read by the MINUTE_TIMER case, which is the only thing that can reach an update at all.
+        ///
+        /// A flag rather than a queued REINIT. GetCompressedUpdate invokes its install method
+        /// synchronously - the WaitCallback type says thread pool, the call site does not - so
+        /// DatabaseUpdateInstall runs on the worker thread, by way of MINUTE_TIMER -> UpdaterMethod.
+        /// Posting to Q from there is the same self-deadlock the inactivity lock above had: one
+        /// bounded queue, one consumer, and the consumer is the caller.
+        /// </summary>
+        private bool ReinitAfterDatabaseUpdate;
+
         private void DatabaseUpdateInstall(object file)
         {
             string tmpFilePath = (string)file;
@@ -1428,7 +1440,7 @@ namespace SimpleDeFence
             }
             FileLocker.Lock(DatabaseClasses.AppDatabase.DBPath, FileAccess.Read, FileShare.Read);
             NotifyController(MessageType.DATABASE_UPDATED);
-            Q.Add(new TwRequest(TwMessageSimple.CreateRequest(MessageType.REINIT)));
+            ReinitAfterDatabaseUpdate = true;
         }
 
         private void NotifyController(MessageType msg)
@@ -1871,10 +1883,24 @@ namespace SimpleDeFence
                             TryInitFirewall();
                         }
 
-                        // Check for inactivity and lock if necessary
+                        // Check for inactivity and lock if necessary.
+                        //
+                        // Applied here rather than queued, for the reason the retry above already
+                        // states and this line used to ignore: Q is bounded at 32 and has exactly
+                        // one consumer - this thread. Posting to it from inside ProcessCmd means
+                        // that if the queue filled while we were busy above (ProcessStartWatcher
+                        // enqueues an ADD_TEMPORARY_EXCEPTION per process start, from WMI's own
+                        // threads, with no coalescing), Add blocks waiting for a consumer that is
+                        // this very thread - and the service wedges for good, still Running as far
+                        // as the SCM is concerned and answering nothing.
+                        //
+                        // This is the whole body of the LOCK case; running it inline is the same
+                        // work in the same order on the same thread, minus the hand-off that could
+                        // not complete.
                         if (DateTime.Now - LastControllerCommandTime > TimeSpan.FromMinutes(10))
                         {
-                            Q.Add(new TwRequest(TwMessageSimple.CreateRequest(MessageType.LOCK)));
+                            PasswordLock.Locked = true;
+                            GlobalInstances.ServerChangeset = Guid.NewGuid();
                         }
 
                         if (PruneExpiredRules())
@@ -1904,6 +1930,16 @@ namespace SimpleDeFence
                         {
                             LastUpdateCheck = DateTime.Now;
                             UpdaterMethod();
+                        }
+
+                        // A database update that landed during the check above needs the rule set
+                        // rebuilt on top of it. Directly, for the same reason as everything else in
+                        // this case - see ReinitAfterDatabaseUpdate.
+                        if (ReinitAfterDatabaseUpdate)
+                        {
+                            ReinitAfterDatabaseUpdate = false;
+                            Utils.Log("Reinitializing after an application database update.", Utils.LOG_ID_SERVICE);
+                            TryInitFirewall();
                         }
 
                         return args.CreateResponse();
