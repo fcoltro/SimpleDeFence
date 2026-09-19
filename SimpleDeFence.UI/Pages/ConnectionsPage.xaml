@@ -51,8 +51,13 @@
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                             <!-- IsHitTestVisible="False" so the wash never intercepts a click meant
                                  for the Allow or "Show all" button underneath it. -->
+                            <!-- RowHoverBrush, not SubtleFillColorSecondary: this overlay sits on
+                                 top of a row that may already be tinted red or olive by its
+                                 classification, and the stock 6% wash was invisible against those.
+                                 Shared with the Rules list via Themes/StatusResources.xaml so the
+                                 two pages cannot drift apart on how strong a hover looks. -->
                             <Rectangle x:Name="HoverOverlay"
-                                       Fill="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                       Fill="{ThemeResource RowHoverBrush}"
                                        Opacity="0" IsHitTestVisible="False"/>
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">

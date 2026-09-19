@@ -3,6 +3,41 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SimpleDeFence.UI.Themes">
 
+    <!-- Row hover, strong enough to actually see.
+
+         WinUI's stock ListViewItem hover is SubtleFillColorSecondary - around 6% white in dark.
+         On a page whose rows already carry a classification tint (Connections colours by whether
+         the traffic stayed local, Rules by whether the entry is a block) a 6% wash over that tint
+         is indistinguishable from no wash at all, and the lists read as if hover were simply not
+         implemented.
+
+         Overriding the brushes rather than replacing the ListViewItem template on each page,
+         because the Rules list is SelectionMode="Multiple" and its checkboxes are drawn by the
+         stock ListViewItemPresenter - a custom ControlTemplate would silently delete them, and
+         with them the only way to select anything for the Remove button.
+
+         In ThemeDictionaries, unlike the status palette above: these are consumed by XAML
+         {ThemeResource} lookups on the elements themselves, which resolve against the element's
+         own ActualTheme, so the per-theme split works correctly here and is what gives a hover
+         that reads on a near-white row and a near-black one alike. -->
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="RowHoverBrush"                                 Color="#1A000000"/>
+            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver"             Color="#1A000000"/>
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPointerOver"     Color="#26000000"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="RowHoverBrush"                                 Color="#22FFFFFF"/>
+            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver"             Color="#22FFFFFF"/>
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPointerOver"     Color="#30FFFFFF"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="HighContrast">
+            <!-- Left to the system: high contrast users have chosen their own highlight colour and
+                 a hand-picked wash would override it with something they did not ask for. -->
+            <SolidColorBrush x:Key="RowHoverBrush" Color="{ThemeResource SystemColorHighlightColor}"/>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
     <!-- One explicit status palette, shared by light and dark, instead of the WinUI system
          semantic colours these used to bind to.
 
@@ -31,4 +66,7 @@
     <SolidColorBrush x:Key="StatusAccentAltBrush"   Color="#4C9BE8"/>
 
     <local:ModeStateToBrushConverter x:Key="ModeStateToBrush"/>
+
+    <!-- Row hover, strong enough to actually see.
+         See the ThemeDictionaries below for the values and the reasoning. -->
 </ResourceDictionary>
