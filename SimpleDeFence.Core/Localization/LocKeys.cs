@@ -162,6 +162,7 @@
             public const string EmptyApplications = "rules.empty.applications";
             public const string EmptySpecial = "rules.empty.special";
             public const string EmptyFiltered = "rules.empty.filtered";
+            public const string AppMissing = "rules.appMissing";
             public const string Remove = "rules.remove";
             public const string MultiSelectHint = "rules.multiSelectHint";
             public const string RemoveConfirmTitle = "rules.removeConfirm.title";

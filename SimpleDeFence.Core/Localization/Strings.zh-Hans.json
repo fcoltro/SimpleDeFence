@@ -167,6 +167,7 @@
       "special": "没有可用的特殊例外。",
       "filtered": "没有符合当前筛选条件的内容。"
     },
+    "appMissing": "此应用程序的文件已不在磁盘上，可能已被卸载。",
     "remove": "移除",
     "removeConfirm": {
       "title": "移除例外？",

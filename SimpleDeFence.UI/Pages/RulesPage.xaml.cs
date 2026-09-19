@@ -22,6 +22,24 @@ namespace SimpleDeFence.UI.Pages
         public string Policy => Row.Policy;
         public bool IsBlocked => Row.IsBlocked;
 
+        /// <summary>True when the rule's subject is a standalone executable or service whose file
+        /// no longer exists on disk - typically because the app was uninstalled after the rule was
+        /// created. ServiceSubject derives from ExecutableSubject and is covered by the same check;
+        /// GlobalSubject (no path) and AppContainerSubject (a UWP package, not a loose file) have no
+        /// simple existence check and are never flagged.</summary>
+        public bool IsMissing => Row.Exception?.Subject is ExecutableSubject exe
+            && !System.IO.File.Exists(exe.ExecutablePath);
+
+        /// <summary>Paired with MissingNameVisibility below: the row template shows one of two
+        /// overlapping TextBlocks rather than switching a single TextBlock's Foreground from C#.
+        /// A ThemeResource used directly in XAML resolves against the TextBlock's own ActualTheme;
+        /// resolving the same resource from C# (as ModeStateToBrushConverter's own comment explains)
+        /// would instead consult the Application's theme, which can disagree with the page's when the
+        /// user has picked an explicit theme. Two visibility-switched TextBlocks sidesteps that
+        /// mismatch entirely.</summary>
+        public Visibility NormalNameVisibility => IsMissing ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility MissingNameVisibility => IsMissing ? Visibility.Visible : Visibility.Collapsed;
+
         /// <summary>Blocked entries are tinted, the same signal ExceptionRow/SettingsForm give via
         /// row colour.</summary>
         // global:: is required - inside SimpleDeFence.UI.Pages a bare "Windows" binds to
