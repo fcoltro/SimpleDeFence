@@ -41,3 +41,11 @@ application's own updater before anything runs.
 Copy the `1.0.0` folder to the new version number, then update in all three files:
 `PackageVersion`, `InstallerUrl`, `InstallerSha256`, `ReleaseDate`, `ReleaseNotesUrl`, and
 `ProductCode` if the MSI's product code changed.
+
+## Version 1.0.1
+
+`manifests/.../1.0.1/` is prepared but must **not** be submitted while the 1.0.0 pull request
+(microsoft/winget-pkgs#437457) is still open — submit it once 1.0.0 has merged, as a separate
+"New version" PR. `ProductCode` differs from 1.0.0 because the MSI mints a new one on every build; it
+and `InstallerSha256` were read from the released v1.0.1 asset, and the hash matches
+`updates/update.json`.

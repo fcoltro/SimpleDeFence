@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+PackageIdentifier: fcoltro.SimpleDeFence
+PackageVersion: 1.0.1
+MinimumOSVersion: 10.0.19041.0
+InstallerType: wix
+Scope: machine
+InstallModes:
+  - interactive
+  - silent
+  - silentWithProgress
+UpgradeBehavior: install
+ProductCode: '{E35A0179-C2DC-45E5-AF01-A7666EB9B128}'
+ReleaseDate: 2026-09-19
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/fcoltro/SimpleDeFence/releases/download/v1.0.1/SimpleDeFence_x64.msi
+    InstallerSha256: 854A03A9939D513D463066E133EA82F793D0D4ED5C783A02E70CF355B3FDAA99
+ManifestType: installer
+ManifestVersion: 1.6.0
