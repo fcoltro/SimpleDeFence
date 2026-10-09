@@ -349,6 +349,7 @@ namespace SimpleDeFence
         internal static Version SimpleDeFenceVersion { get; } = typeof(Utils).Assembly.GetName().Version;
 
         private readonly static object logLocker = new();
+        private static bool deprecatedLogsRemoved;   // guarded by logLocker
         internal static readonly string LOG_ID_SERVICE   = "service";
         internal static readonly string LOG_ID_GUI       = "gui";
         internal static readonly string LOG_ID_INSTALLER = "installer";
@@ -370,22 +371,28 @@ namespace SimpleDeFence
             {
                 lock (logLocker)
                 {
-                    // First, remove deprecated log files if any is found
-                    // TODO: This can probably be removed in the future
-                    string[] old_logs = new string[] {
-                        Path.Combine(Utils.AppDataPath, "errorlog"),
-                        Path.Combine(Utils.AppDataPath, "service.log"),
-                        Path.Combine(Utils.AppDataPath, "client.log"),
-                    };
-
-                    foreach (string file in old_logs)
+                    // First, remove log files left at the top level by older versions, which kept
+                    // their logs there rather than in logs\. Once per process is enough; these
+                    // are never recreated, so checking on every write was only wasted I/O.
+                    if (!deprecatedLogsRemoved)
                     {
-                        try
+                        deprecatedLogsRemoved = true;
+
+                        string[] old_logs = new string[] {
+                            Path.Combine(Utils.AppDataPath, "errorlog"),
+                            Path.Combine(Utils.AppDataPath, "service.log"),
+                            Path.Combine(Utils.AppDataPath, "client.log"),
+                        };
+
+                        foreach (string file in old_logs)
                         {
-                            if (File.Exists(file))
-                                File.Delete(file);
+                            try
+                            {
+                                if (File.Exists(file))
+                                    File.Delete(file);
+                            }
+                            catch { }
                         }
-                        catch { }
                     }
 
                     // Name of the current log file

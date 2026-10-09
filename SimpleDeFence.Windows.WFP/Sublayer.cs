@@ -20,12 +20,11 @@ namespace SimpleDeFence.Windows.WFP
         {
             _nativeStruct = nativeStruct;
 
+            // providerKey points into memory owned by the WFP enumeration, which SublayerCollection
+            // frees as soon as the batch is read. Copy the GUID through the setter so the struct
+            // holds a pointer this object owns, as Filter does, rather than one left dangling.
             if (_nativeStruct.providerKey != IntPtr.Zero)
-            {
-                // TODO: Do we really not need to own these SafeHandles ???
-                //_providerKeyHandle = new AllocHGlobalSafeHandle(_nativeStruct.providerKey, false);
-                _providerKey = PInvokeHelper.PtrToStructure<Guid>(_nativeStruct.providerKey);
-            }
+                ProviderKey = PInvokeHelper.PtrToStructure<Guid>(_nativeStruct.providerKey);
         }
 
         public string? Name
