@@ -180,7 +180,8 @@ Still to do:
 - [ ] **Add a social preview image** (Settings → General → Social preview, 1280×640) — this is what
       renders when the link is shared anywhere, and its absence costs real clicks
 - [ ] **Enable Discussions** for questions that are not bugs, so issues stay a bug tracker
-- [ ] **Pin** a "Start here / FAQ" discussion
+- [ ] **Pin** a "Start here / FAQ" discussion. The text is drafted in [FAQ.md](FAQ.md): paste it
+      into a new Discussion once Discussions is enabled, then pin it
 - [ ] Consider a short **GIF** of allowing a blocked app in one click — that is the product's best
       moment and it is invisible in text
 
