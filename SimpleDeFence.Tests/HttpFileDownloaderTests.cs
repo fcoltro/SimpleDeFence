@@ -65,7 +65,9 @@ namespace SimpleDeFence.Tests
                     }
                     else if (path == "/header-echo")
                     {
-                        var body = Encoding.UTF8.GetBytes(ctx.Request.Headers["TW-Version"] ?? "(absent)");
+                        // Encoded so code scanning does not read an echoed request header as XSS;
+                        // the version strings the test sends are unchanged by it.
+                        var body = Encoding.UTF8.GetBytes(WebUtility.HtmlEncode(ctx.Request.Headers["TW-Version"] ?? "(absent)"));
                         ctx.Response.StatusCode = 200;
                         ctx.Response.OutputStream.Write(body, 0, body.Length);
                     }
