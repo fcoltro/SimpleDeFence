@@ -50,28 +50,39 @@ namespace SimpleDeFence.Tests
                 try { ctx = _listener.GetContext(); }
                 catch { return; }
 
-                var path = ctx.Request.Url?.AbsolutePath ?? "/";
-                if (path == "/payload")
+                // The client can finish (or, for the 404, throw on the status line) before this
+                // thread closes the response, and Dispose may stop the listener in that gap.
+                // An exception escaping a background thread kills the whole test host, so a
+                // failure after shutdown has begun ends the loop instead.
+                try
                 {
-                    var body = Encoding.UTF8.GetBytes("firewall configuration payload");
-                    ctx.Response.StatusCode = 200;
-                    ctx.Response.OutputStream.Write(body, 0, body.Length);
+                    var path = ctx.Request.Url?.AbsolutePath ?? "/";
+                    if (path == "/payload")
+                    {
+                        var body = Encoding.UTF8.GetBytes("firewall configuration payload");
+                        ctx.Response.StatusCode = 200;
+                        ctx.Response.OutputStream.Write(body, 0, body.Length);
+                    }
+                    else if (path == "/header-echo")
+                    {
+                        var body = Encoding.UTF8.GetBytes(ctx.Request.Headers["TW-Version"] ?? "(absent)");
+                        ctx.Response.StatusCode = 200;
+                        ctx.Response.OutputStream.Write(body, 0, body.Length);
+                    }
+                    else
+                    {
+                        // An error page with a body, which is the case that matters: WebClient and this
+                        // replacement must both throw rather than write it to disk as if it were the file.
+                        var body = Encoding.UTF8.GetBytes("<html>404 not found</html>");
+                        ctx.Response.StatusCode = 404;
+                        ctx.Response.OutputStream.Write(body, 0, body.Length);
+                    }
+                    ctx.Response.OutputStream.Close();
                 }
-                else if (path == "/header-echo")
+                catch when (_stop)
                 {
-                    var body = Encoding.UTF8.GetBytes(ctx.Request.Headers["TW-Version"] ?? "(absent)");
-                    ctx.Response.StatusCode = 200;
-                    ctx.Response.OutputStream.Write(body, 0, body.Length);
+                    return;
                 }
-                else
-                {
-                    // An error page with a body, which is the case that matters: WebClient and this
-                    // replacement must both throw rather than write it to disk as if it were the file.
-                    var body = Encoding.UTF8.GetBytes("<html>404 not found</html>");
-                    ctx.Response.StatusCode = 404;
-                    ctx.Response.OutputStream.Write(body, 0, body.Length);
-                }
-                ctx.Response.OutputStream.Close();
             }
         }
 
