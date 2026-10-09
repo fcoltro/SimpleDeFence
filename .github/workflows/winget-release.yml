@@ -6,7 +6,15 @@ name: Publish to winget
 # is harmless.
 #
 # One-time setup: create a classic personal access token with the `public_repo` scope, store it as
-# the repository secret WINGET_TOKEN, and fork microsoft/winget-pkgs to the account that owns it.
+# the repository secret WINGET_TOKEN, and fork microsoft/winget-pkgs to the account that owns it
+# (fcoltro/winget-pkgs, which already exists).
+#
+# The version comes from the tag with its leading 'v' removed, so tags must carry all three parts
+# (v1.2.0, not v1.2) to match the PackageVersion already in winget.
+#
+# v1.0.1 was released before this workflow existed, so no run was ever triggered for it. Once 1.0.0
+# has merged, either submit packaging/winget/manifests/.../1.0.1 by hand or run this workflow
+# manually with the tag v1.0.1.
 
 on:
   release:
@@ -24,7 +32,7 @@ jobs:
   winget:
     runs-on: windows-latest
     steps:
-      - uses: vedantmgoyal9/winget-releaser@main
+      - uses: vedantmgoyal9/winget-releaser@f29ed1ffd34f91223a2aebaa71beaab0901ff9fd # v2
         with:
           identifier: fcoltro.SimpleDeFence
           installers-regex: 'SimpleDeFence_x64\.msi$'

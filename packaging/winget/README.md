@@ -38,9 +38,14 @@ application's own updater before anything runs.
 
 ## For the next release
 
-Copy the `1.0.0` folder to the new version number, then update in all three files:
-`PackageVersion`, `InstallerUrl`, `InstallerSha256`, `ReleaseDate`, `ReleaseNotesUrl`, and
-`ProductCode` if the MSI's product code changed.
+Once 1.0.0 is in winget, `.github/workflows/winget-release.yml` opens the "New version" pull request
+on its own whenever a release is published, reading the hash and `ProductCode` from the release's
+`SimpleDeFence_x64.msi`. It needs the `WINGET_TOKEN` secret (see the workflow's header), and the tag
+must have all three version parts (`v1.2.0`, not `v1.2`).
+
+To do it by hand instead, copy the latest version folder to the new version number, then update in
+all three files: `PackageVersion`, `InstallerUrl`, `InstallerSha256`, `ReleaseDate`,
+`ReleaseNotesUrl`, and `ProductCode` (the MSI mints a new one on every build).
 
 ## Version 1.0.1
 
