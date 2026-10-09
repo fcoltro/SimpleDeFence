@@ -170,11 +170,15 @@ Happy to answer questions.
 
 These are what convert a visitor into a user once a post sends them your way.
 
+- [x] **Screenshots in the README.** Done in dc8f941: the Connections screen is now the README's
+      hero image, light and dark via a `<picture>` element. The tray menu was not captured; add it
+      if the README ever wants a second image.
+
+Still to do:
+
 - [ ] **Set the homepage URL** to the latest release, so the repo sidebar has a download link
 - [ ] **Add a social preview image** (Settings → General → Social preview, 1280×640) — this is what
       renders when the link is shared anywhere, and its absence costs real clicks
-- [ ] **Screenshots in the README.** Currently there are none, and for a GUI application that is the
-      biggest single omission. Connections screen and tray menu, light and dark.
 - [ ] **Enable Discussions** for questions that are not bugs, so issues stay a bug tracker
 - [ ] **Pin** a "Start here / FAQ" discussion
 - [ ] Consider a short **GIF** of allowing a blocked app in one click — that is the product's best
