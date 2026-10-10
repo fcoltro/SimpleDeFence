@@ -569,7 +569,7 @@ namespace SimpleDeFence.Windows.WFP
         public UserIdFilterCondition(string sid, RemoteOrLocal peer)
             : base((RemoteOrLocal.Local == peer) ? ConditionKeys.FWPM_CONDITION_ALE_USER_ID : ConditionKeys.FWPM_CONDITION_ALE_REMOTE_USER_ID,
                   FieldMatchType.FWP_MATCH_EQUAL,
-                  $"O:LSD:(A;;CC;;;{sid}))")
+                  $"O:LSD:(A;;CC;;;{sid})")   // one closing parenthesis; the stray second one made the SDDL invalid
         {
         }
     }

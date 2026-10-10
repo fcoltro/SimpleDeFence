@@ -125,7 +125,7 @@ namespace SimpleDeFence.Windows
         public static bool Win8OrNewer { get; } = WinVerEqOrGr(6, 2, 0);
         public static bool Win81OrNewer { get; } = WinVerEqOrGr(6, 3, 0);
         public static bool Win10OrNewer { get; } = WinVerEqOrGr(10, 0, 0);
-        public static bool Win11OrNewer { get; } = WinVerEqOrGr(10, 0, 2200);
+        public static bool Win11OrNewer { get; } = WinVerEqOrGr(10, 0, 22000);   // was 2200, which every Windows 10 build passes
 
         public static bool IsWow64Process { get; } = SafeNativeMethods.InternalCheckIsWow64();
         public static bool Is64BitProcess { get; } = (IntPtr.Size == 8);
