@@ -1194,13 +1194,13 @@ namespace SimpleDeFence
             switch (outcome)
             {
                 case ConfigLoadOutcome.Unreadable:
-                    Utils.Log("The configuration file is present but could not be read. Running on default settings; the file has been left alone.", Utils.LOG_ID_SERVICE);
+                    Utils.Log("The configuration file is present but could not be read. Running on default settings.", Utils.LOG_ID_SERVICE);
                     break;
                 case ConfigLoadOutcome.Unauthenticated:
-                    Utils.Log("The configuration file failed its authentication check - it was altered, truncated, or written under a different key. Running on default settings; the file has been left alone.", Utils.LOG_ID_SERVICE);
+                    Utils.Log("The configuration file failed its authentication check - it was altered, truncated, or written under a different key. Running on default settings.", Utils.LOG_ID_SERVICE);
                     break;
                 case ConfigLoadOutcome.DowngradeRefused:
-                    Utils.Log("The configuration file is in the superseded format, which this installation has already migrated away from, so it was refused as a downgrade. Running on default settings; the file has been left alone.", Utils.LOG_ID_SERVICE);
+                    Utils.Log("The configuration file is in the superseded format, which this installation has already migrated away from, so it was refused as a downgrade. Running on default settings.", Utils.LOG_ID_SERVICE);
                     break;
                 default:
                     VisibleState.Degraded &= ~ServiceDegradation.ConfigurationUnreadable;
@@ -1208,6 +1208,29 @@ namespace SimpleDeFence
             }
 
             VisibleState.Degraded |= ServiceDegradation.ConfigurationUnreadable;
+            KeepRejectedConfig();
+        }
+
+        /// <summary>
+        /// Copies a configuration the service refused to config.rejected, before anything else
+        /// gets the chance to replace it. "Left alone" only lasted until the next save - pruning an
+        /// expired rule at startup, or the user changing any setting - which wrote the defaults
+        /// over the only copy of the user's rules. The copy keeps the AppData directory's ACL, so
+        /// it is as private as the original.
+        /// </summary>
+        private static void KeepRejectedConfig()
+        {
+            var rejectedPath = ConfigSavePath + ".rejected";
+            try
+            {
+                File.Copy(ConfigSavePath, rejectedPath, overwrite: true);
+                Utils.Log($"The refused configuration file was copied to {rejectedPath}.", Utils.LOG_ID_SERVICE);
+            }
+            catch (Exception e)
+            {
+                Utils.Log("Could not keep a copy of the refused configuration file. For details see the next log entry.", Utils.LOG_ID_SERVICE);
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+            }
         }
 
         // This method completely reinitializes the firewall.
