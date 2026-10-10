@@ -141,8 +141,13 @@
            missing. /install is EnsureServiceInstalledAndRunning, which leaves a healthy service
            as it is. -->
       <Custom Action='InstallCustom' Before='InstallFinalize'>NOT REMOVE="ALL"</Custom>
-      <Custom Action='StartControllerAndDetect' After='InstallCustom'>(NOT Installed) AND (NOT OLDER_UPGRADEABLE_FOUND)</Custom>
-      <Custom Action='StartController' After='InstallCustom'>(NOT Installed) AND OLDER_UPGRADEABLE_FOUND</Custom>
+      <!-- Only without the full wizard (UILevel below 5: a silent or basic-UI install such as the
+           in-app update). With the wizard they did not open the app (seen installing 1.0.2),
+           most likely because they run inside the installer service, which cannot start an
+           executable that asks for elevation, and asyncNoWait hides the failure. The wizard
+           opens the app from its last page instead - see LaunchApplication. -->
+      <Custom Action='StartControllerAndDetect' After='InstallCustom'>(NOT Installed) AND (NOT OLDER_UPGRADEABLE_FOUND) AND (UILevel &lt; 5)</Custom>
+      <Custom Action='StartController' After='InstallCustom'>(NOT Installed) AND OLDER_UPGRADEABLE_FOUND AND (UILevel &lt; 5)</Custom>
       <!-- InstallFinalize -->
     </InstallExecuteSequence>
 
@@ -158,6 +163,13 @@
     <WixVariable Id="WixUIDialogBmp" Value="background.bmp" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value='The default configuration of SimpleDeFence is to block most programs. If an application is unable to access the network, remember to use one of the "Whitelist by..." options from the tray menu.' />
+    <!-- "Open SimpleDeFence" box on the wizard's last page, ticked by default. WixShellExec runs
+         in the wizard's own process through ShellExecute, which can raise the elevation prompt
+         the app's manifest asks for. -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open SimpleDeFence" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WixShellExecTarget" Value="[#TinyWallEXE]" />
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
     <WixVariable Id="WixUILicenseRtf" Value="Sources\ProgramFiles\SimpleDeFence\License.rtf" />
 
   </Product>
