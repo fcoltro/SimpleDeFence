@@ -114,6 +114,9 @@
     <CustomAction Id='InstallCustom' FileKey='TinyWallEXE' ExeCommand='/install' Return='check' Execute='commit' Impersonate='no' />
     <CustomAction Id='InstallCustomRollback' FileKey='TinyWallEXE' ExeCommand='/uninstall' Return='check' Execute='rollback' Impersonate='no' />
     <CustomAction Id='UninstallCustom' FileKey='TinyWallEXE' ExeCommand='/uninstall' Return='check' Execute='deferred' Impersonate='no' />
+    <!-- Undoes UninstallCustom when a removal fails after it ran. Without it a failed uninstall
+         restored the program files but left the machine with no service and no WFP filters. -->
+    <CustomAction Id='UninstallCustomRollback' FileKey='TinyWallEXE' ExeCommand='/install' Return='ignore' Execute='rollback' Impersonate='no' />
     <CustomAction Id='StartControllerAndDetect' FileKey='TinyWallEXE' ExeCommand='/autowhitelist' Return='asyncNoWait' Execute='commit' />
     <CustomAction Id='StartController' FileKey='TinyWallEXE' ExeCommand='' Return='asyncNoWait' Execute='commit' />
 
@@ -126,9 +129,18 @@
       <Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
       <RemoveExistingProducts After='InstallValidate'>OLDER_UPGRADEABLE_FOUND</RemoveExistingProducts>
       <!-- InstallInitialize -->
-      <Custom Action='UninstallCustom' Before='UnpublishFeatures'>Installed</Custom>
+      <!-- REMOVE="ALL", not Installed. Installed is also true during a repair (the wizard's Repair
+           button, msiexec /f), which stopped and removed the service and its filters while
+           InstallCustom - gated on NOT Installed - never put them back: a repair silently left the
+           machine with no firewall. A major upgrade still removes the old product through its own
+           package, which runs with REMOVE="ALL". -->
+      <Custom Action='UninstallCustomRollback' Before='UninstallCustom'>REMOVE="ALL"</Custom>
+      <Custom Action='UninstallCustom' Before='UnpublishFeatures'>REMOVE="ALL"</Custom>
       <Custom Action='InstallCustomRollback' Before='InstallCustom'>NOT Installed</Custom>
-      <Custom Action='InstallCustom' Before='InstallFinalize'>NOT Installed</Custom>
+      <!-- Also on repair, so a repair re-registers the service and its filters if they went
+           missing. /install is EnsureServiceInstalledAndRunning, which leaves a healthy service
+           as it is. -->
+      <Custom Action='InstallCustom' Before='InstallFinalize'>NOT REMOVE="ALL"</Custom>
       <Custom Action='StartControllerAndDetect' After='InstallCustom'>(NOT Installed) AND (NOT OLDER_UPGRADEABLE_FOUND)</Custom>
       <Custom Action='StartController' After='InstallCustom'>(NOT Installed) AND OLDER_UPGRADEABLE_FOUND</Custom>
       <!-- InstallFinalize -->
@@ -218,7 +230,10 @@
           <Component Id="RemoveAppDataDir" Guid="{602DBDBF-489B-4F86-849B-30FDBE6D5EFF}" Win64="$(var.Win64)" Transitive="yes">
             <RemoveFile Id="AppDataDirFiles" On='install' Name='*' />
             <RemoveFolder Id="AppDataDirFolder" On='install' />
-            <Condition><![CDATA[NOT OLDER_UPGRADEABLE_FOUND]]></Condition>
+            <!-- NOT Installed as well: on a repair this component is reinstalled, and its
+                 RemoveFile On='install' then deleted the user's configuration, its key and the
+                 password file from ProgramData. -->
+            <Condition><![CDATA[(NOT OLDER_UPGRADEABLE_FOUND) AND (NOT Installed)]]></Condition>
           </Component>
         </Directory>
       </Directory>
