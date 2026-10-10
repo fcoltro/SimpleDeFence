@@ -24,6 +24,10 @@ on:
       tag:
         description: Release tag to create, e.g. v1.0.2
         required: true
+      replace:
+        description: If this release already exists, delete it and its tag, and publish it again from this commit
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -96,6 +100,22 @@ jobs:
         $hash = (Get-FileHash $msi -Algorithm SHA256).Hash.ToLowerInvariant()
         "SHA-256 of SimpleDeFence_x64.msi for $($env:TAG): ``$hash``" >> $env:GITHUB_STEP_SUMMARY
         Write-Host "SHA256 $hash"
+
+    # Only on a manual run with "replace" ticked, for rebuilding a release that nobody has been
+    # offered in-app yet. Once updates/update.json names a release, bump the version instead:
+    # installed clients only move to a higher version.
+    - name: Remove the existing release
+      if: github.event_name == 'workflow_dispatch' && inputs.replace
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release view $env:TAG *> $null
+        if ($LASTEXITCODE -eq 0) {
+          gh release delete $env:TAG --cleanup-tag --yes
+          if ($LASTEXITCODE -ne 0) { throw "gh release delete failed with exit code $LASTEXITCODE" }
+        }
+        $global:LASTEXITCODE = 0
 
     # On a dispatched run the tag does not exist yet, so the release creates it on this commit.
     - name: Create release
