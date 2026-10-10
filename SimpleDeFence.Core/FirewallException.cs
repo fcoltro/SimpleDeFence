@@ -14,7 +14,7 @@ namespace SimpleDeFence
         For_1_Hour = 60,
         For_4_Hours = 240,
         For_9_Hours = 540,
-        For_24_Hours = 1140,
+        For_24_Hours = 1440,   // minutes; was 1140, which pruned "24 hours" after 19
         Invalid
     }
 

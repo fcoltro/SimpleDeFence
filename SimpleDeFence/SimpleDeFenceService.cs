@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Management;
 using System.Threading;
+using System.Threading.Tasks;
 using SimpleDeFence.Windows;
 using SimpleDeFence.Windows.Services;
 using SimpleDeFence.Windows.WFP;
@@ -251,6 +252,23 @@ namespace SimpleDeFence
                 }   // if (ChildInheritance ...
             }
 
+            PrepareRulesForInstall(rules);
+            return rules;
+        }
+
+        /// <summary>
+        /// The last two steps every rule needs before it reaches WFP, whichever path built it.
+        ///
+        /// ADD_TEMPORARY_EXCEPTION used to skip both, because they lived inline at the end of
+        /// AssembleActiveRules. Its rules carry Win32 paths - ProcessManager.GetProcessPath returns
+        /// "C:\..." - and ConstructFilter tells AppIdFilterCondition the path is already in kernel
+        /// form, so the filter matched on the literal text "c:\..." while WFP compares
+        /// "\device\harddiskvolumeN\...". Every child-process rule inherited at process start
+        /// therefore matched nothing, and the child stayed blocked until the next 30-minute full
+        /// reload. The display-off restriction was skipped the same way.
+        /// </summary>
+        private void PrepareRulesForInstall(List<RuleDef> rules)
+        {
             // Convert all paths to kernel-format
             foreach (var r in rules)
             {
@@ -270,8 +288,6 @@ namespace SimpleDeFence
                     }
                 }
             }
-
-            return rules;
         }
 
         private void InstallRules(List<RuleDef> rules, List<RuleDef> rawSocketExceptions, bool useTransaction)
@@ -329,12 +345,13 @@ namespace SimpleDeFence
                     VisibleState.Degraded |= ServiceDegradation.RulesIncomplete;
                 }
 
-                // Built-in protections
+                // Raw-socket permits belong to the rules just installed, so they go in with them.
+                // The WSL2 filters do not - they are installed once per full rule set, by
+                // InstallFirewallRules. They used to be here, which re-added all eight of them,
+                // persistent and boot-time, under fresh keys every time a temporary exception was
+                // installed, and the copies piled up until the next full reload.
                 if (VisibleState.Mode != FirewallMode.Disabled)
-                {
                     InstallRawSocketPermits(rawSocketExceptions);
-                    InstallWsl2Filters(ActiveConfig.Service.ActiveProfile.HasSpecialException("WSL_2"));
-                }
 
                 trx?.Commit();
             }
@@ -418,6 +435,9 @@ namespace SimpleDeFence
 
             timer.NewSubTask("Installing rules");
             InstallRules(rules, rawSocketExceptions, false);
+
+            if (VisibleState.Mode != FirewallMode.Disabled)
+                InstallWsl2Filters(ActiveConfig.Service.ActiveProfile.HasSpecialException("WSL_2"));
 
             timer.NewSubTask("WFP transaction commit");
             trx.Commit();
@@ -1341,77 +1361,162 @@ namespace SimpleDeFence
             }
         }
 
-        private void UpdaterMethod()
+        /// <summary>
+        /// What a background update check found, waiting for the worker thread to apply it.
+        ///
+        /// The check used to run inline in MINUTE_TIMER, on the service's only worker thread, with
+        /// a 100-second HTTP timeout per download - so a slow network stalled every GUI command
+        /// queued behind it, and the GUI reported the service as unreachable. The network half now
+        /// runs on its own thread and leaves its result here; the worker picks it up on its next
+        /// minute tick and does the installing, which touches state that only the worker owns.
+        /// </summary>
+        private sealed class PendingUpdate
+        {
+            public UpdateDescriptor Descriptor = null!;
+            public string? HostsFile;
+            public string? DatabaseFile;
+        }
+
+        private readonly object PendingUpdateLock = new();
+        private PendingUpdate? PendingUpdateResult;   // guarded by PendingUpdateLock
+        private Task? UpdateCheckTask;                // touched only on the worker thread
+
+        private void StartBackgroundUpdateCheck()
+        {
+            if (UpdateCheckTask is { IsCompleted: false })
+                return;
+
+            UpdateCheckTask = Task.Run(() =>
+            {
+                var result = DownloadUpdates();
+                if (result is null)
+                    return;
+
+                lock (PendingUpdateLock)
+                {
+                    DeletePendingFiles(PendingUpdateResult);
+                    PendingUpdateResult = result;
+                }
+            });
+        }
+
+        /// <summary>Network half of the update check. Runs off the worker thread and touches
+        /// nothing but files of its own and the read-only hashes it compares against.</summary>
+        private static PendingUpdate? DownloadUpdates()
         {
             // This is an automatic update check in the background.
             // If we fail (for whatever reason, no internet, server down etc.), do it silently.
             UpdateDescriptor? update = null;
             try { update = UpdateChecker.GetDescriptor(); }
-            catch { return; }
+            catch { return null; }
             if (update is null)
-                return;
+                return null;
 
-            VisibleState.Update = update;
-            GlobalInstances.ServerChangeset = Guid.NewGuid();
-
+            var result = new PendingUpdate { Descriptor = update };
             try
             {
                 var hostsUpdate = update.GetModule(UpdateDescriptor.MODULE_NAME_HOSTS);
                 if (hostsUpdate is not null)
                 {
                     if (!string.Equals(hostsUpdate.DownloadHash, HostsFileManager.GetHostsHash(), StringComparison.OrdinalIgnoreCase))
-                        GetCompressedUpdate(hostsUpdate, HostsUpdateInstall);
+                        result.HostsFile = GetCompressedUpdate(hostsUpdate);
                 }
 
                 var databaseUpdate = update.GetModule(UpdateDescriptor.MODULE_NAME_DATABASE);
                 if (databaseUpdate is not null)
                 {
                     if (!string.Equals(databaseUpdate.DownloadHash, Hasher.HashFile(DatabaseClasses.AppDatabase.DBPath), StringComparison.OrdinalIgnoreCase))
-                        GetCompressedUpdate(databaseUpdate, DatabaseUpdateInstall);
+                        result.DatabaseFile = GetCompressedUpdate(databaseUpdate);
                 }
             }
             catch (Exception e)
             {
                 Utils.LogException(e, Utils.LOG_ID_SERVICE);
             }
+
+            return result;
         }
 
-        private static void GetCompressedUpdate(UpdateModule module, WaitCallback installMethod)
+        /// <summary>Worker-thread half: installs whatever the last background check downloaded.</summary>
+        private void ApplyPendingUpdate()
+        {
+            PendingUpdate? pending;
+            lock (PendingUpdateLock)
+            {
+                pending = PendingUpdateResult;
+                PendingUpdateResult = null;
+            }
+
+            if (pending is null)
+                return;
+
+            try
+            {
+                VisibleState.Update = pending.Descriptor;
+                GlobalInstances.ServerChangeset = Guid.NewGuid();
+
+#if !DEBUG  // don't install anything during debug
+                if (pending.HostsFile is not null)
+                    HostsUpdateInstall(pending.HostsFile);
+                if (pending.DatabaseFile is not null)
+                    DatabaseUpdateInstall(pending.DatabaseFile);
+#endif
+            }
+            catch (Exception e)
+            {
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+            }
+            finally
+            {
+                DeletePendingFiles(pending);
+            }
+        }
+
+        private static void DeletePendingFiles(PendingUpdate? pending)
+        {
+            if (pending is null)
+                return;
+            TryDeleteFile(pending.HostsFile);
+            TryDeleteFile(pending.DatabaseFile);
+        }
+
+        private static void TryDeleteFile(string? path)
+        {
+            if (path is null)
+                return;
+            try { File.Delete(path); } catch { }
+        }
+
+        /// <summary>Downloads, decompresses and verifies one module. Returns the path of the
+        /// verified payload, which the caller owns and deletes, or null if any step failed.</summary>
+        private static string? GetCompressedUpdate(UpdateModule module)
         {
             if (!UpdateUrlPolicy.IsAllowed(module.UpdateURL))
             {
                 Utils.Log($"Ignoring the {module.Component} update: its URL is not one of this project's HTTPS release locations.", Utils.LOG_ID_SERVICE);
-                return;
+                return null;
             }
 
             string tmpCompressedPath = Path.GetTempFileName();
             string tmpFile = Path.GetTempFileName();
+            bool keep = false;
             try
             {
-                HttpFileDownloader.DownloadFile(module.UpdateURL, tmpCompressedPath);
+                HttpFileDownloader.DownloadFile(module.UpdateURL!, tmpCompressedPath);
                 Utils.DecompressDeflate(tmpCompressedPath, tmpFile);
 
-                if (Hasher.HashFile(tmpFile).Equals(module.DownloadHash, StringComparison.OrdinalIgnoreCase))
-                {
-#if !DEBUG  // don't install anything during debug
-                    installMethod(tmpFile);
-#endif
-                }
+                keep = Hasher.HashFile(tmpFile).Equals(module.DownloadHash, StringComparison.OrdinalIgnoreCase);
+                return keep ? tmpFile : null;
             }
-            catch { }
+            catch
+            {
+                return null;
+            }
             finally
             {
-                try
-                {
-                    File.Delete(tmpCompressedPath);
-                }
-                catch { }
-
-                try
-                {
-                    File.Delete(tmpFile);
-                }
-                catch { }
+                TryDeleteFile(tmpCompressedPath);
+                if (!keep)
+                    TryDeleteFile(tmpFile);
             }
         }
 
@@ -1430,9 +1535,8 @@ namespace SimpleDeFence
         /// Set when a database update has landed and the firewall has to be rebuilt on top of it.
         /// Read by the MINUTE_TIMER case, which is the only thing that can reach an update at all.
         ///
-        /// A flag rather than a queued REINIT. GetCompressedUpdate invokes its install method
-        /// synchronously - the WaitCallback type says thread pool, the call site does not - so
-        /// DatabaseUpdateInstall runs on the worker thread, by way of MINUTE_TIMER -> UpdaterMethod.
+        /// A flag rather than a queued REINIT. DatabaseUpdateInstall runs on the worker thread, by
+        /// way of MINUTE_TIMER -> ApplyPendingUpdate.
         /// Posting to Q from there is the same self-deadlock the inactivity lock above had: one
         /// bounded queue, one consumer, and the consumer is the caller.
         /// </summary>
@@ -1744,6 +1848,7 @@ namespace SimpleDeFence
                                 GetRulesForException(ex, rules, rawSocketExceptions, (ulong)FilterWeights.UserPermit, (ulong)FilterWeights.UserBlock);
                             }
 
+                            PrepareRulesForInstall(rules);
                             InstallRules(rules, rawSocketExceptions, true);
                         }
                         finally
@@ -1935,11 +2040,14 @@ namespace SimpleDeFence
                             InstallFirewallRules();
                         }
 
-                        // Check for updates once every 2 days
+                        // Install whatever the previous background check brought back, then
+                        // start a new check once every 2 days. The check itself runs off this
+                        // thread - see PendingUpdate.
+                        ApplyPendingUpdate();
                         if (ActiveConfig.Service.AutoUpdateCheck && (DateTime.Now - LastUpdateCheck >= TimeSpan.FromDays(2)))
                         {
                             LastUpdateCheck = DateTime.Now;
-                            UpdaterMethod();
+                            StartBackgroundUpdateCheck();
                         }
 
                         // A database update that landed during the check above needs the rule set
