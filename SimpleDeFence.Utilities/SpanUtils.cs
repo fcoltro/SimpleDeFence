@@ -47,11 +47,6 @@ namespace SimpleDeFence.Utilities
             return (ret, negative);
         }
 
-        public static int DecimalToInt32(this ReadOnlySpan<char> span)
-        {
-            (var unsignedVal, var negative) = DecimalToNumeric(span, 10, true);
-            return checked((negative ? (int)-(uint)unsignedVal : (int)unsignedVal));
-        }
         public static ushort DecimalToUInt16(this ReadOnlySpan<char> span)
         {
             (var unsignedVal, var _) = DecimalToNumeric(span, 5, false);

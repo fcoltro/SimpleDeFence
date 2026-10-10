@@ -72,6 +72,7 @@ namespace SimpleDeFence
 
         // Context for auto rule inheritance
         private readonly object InheritanceGuard = new();
+        private bool ProcessStartWatcherErrorLogged;   // WMI failures repeat on every rule rebuild; log the first only
         private readonly HashSet<string> UserSubjectExes = new(StringComparer.OrdinalIgnoreCase);        // All executables with pre-configured rules.
         private readonly Dictionary<string, List<FirewallExceptionV3>> ChildInheritance = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, HashSet<string>> ChildInheritedSubjectExes = new(StringComparer.OrdinalIgnoreCase);   // Executables that have been already auto-whitelisted due to inheritance
@@ -149,7 +150,6 @@ namespace SimpleDeFence
                 UserExceptions.AddRange(ActiveConfig.Service.ActiveProfile.AppExceptions);
 
                 // Collect all special exceptions
-                ActiveConfig.Service.ActiveProfile.SpecialExceptions.Remove("SimpleDeFence");    // TODO: Deprecated: Needed due to old configs. Remove in future version.
                 foreach (string appName in ActiveConfig.Service.ActiveProfile.SpecialExceptions)
                     UserExceptions.AddRange(CollectExceptionsForAppByName(appName));
 
@@ -369,10 +369,14 @@ namespace SimpleDeFence
                     else
                         ProcessStartWatcher.Stop();
                 }
-                catch
+                catch (Exception e)
                 {
-                    // TODO: Add nonce-flag and log only if it has not been logged already
-                    // Utils.Log("WMI error. Subprocess monitoring will be disabled.", Utils.LOG_ID_SERVICE);
+                    if (!ProcessStartWatcherErrorLogged)
+                    {
+                        ProcessStartWatcherErrorLogged = true;
+                        Utils.Log("WMI error. Subprocess monitoring will be disabled.", Utils.LOG_ID_SERVICE);
+                        Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                    }
                 }
             }
 
