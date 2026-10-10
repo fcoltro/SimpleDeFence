@@ -378,40 +378,54 @@ namespace SimpleDeFence
                 acl.AddAccessRule(new FileSystemAccessRule(users, FileSystemRights.ReadAndExecute, Inherit, PropagationFlags.None, AccessControlType.Allow));
                 root.SetAccessControl(acl);
 
-                // The new inherited set does not displace an explicit entry already on a child, and
-                // an explicit full-control entry is exactly what a pre-created file carries. Strip
-                // them so the directory's rules are the only ones in play.
-                //
+                // The owner too, not only the rules. Whoever owns an object may rewrite its DACL
+                // whatever the DACL says, so a standard user who created this directory - or a file
+                // in it - before the service ever ran would simply grant themselves write access
+                // again after this method had "repaired" it. Anyone can create
+                // ProgramData\SimpleDeFence before the MSI does, which makes that the easy case.
+                // Applied separately so that a refusal here cannot cost us the DACL above.
+                try
+                {
+                    var ownerAcl = root.GetAccessControl(AccessControlSections.Owner);
+                    if (ResetOwner(ownerAcl, admins))
+                        root.SetAccessControl(ownerAcl);
+                }
+                catch (Exception e)
+                {
+                    Utils.Log($"Could not take ownership of \"{root.FullName}\": {e.Message}", logContext);
+                }
+
+                // logs\ used to grant Users Modify so the GUI could write there. That grant applied
+                // to the directory itself, which is enough for a standard user to empty it and turn
+                // it into a junction - after which the service's own log writes, as LocalSystem,
+                // follow it anywhere. The GUI logs to its own profile now (Utils.LogDirectoryFor),
+                // so the grant is gone; a junction already planted is removed, not followed. Deleting
+                // a reparse point removes only the link.
+                var logs = new DirectoryInfo(Path.Combine(root.FullName, "logs"));
+                if (logs.Exists && (logs.Attributes & FileAttributes.ReparsePoint) != 0)
+                {
+                    Utils.Log("The logs directory was a reparse point; removing the link and recreating it.", logContext);
+                    logs.Delete();
+                }
+
                 // AttributesToSkip carries the ReparsePoint bit, and that is the whole security of
                 // this loop. SearchOption.AllDirectories - which this used to pass - walks *through*
                 // junctions, and everything below runs as LocalSystem stripping explicit ACEs and
-                // re-enabling inheritance. The "logs" grant further down hands Users the Modify
-                // right on a directory inside this tree, so an unprivileged user can drop a junction
-                // in it pointing at, say, C:\Users; this method runs again on the next service
-                // start, walks into it, and strips the explicit ACEs off every profile directory it
-                // finds - handing the attacker whatever C:\Users inherits down onto every other
-                // user's profile. Skipping reparse points leaves the junction itself untouched and
-                // never follows it. The default AttributesToSkip (Hidden|System) is deliberately
-                // dropped: a hidden or system file in our own data directory still needs cleaning.
+                // re-enabling inheritance. A junction that pointed at, say, C:\Users would have had
+                // the explicit ACEs stripped off every profile directory below it. Skipping reparse
+                // points leaves any such link untouched and never follows it. The default
+                // AttributesToSkip (Hidden|System) is deliberately dropped: a hidden or system file
+                // in our own data directory still needs cleaning.
                 var walk = new EnumerationOptions
                 {
                     RecurseSubdirectories = true,
                     AttributesToSkip = FileAttributes.ReparsePoint,
                 };
                 foreach (var child in root.EnumerateFileSystemInfos("*", walk))
-                    ClearExplicitAccessRules(child, logContext);
+                    ClearExplicitAccessRules(child, admins, logContext);
 
-                // One exception, carved as narrowly as it can be: the tray icon and GUI run as the
-                // signed-in user and write their log here. The directory is created by the service
-                // so it cannot be replaced by a junction, and write access to it buys an attacker
-                // nothing better than noisy log files.
-                var logs = new DirectoryInfo(Path.Combine(root.FullName, "logs"));
                 if (!logs.Exists)
                     logs.Create();
-
-                var logAcl = logs.GetAccessControl();
-                logAcl.AddAccessRule(new FileSystemAccessRule(users, FileSystemRights.Modify, Inherit, PropagationFlags.None, AccessControlType.Allow));
-                logs.SetAccessControl(logAcl);
             }
             catch (Exception e)
             {
@@ -422,21 +436,21 @@ namespace SimpleDeFence
 
         /// <summary>Removes every non-inherited rule from one file or directory, so that what the
         /// parent grants is all that applies to it.</summary>
-        private static void ClearExplicitAccessRules(FileSystemInfo item, string logContext)
+        private static void ClearExplicitAccessRules(FileSystemInfo item, SecurityIdentifier owner, string logContext)
         {
             try
             {
                 if (item is DirectoryInfo dir)
                 {
-                    var acl = dir.GetAccessControl();
-                    if (!RemoveExplicitRules(acl))
+                    var acl = dir.GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
+                    if (!RemoveExplicitRules(acl) & !ResetOwner(acl, owner))
                         return;
                     dir.SetAccessControl(acl);
                 }
                 else if (item is FileInfo file)
                 {
-                    var acl = file.GetAccessControl();
-                    if (!RemoveExplicitRules(acl))
+                    var acl = file.GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
+                    if (!RemoveExplicitRules(acl) & !ResetOwner(acl, owner))
                         return;
                     file.SetAccessControl(acl);
                 }
@@ -446,6 +460,20 @@ namespace SimpleDeFence
                 // One unreadable child must not stop the rest of the directory being repaired.
                 Utils.Log($"Could not reset permissions on \"{item.FullName}\": {e.Message}", logContext);
             }
+        }
+
+        /// <summary>Makes <paramref name="owner"/> the owner unless it already is one of the two
+        /// principals that may own files here. A file a standard user created keeps that user as
+        /// its owner, and its owner can restore any rule this pass removes.</summary>
+        private static bool ResetOwner(FileSystemSecurity acl, SecurityIdentifier owner)
+        {
+            var current = acl.GetOwner(typeof(SecurityIdentifier)) as SecurityIdentifier;
+            if (current is not null
+                && (current.IsWellKnown(WellKnownSidType.LocalSystemSid) || current.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)))
+                return false;
+
+            acl.SetOwner(owner);
+            return true;
         }
 
         private static bool RemoveExplicitRules(FileSystemSecurity acl)

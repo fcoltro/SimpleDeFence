@@ -365,6 +365,29 @@ namespace SimpleDeFence
                 logname
             );
         }
+        /// <summary>
+        /// Where a log of the given kind is written.
+        ///
+        /// The GUI runs as the signed-in user, so its log goes to that user's own profile. It used
+        /// to share ProgramData\SimpleDeFence\logs with the service, which forced that directory to
+        /// grant Users the Modify right - and Modify on the directory itself is enough for a
+        /// standard user to empty it, turn it into a junction to \RPC Control and plant an
+        /// object-manager symlink named service.log, after which the service, as LocalSystem,
+        /// appends to and truncates whatever file that link points at. With only elevated writers
+        /// left, ProgramData\SimpleDeFence\logs no longer needs to be writable by anyone else.
+        /// </summary>
+        internal static string LogDirectoryFor(string logname)
+        {
+            if (string.Equals(logname, LOG_ID_GUI, StringComparison.Ordinal))
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "SimpleDeFence", "logs");
+            }
+
+            return Path.Combine(Utils.AppDataPath, "logs");
+        }
+
         internal static void Log(string info, string logname)
         {
             try
@@ -396,11 +419,17 @@ namespace SimpleDeFence
                     }
 
                     // Name of the current log file
-                    string logdir = Path.Combine(Utils.AppDataPath, "logs");
+                    string logdir = LogDirectoryFor(logname);
                     string logfile = Path.Combine(logdir, $"{logname}.log");
 
                     if (!Directory.Exists(logdir))
                         Directory.CreateDirectory(logdir);
+
+                    // Never follow a link out of the log directory. SimpleDeFenceDoctor removes one
+                    // at service start, but anything logged before that runs must not write - as
+                    // LocalSystem - wherever a planted junction points.
+                    if ((File.GetAttributes(logdir) & FileAttributes.ReparsePoint) != 0)
+                        return;
 
                     // Only log if log file has not yet reached a certain size
                     if (File.Exists(logfile))
@@ -440,7 +469,12 @@ namespace SimpleDeFence
                 return Path.GetDirectoryName(Utils.ExecutablePath);
 #else
                 string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "SimpleDeFence");
-                if (!Directory.Exists(dir))
+
+                // Only an elevated process (or the service) may bring this directory into being.
+                // Whoever creates it owns it, and an owner can always rewrite its permissions - so
+                // a standard user's GUI creating it, before install or after an uninstall, would
+                // hand that user a directory the SYSTEM service later trusts.
+                if (!Directory.Exists(dir) && RunningAsAdmin())
                     Directory.CreateDirectory(dir);
                 return dir;
 #endif
