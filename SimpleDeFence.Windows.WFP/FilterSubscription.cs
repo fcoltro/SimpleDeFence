@@ -87,8 +87,16 @@ namespace SimpleDeFence.Windows.WFP
 
         private void NativeCallbackHandler(IntPtr context, IntPtr change)
         {
-            Interop.FWPM_FILTER_CHANGE0 cs = PInvokeHelper.PtrToStructure<Interop.FWPM_FILTER_CHANGE0>(change);
-            _callback(_context, (FilterChangeType)cs.changeType, cs.filterKey);
+            // Called by WFP with native frames below it, where an escaping exception is unhandled
+            // and ends the process. One missed change notification is the lesser loss.
+            try
+            {
+                Interop.FWPM_FILTER_CHANGE0 cs = PInvokeHelper.PtrToStructure<Interop.FWPM_FILTER_CHANGE0>(change);
+                _callback(_context, (FilterChangeType)cs.changeType, cs.filterKey);
+            }
+            catch
+            {
+            }
         }
 
         public void Dispose()

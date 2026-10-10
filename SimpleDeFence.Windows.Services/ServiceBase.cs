@@ -352,34 +352,48 @@ namespace SimpleDeFence.Windows.Services
         {
             const int NO_ERROR = 0;
 
-            switch ((ServiceControlCommand)command)
+            // The SCM calls this on its dispatcher thread with native frames below. An exception
+            // escaping from a handler - a power or device event that fails to decode, say - is
+            // unhandled there and ends the service, so report it and keep running instead.
+            try
             {
-                case ServiceControlCommand.SERVICE_CONTROL_INTERROGATE:
-                    UpdateServiceStatus();
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_POWEREVENT:
-                    ProcessPowerEvent(eventType, eventData);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_DEVICEEVENT:
-                    ProcessDeviceEvent(eventType, eventData);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_STOP:
-                    if (!IsStateChangePending(CurrentState))
-                        StartStateChange(ServiceState.StopPending);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_PAUSE:
-                    if (!IsStateChangePending(CurrentState))
-                        StartStateChange(ServiceState.PausePending);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_CONTINUE:
-                    if (!IsStateChangePending(CurrentState))
-                        StartStateChange(ServiceState.ContinuePending);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_PRESHUTDOWN:
-                // Fall-through
-                case ServiceControlCommand.SERVICE_CONTROL_SHUTDOWN:
-                    ThreadPool.QueueUserWorkItem(_ => OnShutdownWrapper());
-                    break;
+                switch ((ServiceControlCommand)command)
+                {
+                    case ServiceControlCommand.SERVICE_CONTROL_INTERROGATE:
+                        UpdateServiceStatus();
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_POWEREVENT:
+                        ProcessPowerEvent(eventType, eventData);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_DEVICEEVENT:
+                        ProcessDeviceEvent(eventType, eventData);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_STOP:
+                        if (!IsStateChangePending(CurrentState))
+                            StartStateChange(ServiceState.StopPending);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_PAUSE:
+                        if (!IsStateChangePending(CurrentState))
+                            StartStateChange(ServiceState.PausePending);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_CONTINUE:
+                        if (!IsStateChangePending(CurrentState))
+                            StartStateChange(ServiceState.ContinuePending);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_PRESHUTDOWN:
+                    // Fall-through
+                    case ServiceControlCommand.SERVICE_CONTROL_SHUTDOWN:
+                        ThreadPool.QueueUserWorkItem(_ => OnShutdownWrapper());
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                if (AutoLog)
+                {
+                    try { EventLog.WriteEntry($"Service control {command} failed: {e}", EventLogEntryType.Error); }
+                    catch { }
+                }
             }
 
             return NO_ERROR;

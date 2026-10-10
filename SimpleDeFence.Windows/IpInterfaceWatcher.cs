@@ -123,7 +123,15 @@ namespace SimpleDeFence.Windows
 
         private void NotifyIpInterfaceChangeCallback(IntPtr CallerContext, IntPtr Row, MIB_NOTIFICATION_TYPE NotificationType)
         {
-            ChangeEventMerger.Pulse();
+            // A notification already in flight while Dispose runs reaches a disposed merger, and
+            // Pulse throws. Out of a native callback that would end the process.
+            try
+            {
+                ChangeEventMerger.Pulse();
+            }
+            catch (ObjectDisposedException)
+            {
+            }
         }
 
         protected override void Dispose(bool disposing)

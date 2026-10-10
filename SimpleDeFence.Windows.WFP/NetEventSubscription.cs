@@ -290,8 +290,17 @@ namespace SimpleDeFence.Windows.WFP
 
         private void NativeCallbackHandler0(IntPtr context, IntPtr netEvent1)
         {
-            Interop.FWPM_NET_EVENT1 ev = PInvokeHelper.PtrToStructure<Interop.FWPM_NET_EVENT1>(netEvent1);
-            _callback(new NetEventData(ev, SBuilder));
+            // Runs on a WFP thread with native frames below it. An exception escaping here is
+            // unhandled and ends the service process - and the firewall with it - over one event
+            // that could not be decoded or logged. Dropping that event is the lesser loss.
+            try
+            {
+                Interop.FWPM_NET_EVENT1 ev = PInvokeHelper.PtrToStructure<Interop.FWPM_NET_EVENT1>(netEvent1);
+                _callback(new NetEventData(ev, SBuilder));
+            }
+            catch
+            {
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -348,8 +357,15 @@ namespace SimpleDeFence.Windows.WFP
 
         private void NativeCallbackHandler1(IntPtr context, IntPtr netEvent1)
         {
-            var ev = PInvokeHelper.PtrToStructure<Interop.FWPM_NET_EVENT2>(netEvent1);
-            _callback(new NetEventData(ev, SBuilder));
+            // See NetEventSubscription0.NativeCallbackHandler0.
+            try
+            {
+                var ev = PInvokeHelper.PtrToStructure<Interop.FWPM_NET_EVENT2>(netEvent1);
+                _callback(new NetEventData(ev, SBuilder));
+            }
+            catch
+            {
+            }
         }
 
         protected override void Dispose(bool disposing)
