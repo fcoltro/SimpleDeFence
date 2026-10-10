@@ -10,19 +10,12 @@ namespace SimpleDeFence.Tests
         /// from this repository. Read from disk rather than reconstructed, so this fails if the
         /// published file and the model ever drift apart - which is how it can 404 or throw with
         /// nobody noticing: both callers swallow the failure.</summary>
-        private static string? RepoDescriptorPath()
-        {
-            var p = Path.GetFullPath(Path.Combine(
-                AppContext.BaseDirectory, "..", "..", "..", "..", "updates", "update.json"));
-            return File.Exists(p) ? p : null;
-        }
+        private static string RepoDescriptorPath() => TestRepo.File("updates", "update.json");
 
         [Fact]
         public void The_published_descriptor_deserializes()
         {
             var path = RepoDescriptorPath();
-            if (path is null)
-                return; // running outside the repo layout
 
             var descriptor = SerializationHelper.DeserializeFromFile(path, new UpdateDescriptor());
 
@@ -36,8 +29,6 @@ namespace SimpleDeFence.Tests
             // GetModule is what both callers use; a descriptor without the running architecture's
             // module makes the update check silently do nothing.
             var path = RepoDescriptorPath();
-            if (path is null)
-                return;
 
             var descriptor = SerializationHelper.DeserializeFromFile(path, new UpdateDescriptor());
 
@@ -51,8 +42,6 @@ namespace SimpleDeFence.Tests
             // assembly's. Publishing a version ahead of the build would prompt every user to
             // "update" to something that does not exist yet.
             var path = RepoDescriptorPath();
-            if (path is null)
-                return;
 
             var descriptor = SerializationHelper.DeserializeFromFile(path, new UpdateDescriptor());
             var module = descriptor.GetModule(UpdateDescriptor.MODULE_NAME_MAINBIN);
@@ -61,10 +50,7 @@ namespace SimpleDeFence.Tests
             // Compared against the version SimpleDeFence.csproj declares, not against a loaded
             // assembly: the updater reads Assembly.GetEntryAssembly(), which under the test host is
             // the test host, and SimpleDeFence.Core carries its own unrelated 1.0.0.0.
-            var csproj = Path.GetFullPath(Path.Combine(
-                AppContext.BaseDirectory, "..", "..", "..", "..", "SimpleDeFence", "SimpleDeFence.csproj"));
-            if (!File.Exists(csproj))
-                return;
+            var csproj = TestRepo.File("SimpleDeFence", "SimpleDeFence.csproj");
 
             var match = System.Text.RegularExpressions.Regex.Match(
                 File.ReadAllText(csproj), @"<Version>([^<]+)</Version>");
@@ -83,13 +69,34 @@ namespace SimpleDeFence.Tests
             // The service downloads and installs these two without asking. They belong in the
             // descriptor only once there is a real payload and a matching hash to verify it.
             var path = RepoDescriptorPath();
-            if (path is null)
-                return;
 
             var descriptor = SerializationHelper.DeserializeFromFile(path, new UpdateDescriptor());
 
             Assert.Null(descriptor.GetModule(UpdateDescriptor.MODULE_NAME_HOSTS));
             Assert.Null(descriptor.GetModule(UpdateDescriptor.MODULE_NAME_DATABASE));
+        }
+
+        [Fact]
+        public void The_published_installer_url_passes_the_update_url_policy()
+        {
+            // Both updaters now refuse a payload URL outside this project's HTTPS GitHub
+            // locations. A descriptor that fails here would leave every install unable to update.
+            var descriptor = SerializationHelper.DeserializeFromFile(RepoDescriptorPath(), new UpdateDescriptor());
+            var module = descriptor.GetModule(UpdateDescriptor.MODULE_NAME_MAINBIN);
+
+            Assert.NotNull(module);
+            Assert.True(UpdateUrlPolicy.IsAllowed(module!.UpdateURL), module.UpdateURL);
+        }
+
+        [Fact]
+        public void GetModule_tolerates_a_module_without_a_component()
+        {
+            var descriptor = new UpdateDescriptor
+            {
+                Modules = new[] { new UpdateModule { Component = null! }, new UpdateModule { Component = UpdateDescriptor.MODULE_NAME_MAINBIN } },
+            };
+
+            Assert.NotNull(descriptor.GetModule(UpdateDescriptor.MODULE_NAME_MAINBIN));
         }
     }
 }

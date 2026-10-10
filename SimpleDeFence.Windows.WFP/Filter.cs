@@ -65,13 +65,27 @@ namespace SimpleDeFence.Windows.WFP
         internal Filter(in Interop.FWPM_FILTER0_NoStrings filt0, bool getConditions)
             : this(new FilterConditionList())
         {
+            // The private constructor pointed weight and providerKey at memory this object owns.
+            // Copying filt0 over _nativeStruct replaced those pointers with ones into WFP's own
+            // allocation, which the caller frees as soon as enumeration is done - after which the
+            // Weight and ProviderKey setters wrote into freed memory. Keep ours, and copy the
+            // values across instead.
+            var ownedWeight = _nativeStruct.weight;
+            var ownedProviderKey = _nativeStruct.providerKey;
             _nativeStruct = filt0;
+            _nativeStruct.weight = ownedWeight;
+            _nativeStruct.providerKey = ownedProviderKey;
 
-            if (_nativeStruct.providerKey != IntPtr.Zero)
-                ProviderKey = PInvokeHelper.PtrToStructure<Guid>(_nativeStruct.providerKey);
+            if (filt0.providerKey != IntPtr.Zero)
+                ProviderKey = PInvokeHelper.PtrToStructure<Guid>(filt0.providerKey);
 
-            if (_nativeStruct.weight.value.uint64 != IntPtr.Zero)
-                Weight = PInvokeHelper.PtrToStructure<ulong>(_nativeStruct.weight.value.uint64);
+            // Only FWP_UINT64 stores the weight behind a pointer. FWP_UINT8 - the other weight
+            // type WFP returns - holds it inline, and dereferencing that byte as an address
+            // crashed the process.
+            if (filt0.weight.type == Interop.FWP_DATA_TYPE.FWP_UINT64 && filt0.weight.value.uint64 != IntPtr.Zero)
+                Weight = PInvokeHelper.PtrToStructure<ulong>(filt0.weight.value.uint64);
+            else if (filt0.weight.type == Interop.FWP_DATA_TYPE.FWP_UINT8)
+                Weight = filt0.weight.value.uint8;
 
             if (_nativeStruct.displayData.name != IntPtr.Zero)
                 DisplayName = Marshal.PtrToStringUni(_nativeStruct.displayData.name);

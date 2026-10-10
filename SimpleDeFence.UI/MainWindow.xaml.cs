@@ -309,7 +309,7 @@ namespace SimpleDeFence.UI
             menu.ShowAt(ModeChip);
         }
 
-        private async System.Threading.Tasks.Task ApplyModeAsync(FirewallMode mode)
+        internal async System.Threading.Tasks.Task ApplyModeAsync(FirewallMode mode)
         {
             if (mode == Shell.CurrentMode)
                 return;
@@ -361,7 +361,18 @@ namespace SimpleDeFence.UI
                 DefaultButton = ContentDialogButton.Close,
             };
 
-            return await dialog.ShowAsync() == ContentDialogResult.Primary;
+            // The tray reaches this with the window hidden. Guarded because the callers are
+            // async-void click handlers with no backstop: a second dialog on this XamlRoot throws,
+            // and that used to take the process down. Not being able to ask is a "no".
+            App.BringMainWindowForward();
+            try
+            {
+                return await dialog.ShowAsync() == ContentDialogResult.Primary;
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
         }
 
         private async System.Threading.Tasks.Task ShowMessageAsync(string title, string body)
@@ -375,7 +386,16 @@ namespace SimpleDeFence.UI
                 Content = body,
                 CloseButtonText = Loc.T(LocKeys.Common.Ok),
             };
-            await dialog.ShowAsync();
+
+            App.BringMainWindowForward();
+            try
+            {
+                await dialog.ShowAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // Another dialog already holds this XamlRoot.
+            }
         }
     }
 }

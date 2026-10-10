@@ -17,6 +17,10 @@ namespace SimpleDeFence.Utilities
             // Skip leading and trailing whitespace
             span = span.Trim();
 
+            // An empty or all-whitespace input is a format error, not an index past the end.
+            if (span.Length == 0)
+                throw new FormatException();
+
             // String may begin with a sign
             if (span[0] == '+')
             {
@@ -38,8 +42,10 @@ namespace SimpleDeFence.Utilities
                     throw new OverflowException();
 
                 char c = span[i];
-                if (char.IsDigit(c))
-                    ret = ret * 10UL + (ulong)(c - 48);
+                // ASCII digits only. char.IsDigit also accepts every Unicode decimal digit, and
+                // c - '0' on, say, U+0665 is 1589 - a wrong port rather than a refused one.
+                if (c is >= '0' and <= '9')
+                    ret = ret * 10UL + (ulong)(c - '0');
                 else
                     throw new FormatException();
             }

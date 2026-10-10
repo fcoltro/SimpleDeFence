@@ -169,7 +169,12 @@ namespace SimpleDeFence.Windows
             public static extern WinVerifyTrustResult WinVerifyTrust(
                 [In] IntPtr hwnd,
                 [In] [MarshalAs(UnmanagedType.LPStruct)] Guid pgActionID,
-                [In] WinTrustData pWVTData
+                // In AND Out: WinTrustData is a class with a string field, so it is not blittable
+                // and [In] alone copies it to native memory without copying it back. The Verify
+                // call fills in StateData, and with [In] only that never reached the managed object -
+                // so the Close call below passed a null state and every check leaked its provider
+                // state.
+                [In, Out] WinTrustData pWVTData
             );
         }
 
@@ -188,19 +193,15 @@ namespace SimpleDeFence.Windows
                     return VerifyResult.SIGNATURE_VALID;
                 case WinVerifyTrustResult.CRYPT_E_FILE_ERROR:
                     return VerifyResult.SIGNATURE_MISSING;
+                // The result of the Verify call, not GetLastWin32Error(): the Close call above has
+                // already overwritten the thread's last error, so an unsigned file was reported as
+                // carrying an invalid signature.
+                case WinVerifyTrustResult.TRUST_E_NOSIGNATURE:
+                case WinVerifyTrustResult.TRUST_E_SUBJECT_FORM_UNKNOWN:
+                case WinVerifyTrustResult.TRUST_E_PROVIDER_UNKNOWN:
+                    return VerifyResult.SIGNATURE_MISSING;
                 default:
-                    uint dwLastError;
-                    unchecked { dwLastError = (uint)Marshal.GetLastWin32Error(); }
-                    if (((uint)WinVerifyTrustResult.TRUST_E_NOSIGNATURE == dwLastError) ||
-                            ((uint)WinVerifyTrustResult.TRUST_E_SUBJECT_FORM_UNKNOWN == dwLastError) ||
-                            ((uint)WinVerifyTrustResult.TRUST_E_PROVIDER_UNKNOWN == dwLastError))
-                    {
-                        return VerifyResult.SIGNATURE_MISSING;
-                    }
-                    else
-                    {
-                        return VerifyResult.SIGNATURE_INVALID;
-                    }
+                    return VerifyResult.SIGNATURE_INVALID;
             }
         }
 

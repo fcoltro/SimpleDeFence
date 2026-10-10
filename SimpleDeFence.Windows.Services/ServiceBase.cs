@@ -352,34 +352,48 @@ namespace SimpleDeFence.Windows.Services
         {
             const int NO_ERROR = 0;
 
-            switch ((ServiceControlCommand)command)
+            // The SCM calls this on its dispatcher thread with native frames below. An exception
+            // escaping from a handler - a power or device event that fails to decode, say - is
+            // unhandled there and ends the service, so report it and keep running instead.
+            try
             {
-                case ServiceControlCommand.SERVICE_CONTROL_INTERROGATE:
-                    UpdateServiceStatus();
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_POWEREVENT:
-                    ProcessPowerEvent(eventType, eventData);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_DEVICEEVENT:
-                    ProcessDeviceEvent(eventType, eventData);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_STOP:
-                    if (!IsStateChangePending(CurrentState))
-                        StartStateChange(ServiceState.StopPending);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_PAUSE:
-                    if (!IsStateChangePending(CurrentState))
-                        StartStateChange(ServiceState.PausePending);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_CONTINUE:
-                    if (!IsStateChangePending(CurrentState))
-                        StartStateChange(ServiceState.ContinuePending);
-                    break;
-                case ServiceControlCommand.SERVICE_CONTROL_PRESHUTDOWN:
-                // Fall-through
-                case ServiceControlCommand.SERVICE_CONTROL_SHUTDOWN:
-                    ThreadPool.QueueUserWorkItem(_ => OnShutdownWrapper());
-                    break;
+                switch ((ServiceControlCommand)command)
+                {
+                    case ServiceControlCommand.SERVICE_CONTROL_INTERROGATE:
+                        UpdateServiceStatus();
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_POWEREVENT:
+                        ProcessPowerEvent(eventType, eventData);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_DEVICEEVENT:
+                        ProcessDeviceEvent(eventType, eventData);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_STOP:
+                        if (!IsStateChangePending(CurrentState))
+                            StartStateChange(ServiceState.StopPending);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_PAUSE:
+                        if (!IsStateChangePending(CurrentState))
+                            StartStateChange(ServiceState.PausePending);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_CONTINUE:
+                        if (!IsStateChangePending(CurrentState))
+                            StartStateChange(ServiceState.ContinuePending);
+                        break;
+                    case ServiceControlCommand.SERVICE_CONTROL_PRESHUTDOWN:
+                    // Fall-through
+                    case ServiceControlCommand.SERVICE_CONTROL_SHUTDOWN:
+                        ThreadPool.QueueUserWorkItem(_ => OnShutdownWrapper());
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                if (AutoLog)
+                {
+                    try { EventLog.WriteEntry($"Service control {command} failed: {e}", EventLogEntryType.Error); }
+                    catch { }
+                }
             }
 
             return NO_ERROR;
@@ -628,14 +642,20 @@ namespace SimpleDeFence.Windows.Services
             {
                 services[i].Status.serviceType = serviceType;
                 entries[i] = new SERVICE_TABLE_ENTRY(services[i].UnmanagedServiceName.DangerousGetHandle(), new SERVICE_TABLE_ENTRY.ServiceMainDelegate(services[i].ServiceMain));
-                Marshal.StructureToPtr(entries[i], entriesPointer, true);
+                Marshal.StructureToPtr(entries[i], entriesPointer, false);   // fresh memory: nothing old to destroy
                 entriesPointer = (IntPtr)((long)entriesPointer + ENTRY_SIZE);
             }
             SERVICE_TABLE_ENTRY lastEntry = SERVICE_TABLE_ENTRY.Zero();
-            Marshal.StructureToPtr(lastEntry, entriesPointer, true);
+            Marshal.StructureToPtr(lastEntry, entriesPointer, false);
 
             // Doesn't return while service is running.
             bool res = NativeMethods.StartServiceCtrlDispatcher(nativeEntriesTable.DangerousGetHandle());
+
+            // The ServiceMain delegates are reachable only through this array once the loop above
+            // is done; the native table holds bare function pointers the GC cannot see. Without
+            // this, a collection during the dispatcher call could free a thunk before the SCM
+            // called through it.
+            GC.KeepAlive(entries);
 
             // SCM might terminate the process after this point,
             // no further code is guaranteed to run.

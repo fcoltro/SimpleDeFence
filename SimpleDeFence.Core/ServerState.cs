@@ -64,7 +64,9 @@ namespace SimpleDeFence
         {
             for (int i = 0; i < Modules.Length; ++i)
             {
-                if (Modules[i].Component.Equals(moduleName, StringComparison.InvariantCultureIgnoreCase))
+                // Static Equals: the descriptor arrives over the network, and a module without a
+                // Component used to throw NullReferenceException out of the update check.
+                if (string.Equals(Modules[i]?.Component, moduleName, StringComparison.InvariantCultureIgnoreCase))
                     return Modules[i];
             }
 

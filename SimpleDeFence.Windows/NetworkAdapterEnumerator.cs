@@ -1,4 +1,4 @@
-using SimpleDeFence.Utilities;
+﻿using SimpleDeFence.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -88,6 +88,17 @@ namespace SimpleDeFence.Windows
             public byte OnLinkPrefixLength;
         }
 
+        /// <summary>The leading fields every IP_ADAPTER_*_ADDRESS node shares. Gateway and DNS
+        /// server nodes are only this long (32 bytes on x64); reading them as the 64-byte unicast
+        /// struct read past the end of each node.</summary>
+        [StructLayout(LayoutKind.Sequential)]
+        private struct IP_ADAPTER_ADDRESS_HEADER
+        {
+            public ulong Alignment;
+            public IntPtr Next;
+            public SOCKET_ADDRESS Address;
+        }
+
         #endregion
 
         public struct UnicastEntry
@@ -154,11 +165,23 @@ namespace SimpleDeFence.Windows
         {
             while (ptr != IntPtr.Zero)
             {
-                var uni = Marshal.PtrToStructure<IP_ADAPTER_UNICAST_ADDRESS>(ptr);
-                var ip = ReadIPAddress(uni.Address.lpSockaddr);
-                if (ip != null)
-                    result.Add(forceAsHost ? new IpAddrMask(ip) : new IpAddrMask(ip, uni.OnLinkPrefixLength));
-                ptr = uni.Next;
+                if (forceAsHost)
+                {
+                    // Gateway and DNS nodes: no prefix, and only the shared header to read.
+                    var node = Marshal.PtrToStructure<IP_ADAPTER_ADDRESS_HEADER>(ptr);
+                    var ip = ReadIPAddress(node.Address.lpSockaddr);
+                    if (ip != null)
+                        result.Add(new IpAddrMask(ip));
+                    ptr = node.Next;
+                }
+                else
+                {
+                    var uni = Marshal.PtrToStructure<IP_ADAPTER_UNICAST_ADDRESS>(ptr);
+                    var ip = ReadIPAddress(uni.Address.lpSockaddr);
+                    if (ip != null)
+                        result.Add(new IpAddrMask(ip, uni.OnLinkPrefixLength));
+                    ptr = uni.Next;
+                }
             }
         }
 

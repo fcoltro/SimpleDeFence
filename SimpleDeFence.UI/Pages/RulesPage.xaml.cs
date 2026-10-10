@@ -928,6 +928,10 @@ namespace SimpleDeFence.UI.Pages
             _quickAddBusy = true;
             try
             {
+                // From the tray or a hotkey the window is usually hidden, and every dialog below
+                // is hosted on it.
+                App.BringMainWindowForward();
+
                 if (await pick(xamlRoot) is not { } picked)
                     return; // Cancelled or blocked - not an error, no dialog.
 
@@ -1194,7 +1198,13 @@ namespace SimpleDeFence.UI.Pages
             // the TwoWay binding) - RefreshAsync below is what reconciles it back to the truth,
             // whichever way the commit went.
             if (_committing)
+            {
+                // Refused, but the switch has already moved. ApplyFilter rebuilds the items from
+                // _rows, which still hold the truth; deferred because this runs inside the
+                // switch's own binding update.
+                DispatcherQueue.TryEnqueue(ApplyFilter);
                 return;
+            }
 
             var id = item.Row.SpecialId!;
             var resp = await CommitAsync(profile => RuleEdit.SetSpecialEnabled(profile, id, enabled));
@@ -1205,8 +1215,10 @@ namespace SimpleDeFence.UI.Pages
             }
             else
             {
-                // The toggle already flipped visually; revert it to the truth.
+                // The toggle already flipped visually; revert it to the truth. RefreshAsync returns
+                // early when another refresh is running, so rebuild from _rows either way.
                 await RefreshAsync();
+                ApplyFilter();
                 await ShowResultAsync(Loc.T(LocKeys.Rules.SpecialToggleFailedTitle), FailureDetail(resp,
                     LocKeys.Rules.SpecialToggleFailedLockedDetail, LocKeys.Rules.SpecialToggleFailedStaleDetail,
                     LocKeys.Rules.SpecialToggleFailedGenericDetail));

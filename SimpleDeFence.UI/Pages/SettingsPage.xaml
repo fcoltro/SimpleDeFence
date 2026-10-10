@@ -185,7 +185,7 @@
                                                Opacity="0.8" TextWrapping="Wrap" MaxWidth="360"
                                                HorizontalAlignment="Left"
                                                Style="{StaticResource CaptionTextBlockStyle}"/>
-                                    <PasswordBox x:Name="NewPasswordBox" PlaceholderText="{loc:Loc Key=settings.security.newPassword}" HorizontalAlignment="Stretch"/>
+                                    <PasswordBox x:Name="NewPasswordBox" PlaceholderText="{loc:Loc Key=settings.security.newPassword}" HorizontalAlignment="Stretch" PasswordChanged="NewPasswordBox_PasswordChanged"/>
                                     <PasswordBox x:Name="NewPasswordConfirmBox" PlaceholderText="{loc:Loc Key=settings.security.confirmPassword}" HorizontalAlignment="Stretch"/>
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <Button x:Name="SetPasswordButton" Content="{loc:Loc Key=settings.security.setPassword}" Click="SetPasswordButton_Click"/>

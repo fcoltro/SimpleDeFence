@@ -416,21 +416,24 @@ namespace SimpleDeFence.UI.Pages
             // a second commit while one is already in flight, the same guard
             // RulesPage.ToggleSpecialAsync uses, rather than the narrower _busy (which only guards
             // Refresh) this handler used before self-review caught the gap.
-            if (_seeding || _committing) return;
+            if (_seeding) return;
+            if (_committing) { RevertDroppedToggle(); return; }
             var value = AllowLocalSubnetToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.ActiveProfile.AllowLocalSubnet = value));
         }
 
         private void DisplayOffBlockToggle_Toggled(object sender, RoutedEventArgs e)
         {
-            if (_seeding || _committing) return;
+            if (_seeding) return;
+            if (_committing) { RevertDroppedToggle(); return; }
             var value = DisplayOffBlockToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.ActiveProfile.DisplayOffBlock = value));
         }
 
         private void EnableBlocklistsToggle_Toggled(object sender, RoutedEventArgs e)
         {
-            if (_seeding || _committing) return;
+            if (_seeding) return;
+            if (_committing) { RevertDroppedToggle(); return; }
             var value = EnableBlocklistsToggle.IsOn;
             UpdateBlocklistSubTogglesEnabled();
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.Blocklists.EnableBlocklists = value));
@@ -438,28 +441,32 @@ namespace SimpleDeFence.UI.Pages
 
         private void EnableHostsBlocklistToggle_Toggled(object sender, RoutedEventArgs e)
         {
-            if (_seeding || _committing) return;
+            if (_seeding) return;
+            if (_committing) { RevertDroppedToggle(); return; }
             var value = EnableHostsBlocklistToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.Blocklists.EnableHostsBlocklist = value));
         }
 
         private void EnablePortBlocklistToggle_Toggled(object sender, RoutedEventArgs e)
         {
-            if (_seeding || _committing) return;
+            if (_seeding) return;
+            if (_committing) { RevertDroppedToggle(); return; }
             var value = EnablePortBlocklistToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.Blocklists.EnablePortBlocklist = value));
         }
 
         private void LockHostsFileToggle_Toggled(object sender, RoutedEventArgs e)
         {
-            if (_seeding || _committing) return;
+            if (_seeding) return;
+            if (_committing) { RevertDroppedToggle(); return; }
             var value = LockHostsFileToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.LockHostsFile = value));
         }
 
         private void AutoUpdateCheckToggle_Toggled(object sender, RoutedEventArgs e)
         {
-            if (_seeding || _committing) return;
+            if (_seeding) return;
+            if (_committing) { RevertDroppedToggle(); return; }
             var value = AutoUpdateCheckToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.AutoUpdateCheck = value));
         }
@@ -629,10 +636,18 @@ namespace SimpleDeFence.UI.Pages
             // either commit starts - the same guard RulesPage.ToggleSpecialAsync places inside
             // itself, for the identical reason, rather than relying solely on the caller's check.
             if (_committing)
+            {
+                RevertDroppedToggle();
                 return;
+            }
 
             var resp = await CommitAsync(mutate);
             await RefreshAsync();
+
+            // RefreshAsync only reseeds when it reached the service and was not already busy, so a
+            // failed commit could leave the switch the user flipped showing a value the service
+            // never applied. Put every control back to the last configuration it actually sent.
+            ReseedFromCache();
 
             if (resp != MessageType.PUT_SETTINGS)
             {
@@ -642,13 +657,41 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
+        /// <summary>A toggle flipped while another commit was in flight is refused, but the switch
+        /// has already moved. Deferred, because this runs inside the switch's own Toggled dispatch,
+        /// where setting IsOn back re-enters it.</summary>
+        private void RevertDroppedToggle() => DispatcherQueue.TryEnqueue(ReseedFromCache);
+
+        /// <summary>Seeds every control from the cached server configuration, without a round trip.</summary>
+        private void ReseedFromCache()
+        {
+            if (App.Firewall.Config is null)
+                return;
+
+            _seeding = true;
+            try
+            {
+                SeedControls();
+            }
+            finally
+            {
+                _seeding = false;
+            }
+        }
+
         private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
 
         private async void SetPasswordButton_Click(object sender, RoutedEventArgs e)
         {
             if (_committing) return;
 
+            // An empty password is not a password: SetPasswordAsync("") is exactly what Remove
+            // sends, so two empty boxes used to remove the password while reporting it updated.
+            // The button is disabled while the box is empty; this is the backstop.
             var password = NewPasswordBox.Password;
+            if (string.IsNullOrEmpty(password))
+                return;
+
             if (password != NewPasswordConfirmBox.Password)
             {
                 await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityPasswordMismatchTitle),
@@ -664,6 +707,8 @@ namespace SimpleDeFence.UI.Pages
             if (_committing) return;
             await SetPasswordAsync(string.Empty, Loc.T(LocKeys.Settings.SecurityPasswordRemovedBody));
         }
+
+        private void NewPasswordBox_PasswordChanged(object sender, RoutedEventArgs e) => UpdateControlsEnabled();
 
         private async Task SetPasswordAsync(string password, string successBody)
         {
@@ -681,12 +726,13 @@ namespace SimpleDeFence.UI.Pages
             }
             finally
             {
+                // Cleared on every path, the failure one included, so the plaintext does not sit
+                // in the boxes after the attempt is over.
+                NewPasswordBox.Password = string.Empty;
+                NewPasswordConfirmBox.Password = string.Empty;
                 _committing = false;
                 UpdateControlsEnabled();
             }
-
-            NewPasswordBox.Password = string.Empty;
-            NewPasswordConfirmBox.Password = string.Empty;
 
             if (resp == MessageType.SET_PASSPHRASE)
             {
@@ -881,7 +927,7 @@ namespace SimpleDeFence.UI.Pages
         /// use. Tasks 7-8 extend this further for their own groups' controls.</summary>
         private void UpdateControlsEnabled()
         {
-            SetPasswordButton.IsEnabled = !_committing;
+            SetPasswordButton.IsEnabled = !_committing && !string.IsNullOrEmpty(NewPasswordBox.Password);
             var hasPassword = App.Firewall.State?.HasPassword ?? false;
             var locked = App.Firewall.State?.Locked ?? false;
             RemovePasswordButton.IsEnabled = hasPassword && !_committing;

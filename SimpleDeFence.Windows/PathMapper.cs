@@ -57,7 +57,9 @@ namespace SimpleDeFence.Windows
         }
 
         private readonly ManualResetEvent CacheReadyEvent = new(false);
-        private readonly string SystemRoot = Environment.GetFolderPath(Environment.SpecialFolder.System);
+        // \SystemRoot is the Windows directory, not System32. SpecialFolder.System turned
+        // \SystemRoot\System32\drivers\x.sys into C:\Windows\system32\System32\drivers\x.sys.
+        private readonly string SystemRoot = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
         private readonly object locker = new();
 
         private bool CacheRebuilding;
@@ -298,8 +300,10 @@ namespace SimpleDeFence.Windows
                 // TODO: Warn or log somehow.
             }
 
-            // Fallback heuristic
-            return path.Slice(3).ToString();
+            // Fallback heuristic: the drive root. This returned Slice(3) - everything *after* the
+            // root - so a path of 512 characters or more, or one GetVolumePathName refused, came
+            // back as a mount point that named no drive at all and could never be converted.
+            return path.Slice(0, 3).ToString();
         }
 
         public string ConvertPathIgnoreErrors(string path, PathFormat target)
@@ -420,6 +424,10 @@ namespace SimpleDeFence.Windows
                 switch (target)
                 {
                     case PathFormat.NativeNt:
+                        // An empty Device (QueryDosDevice failed) would yield just the trailing
+                        // part, which names no file at all.
+                        if (string.IsNullOrEmpty(dc[cacheIdx].Device))
+                            throw new DriveNotFoundException();
                         return SpanUtils.Concat(dc[cacheIdx].Device.AsSpan(), trailing);
                     case PathFormat.Volume:
                         if (dc[cacheIdx].Volumes.Count > 0)
@@ -447,6 +455,8 @@ namespace SimpleDeFence.Windows
                             switch (target)
                             {
                                 case PathFormat.NativeNt:
+                                    if (string.IsNullOrEmpty(cacheEntry.Device))
+                                        throw new DriveNotFoundException();
                                     return SpanUtils.Concat(cacheEntry.Device.AsSpan(), trailing);
                                 case PathFormat.Win32:
                                     if (cacheEntry.Drives.Count > 0)
@@ -469,7 +479,9 @@ namespace SimpleDeFence.Windows
 
                 foreach (var cacheEntry in Cache)
                 {
-                    if ((cacheEntry.Device is not null) && ret.StartsWith(cacheEntry.Device.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    // Not just non-null: Device is string.Empty when QueryDosDevice failed for that
+                    // volume, and every path StartsWith "" - so such a volume claimed them all.
+                    if (!string.IsNullOrEmpty(cacheEntry.Device) && ret.StartsWith(cacheEntry.Device.AsSpan(), StringComparison.OrdinalIgnoreCase))
                     {
                         var trailing = ret.Slice(cacheEntry.Device.Length);
                         switch (target)

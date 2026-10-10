@@ -128,8 +128,19 @@ namespace SimpleDeFence
                         // an exception, in which case the newer (edited) version
                         // is added using the same ID as the unedited one.
 
-                        var older = app1.CreationDate > app2.CreationDate ? app2 : app1;
-                        AppExceptions.Remove(older);
+                        if (app1.CreationDate > app2.CreationDate)
+                        {
+                            AppExceptions.RemoveAt(j);
+                        }
+                        else
+                        {
+                            // app1 is the one going. Carrying on with it would compare - and merge
+                            // into - an object no longer in the list, and the element that slides
+                            // into slot i would be skipped by the outer loop. Start slot i again.
+                            AppExceptions.RemoveAt(i);
+                            --i;
+                            break;
+                        }
                     }
                     else if (app1.Subject.Equals(app2.Subject)
                         && (app1.Timer == AppExceptionTimer.Permanent)
@@ -140,7 +151,7 @@ namespace SimpleDeFence
                         ExceptionPolicy targetPolicy = app1.Policy;
                         if (app2.Policy.MergeRulesTo(ref targetPolicy))
                         {
-                            AppExceptions.Remove(app2);
+                            AppExceptions.RemoveAt(j);
                             app1.Policy = targetPolicy;
                             app1.RegenerateId();
                         }

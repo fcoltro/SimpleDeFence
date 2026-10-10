@@ -69,7 +69,6 @@ namespace SimpleDeFence
         static int Main(string[] args)
         {
             HierarchicalStopwatch.Enable = File.Exists(Path.Combine(Utils.AppDataPath, "enable-timings"));
-            HierarchicalStopwatch.LogFileBase = Path.Combine(Utils.AppDataPath, @"logs\timings");
 
             DefaultOsCulture ??= Thread.CurrentThread.CurrentUICulture;
 
@@ -105,6 +104,14 @@ namespace SimpleDeFence
 
             if (opts.ProgramMode == StartUpMode.Invalid)
                 opts.ProgramMode = StartUpMode.Controller;
+
+            // Timings follow the same split as Utils.Log: the elevated writers keep them in the
+            // service's data directory, everything that may run as the signed-in user writes to
+            // that user's own profile - see Utils.LogDirectoryFor for why the shared directory is
+            // no longer writable by Users.
+            bool elevatedMode = opts.ProgramMode is StartUpMode.Service or StartUpMode.Install or StartUpMode.Uninstall;
+            HierarchicalStopwatch.LogFileBase = Path.Combine(
+                Utils.LogDirectoryFor(elevatedMode ? Utils.LOG_ID_SERVICE : Utils.LOG_ID_GUI), "timings");
 
             opts.autowhitelist = Utils.StringArrayContains(args, "/autowhitelist");
             opts.updatenow = Utils.StringArrayContains(args, "/updatenow");

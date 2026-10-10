@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using SimpleDeFence.Utilities;
@@ -130,12 +130,9 @@ namespace SimpleDeFence.Tests
         public void Reads_a_real_satellite_from_this_repository()
         {
             // The format this has to cope with in practice, not a fixture of my own making.
-            var repoResx = Path.GetFullPath(Path.Combine(
-                AppContext.BaseDirectory, "..", "..", "..", "..",
-                "SimpleDeFence", "Resources", "Messages.pt-BR.resx"));
-
-            if (!File.Exists(repoResx))
-                return; // running outside the repo layout
+            // Messages.pt-BR.resx, which this used to read, was deleted along with the other
+            // satellites; the neutral file is the one the project still ships.
+            var repoResx = TestRepo.File("SimpleDeFence", "Resources", "Messages.resx");
 
             var read = ResxFile.Read(repoResx);
 

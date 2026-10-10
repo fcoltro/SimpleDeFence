@@ -301,7 +301,12 @@ namespace SimpleDeFence.UI.Services
 
         private void UpdateModeIcon()
         {
-            var mode = App.Firewall.State?.Mode ?? FirewallMode.Unknown;
+            // Unknown when the service is not answering. FirewallClient keeps the last State it
+            // received when a refresh fails, so reading State alone left the tray showing - in
+            // green - a mode the service was no longer there to enforce.
+            var mode = App.Firewall.Connected
+                ? App.Firewall.State?.Mode ?? FirewallMode.Unknown
+                : FirewallMode.Unknown;
             var lightTaskbar = SystemTheme.TaskbarUsesLightTheme();
             if (mode == _shownMode && lightTaskbar == _shownLightTheme)
                 return;
@@ -357,8 +362,15 @@ namespace SimpleDeFence.UI.Services
             _hostsBlocklistItem.IsChecked = config?.Blocklists.EnableBlocklists ?? false;
         }
 
+        /// <summary>Goes through the window's own mode switch rather than straight to the client,
+        /// so the tray gets the same Learning confirmation (Learning lets all traffic through) and
+        /// the same failure dialogs as the mode chip. It used to switch without asking and say
+        /// nothing when a locked or failed switch did not take.</summary>
         private static async Task SwitchModeAsync(FirewallMode mode)
-            => await App.Firewall.SwitchModeAsync(mode);
+        {
+            if (App.MainWindow is MainWindow window)
+                await window.ApplyModeAsync(mode);
+        }
 
         private static async Task LockAsync()
             => await App.Firewall.LockAsync();
@@ -435,6 +447,8 @@ namespace SimpleDeFence.UI.Services
             var xamlRoot = App.MainWindow?.Content?.XamlRoot;
             if (xamlRoot is null)
                 return;
+
+            App.BringMainWindowForward();
 
             var dialog = new ContentDialog
             {

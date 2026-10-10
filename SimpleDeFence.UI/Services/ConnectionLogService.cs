@@ -189,9 +189,18 @@ namespace SimpleDeFence.UI.Services
 
         /// <summary>Everything is quoted rather than only the fields that need it. Application names
         /// and paths are attacker-influenced text on a security tool's log - a path containing a
-        /// comma or a quote must not be able to shift the columns of every row after it.</summary>
+        /// comma or a quote must not be able to shift the columns of every row after it.
+        ///
+        /// Quoting does not stop a spreadsheet from reading a cell as a formula, though: a field
+        /// that begins with = + - or @ (or a tab or carriage return, which some importers strip
+        /// first) is evaluated when the log is opened in Excel. A leading apostrophe makes it text.</summary>
         private static string Quote(string value)
-            => "\"" + (value ?? string.Empty).Replace("\"", "\"\"") + "\"";
+        {
+            value ??= string.Empty;
+            if (value.Length > 0 && value[0] is '=' or '+' or '-' or '@' or '\t' or '\r')
+                value = "'" + value;
+            return "\"" + value.Replace("\"", "\"\"") + "\"";
+        }
 
         public void Dispose()
         {
