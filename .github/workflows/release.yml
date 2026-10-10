@@ -24,6 +24,10 @@ on:
       tag:
         description: Release tag to create, e.g. v1.0.2
         required: true
+      replace:
+        description: If this release already exists, delete it and its tag, and publish it again from this commit
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -52,8 +56,15 @@ jobs:
         $notes = "docs/release-notes/$env:TAG.md"
         if (-not (Test-Path $notes)) { throw "Release notes missing: $notes" }
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+    # Puts MSBuild on PATH. This replaces microsoft/setup-msbuild, whose last release still targets
+    # Node.js 20, which GitHub has deprecated. It runs the same vswhere query that action does.
+    - name: Add MSBuild to PATH
+      shell: pwsh
+      run: |
+        $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+        $msbuild = & $vswhere -products * -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
+        if (-not $msbuild) { throw "MSBuild not found by vswhere" }
+        Split-Path $msbuild | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
     - name: Test
       run: dotnet test SimpleDeFence.Tests/SimpleDeFence.Tests.csproj --configuration Release
@@ -89,6 +100,22 @@ jobs:
         $hash = (Get-FileHash $msi -Algorithm SHA256).Hash.ToLowerInvariant()
         "SHA-256 of SimpleDeFence_x64.msi for $($env:TAG): ``$hash``" >> $env:GITHUB_STEP_SUMMARY
         Write-Host "SHA256 $hash"
+
+    # Only on a manual run with "replace" ticked, for rebuilding a release that nobody has been
+    # offered in-app yet. Once updates/update.json names a release, bump the version instead:
+    # installed clients only move to a higher version.
+    - name: Remove the existing release
+      if: github.event_name == 'workflow_dispatch' && inputs.replace
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release view $env:TAG *> $null
+        if ($LASTEXITCODE -eq 0) {
+          gh release delete $env:TAG --cleanup-tag --yes
+          if ($LASTEXITCODE -ne 0) { throw "gh release delete failed with exit code $LASTEXITCODE" }
+        }
+        $global:LASTEXITCODE = 0
 
     # On a dispatched run the tag does not exist yet, so the release creates it on this commit.
     - name: Create release
