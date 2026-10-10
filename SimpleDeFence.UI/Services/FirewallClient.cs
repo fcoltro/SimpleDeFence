@@ -196,7 +196,34 @@ namespace SimpleDeFence.UI.Services
             => CommitConfigChangesAsync(config =>
                 config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
 
-        public Task<MessageType> CommitConfigChangesAsync(Action<ServerConfiguration> mutate)
+        /// <summary>
+        /// Taken under the same gate as RefreshAsync, and followed by Changed on every path.
+        ///
+        /// Without the gate, a refresh already in flight with changeset N could finish after this
+        /// commit had moved it to N+1 and write N back - so the next commit went out stale and was
+        /// silently discarded. Without Changed, nothing that had not itself asked for the commit
+        /// heard about it: the tray's check marks, which flip themselves when clicked, stayed on a
+        /// value the service had refused, and the tray and the shell chip went on describing the
+        /// configuration from before a successful one.
+        /// </summary>
+        public async Task<MessageType> CommitConfigChangesAsync(Action<ServerConfiguration> mutate)
+        {
+            MessageType result;
+            await _gate.WaitAsync().ConfigureAwait(true);
+            try
+            {
+                result = await CommitConfigChangesCoreAsync(mutate).ConfigureAwait(true);
+            }
+            finally
+            {
+                _gate.Release();
+            }
+
+            Changed?.Invoke(this, EventArgs.Empty);
+            return result;
+        }
+
+        private Task<MessageType> CommitConfigChangesCoreAsync(Action<ServerConfiguration> mutate)
         {
             return Task.Run(() =>
             {

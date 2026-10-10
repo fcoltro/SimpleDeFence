@@ -92,6 +92,16 @@ namespace SimpleDeFence.UI
         /// element. Called at launch (this file) and immediately on change from the Settings page
         /// (Task 4's General group), so both share one mapping from the stored string to
         /// ElementTheme.</summary>
+        internal static void BringMainWindowForward()
+        {
+            // Every ContentDialog the tray, the hotkeys or the updater raises is hosted on the main
+            // window's XamlRoot, and closing the window only hides it. A dialog on a hidden window
+            // is invisible but still modal: it waits for an answer nobody can give, and holds the
+            // XamlRoot so the next dialog fails. Anything that is about to show one calls this.
+            if (MainWindow is SimpleDeFence.UI.MainWindow window && !window.AppWindow.IsVisible)
+                window.ShowFromTray();
+        }
+
         internal static void ApplyTheme(string uiTheme)
         {
             if (MainWindow?.Content is not Microsoft.UI.Xaml.FrameworkElement root)
