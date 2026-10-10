@@ -648,7 +648,13 @@ namespace SimpleDeFence.UI.Pages
         {
             if (_committing) return;
 
+            // An empty password is not a password: SetPasswordAsync("") is exactly what Remove
+            // sends, so two empty boxes used to remove the password while reporting it updated.
+            // The button is disabled while the box is empty; this is the backstop.
             var password = NewPasswordBox.Password;
+            if (string.IsNullOrEmpty(password))
+                return;
+
             if (password != NewPasswordConfirmBox.Password)
             {
                 await ShowResultAsync(Loc.T(LocKeys.Settings.SecurityPasswordMismatchTitle),
@@ -664,6 +670,8 @@ namespace SimpleDeFence.UI.Pages
             if (_committing) return;
             await SetPasswordAsync(string.Empty, Loc.T(LocKeys.Settings.SecurityPasswordRemovedBody));
         }
+
+        private void NewPasswordBox_PasswordChanged(object sender, RoutedEventArgs e) => UpdateControlsEnabled();
 
         private async Task SetPasswordAsync(string password, string successBody)
         {
@@ -681,12 +689,13 @@ namespace SimpleDeFence.UI.Pages
             }
             finally
             {
+                // Cleared on every path, the failure one included, so the plaintext does not sit
+                // in the boxes after the attempt is over.
+                NewPasswordBox.Password = string.Empty;
+                NewPasswordConfirmBox.Password = string.Empty;
                 _committing = false;
                 UpdateControlsEnabled();
             }
-
-            NewPasswordBox.Password = string.Empty;
-            NewPasswordConfirmBox.Password = string.Empty;
 
             if (resp == MessageType.SET_PASSPHRASE)
             {
@@ -881,7 +890,7 @@ namespace SimpleDeFence.UI.Pages
         /// use. Tasks 7-8 extend this further for their own groups' controls.</summary>
         private void UpdateControlsEnabled()
         {
-            SetPasswordButton.IsEnabled = !_committing;
+            SetPasswordButton.IsEnabled = !_committing && !string.IsNullOrEmpty(NewPasswordBox.Password);
             var hasPassword = App.Firewall.State?.HasPassword ?? false;
             var locked = App.Firewall.State?.Locked ?? false;
             RemovePasswordButton.IsEnabled = hasPassword && !_committing;

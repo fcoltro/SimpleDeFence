@@ -34,6 +34,14 @@ namespace SimpleDeFence.Utilities
 
         public IpAddrMask(IPAddress addr, int prefixLen)
         {
+            // Range-checked because every filter-building caller narrows PrefixLen with a (byte)
+            // cast, which turns an out-of-range "10.0.0.0/256" into /0 - a rule that matches every
+            // address - and sails past the check IpFilterCondition makes on its own argument. A
+            // negative prefix used to surface later as an IndexOutOfRangeException in SubnetMask.
+            int maxPrefix = addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork ? 32 : 128;
+            if (prefixLen < 0 || prefixLen > maxPrefix)
+                throw new ArgumentOutOfRangeException(nameof(prefixLen), prefixLen, $"Prefix length must be between 0 and {maxPrefix}.");
+
             Address = addr;
             PrefixLen = prefixLen;
         }
@@ -285,7 +293,8 @@ namespace SimpleDeFence.Utilities
                 var addrSpan = str.Slice(0, slash);
                 addr = IPAddress.Parse(addrSpan);
                 var prefixSpan = str.Slice(slash + 1);
-                prefix = int.Parse(prefixSpan, NumberStyles.Integer, CultureInfo.InvariantCulture);
+                // Digits only: no sign, no surrounding whitespace.
+                prefix = int.Parse(prefixSpan, NumberStyles.None, CultureInfo.InvariantCulture);
             }
 
             return new IpAddrMask(addr, prefix);

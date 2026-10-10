@@ -2344,7 +2344,13 @@ namespace SimpleDeFence
             }
             else
             {
-                LastControllerCommandTime = DateTime.Now;
+                // Only commands that change something count as activity. Reads arrive on timers -
+                // the connection logger polls READ_FW_LOG every few seconds, the Connections page
+                // re-gathers on its own interval, both resolving paths through GET_PROCESS_PATH -
+                // and counting those kept the 10-minute inactivity lock in MINUTE_TIMER from ever
+                // firing while either was running.
+                if ((int)reqMsg.Type >= (int)MessageType.UNLOCK)
+                    LastControllerCommandTime = DateTime.Now;
 
                 // Process and wait for response
                 var req = new TwRequest(reqMsg);
