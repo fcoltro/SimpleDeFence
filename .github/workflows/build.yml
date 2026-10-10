@@ -39,8 +39,15 @@ jobs:
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+    # Puts MSBuild on PATH. This replaces microsoft/setup-msbuild, whose last release still targets
+    # Node.js 20, which GitHub has deprecated. It runs the same vswhere query that action does.
+    - name: Add MSBuild to PATH
+      shell: pwsh
+      run: |
+        $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+        $msbuild = & $vswhere -products * -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
+        if (-not $msbuild) { throw "MSBuild not found by vswhere" }
+        Split-Path $msbuild | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
     - name: Restore
       run: dotnet restore SimpleDeFence/SimpleDeFence.csproj
