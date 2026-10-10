@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -34,15 +34,20 @@ namespace SimpleDeFence.UI.Services
             UpdateDescriptor descriptor;
             var checkTask = UpdateDescriptorFetcher.GetDescriptorAsync(cts.Token);
 
+            var progressClosed = WaitForCloseAsync(progressDialog);
             _ = TryShowDialogAsync(progressDialog);
-            var completed = await Task.WhenAny(checkTask, WaitForCloseAsync(progressDialog));
+            var completed = await Task.WhenAny(checkTask, progressClosed);
             if (completed != checkTask)
             {
                 cts.Cancel();
                 return; // User cancelled.
             }
 
+            // Hide() only starts the close. Showing the next dialog before this one has finished
+            // closing throws, which TryShowDialogAsync turns into "None" - so the result or error
+            // that follows was silently dropped.
             progressDialog.Hide();
+            await progressClosed;
 
             try
             {
@@ -130,17 +135,31 @@ namespace SimpleDeFence.UI.Services
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
             };
 
+            if (!UpdateUrlPolicy.IsAllowed(mainModule.UpdateURL))
+            {
+                await ShowMessageAsync(xamlRoot,
+                    Loc.T(LocKeys.Settings.UpdatesCheckFailedTitle),
+                    Loc.T(LocKeys.Settings.UpdatesVerificationFailed));
+                return;
+            }
+
             var downloadTask = DownloadFileAsync(httpClient, mainModule.UpdateURL!, tmpFile, cts.Token);
+            var progressClosed = WaitForCloseAsync(progressDialog);
             _ = TryShowDialogAsync(progressDialog);
-            var completed = await Task.WhenAny(downloadTask, WaitForCloseAsync(progressDialog));
+            var completed = await Task.WhenAny(downloadTask, progressClosed);
             if (completed != downloadTask)
             {
                 cts.Cancel();
+
+                // The download still holds the file open until it observes the cancellation, and
+                // deleting before then fails silently and leaves a partial MSI in %TEMP%.
+                try { await downloadTask; } catch { }
                 TryDelete(tmpFile);
                 return;
             }
 
             progressDialog.Hide();
+            await progressClosed;
 
             try
             {
@@ -197,9 +216,33 @@ namespace SimpleDeFence.UI.Services
                 return;
             }
 
+            // Authenticode, checked while the handle above still pins the bytes. The hash only
+            // proves the file is the one the descriptor names, and the descriptor is unsigned, so
+            // a signature is the only thing here that says who built it. A signature that is
+            // present but does not verify is always refused - that is a tampered or re-signed
+            // file. An unsigned package is accepted only while releases are not signed yet; flip
+            // RequireSignedInstaller once they are.
+            var signature = SimpleDeFence.Windows.WinTrust.VerifyFileAuthenticode(tmpFile);
+            if (signature == SimpleDeFence.Windows.WinTrust.VerifyResult.SIGNATURE_INVALID
+                || (RequireSignedInstaller && signature != SimpleDeFence.Windows.WinTrust.VerifyResult.SIGNATURE_VALID))
+            {
+                verified.Dispose();
+                TryDelete(tmpFile);
+                await ShowMessageAsync(xamlRoot,
+                    Loc.T(LocKeys.Settings.UpdatesCheckFailedTitle),
+                    Loc.T(LocKeys.Settings.UpdatesVerificationFailed));
+                return;
+            }
+
             try
             {
                 StartInstaller(tmpFile);
+
+                // Rooted for the life of the process. A local would be eligible for collection the
+                // moment this method returns, and the finalizer closing it would release the lock
+                // while msiexec - which opens the file by path, after the user answers its UAC
+                // prompt - has not read it yet.
+                HeldInstallerHandle = verified;
             }
             catch (Exception ex)
             {
@@ -208,6 +251,14 @@ namespace SimpleDeFence.UI.Services
                 await ShowMessageAsync(xamlRoot, Loc.T(LocKeys.Settings.UpdatesCheckFailedTitle), ex.Message);
             }
         }
+
+        /// <summary>True once releases are Authenticode-signed. While false, an unsigned installer
+        /// is accepted (one with a broken signature never is).</summary>
+        private static readonly bool RequireSignedInstaller = false;
+
+        /// <summary>Keeps the verified installer locked against writers and deletes until this
+        /// process exits. See the end of <see cref="DownloadAndInstallAsync"/>.</summary>
+        private static FileStream? HeldInstallerHandle;
 
         /// <summary>
         /// Runs the downloaded package through msiexec explicitly.

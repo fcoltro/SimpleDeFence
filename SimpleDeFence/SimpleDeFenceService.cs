@@ -1378,6 +1378,12 @@ namespace SimpleDeFence
 
         private static void GetCompressedUpdate(UpdateModule module, WaitCallback installMethod)
         {
+            if (!UpdateUrlPolicy.IsAllowed(module.UpdateURL))
+            {
+                Utils.Log($"Ignoring the {module.Component} update: its URL is not one of this project's HTTPS release locations.", Utils.LOG_ID_SERVICE);
+                return;
+            }
+
             string tmpCompressedPath = Path.GetTempFileName();
             string tmpFile = Path.GetTempFileName();
             try
