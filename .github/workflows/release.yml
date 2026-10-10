@@ -1,0 +1,103 @@
+name: Release
+
+# Builds the x64 MSI and publishes it as a GitHub release.
+#
+# Two ways to start it:
+#   - push a tag such as v1.0.2, or
+#   - run it from the Actions tab with the tag name. The tag is then created on the commit the run
+#     was started from (main, unless another branch is picked).
+#
+# The tag must match <Version> in SimpleDeFence/SimpleDeFence.csproj, and the release notes are
+# read from docs/release-notes/<tag>.md, so both have to be on that commit first.
+#
+# The SHA-256 of the uploaded MSI is printed in the run summary. updates/update.json needs that
+# exact value: MSI builds are not reproducible, so a rebuild of the same commit hashes differently.
+#
+# A release created with GITHUB_TOKEN does not trigger other workflows, so "Publish to winget"
+# does not start on its own from here. Run it by hand with the same tag.
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to create, e.g. v1.0.2
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  # See build.yml: MsiSetup.wixproj harvests from this exact path.
+  PUBLISH_DIR: SimpleDeFence/bin/Release/net10.0-windows10.0.19041.0/win-x64/publish
+  TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+
+jobs:
+  release:
+    runs-on: windows-2022
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+    - name: Check tag, version and notes
+      shell: pwsh
+      run: |
+        if ($env:TAG -notmatch '^v\d+\.\d+\.\d+$') { throw "Tag '$env:TAG' must look like v1.2.3 (winget reads the version from it)." }
+        [xml]$proj = Get-Content SimpleDeFence/SimpleDeFence.csproj
+        $version = ($proj.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ }) | Select-Object -First 1
+        if ("v$version" -ne $env:TAG) { throw "Tag $env:TAG does not match <Version>$version</Version> in SimpleDeFence.csproj." }
+        $notes = "docs/release-notes/$env:TAG.md"
+        if (-not (Test-Path $notes)) { throw "Release notes missing: $notes" }
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+
+    - name: Test
+      run: dotnet test SimpleDeFence.Tests/SimpleDeFence.Tests.csproj --configuration Release
+
+    - name: Publish for packaging
+      run: dotnet publish SimpleDeFence/SimpleDeFence.csproj -c Release -r win-x64 -p:SelfContained=true -o ${{ env.PUBLISH_DIR }}
+
+    - name: Install WiX 3
+      run: choco install wixtoolset -y --no-progress
+
+    # Same harvest as build.yml; HarvestPublishDir.xslt documents the arguments.
+    - name: Harvest publish output
+      shell: pwsh
+      working-directory: MsiSetup
+      run: |
+        $heat = Join-Path ${env:ProgramFiles(x86)} 'WiX Toolset v3.14\bin\heat.exe'
+        if (-not (Test-Path $heat)) { throw "heat.exe not found at $heat" }
+        $publishDir = '..' + [char]92 + '${{ env.PUBLISH_DIR }}'.Replace('/', [char]92)
+        if (-not (Test-Path $publishDir)) { throw "publish output missing at $publishDir" }
+        & $heat dir $publishDir `
+          -platform x64 -cg PublishedDependencies -ag -scom -sreg -srd `
+          -dr INSTALLDIR -var var.PublishDir -t HarvestPublishDir.xslt -out Dependencies.wxs
+        if ($LASTEXITCODE -ne 0) { throw "heat.exe failed with exit code $LASTEXITCODE" }
+
+    - name: Build MSI
+      run: msbuild MsiSetup/MsiSetup.wixproj /p:Configuration=Release /p:Platform=x64
+
+    - name: Hash MSI
+      shell: pwsh
+      run: |
+        $msi = 'MsiSetup/bin/Release/SimpleDeFence_x64.msi'
+        if (-not (Test-Path $msi)) { throw "MSI missing at $msi" }
+        $hash = (Get-FileHash $msi -Algorithm SHA256).Hash.ToLowerInvariant()
+        "SHA-256 of SimpleDeFence_x64.msi for $($env:TAG): ``$hash``" >> $env:GITHUB_STEP_SUMMARY
+        Write-Host "SHA256 $hash"
+
+    # On a dispatched run the tag does not exist yet, so the release creates it on this commit.
+    - name: Create release
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release create $env:TAG MsiSetup/bin/Release/SimpleDeFence_x64.msi `
+          --title "SimpleDeFence $($env:TAG.Substring(1))" `
+          --notes-file "docs/release-notes/$env:TAG.md" `
+          --target $env:GITHUB_SHA
+        if ($LASTEXITCODE -ne 0) { throw "gh release create failed with exit code $LASTEXITCODE" }
