@@ -1128,9 +1128,9 @@ namespace SimpleDeFence.UI.Pages
         {
             try
             {
-                var package = new Windows.ApplicationModel.DataTransfer.DataPackage();
+                var package = new global::Windows.ApplicationModel.DataTransfer.DataPackage();
                 package.SetText(text);
-                Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
+                global::Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
             }
             catch (Exception)
             {
