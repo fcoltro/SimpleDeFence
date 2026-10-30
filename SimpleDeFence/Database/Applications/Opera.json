@@ -1,0 +1,25 @@
+{
+  "Name": "Opera",
+  "Components": [
+    {
+      "Subject": {
+        "SubjectType": 2,
+        "ExecutablePath": "opera.exe"
+      },
+      "Policy": {
+        "PolicyType": 3,
+        "LocalNetworkOnly": false,
+        "AllowedRemoteTcpConnectPorts": "*",
+        "AllowedRemoteUdpConnectPorts": "*",
+        "AllowedLocalTcpListenerPorts": "",
+        "AllowedLocalUdpListenerPorts": ""
+      },
+      "SearchPaths": [
+        "{folder:LocalAppData}\\Programs\\Opera",
+        "{folder:pf64}\\Opera"
+      ],
+      "CertificateSubjects": []
+    }
+  ],
+  "Flags": {}
+}

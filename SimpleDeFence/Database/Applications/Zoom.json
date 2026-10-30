@@ -1,0 +1,25 @@
+{
+  "Name": "Zoom",
+  "Components": [
+    {
+      "Subject": {
+        "SubjectType": 2,
+        "ExecutablePath": "Zoom.exe"
+      },
+      "Policy": {
+        "PolicyType": 3,
+        "LocalNetworkOnly": false,
+        "AllowedRemoteTcpConnectPorts": "*",
+        "AllowedRemoteUdpConnectPorts": "*",
+        "AllowedLocalTcpListenerPorts": "",
+        "AllowedLocalUdpListenerPorts": ""
+      },
+      "SearchPaths": [
+        "{folder:pf64}\\Zoom\\bin",
+        "{folder:pf32}\\Zoom\\bin"
+      ],
+      "CertificateSubjects": []
+    }
+  ],
+  "Flags": {}
+}

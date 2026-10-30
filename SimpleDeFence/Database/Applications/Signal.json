@@ -1,0 +1,24 @@
+{
+  "Name": "Signal",
+  "Components": [
+    {
+      "Subject": {
+        "SubjectType": 2,
+        "ExecutablePath": "Signal.exe"
+      },
+      "Policy": {
+        "PolicyType": 3,
+        "LocalNetworkOnly": false,
+        "AllowedRemoteTcpConnectPorts": "*",
+        "AllowedRemoteUdpConnectPorts": "*",
+        "AllowedLocalTcpListenerPorts": "",
+        "AllowedLocalUdpListenerPorts": ""
+      },
+      "SearchPaths": [
+        "{folder:LocalAppData}\\Programs\\signal-desktop"
+      ],
+      "CertificateSubjects": []
+    }
+  ],
+  "Flags": {}
+}

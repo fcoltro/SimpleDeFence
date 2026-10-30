@@ -1,0 +1,45 @@
+{
+  "Name": "Brave Browser",
+  "Components": [
+    {
+      "Subject": {
+        "SubjectType": 2,
+        "ExecutablePath": "brave.exe"
+      },
+      "Policy": {
+        "PolicyType": 3,
+        "LocalNetworkOnly": false,
+        "AllowedRemoteTcpConnectPorts": "*",
+        "AllowedRemoteUdpConnectPorts": "*",
+        "AllowedLocalTcpListenerPorts": "",
+        "AllowedLocalUdpListenerPorts": ""
+      },
+      "SearchPaths": [
+        "{folder:pf64}\\BraveSoftware\\Brave-Browser\\Application",
+        "{folder:pf32}\\BraveSoftware\\Brave-Browser\\Application",
+        "{folder:LocalAppData}\\BraveSoftware\\Brave-Browser\\Application"
+      ],
+      "CertificateSubjects": []
+    },
+    {
+      "Subject": {
+        "SubjectType": 2,
+        "ExecutablePath": "BraveUpdate.exe"
+      },
+      "Policy": {
+        "PolicyType": 3,
+        "LocalNetworkOnly": false,
+        "AllowedRemoteTcpConnectPorts": "*",
+        "AllowedRemoteUdpConnectPorts": "",
+        "AllowedLocalTcpListenerPorts": "",
+        "AllowedLocalUdpListenerPorts": ""
+      },
+      "SearchPaths": [
+        "{folder:pf32}\\BraveSoftware\\Update",
+        "{folder:LocalAppData}\\BraveSoftware\\Update"
+      ],
+      "CertificateSubjects": []
+    }
+  ],
+  "Flags": {}
+}

@@ -1,0 +1,27 @@
+{
+  "Name": "Microsoft OneDrive",
+  "Components": [
+    {
+      "Subject": {
+        "SubjectType": 2,
+        "ExecutablePath": "OneDrive.exe"
+      },
+      "Policy": {
+        "PolicyType": 3,
+        "LocalNetworkOnly": false,
+        "AllowedRemoteTcpConnectPorts": "*",
+        "AllowedRemoteUdpConnectPorts": "",
+        "AllowedLocalTcpListenerPorts": "",
+        "AllowedLocalUdpListenerPorts": ""
+      },
+      "SearchPaths": [
+        "{folder:LocalAppData}\\Microsoft\\OneDrive",
+        "{folder:pf64}\\Microsoft OneDrive"
+      ],
+      "CertificateSubjects": [
+        "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
+      ]
+    }
+  ],
+  "Flags": {}
+}

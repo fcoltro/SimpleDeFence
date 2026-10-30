@@ -1,23 +1,23 @@
 {
-  "Name": "Windows Sidebar",
+  "Name": "Slack",
   "Components": [
     {
       "Subject": {
         "SubjectType": 2,
-        "ExecutablePath": "sidebar.exe"
+        "ExecutablePath": "slack.exe"
       },
       "Policy": {
         "PolicyType": 3,
         "LocalNetworkOnly": false,
         "AllowedRemoteTcpConnectPorts": "*",
-        "AllowedRemoteUdpConnectPorts": "",
+        "AllowedRemoteUdpConnectPorts": "*",
         "AllowedLocalTcpListenerPorts": "",
         "AllowedLocalUdpListenerPorts": ""
       },
-      "AllowedSha1": [
-        "E513DD19714559226CD52169FBB4489CA5740E88",
-        "12a602b86fc394b1c88348fb099685eabb876495"
-      ]
+      "SearchPaths": [
+        "{folder:pf64}\\Slack"
+      ],
+      "CertificateSubjects": []
     }
   ],
   "Flags": {}
