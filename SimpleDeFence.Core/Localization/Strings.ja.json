@@ -285,7 +285,10 @@
       "allowLocalSubnet": "ローカルネットワークを許可",
       "allowLocalSubnetDescription": "ローカルネットワーク上の他のデバイスとの通信を常に許可します。",
       "displayOffBlock": "ディスプレイがオフのときにネットワークをブロック",
-      "displayOffBlockDescription": "画面がオフの間、すべてのネットワーク通信をブロックします。"
+      "displayOffBlockDescription": "画面がオフの間、すべてのネットワーク通信をブロックします。",
+      "publicNetworkLockdown": "パブリック ネットワークでロックダウン",
+      "publicNetworkLockdownDescription": "Windows がパブリックとしているネットワーク (カフェやホテルの Wi-Fi など) では、「ローカルネットワークを許可」を無視し、ファイルとプリンターの共有、ネットワーク探索、ping、リモート アクセスをオフにします。",
+      "publicNetworkNow": "現在パブリック ネットワークに接続しています。"
     },
     "blocklists": {
       "enable": "ブロックリストを有効にする",

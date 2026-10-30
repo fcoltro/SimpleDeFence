@@ -285,7 +285,10 @@
       "allowLocalSubnet": "Autoriser le réseau local",
       "allowLocalSubnetDescription": "Toujours autoriser le trafic vers et depuis les autres appareils de votre réseau local.",
       "displayOffBlock": "Bloquer le réseau quand l'écran est éteint",
-      "displayOffBlockDescription": "Bloque tout le trafic réseau tant que l'écran est éteint."
+      "displayOffBlockDescription": "Bloque tout le trafic réseau tant que l'écran est éteint.",
+      "publicNetworkLockdown": "Verrouiller sur les réseaux publics",
+      "publicNetworkLockdownDescription": "Sur les réseaux que Windows considère comme publics, comme le Wi-Fi d’un café ou d’un hôtel, « Autoriser le réseau local » est ignoré et le partage de fichiers et d’imprimantes, la découverte du réseau, le ping et l’accès à distance sont désactivés.",
+      "publicNetworkNow": "Vous êtes actuellement sur un réseau public."
     },
     "blocklists": {
       "enable": "Activer les listes de blocage",

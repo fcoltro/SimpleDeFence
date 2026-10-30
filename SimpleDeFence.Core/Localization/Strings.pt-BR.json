@@ -285,7 +285,10 @@
       "allowLocalSubnet": "Permitir rede local",
       "allowLocalSubnetDescription": "Sempre permitir tráfego de e para outros dispositivos na sua rede local.",
       "displayOffBlock": "Bloquear rede quando a tela estiver desligada",
-      "displayOffBlockDescription": "Bloqueia todo o tráfego de rede enquanto a tela estiver desligada."
+      "displayOffBlockDescription": "Bloqueia todo o tráfego de rede enquanto a tela estiver desligada.",
+      "publicNetworkLockdown": "Bloquear em redes públicas",
+      "publicNetworkLockdownDescription": "Em redes que o Windows marca como públicas, como o Wi-Fi de um café ou hotel, ignora \"Permitir rede local\" e desativa o compartilhamento de arquivos e impressoras, a descoberta de rede, o ping e o acesso remoto.",
+      "publicNetworkNow": "Você está em uma rede pública agora."
     },
     "blocklists": {
       "enable": "Ativar listas de bloqueio",

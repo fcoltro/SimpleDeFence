@@ -285,7 +285,10 @@
       "allowLocalSubnet": "Lokales Netzwerk erlauben",
       "allowLocalSubnetDescription": "Datenverkehr zu und von anderen Geräten in deinem lokalen Netzwerk immer erlauben.",
       "displayOffBlock": "Netzwerk bei ausgeschaltetem Bildschirm blockieren",
-      "displayOffBlockDescription": "Blockiert den gesamten Netzwerkverkehr, solange der Bildschirm aus ist."
+      "displayOffBlockDescription": "Blockiert den gesamten Netzwerkverkehr, solange der Bildschirm aus ist.",
+      "publicNetworkLockdown": "In öffentlichen Netzwerken abschotten",
+      "publicNetworkLockdownDescription": "In Netzwerken, die Windows als öffentlich einstuft, etwa im Café oder Hotel, wird „Lokales Netzwerk erlauben“ ignoriert, und Datei- und Druckerfreigabe, Netzwerkerkennung, Ping und Fernzugriff werden ausgeschaltet.",
+      "publicNetworkNow": "Du bist gerade mit einem öffentlichen Netzwerk verbunden."
     },
     "blocklists": {
       "enable": "Sperrlisten aktivieren",

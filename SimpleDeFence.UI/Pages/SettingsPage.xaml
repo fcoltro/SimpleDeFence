@@ -123,6 +123,14 @@
                                           OnContent="{loc:Loc Key=common.on}"
                                           OffContent="{loc:Loc Key=common.off}"/>
                         </controls:SettingsCard>
+                        <!-- Description is set in SeedControls: it adds a line when a Public
+                             network is connected now, so the switch says what it would do. -->
+                        <controls:SettingsCard x:Name="PublicNetworkLockdownCard"
+                                                Header="{loc:Loc Key=settings.protection.publicNetworkLockdown}">
+                            <ToggleSwitch x:Name="PublicNetworkLockdownToggle" Toggled="PublicNetworkLockdownToggle_Toggled"
+                                          OnContent="{loc:Loc Key=common.on}"
+                                          OffContent="{loc:Loc Key=common.off}"/>
+                        </controls:SettingsCard>
                         <controls:SettingsCard Header="{loc:Loc Key=settings.protection.displayOffBlock}"
                                                 Description="{loc:Loc Key=settings.protection.displayOffBlockDescription}">
                             <ToggleSwitch x:Name="DisplayOffBlockToggle" Toggled="DisplayOffBlockToggle_Toggled"

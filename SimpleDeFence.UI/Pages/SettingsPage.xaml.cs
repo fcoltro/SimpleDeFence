@@ -124,6 +124,11 @@ namespace SimpleDeFence.UI.Pages
             var config = App.Firewall.Config!;
             AllowLocalSubnetToggle.IsOn = config.ActiveProfile.AllowLocalSubnet;
             DisplayOffBlockToggle.IsOn = config.ActiveProfile.DisplayOffBlock;
+            PublicNetworkLockdownToggle.IsOn = config.PublicNetworkLockdown;
+            var lockdownDescription = Loc.T(LocKeys.Settings.ProtectionPublicNetworkLockdownDescription);
+            PublicNetworkLockdownCard.Description = App.Firewall.State?.OnPublicNetwork == true
+                ? lockdownDescription + "\n" + Loc.T(LocKeys.Settings.ProtectionPublicNetworkNow)
+                : lockdownDescription;
 
             EnableBlocklistsToggle.IsOn = config.Blocklists.EnableBlocklists;
             EnableHostsBlocklistToggle.IsOn = config.Blocklists.EnableHostsBlocklist;
@@ -444,6 +449,14 @@ namespace SimpleDeFence.UI.Pages
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.ActiveProfile.DisplayOffBlock = value));
         }
 
+        private void PublicNetworkLockdownToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding) return;
+            if (_committing) { RevertDroppedToggle(); return; }
+            var value = PublicNetworkLockdownToggle.IsOn;
+            DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.PublicNetworkLockdown = value));
+        }
+
         private void EnableBlocklistsToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (_seeding) return;
@@ -564,6 +577,7 @@ namespace SimpleDeFence.UI.Pages
             var resp = await CommitAsync(config =>
             {
                 config.LockHostsFile = imported.Service.LockHostsFile;
+                config.PublicNetworkLockdown = imported.Service.PublicNetworkLockdown;
                 config.AutoUpdateCheck = imported.Service.AutoUpdateCheck;
                 config.StartupMode = imported.Service.StartupMode;
                 config.Blocklists = imported.Service.Blocklists;

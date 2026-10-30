@@ -285,7 +285,10 @@
       "allowLocalSubnet": "Izinkan jaringan lokal",
       "allowLocalSubnetDescription": "Selalu izinkan lalu lintas dari dan ke perangkat lain di jaringan lokal Anda.",
       "displayOffBlock": "Blokir jaringan saat layar mati",
-      "displayOffBlockDescription": "Memblokir seluruh lalu lintas jaringan selagi layar mati."
+      "displayOffBlockDescription": "Memblokir seluruh lalu lintas jaringan selagi layar mati.",
+      "publicNetworkLockdown": "Kunci di jaringan publik",
+      "publicNetworkLockdownDescription": "Di jaringan yang ditandai Windows sebagai Publik, seperti Wi-Fi kafe atau hotel, abaikan \"Izinkan jaringan lokal\" dan matikan berbagi file dan printer, penemuan jaringan, ping, serta akses jarak jauh.",
+      "publicNetworkNow": "Anda sedang terhubung ke jaringan Publik."
     },
     "blocklists": {
       "enable": "Aktifkan daftar blokir",

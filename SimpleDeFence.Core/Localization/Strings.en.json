@@ -285,7 +285,10 @@
       "allowLocalSubnet": "Allow local network",
       "allowLocalSubnetDescription": "Always allow traffic to and from other devices on your local network.",
       "displayOffBlock": "Block network when display is off",
-      "displayOffBlockDescription": "Blocks all network traffic while the screen is off."
+      "displayOffBlockDescription": "Blocks all network traffic while the screen is off.",
+      "publicNetworkLockdown": "Lock down on public networks",
+      "publicNetworkLockdownDescription": "On networks Windows marks as Public, such as café or hotel Wi-Fi, ignore \"Allow local network\" and turn off file and printer sharing, network discovery, ping and remote access.",
+      "publicNetworkNow": "You are on a Public network right now."
     },
     "blocklists": {
       "enable": "Enable blocklists",

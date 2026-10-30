@@ -285,7 +285,10 @@
       "allowLocalSubnet": "السماح بالشبكة المحلية",
       "allowLocalSubnetDescription": "السماح دائمًا بحركة المرور من وإلى الأجهزة الأخرى على شبكتك المحلية.",
       "displayOffBlock": "حظر الشبكة عند إطفاء الشاشة",
-      "displayOffBlockDescription": "يحظر كل حركة مرور الشبكة أثناء إطفاء الشاشة."
+      "displayOffBlockDescription": "يحظر كل حركة مرور الشبكة أثناء إطفاء الشاشة.",
+      "publicNetworkLockdown": "الإغلاق على الشبكات العامة",
+      "publicNetworkLockdownDescription": "على الشبكات التي يصنّفها Windows على أنها عامة، مثل شبكة Wi-Fi في مقهى أو فندق، يتم تجاهل «السماح بالشبكة المحلية» وإيقاف مشاركة الملفات والطابعات واكتشاف الشبكة والـ ping والوصول عن بُعد.",
+      "publicNetworkNow": "أنت متصل بشبكة عامة الآن."
     },
     "blocklists": {
       "enable": "تمكين قوائم الحظر",

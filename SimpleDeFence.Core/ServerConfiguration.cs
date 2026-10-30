@@ -176,6 +176,11 @@ namespace SimpleDeFence
         [DataMember(EmitDefaultValue = false)]
         public bool AutoUpdateCheck { get; set; } = true;
 
+        /// <summary>On a network Windows calls Public, leave out "Allow local subnet" and the
+        /// sharing and remote-access special exceptions. See PublicNetworkLockdown.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public bool PublicNetworkLockdown { get; set; } = false;
+
         [DataMember(EmitDefaultValue = false)]
         public FirewallMode StartupMode { get; set; } = FirewallMode.Normal;
 

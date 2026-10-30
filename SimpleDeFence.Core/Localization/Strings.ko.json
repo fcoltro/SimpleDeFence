@@ -285,7 +285,10 @@
       "allowLocalSubnet": "로컬 네트워크 허용",
       "allowLocalSubnetDescription": "로컬 네트워크의 다른 장치와 주고받는 트래픽을 항상 허용합니다.",
       "displayOffBlock": "디스플레이가 꺼져 있을 때 네트워크 차단",
-      "displayOffBlockDescription": "화면이 꺼져 있는 동안 모든 네트워크 트래픽을 차단합니다."
+      "displayOffBlockDescription": "화면이 꺼져 있는 동안 모든 네트워크 트래픽을 차단합니다.",
+      "publicNetworkLockdown": "공용 네트워크에서 잠금",
+      "publicNetworkLockdownDescription": "카페나 호텔 Wi-Fi처럼 Windows가 공용으로 지정한 네트워크에서는 '로컬 네트워크 허용'을 무시하고 파일 및 프린터 공유, 네트워크 검색, ping, 원격 액세스를 끕니다.",
+      "publicNetworkNow": "현재 공용 네트워크에 연결되어 있습니다."
     },
     "blocklists": {
       "enable": "차단 목록 사용",

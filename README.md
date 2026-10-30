@@ -75,6 +75,9 @@ executed.
   restart, and the rule removes itself.
 - **Learning with a time limit**: Learning mode can switch itself back to Normal after 10, 30 or
   60 minutes, and the window then points you to the rules it added.
+- **Public network lockdown**: on networks Windows marks as Public, such as café or hotel Wi-Fi,
+  "Allow local network", file and printer sharing, network discovery, ping and remote access are
+  turned off, and come back on the next network that is not Public.
 - **Global hotkeys** for allowing an executable, a running process or a visible window, and
   Ctrl+Alt+B to switch to Block all (and back to Normal) from anywhere.
 - **A command line** for scripts and scheduled tasks:

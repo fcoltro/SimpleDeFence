@@ -285,7 +285,10 @@
       "allowLocalSubnet": "Consenti la rete locale",
       "allowLocalSubnetDescription": "Consenti sempre il traffico da e verso gli altri dispositivi della tua rete locale.",
       "displayOffBlock": "Blocca la rete quando lo schermo è spento",
-      "displayOffBlockDescription": "Blocca tutto il traffico di rete mentre lo schermo è spento."
+      "displayOffBlockDescription": "Blocca tutto il traffico di rete mentre lo schermo è spento.",
+      "publicNetworkLockdown": "Blocca sulle reti pubbliche",
+      "publicNetworkLockdownDescription": "Sulle reti che Windows segna come pubbliche, come il Wi-Fi di un bar o di un hotel, ignora «Consenti la rete locale» e disattiva la condivisione di file e stampanti, l’individuazione di rete, il ping e l’accesso remoto.",
+      "publicNetworkNow": "In questo momento sei su una rete pubblica."
     },
     "blocklists": {
       "enable": "Attiva gli elenchi di blocco",

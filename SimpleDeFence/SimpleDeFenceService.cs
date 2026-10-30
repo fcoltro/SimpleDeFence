@@ -101,8 +101,9 @@ namespace SimpleDeFence
             var rules = new List<RuleDef>();
             var ModeId = Guid.NewGuid();
 
-            // Do we want to let local traffic through?
-            if (ActiveConfig.Service.ActiveProfile.AllowLocalSubnet)
+            // Do we want to let local traffic through? Not on a Public network while public
+            // network lockdown is on - see PublicNetworkLockdown.
+            if (PublicNetworkLockdown.AllowsLocalSubnet(ActiveConfig.Service, VisibleState.OnPublicNetwork))
             {
                 var def = new RuleDef(ModeId, "Allow local subnet", GlobalSubject.Instance, RuleAction.Allow, RuleDirection.InOut, Protocol.Any, (ulong)FilterWeights.DefaultPermit)
                 {
@@ -150,9 +151,12 @@ namespace SimpleDeFence
                 // Collect all applications exceptions
                 UserExceptions.AddRange(ActiveConfig.Service.ActiveProfile.AppExceptions);
 
-                // Collect all special exceptions
+                // Collect all special exceptions, minus the ones public network lockdown suspends
                 foreach (string appName in ActiveConfig.Service.ActiveProfile.SpecialExceptions)
-                    UserExceptions.AddRange(CollectExceptionsForAppByName(appName));
+                {
+                    if (PublicNetworkLockdown.AllowsSpecialException(ActiveConfig.Service, VisibleState.OnPublicNetwork, appName))
+                        UserExceptions.AddRange(CollectExceptionsForAppByName(appName));
+                }
 
                 // Convert exceptions to rules
                 foreach (FirewallExceptionV3 ex in UserExceptions)
@@ -2081,6 +2085,12 @@ namespace SimpleDeFence
                             rule_reload_needed = true;
                         }
 
+                        // Changing a network from Private to Public in Settings does not touch its
+                        // addresses, so the interface watcher says nothing. A minute's delay is
+                        // the price of not subscribing to Network List Manager events.
+                        if (RefreshNetworkCategory())
+                            rule_reload_needed = true;
+
                         // Periodically reload all rules.
                         // This is needed to clear out temprary rules added due to child-process rule inheritance.
                         if (DateTime.Now - LastRuleReloadTime > TimeSpan.FromMinutes(30))
@@ -2122,7 +2132,9 @@ namespace SimpleDeFence
                 case MessageType.REENUMERATE_ADDRESSES:
                     {
                         var args = (TwMessageSimple)req;
-                        if (ReenumerateAdresses())  // returns true if anything changed
+                        // Both checks run every time: a new network can bring new addresses, a
+                        // new category, or both. "|" rather than "||" for that reason.
+                        if (ReenumerateAdresses() | RefreshNetworkCategory())  // true if anything changed
                             InstallFirewallRules();
                         return args.CreateResponse();
                     }
@@ -2141,6 +2153,46 @@ namespace SimpleDeFence
                         return TwMessageError.Instance;
                     }
             }
+        }
+
+        private bool NetworkCategoryFailureLogged = false;
+
+        /// <summary>
+        /// Reads whether a Public network is connected into VisibleState.OnPublicNetwork. Returns
+        /// true when that changed and the rules depend on it, so the caller reinstalls them.
+        ///
+        /// When Windows cannot be asked, the last answer stands. Guessing "Public" would take a
+        /// home user's printer away because a COM call failed; guessing "not Public" would open the
+        /// rules on a café's network for the same reason. Keeping what was last known is wrong
+        /// only for as long as the failure lasts, and it is logged once.
+        /// </summary>
+        private bool RefreshNetworkCategory()
+        {
+            bool onPublic;
+            try
+            {
+                onPublic = NetworkCategory.IsConnectedToPublicNetwork();
+                NetworkCategoryFailureLogged = false;
+            }
+            catch (Exception e)
+            {
+                if (!NetworkCategoryFailureLogged)
+                {
+                    Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                    NetworkCategoryFailureLogged = true;
+                }
+                return false;
+            }
+
+            if (onPublic == VisibleState.OnPublicNetwork)
+                return false;
+
+            VisibleState.OnPublicNetwork = onPublic;
+            GlobalInstances.ServerChangeset = Guid.NewGuid();
+            Utils.Log(onPublic ? "Connected to a Public network." : "No longer connected to a Public network.", Utils.LOG_ID_SERVICE);
+            // Null when called from the constructor, before REINIT has loaded the configuration;
+            // REINIT installs the rules anyway.
+            return ActiveConfig.Service?.PublicNetworkLockdown == true;
         }
 
         private bool ReenumerateAdresses()
@@ -2239,6 +2291,7 @@ namespace SimpleDeFence
 
             // Discover network configuration
             ReenumerateAdresses();
+            RefreshNetworkCategory();
 
             // Fire up pipe
             ServerPipe = new PipeServerEndpoint(new PipeDataReceived(PipeServerDataReceived), "SimpleDeFenceController");

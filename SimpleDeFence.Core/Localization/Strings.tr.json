@@ -285,7 +285,10 @@
       "allowLocalSubnet": "Yerel ağa izin ver",
       "allowLocalSubnetDescription": "Yerel ağınızdaki diğer aygıtlara giden ve onlardan gelen trafiğe her zaman izin ver.",
       "displayOffBlock": "Ekran kapalıyken ağı engelle",
-      "displayOffBlockDescription": "Ekran kapalıyken tüm ağ trafiğini engeller."
+      "displayOffBlockDescription": "Ekran kapalıyken tüm ağ trafiğini engeller.",
+      "publicNetworkLockdown": "Ortak ağlarda kilitle",
+      "publicNetworkLockdownDescription": "Windows'un Ortak olarak işaretlediği ağlarda, örneğin kafe veya otel Wi-Fi'ında, \"Yerel ağa izin ver\" yok sayılır; dosya ve yazıcı paylaşımı, ağ bulma, ping ve uzaktan erişim kapatılır.",
+      "publicNetworkNow": "Şu anda Ortak bir ağdasınız."
     },
     "blocklists": {
       "enable": "Engelleme listelerini etkinleştir",

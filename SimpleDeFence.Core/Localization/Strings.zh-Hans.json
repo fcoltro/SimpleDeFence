@@ -285,7 +285,10 @@
       "allowLocalSubnet": "允许本地网络",
       "allowLocalSubnetDescription": "始终允许与本地网络中其他设备之间的流量。",
       "displayOffBlock": "显示器关闭时阻止网络",
-      "displayOffBlockDescription": "在屏幕关闭期间阻止所有网络流量。"
+      "displayOffBlockDescription": "在屏幕关闭期间阻止所有网络流量。",
+      "publicNetworkLockdown": "在公用网络上锁定",
+      "publicNetworkLockdownDescription": "在 Windows 标记为公用的网络上（例如咖啡馆或酒店的 Wi-Fi），忽略“允许本地网络”，并关闭文件和打印机共享、网络发现、ping 和远程访问。",
+      "publicNetworkNow": "你当前连接的是公用网络。"
     },
     "blocklists": {
       "enable": "启用阻止列表",

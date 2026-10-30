@@ -285,7 +285,10 @@
       "allowLocalSubnet": "Permitir la red local",
       "allowLocalSubnetDescription": "Permite siempre el tráfico hacia y desde otros dispositivos de tu red local.",
       "displayOffBlock": "Bloquear la red cuando la pantalla esté apagada",
-      "displayOffBlockDescription": "Bloquea todo el tráfico de red mientras la pantalla está apagada."
+      "displayOffBlockDescription": "Bloquea todo el tráfico de red mientras la pantalla está apagada.",
+      "publicNetworkLockdown": "Bloquear en redes públicas",
+      "publicNetworkLockdownDescription": "En las redes que Windows marca como públicas, como el Wi-Fi de una cafetería o un hotel, se ignora «Permitir la red local» y se desactivan el uso compartido de archivos e impresoras, la detección de redes, el ping y el acceso remoto.",
+      "publicNetworkNow": "Ahora mismo estás en una red pública."
     },
     "blocklists": {
       "enable": "Activar las listas de bloqueo",

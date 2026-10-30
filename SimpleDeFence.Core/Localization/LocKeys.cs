@@ -284,6 +284,9 @@
             public const string ProtectionAllowLocalSubnetDescription = "settings.protection.allowLocalSubnetDescription";
             public const string ProtectionDisplayOffBlock = "settings.protection.displayOffBlock";
             public const string ProtectionDisplayOffBlockDescription = "settings.protection.displayOffBlockDescription";
+            public const string ProtectionPublicNetworkLockdown = "settings.protection.publicNetworkLockdown";
+            public const string ProtectionPublicNetworkLockdownDescription = "settings.protection.publicNetworkLockdownDescription";
+            public const string ProtectionPublicNetworkNow = "settings.protection.publicNetworkNow";
 
             public const string BlocklistsEnable = "settings.blocklists.enable";
             public const string BlocklistsEnableDescription = "settings.blocklists.enableDescription";
