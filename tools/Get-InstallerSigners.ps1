@@ -58,7 +58,7 @@ function Get-Bytes([string]$url, [long]$from = -1, [long]$to = -1) {
 
 # Returns the signer's subject from a PE file's certificate table, given a way to read byte ranges.
 function Get-PeSigner([scriptblock]$read) {
-    $head = & $read 0 4095
+    [byte[]]$head = & $read 0 4095
     if ($head[0] -ne 0x4D -or $head[1] -ne 0x5A) { return $null }    # not "MZ"
     $pe = [BitConverter]::ToInt32($head, 0x3C)
     $opt = $pe + 24
@@ -67,7 +67,7 @@ function Get-PeSigner([scriptblock]$read) {
     $certOffset = [BitConverter]::ToUInt32($head, $dirs + 4 * 8)
     $certSize = [BitConverter]::ToUInt32($head, $dirs + 4 * 8 + 4)
     if ($certSize -le 8) { throw 'the file is not signed' }
-    $table = & $read $certOffset ($certOffset + $certSize - 1)
+    [byte[]]$table = & $read $certOffset ($certOffset + $certSize - 1)
     # WIN_CERTIFICATE: dwLength, wRevision, wCertificateType, then the PKCS#7 blob.
     $length = [BitConverter]::ToInt32($table, 0)
     $pkcs7 = New-Object byte[] ($length - 8)
@@ -85,9 +85,11 @@ function Get-Signer([string]$url) {
         if ($subject) { return $subject }
     }
     # The server sent the whole file, or it isn't a PE (an MSI): check it on disk.
-    $file = Join-Path $env:TEMP ('signer-check-' + [Guid]::NewGuid() + [IO.Path]::GetExtension(([Uri]$url).AbsolutePath))
+    # Assigned in each branch, not through "$bytes = if", which would unroll the array.
+    if ($first.Partial) { $bytes = (Get-Bytes $url).Bytes } else { $bytes = $first.Bytes }
+    $isMsi = $bytes.Length -gt 4 -and $bytes[0] -eq 0xD0 -and $bytes[1] -eq 0xCF -and $bytes[2] -eq 0x11 -and $bytes[3] -eq 0xE0
+    $file = Join-Path $env:TEMP ('signer-check-' + [Guid]::NewGuid() + $(if ($isMsi) { '.msi' } else { '.exe' }))
     try {
-        $bytes = if ($first.Partial) { (Get-Bytes $url).Bytes } else { $first.Bytes }
         [IO.File]::WriteAllBytes($file, $bytes)
         $sig = Get-AuthenticodeSignature -LiteralPath $file
         if (-not $sig.SignerCertificate) { throw "no signature ($($sig.Status))" }
