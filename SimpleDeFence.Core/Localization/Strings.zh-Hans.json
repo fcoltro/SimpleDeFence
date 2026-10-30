@@ -144,6 +144,10 @@
     },
     "legend": {
       "local": "高亮显示的行未离开你的本地网络"
+    },
+    "allowByPublisher": "来自 {0} 的所有程序",
+    "allowPublisherSuccess": {
+      "body": "由 {0} 签名的程序现在可以连接了。"
     }
   },
   "subject": {
@@ -180,7 +184,8 @@
     "empty": {
       "applications": "尚无应用程序例外。",
       "special": "没有可用的特殊例外。",
-      "filtered": "没有符合当前筛选条件的内容。"
+      "filtered": "没有符合当前筛选条件的内容。",
+      "publishers": "没有受信任的发布者。"
     },
     "appMissing": "此应用程序的文件已不在磁盘上，可能已被卸载。",
     "remove": "移除",
@@ -235,7 +240,9 @@
         "genericDetail": "服务返回 {0}。策略未被更改。"
       }
     },
-    "multiSelectHint": "已选择 {0} 条规则。“移除”会全部删除；选择单条规则才能编辑它。"
+    "multiSelectHint": "已选择 {0} 条规则。“移除”会全部删除；选择单条规则才能编辑它。",
+    "publishersKind": "受信任的发布者",
+    "publishersDescription": "由这些发布者签名的程序无需单独规则即可连接，更新后也是如此。可在“连接”页面的“允许”中添加。"
   },
   "settings": {
     "title": "设置",

@@ -144,6 +144,10 @@
     },
     "legend": {
       "local": "Le righe evidenziate sono rimaste nella tua rete locale"
+    },
+    "allowByPublisher": "Tutti i programmi di {0}",
+    "allowPublisherSuccess": {
+      "body": "I programmi firmati da {0} ora possono connettersi."
     }
   },
   "subject": {
@@ -180,7 +184,8 @@
     "empty": {
       "applications": "Non ci sono ancora eccezioni per le applicazioni.",
       "special": "Nessuna eccezione speciale disponibile.",
-      "filtered": "Niente corrisponde al filtro attuale."
+      "filtered": "Niente corrisponde al filtro attuale.",
+      "publishers": "Nessun editore attendibile."
     },
     "appMissing": "Il file di questa applicazione non esiste più sul disco: potrebbe essere stata disinstallata.",
     "remove": "Rimuovi",
@@ -235,7 +240,9 @@
         "genericDetail": "Il servizio ha restituito {0}. Il criterio non è stato modificato."
       }
     },
-    "multiSelectHint": "{0} regole selezionate. Rimuovi le elimina tutte; seleziona una sola regola per modificarla."
+    "multiSelectHint": "{0} regole selezionate. Rimuovi le elimina tutte; seleziona una sola regola per modificarla.",
+    "publishersKind": "Editori attendibili",
+    "publishersDescription": "I programmi firmati da questi editori possono connettersi senza una regola propria, anche dopo un aggiornamento. Aggiungine uno con Consenti nella pagina Connessioni."
   },
   "settings": {
     "title": "Impostazioni",

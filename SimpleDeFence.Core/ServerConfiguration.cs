@@ -47,6 +47,12 @@ namespace SimpleDeFence
         [DataMember(EmitDefaultValue = false)]
         public bool DisplayOffBlock { get; set; } = false;
 
+        /// <summary>Certificate subjects (X509Certificate.Subject, exactly as the signed file
+        /// reports it) whose validly signed programs may connect without a rule of their own. See
+        /// PublisherTrust.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public List<string> TrustedPublishers { get; set; } = new List<string>();
+
         public ServerProfileConfiguration()
         { }
 

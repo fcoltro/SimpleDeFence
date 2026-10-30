@@ -63,11 +63,25 @@ namespace SimpleDeFence.UI.Pages
         public event EventHandler<bool>? ToggleRequested;
     }
 
+    /// <summary>One trusted-publisher row with its Remove button.</summary>
+    public sealed class PublisherListItem
+    {
+        public string Subject { get; init; } = string.Empty;
+        public string Name => PublisherTrust.DisplayName(Subject);
+        public string RemoveText => Loc.T(LocKeys.Rules.Remove);
+
+        public void Remove() => RemoveRequested?.Invoke(this, EventArgs.Empty);
+
+        public event EventHandler? RemoveRequested;
+    }
+
     public sealed partial class RulesPage : Page
     {
         private readonly ObservableCollection<RuleListItem> _apps = new();
         private readonly ObservableCollection<SpecialListItem> _specialRecommended = new();
         private readonly ObservableCollection<SpecialListItem> _specialOptional = new();
+        private readonly ObservableCollection<PublisherListItem> _publishers = new();
+        private IReadOnlyList<string> _publisherSubjects = Array.Empty<string>();
         private IReadOnlyList<RuleRow> _rows = Array.Empty<RuleRow>();
         private bool _busy;
         private bool _committing;
@@ -106,6 +120,7 @@ namespace SimpleDeFence.UI.Pages
             AppsList.ItemsSource = _apps;
             SpecialRecommendedList.ItemsSource = _specialRecommended;
             SpecialOptionalList.ItemsSource = _specialOptional;
+            PublishersList.ItemsSource = _publishers;
             Loaded += async (_, _) => await RefreshAsync();
         }
 
@@ -124,10 +139,12 @@ namespace SimpleDeFence.UI.Pages
                     ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Status.NotConnected),
                         App.Firewall.LastError ?? string.Empty);
                     _rows = Array.Empty<RuleRow>();
+                    _publisherSubjects = Array.Empty<string>();
                 }
                 else
                 {
                     Notice.IsOpen = false;
+                    _publisherSubjects = App.Firewall.Config.ActiveProfile.TrustedPublishers.ToList();
                     var db = await App.Firewall.GetAppDatabaseAsync();
                     _rows = RuleListBuilder.Build(App.Firewall.Config.ActiveProfile, db ?? new AppDatabase());
                 }
@@ -169,6 +186,19 @@ namespace SimpleDeFence.UI.Pages
             SetEmpty(AppsEmpty, _apps.Count, LocKeys.Rules.EmptyApplications, term);
             var specialCount = _specialRecommended.Count + _specialOptional.Count;
             SetEmpty(SpecialEmpty, specialCount, LocKeys.Rules.EmptySpecial, term);
+
+            _publishers.Clear();
+            foreach (var subject in _publisherSubjects)
+            {
+                var item = new PublisherListItem { Subject = subject };
+                if (term.Length != 0
+                    && item.Name.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) < 0
+                    && subject.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) < 0)
+                    continue;
+                item.RemoveRequested += (_, _) => DispatcherQueue.TryEnqueue(() => _ = RemovePublisherAsync(item));
+                _publishers.Add(item);
+            }
+            SetEmpty(PublishersEmpty, _publishers.Count, LocKeys.Rules.EmptyPublishers, term);
 
             UpdateRemoveButton();
         }
@@ -1222,6 +1252,24 @@ namespace SimpleDeFence.UI.Pages
                 await ShowResultAsync(Loc.T(LocKeys.Rules.SpecialToggleFailedTitle), FailureDetail(resp,
                     LocKeys.Rules.SpecialToggleFailedLockedDetail, LocKeys.Rules.SpecialToggleFailedStaleDetail,
                     LocKeys.Rules.SpecialToggleFailedGenericDetail));
+            }
+        }
+
+        private async Task RemovePublisherAsync(PublisherListItem item)
+        {
+            // Serialized with every other commit on this page, and refused rather than queued.
+            if (_committing)
+                return;
+
+            var resp = await CommitAsync(profile =>
+                profile.TrustedPublishers.RemoveAll(s => string.Equals(s, item.Subject, StringComparison.OrdinalIgnoreCase)));
+
+            await RefreshAsync();
+            if (resp != MessageType.PUT_SETTINGS)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Rules.RemoveFailedTitle), FailureDetail(resp,
+                    LocKeys.Rules.RemoveFailedLockedDetail, LocKeys.Rules.RemoveFailedStaleDetail,
+                    LocKeys.Rules.RemoveFailedGenericDetail));
             }
         }
 

@@ -75,6 +75,9 @@ executed.
   restart, and the rule removes itself.
 - **Learning with a time limit**: Learning mode can switch itself back to Normal after 10, 30 or
   60 minutes, and the window then points you to the rules it added.
+- **Trusted publishers**: allow every program signed by one vendor, so an app keeps working
+  through updates that install to a new folder. Only signatures Windows verifies count, and
+  programs in the Windows folder are never allowed this way.
 - **Public network lockdown**: on networks Windows marks as Public, such as café or hotel Wi-Fi,
   "Allow local network", file and printer sharing, network discovery, ping and remote access are
   turned off, and come back on the next network that is not Public.

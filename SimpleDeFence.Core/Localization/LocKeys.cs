@@ -143,6 +143,8 @@
             public const string AllowDialogBody = "connections.allowDialog.body";
             public const string AllowSuccessTitle = "connections.allowSuccess.title";
             public const string AllowSuccessBody = "connections.allowSuccess.body";
+            public const string AllowPublisherSuccessBody = "connections.allowPublisherSuccess.body";
+            public const string AllowByPublisher = "connections.allowByPublisher";
             public const string AllowFailedTitle = "connections.allowFailed.title";
             public const string AllowFailedLockedDetail = "connections.allowFailed.lockedDetail";
             public const string AllowFailedStaleDetail = "connections.allowFailed.staleDetail";
@@ -182,6 +184,9 @@
             public const string FilterPlaceholder = "rules.filterPlaceholder";
             public const string EmptyApplications = "rules.empty.applications";
             public const string EmptySpecial = "rules.empty.special";
+            public const string EmptyPublishers = "rules.empty.publishers";
+            public const string PublishersKind = "rules.publishersKind";
+            public const string PublishersDescription = "rules.publishersDescription";
             public const string EmptyFiltered = "rules.empty.filtered";
             public const string AppMissing = "rules.appMissing";
             public const string Remove = "rules.remove";

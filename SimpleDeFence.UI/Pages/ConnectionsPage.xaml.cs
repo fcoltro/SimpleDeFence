@@ -484,14 +484,31 @@ namespace SimpleDeFence.UI.Pages
             // be the one a single click applies silently, and the Rules page already offers exactly
             // these choices for the same rule after the fact; this just moves them to the point of
             // decision.
-            if (await AskAllowPolicyAsync(item) is not { } choice)
+            //
+            // A program with a signature Windows verifies can also be allowed by its publisher,
+            // which is read first, off the UI thread: verifying hashes the whole file.
+            string? publisher = null;
+            if (subject is ExecutableSubject exe)
+            {
+                try { publisher = await Task.Run(() => exe.CertValid ? exe.CertSubject : null); }
+                catch { publisher = null; }
+            }
+
+            if (await AskAllowPolicyAsync(item, publisher) is not { } choice)
                 return;
-            var (policy, timer) = choice;
+            var (policy, timer, trustPublisher) = choice;
 
             MessageType resp;
             try
             {
-                resp = await App.Firewall.AllowAsync(subject, policy, timer);
+                resp = trustPublisher is null
+                    ? await App.Firewall.AllowAsync(subject, policy, timer)
+                    : await App.Firewall.CommitConfigChangesAsync(config =>
+                    {
+                        var trusted = config.ActiveProfile.TrustedPublishers;
+                        if (!trusted.Contains(trustPublisher!, StringComparer.OrdinalIgnoreCase))
+                            trusted.Add(trustPublisher!);
+                    });
             }
             catch (Exception ex)
             {
@@ -505,7 +522,9 @@ namespace SimpleDeFence.UI.Pages
                 // in the dialog above also writes a rule and also succeeds, and telling the user it
                 // had let the app through would be the one report a firewall must never get wrong -
                 // so that case borrows the Rules page's neutral wording instead.
-                var body = policy is HardBlockPolicy
+                var body = trustPublisher is not null
+                    ? Loc.T(LocKeys.Connections.AllowPublisherSuccessBody, PublisherTrust.DisplayName(trustPublisher))
+                    : policy is HardBlockPolicy
                     ? Loc.T(LocKeys.Rules.DetailApplySuccess)
                     : Loc.T(LocKeys.Connections.AllowSuccessBody, item.AppName);
 
@@ -547,7 +566,10 @@ namespace SimpleDeFence.UI.Pages
         /// covers the other IP protocols. The wider grant is the deliberate one to preselect, now
         /// that it is named on screen and confirmed rather than applied behind the click.
         /// </summary>
-        private async Task<(ExceptionPolicy Policy, AppExceptionTimer Timer)?> AskAllowPolicyAsync(BlockedListItem item)
+        /// <remarks>publisher is the program's verified certificate subject, or null. With one, a
+        /// fourth option trusts that publisher instead of writing a rule for this path, and the
+        /// result carries it as TrustPublisher; Policy and Timer are then unused.</remarks>
+        private async Task<(ExceptionPolicy Policy, AppExceptionTimer Timer, string? TrustPublisher)?> AskAllowPolicyAsync(BlockedListItem item, string? publisher)
         {
             var unrestricted = new RadioButton
             {
@@ -594,6 +616,18 @@ namespace SimpleDeFence.UI.Pages
             panel.Children.Add(unrestrictedLan);
             panel.Children.Add(blocked);
 
+            RadioButton? byPublisher = null;
+            if (publisher is not null)
+            {
+                byPublisher = new RadioButton
+                {
+                    Content = Loc.T(LocKeys.Connections.AllowByPublisher, PublisherTrust.DisplayName(publisher)),
+                    GroupName = "ConnectionsAllowPolicy",
+                };
+                ToolTipService.SetToolTip(byPublisher, publisher);
+                panel.Children.Add(byPublisher);
+            }
+
             // How long the rule lasts. Permanent is preselected, which is what this dialog wrote
             // before it asked; the shorter ones are for the installer or one-off tool that needs
             // the network once, and should not keep it.
@@ -607,6 +641,14 @@ namespace SimpleDeFence.UI.Pages
                 duration.Items.Add(AppExceptionTimers.Label(timer));
             duration.SelectedIndex = 0;
             panel.Children.Add(duration);
+
+            // A publisher is trusted until it is removed on the Rules page; there is no duration
+            // to choose for it.
+            if (byPublisher is not null)
+            {
+                byPublisher.Checked += (_, _) => duration.IsEnabled = false;
+                byPublisher.Unchecked += (_, _) => duration.IsEnabled = true;
+            }
 
             var dialog = new ContentDialog
             {
@@ -643,10 +685,13 @@ namespace SimpleDeFence.UI.Pages
                 ? AppExceptionTimers.Offered[duration.SelectedIndex]
                 : AppExceptionTimer.Permanent;
 
-            if (blocked.IsChecked == true)
-                return (new HardBlockPolicy(), chosenTimer);
+            if (byPublisher?.IsChecked == true)
+                return (new UnrestrictedPolicy(), AppExceptionTimer.Permanent, publisher);
 
-            return (new UnrestrictedPolicy { LocalNetworkOnly = unrestrictedLan.IsChecked == true }, chosenTimer);
+            if (blocked.IsChecked == true)
+                return (new HardBlockPolicy(), chosenTimer, null);
+
+            return (new UnrestrictedPolicy { LocalNetworkOnly = unrestrictedLan.IsChecked == true }, chosenTimer, null);
         }
 
         private async Task ShowAllowResultAsync(string title, string body)

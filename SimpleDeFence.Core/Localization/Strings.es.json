@@ -144,6 +144,10 @@
     },
     "legend": {
       "local": "Las filas resaltadas se quedaron en tu red local"
+    },
+    "allowByPublisher": "Todos los programas de {0}",
+    "allowPublisherSuccess": {
+      "body": "Los programas firmados por {0} ya pueden conectarse."
     }
   },
   "subject": {
@@ -180,7 +184,8 @@
     "empty": {
       "applications": "Todavía no hay excepciones de aplicaciones.",
       "special": "No hay excepciones especiales disponibles.",
-      "filtered": "Nada coincide con el filtro actual."
+      "filtered": "Nada coincide con el filtro actual.",
+      "publishers": "No hay editores de confianza."
     },
     "appMissing": "El archivo de esta aplicación ya no existe en el disco; es posible que se haya desinstalado.",
     "remove": "Quitar",
@@ -235,7 +240,9 @@
         "genericDetail": "El servicio devolvió {0}. La directiva no se cambió."
       }
     },
-    "multiSelectHint": "{0} reglas seleccionadas. Quitar las elimina todas; selecciona una sola regla para editarla."
+    "multiSelectHint": "{0} reglas seleccionadas. Quitar las elimina todas; selecciona una sola regla para editarla.",
+    "publishersKind": "Editores de confianza",
+    "publishersDescription": "Los programas firmados por estos editores pueden conectarse sin una regla propia, también después de una actualización. Añade uno desde Permitir en la página Conexiones."
   },
   "settings": {
     "title": "Configuración",

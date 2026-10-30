@@ -144,6 +144,10 @@
     },
     "legend": {
       "local": "Les lignes surlignées sont restées sur votre réseau local"
+    },
+    "allowByPublisher": "Tous les programmes de {0}",
+    "allowPublisherSuccess": {
+      "body": "Les programmes signés par {0} peuvent maintenant se connecter."
     }
   },
   "subject": {
@@ -180,7 +184,8 @@
     "empty": {
       "applications": "Aucune exception d'application pour l'instant.",
       "special": "Aucune exception spéciale disponible.",
-      "filtered": "Rien ne correspond au filtre actuel."
+      "filtered": "Rien ne correspond au filtre actuel.",
+      "publishers": "Aucun éditeur approuvé."
     },
     "appMissing": "Le fichier de cette application n'existe plus sur le disque - elle a peut-être été désinstallée.",
     "remove": "Supprimer",
@@ -235,7 +240,9 @@
         "genericDetail": "Le service a renvoyé {0}. La stratégie n'a pas été modifiée."
       }
     },
-    "multiSelectHint": "{0} règles sélectionnées. Supprimer les efface toutes ; sélectionnez une seule règle pour la modifier."
+    "multiSelectHint": "{0} règles sélectionnées. Supprimer les efface toutes ; sélectionnez une seule règle pour la modifier.",
+    "publishersKind": "Éditeurs approuvés",
+    "publishersDescription": "Les programmes signés par ces éditeurs peuvent se connecter sans règle propre, y compris après une mise à jour. Ajoutez-en un avec Autoriser sur la page Connexions."
   },
   "settings": {
     "title": "Paramètres",

@@ -144,6 +144,10 @@
     },
     "legend": {
       "local": "As linhas destacadas permaneceram na sua rede local"
+    },
+    "allowByPublisher": "Todos os programas de {0}",
+    "allowPublisherSuccess": {
+      "body": "Programas assinados por {0} agora podem se conectar."
     }
   },
   "subject": {
@@ -180,7 +184,8 @@
     "empty": {
       "applications": "Nenhuma exceção de aplicativo ainda.",
       "special": "Nenhuma exceção especial disponível.",
-      "filtered": "Nada corresponde ao filtro atual."
+      "filtered": "Nada corresponde ao filtro atual.",
+      "publishers": "Nenhum editor confiável."
     },
     "appMissing": "O arquivo deste aplicativo não existe mais no disco - ele pode ter sido desinstalado.",
     "remove": "Remover",
@@ -235,7 +240,9 @@
         "genericDetail": "O serviço retornou {0}. A política não foi alterada."
       }
     },
-    "multiSelectHint": "{0} regras selecionadas. Remover exclui todas elas; selecione uma única regra para editá-la."
+    "multiSelectHint": "{0} regras selecionadas. Remover exclui todas elas; selecione uma única regra para editá-la.",
+    "publishersKind": "Editores confiáveis",
+    "publishersDescription": "Programas assinados por estes editores podem se conectar sem uma regra própria, inclusive depois de uma atualização. Adicione um em Permitir na página Conexões."
   },
   "settings": {
     "title": "Configurações",

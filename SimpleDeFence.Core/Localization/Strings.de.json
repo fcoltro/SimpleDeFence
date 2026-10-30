@@ -144,6 +144,10 @@
     },
     "legend": {
       "local": "Hervorgehobene Zeilen blieben in deinem lokalen Netzwerk"
+    },
+    "allowByPublisher": "Jedes Programm von {0}",
+    "allowPublisherSuccess": {
+      "body": "Von {0} signierte Programme dürfen jetzt Verbindungen herstellen."
     }
   },
   "subject": {
@@ -180,7 +184,8 @@
     "empty": {
       "applications": "Noch keine Anwendungsausnahmen.",
       "special": "Keine Sonderausnahmen verfügbar.",
-      "filtered": "Nichts entspricht dem aktuellen Filter."
+      "filtered": "Nichts entspricht dem aktuellen Filter.",
+      "publishers": "Keine vertrauenswürdigen Herausgeber."
     },
     "appMissing": "Die Datei dieser Anwendung existiert nicht mehr auf der Festplatte - sie wurde möglicherweise deinstalliert.",
     "remove": "Entfernen",
@@ -235,7 +240,9 @@
         "genericDetail": "Der Dienst meldete {0}. Die Richtlinie wurde nicht geändert."
       }
     },
-    "multiSelectHint": "{0} Regeln ausgewählt. Entfernen löscht alle davon; wähle eine einzelne Regel, um sie zu bearbeiten."
+    "multiSelectHint": "{0} Regeln ausgewählt. Entfernen löscht alle davon; wähle eine einzelne Regel, um sie zu bearbeiten.",
+    "publishersKind": "Vertrauenswürdige Herausgeber",
+    "publishersDescription": "Programme, die von diesen Herausgebern signiert sind, dürfen ohne eigene Regel Verbindungen herstellen, auch nach einem Update. Hinzufügen kannst du einen über „Zulassen“ auf der Seite „Verbindungen“."
   },
   "settings": {
     "title": "Einstellungen",

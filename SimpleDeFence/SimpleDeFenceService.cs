@@ -77,6 +77,15 @@ namespace SimpleDeFence
         private readonly HashSet<string> UserSubjectExes = new(StringComparer.OrdinalIgnoreCase);        // All executables with pre-configured rules.
         private readonly Dictionary<string, List<FirewallExceptionV3>> ChildInheritance = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, HashSet<string>> ChildInheritedSubjectExes = new(StringComparer.OrdinalIgnoreCase);   // Executables that have been already auto-whitelisted due to inheritance
+
+        // Context for trusted publishers (see PublisherTrust). Guarded by InheritanceGuard, like
+        // the inheritance context above, because the process-start watcher reads them from WMI's
+        // threads. The signature cache has its own lock: checking a signature is slow, and is done
+        // outside InheritanceGuard so a process start does not hold up a rule rebuild.
+        private HashSet<string> TrustedPublishers = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> PublisherAllowedExes = new(StringComparer.OrdinalIgnoreCase);   // Executables already allowed through a trusted publisher
+        private readonly Dictionary<string, (DateTime LastWriteUtc, bool Valid, string? Subject)> SignatureCache = new(StringComparer.OrdinalIgnoreCase);
+        private readonly string WindowsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
         private readonly ThreadThrottler FirewallThreadThrottler = new(Thread.CurrentThread, ThreadPriority.Highest, false);
         private StringBuilder? ProcessStartWatcher_Sbuilder;
 
@@ -254,6 +263,37 @@ namespace SimpleDeFence
                         }
                     }
                 }   // if (ChildInheritance ...
+
+                // Programs from trusted publishers that are already running. The ones started from
+                // here on are picked up by ProcessStartWatcher_EventArrived.
+                TrustedPublishers = new HashSet<string>(ActiveConfig.Service.ActiveProfile.TrustedPublishers, StringComparer.OrdinalIgnoreCase);
+                if (TrustedPublishers.Count != 0)
+                {
+                    timer.NewSubTask("Trusted publisher processing");
+
+                    var checkedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var p in ProcessManager.CreateToolhelp32SnapshotExtended())
+                    {
+                        string procPath = p.ImagePath;
+                        if (string.IsNullOrEmpty(procPath) || !checkedPaths.Add(procPath))
+                            continue;
+
+                        // A rule of the user's own, or one inherited from a parent, says more about
+                        // this program than its publisher does.
+                        if (UserSubjectExes.Contains(procPath) || ChildInheritedSubjectExes.ContainsKey(procPath))
+                            continue;
+
+                        if (TrustedPublisherException(procPath, TrustedPublishers) is FirewallExceptionV3 ex)
+                        {
+                            GetRulesForException(ex, rules, rawSocketExceptions, (ulong)FilterWeights.UserPermit, (ulong)FilterWeights.UserBlock);
+                            PublisherAllowedExes.Add(procPath);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                TrustedPublishers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             }
 
             PrepareRulesForInstall(rules);
@@ -381,11 +421,12 @@ namespace SimpleDeFence
                 UserSubjectExes.Clear();
                 ChildInheritance.Clear();
                 ChildInheritedSubjectExes.Clear();
+                PublisherAllowedExes.Clear();
                 rules.AddRange(AssembleActiveRules(rawSocketExceptions));
 
                 try
                 {
-                    if (ChildInheritance.Count > 0)
+                    if ((ChildInheritance.Count > 0) || (TrustedPublishers.Count > 0))
                         ProcessStartWatcher.Start();
                     else
                         ProcessStartWatcher.Stop();
@@ -2377,12 +2418,19 @@ namespace SimpleDeFence
                     return;
 
                 List<FirewallExceptionV3>? newExceptions = null;
+                HashSet<string>? trustedPublishers = null;
 
                 lock (InheritanceGuard)
                 {
                     // Skip if we have a user-defined rule for this path
                     if (UserSubjectExes.Contains(path))
                         return;
+
+                    // Taken here, under the lock, and checked after it: see the publisher block
+                    // below. Not when the program is already allowed by its publisher, or by
+                    // inheritance from an earlier start.
+                    if (TrustedPublishers.Count != 0 && !PublisherAllowedExes.Contains(path) && !ChildInheritedSubjectExes.ContainsKey(path))
+                        trustedPublishers = TrustedPublishers;
 
                     // This list will hold parents that we already checked for a process.
                     // Used to avoid infinite loop when parent-PID info is unreliable.
@@ -2431,6 +2479,20 @@ namespace SimpleDeFence
                     }
                 }
 
+                // Not inherited from a parent: maybe its publisher is trusted. The signature check
+                // reads and hashes the file, so it runs outside InheritanceGuard. TrustedPublishers
+                // is replaced, never changed in place, so the set taken above stays valid.
+                if (newExceptions is null && trustedPublishers is not null
+                    && TrustedPublisherException(path, trustedPublishers) is FirewallExceptionV3 publisherEx)
+                {
+                    lock (InheritanceGuard)
+                    {
+                        if (!PublisherAllowedExes.Add(path))
+                            return;
+                    }
+                    newExceptions = new List<FirewallExceptionV3> { publisherEx };
+                }
+
                 if (newExceptions != null)
                 {
                     lock (FirewallThreadThrottler.SynchRoot) { FirewallThreadThrottler.Request(); }
@@ -2441,6 +2503,50 @@ namespace SimpleDeFence
             {
                 e.NewEvent.Dispose();
             }
+        }
+
+        /// <summary>
+        /// The rule a trusted publisher gives a program: unrestricted, the same as "Allow" on the
+        /// Connections page, or null when the program is not from a trusted publisher.
+        /// </summary>
+        private FirewallExceptionV3? TrustedPublisherException(string path, HashSet<string> trustedPublishers)
+        {
+            var (valid, subject) = SignatureOf(path);
+            if (PublisherTrust.TrustedSubject(trustedPublishers, path, subject, valid, WindowsDirectory) is null)
+                return null;
+
+            return new FirewallExceptionV3(new ExecutableSubject(path), new UnrestrictedPolicy());
+        }
+
+        /// <summary>
+        /// Whether a file's signature verifies, and who signed it, remembered per path until the
+        /// file changes. Verifying means hashing the whole file, and the process snapshot names
+        /// the same few dozen programs at every 30-minute reload.
+        /// </summary>
+        private (bool Valid, string? Subject) SignatureOf(string path)
+        {
+            DateTime lastWrite;
+            try { lastWrite = File.GetLastWriteTimeUtc(path); }
+            catch { return (false, null); }
+
+            lock (SignatureCache)
+            {
+                if (SignatureCache.TryGetValue(path, out var cached) && cached.LastWriteUtc == lastWrite)
+                    return (cached.Valid, cached.Subject);
+            }
+
+            var exe = new ExecutableSubject(path);
+            bool valid = exe.CertValid;
+            string? subject = valid ? exe.CertSubject : null;
+
+            lock (SignatureCache)
+            {
+                // A long-running service sees many paths come and go; this is a cache, not a record.
+                if (SignatureCache.Count > 4096)
+                    SignatureCache.Clear();
+                SignatureCache[path] = (lastWrite, valid, subject);
+            }
+            return (valid, subject);
         }
 
         private void WfpNetEventCallback(NetEventData data)

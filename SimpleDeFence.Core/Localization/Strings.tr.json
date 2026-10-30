@@ -144,6 +144,10 @@
     },
     "legend": {
       "local": "Vurgulanan satırlar yerel ağınızın içinde kaldı"
+    },
+    "allowByPublisher": "{0} tarafından yayımlanan tüm programlar",
+    "allowPublisherSuccess": {
+      "body": "{0} tarafından imzalanan programlar artık bağlanabilir."
     }
   },
   "subject": {
@@ -180,7 +184,8 @@
     "empty": {
       "applications": "Henüz uygulama ayrıcalığı yok.",
       "special": "Kullanılabilir özel ayrıcalık yok.",
-      "filtered": "Geçerli süzgeçle eşleşen bir şey yok."
+      "filtered": "Geçerli süzgeçle eşleşen bir şey yok.",
+      "publishers": "Güvenilen yayımcı yok."
     },
     "appMissing": "Bu uygulamanın dosyası artık diskte yok - kaldırılmış olabilir.",
     "remove": "Kaldır",
@@ -235,7 +240,9 @@
         "genericDetail": "Hizmet {0} döndürdü. İlke değiştirilmedi."
       }
     },
-    "multiSelectHint": "{0} kural seçili. Kaldır hepsini siler; düzenlemek için tek bir kural seçin."
+    "multiSelectHint": "{0} kural seçili. Kaldır hepsini siler; düzenlemek için tek bir kural seçin.",
+    "publishersKind": "Güvenilen yayımcılar",
+    "publishersDescription": "Bu yayımcıların imzaladığı programlar, güncellemeden sonra da dahil olmak üzere kendi kuralları olmadan bağlanabilir. Bağlantılar sayfasındaki İzin ver ile ekleyebilirsiniz."
   },
   "settings": {
     "title": "Ayarlar",

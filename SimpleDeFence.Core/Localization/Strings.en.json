@@ -144,6 +144,10 @@
     },
     "legend": {
       "local": "Highlighted rows stayed on your local network"
+    },
+    "allowByPublisher": "Every program from {0}",
+    "allowPublisherSuccess": {
+      "body": "Programs signed by {0} can now connect."
     }
   },
   "subject": {
@@ -180,7 +184,8 @@
     "empty": {
       "applications": "No application exceptions yet.",
       "special": "No special exceptions available.",
-      "filtered": "Nothing matches the current filter."
+      "filtered": "Nothing matches the current filter.",
+      "publishers": "No trusted publishers."
     },
     "appMissing": "This application's file no longer exists on disk - it may have been uninstalled.",
     "remove": "Remove",
@@ -235,7 +240,9 @@
         "genericDetail": "The service returned {0}. The policy was not changed."
       }
     },
-    "multiSelectHint": "{0} rules selected. Remove deletes all of them; select a single rule to edit it."
+    "multiSelectHint": "{0} rules selected. Remove deletes all of them; select a single rule to edit it.",
+    "publishersKind": "Trusted publishers",
+    "publishersDescription": "Programs signed by these publishers can connect without a rule of their own, including after an update. Add one from Allow on the Connections page."
   },
   "settings": {
     "title": "Settings",

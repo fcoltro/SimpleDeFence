@@ -247,6 +247,36 @@
                         </ListView>
                     </StackPanel>
                 </Expander>
+
+                <!-- Trusted publishers: added from the Connections page's Allow dialog, removed
+                     here. Each row is a certificate subject, shown by its common name with the
+                     full subject as a tooltip. -->
+                <Expander IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{loc:Loc Key=rules.publishersKind}"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Key=rules.publishersDescription}" Style="{StaticResource BodyTextBlockStyle}"
+                                   TextWrapping="Wrap" Opacity="0.8" Margin="0,4,0,8"/>
+                        <TextBlock x:Name="PublishersEmpty" Style="{StaticResource BodyTextBlockStyle}"
+                                   Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
+                        <ListView x:Name="PublishersList" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="local:PublisherListItem">
+                                    <Grid Padding="0,4" ColumnSpacing="14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{x:Bind Name}" ToolTipService.ToolTip="{x:Bind Subject}"
+                                                   VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                                        <Button Grid.Column="1" Content="{x:Bind RemoveText}" Click="{x:Bind Remove}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </Expander>
             </StackPanel>
         </ScrollViewer>
     </Grid>
