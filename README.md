@@ -68,7 +68,16 @@ executed.
 - **Password protection** — the running configuration can be locked so it cannot be changed
   without the password, including by anything running as you.
 - **Hosts-file blocklists**, updated on request.
-- **Global hotkeys** for allowing an executable, a running process or a visible window.
+- **Temporary rules**: allow (or block) an app for 5 minutes up to 24 hours, or until the next
+  restart, and the rule removes itself.
+- **Learning with a time limit**: Learning mode can switch itself back to Normal after 10, 30 or
+  60 minutes, and the window then points you to the rules it added.
+- **Global hotkeys** for allowing an executable, a running process or a visible window, and
+  Ctrl+Alt+B to switch to Block all (and back to Normal) from anywhere.
+- **A command line** for scripts and scheduled tasks:
+  `SimpleDeFence.exe /mode normal|blockall|allowoutgoing|disabled`,
+  `SimpleDeFence.exe /mode learning /minutes 30` and `SimpleDeFence.exe /allow "C:\path\to\app.exe"`.
+  Exit code 0 means done, 1 refused or failed, 2 a command line it could not understand.
 - **Sixteen languages**: Arabic, Bengali, Chinese (Simplified), English, Farsi, French, German,
   Hindi, Indonesian, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Spanish and Turkish —
   with right-to-left layout where the language calls for it.

@@ -24,6 +24,12 @@ namespace SimpleDeFence.UI.ViewModels
         private bool _isBusy;
         private string _degradedMessage = string.Empty;
 
+        // What Update last saw, so it can tell when Learning has just ended - by its time limit,
+        // which happens in the service with nobody clicking anything, or by hand - and how many
+        // rules there were when it began. -1 until a Learning period has been seen to start.
+        private FirewallMode _lastSeenMode = FirewallMode.Unknown;
+        private int _rulesWhenLearningStarted = -1;
+
         public ShellViewModel(IFirewallClient client)
         {
             _client = client;
@@ -90,6 +96,12 @@ namespace SimpleDeFence.UI.ViewModels
         /// <summary>True only when the user may actually change the mode.</summary>
         public bool CanSwitchMode => IsConnected && !IsLocked && !IsBusy;
 
+        /// <summary>Raised once when Learning ends while this window is watching, with the number of
+        /// rules it added. Learning writes its rules on the way out, so this is the moment they
+        /// exist to be looked at. Not raised for a Learning period that began before the window
+        /// connected: there is no count to compare against.</summary>
+        public event System.Action<int>? LearningEnded;
+
         public FirewallMode CurrentMode => _client.State?.Mode ?? FirewallMode.Unknown;
 
         public async Task RefreshAsync()
@@ -109,13 +121,13 @@ namespace SimpleDeFence.UI.ViewModels
             Update();
         }
 
-        public async Task<MessageType> SwitchModeAsync(FirewallMode mode)
+        public async Task<MessageType> SwitchModeAsync(FirewallMode mode, int learningMinutes = 0)
         {
             IsBusy = true;
             MessageType resp;
             try
             {
-                resp = await _client.SwitchModeAsync(mode);
+                resp = await _client.SwitchModeAsync(mode, learningMinutes);
             }
             finally
             {
@@ -157,7 +169,8 @@ namespace SimpleDeFence.UI.ViewModels
                 ModeStateKey = StateKeyFor(mode);
                 StatusLine = IsLocked
                     ? Loc.T(LocKeys.Status.Locked)
-                    : FirewallModes.DescriptionFor(mode);
+                    : DescribeMode(mode);
+                TrackLearning(mode);
             }
 
             // Not connected means we know nothing about the service's health, and an alarming
@@ -168,6 +181,46 @@ namespace SimpleDeFence.UI.ViewModels
 
             OnPropertyChanged(nameof(CurrentMode));
             OnPropertyChanged(nameof(CanSwitchMode));
+        }
+
+        /// <summary>The mode's description, plus when Learning switches itself off if it will.</summary>
+        private string DescribeMode(FirewallMode mode)
+        {
+            var description = FirewallModes.DescriptionFor(mode);
+            if (mode == FirewallMode.Learning && _client.State?.LearningEndsAt is System.DateTime ends)
+                return Loc.T(LocKeys.Mode.LearningEndsAt, description, ends.ToString("t"));
+
+            return description;
+        }
+
+        private void TrackLearning(FirewallMode mode)
+        {
+            int rules = RuleCount();
+
+            if (mode == FirewallMode.Learning && _lastSeenMode != FirewallMode.Learning)
+            {
+                // Only a start this window saw counts. On the first Update after connecting the
+                // last-seen mode is Unknown, and the rules Learning had already added would be
+                // counted as there before it.
+                _rulesWhenLearningStarted = _lastSeenMode == FirewallMode.Unknown ? -1 : rules;
+            }
+            else if (mode != FirewallMode.Learning && _lastSeenMode == FirewallMode.Learning)
+            {
+                if (_rulesWhenLearningStarted >= 0)
+                    LearningEnded?.Invoke(System.Math.Max(0, rules - _rulesWhenLearningStarted));
+                _rulesWhenLearningStarted = -1;
+            }
+
+            _lastSeenMode = mode;
+        }
+
+        private int RuleCount()
+        {
+            var config = _client.Config;
+            if (config is null || string.IsNullOrEmpty(config.ActiveProfileName))
+                return 0;
+
+            return config.ActiveProfile.AppExceptions.Count;
         }
 
         /// <summary>One sentence per thing that is wrong, in the order they matter.</summary>

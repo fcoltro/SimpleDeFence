@@ -67,6 +67,21 @@
       "title": "Automatisches Lernen starten?",
       "body": "Im automatischen Lernmodus lässt SimpleDeFence sämtlichen Datenverkehr zu und merkt sich, welche Anwendungen das Netzwerk genutzt haben; beim Verlassen des Modus legt es Ausnahmen für sie an. Für Sonderausnahmen können keine Regeln gelernt werden.\n\nVerwende dies nur auf einem System, bei dem du sicher bist, dass es frei von Schadsoftware ist.",
       "confirm": "Lernmodus starten"
+    },
+    "learningDuration": {
+      "label": "Zurück zu Normal",
+      "never": "Nie (ich schalte es selbst aus)",
+      "minutes10": "Nach 10 Minuten",
+      "minutes30": "Nach 30 Minuten",
+      "hour1": "Nach 1 Stunde"
+    },
+    "learningEndsAt": "{0} Um {1} wird wieder auf Normal umgeschaltet.",
+    "learningEnded": {
+      "title": "Der Lernmodus ist beendet",
+      "body": "Es wurden {0} Regeln hinzugefügt. Prüfen Sie, ob jede zu einem Programm gehört, dem Sie vertrauen.",
+      "bodyOne": "Es wurde 1 Regel hinzugefügt. Prüfen Sie, ob sie zu einem Programm gehört, dem Sie vertrauen.",
+      "bodyNone": "Es wurden keine Regeln hinzugefügt.",
+      "review": "Regeln prüfen"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "Beim Hinzufügen einer einzelnen Ausnahme nach Details fragen",
       "askForExceptionDetailsDescription": "Zeigt eine bearbeitbare Bestätigung, bevor über die Schnellbefehle im Infobereich eine Ausnahme hinzugefügt wird. Sammelvorgänge (z. B. ein ganzer Ordner) fragen nie nach.",
       "enableHotkeys": "Globale Tastenkombinationen aktivieren",
-      "enableHotkeysDescription": "Strg+Alt+E/P/W erlauben von überall aus sofort eine Programmdatei, einen Prozess oder ein Fenster.",
+      "enableHotkeysDescription": "Strg+Alt+E/P/W erlauben von überall aus sofort eine Programmdatei, einen Prozess oder ein Fenster. Strg+Alt+B schaltet auf „Alles blockieren“ und wieder zurück auf Normal.",
       "autoRefreshInterval": "Intervall der automatischen Aktualisierung",
       "autoRefreshIntervalDescription": "Wie oft die Seite „Verbindungen“ neu prüft, solange ihr Schalter für automatische Aktualisierung an ist. Änderungen werden ihr nicht zugestellt, es handelt sich also um ein Abfrageintervall; kürzer ist aktueller und kostet mehr."
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence läuft weiterhin",
       "body": "Das Schließen des Fensters beendet die Firewall nicht. Verwende „Beenden“ in diesem Menü, um sie zu stoppen."
     }
+  },
+  "duration": {
+    "label": "Wie lange",
+    "permanent": "Immer",
+    "minutes5": "Für 5 Minuten",
+    "minutes30": "Für 30 Minuten",
+    "hour1": "Für 1 Stunde",
+    "hours4": "Für 4 Stunden",
+    "hours9": "Für 9 Stunden",
+    "hours24": "Für 24 Stunden",
+    "untilRestart": "Bis zum Neustart",
+    "expiresAtSuffix": "{0}, bis {1}",
+    "untilRestartSuffix": "{0}, bis zum Neustart"
   }
 }

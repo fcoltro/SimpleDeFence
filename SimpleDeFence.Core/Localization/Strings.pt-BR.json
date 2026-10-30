@@ -67,6 +67,21 @@
       "title": "Iniciar o aprendizado automático?",
       "body": "No modo de aprendizado automático o SimpleDeFence permite todo o tráfego e memoriza quais aplicativos usaram a rede, criando exceções para eles ao sair do modo. Não é possível aprender regras para Exceções Especiais.\n\nUse apenas em um sistema que você tenha confiança estar livre de malware.",
       "confirm": "Entrar no modo de aprendizado"
+    },
+    "learningDuration": {
+      "label": "Voltar para Normal",
+      "never": "Nunca (eu mesmo desativo)",
+      "minutes10": "Depois de 10 minutos",
+      "minutes30": "Depois de 30 minutos",
+      "hour1": "Depois de 1 hora"
+    },
+    "learningEndsAt": "{0} Volta para Normal às {1}.",
+    "learningEnded": {
+      "title": "O modo de aprendizado terminou",
+      "body": "Foram adicionadas {0} regras. Confira se cada uma é de um programa confiável.",
+      "bodyOne": "Foi adicionada 1 regra. Confira se ela é de um programa confiável.",
+      "bodyNone": "Nenhuma regra foi adicionada.",
+      "review": "Revisar regras"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "Pedir detalhes ao adicionar uma única exceção",
       "askForExceptionDetailsDescription": "Mostra uma confirmação editável antes de adicionar uma exceção pelos atalhos de adição rápida da bandeja. Adições em lote (como uma pasta inteira) nunca pedem confirmação.",
       "enableHotkeys": "Ativar atalhos de teclado globais",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permitem instantaneamente um executável, processo ou janela a partir de qualquer lugar.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permitem instantaneamente um executável, processo ou janela a partir de qualquer lugar. Ctrl+Alt+B muda para Bloquear tudo e volta para Normal.",
       "autoRefreshInterval": "Intervalo de atualização automática",
       "autoRefreshIntervalDescription": "Com que frequência a página Conexões verifica novamente enquanto a opção Atualização automática está ligada. Nada envia alterações para ela, então este é um intervalo de consulta; valores menores são mais atuais e custam mais."
     },
@@ -412,5 +427,18 @@
       "title": "O SimpleDeFence continua em execução",
       "body": "Fechar a janela não desliga o firewall. Use Sair neste menu para desligá-lo."
     }
+  },
+  "duration": {
+    "label": "Por quanto tempo",
+    "permanent": "Sempre",
+    "minutes5": "Por 5 minutos",
+    "minutes30": "Por 30 minutos",
+    "hour1": "Por 1 hora",
+    "hours4": "Por 4 horas",
+    "hours9": "Por 9 horas",
+    "hours24": "Por 24 horas",
+    "untilRestart": "Até reiniciar",
+    "expiresAtSuffix": "{0}, até {1}",
+    "untilRestartSuffix": "{0}, até reiniciar"
   }
 }

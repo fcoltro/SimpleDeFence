@@ -67,6 +67,21 @@
       "title": "Mulai pembelajaran otomatis?",
       "body": "Dalam mode pembelajaran otomatis, SimpleDeFence mengizinkan seluruh lalu lintas dan mengingat aplikasi mana yang memakai jaringan, lalu menambahkan pengecualian untuk aplikasi tersebut saat Anda keluar dari mode ini. Aturan tidak dapat dipelajari untuk Pengecualian Khusus.\n\nGunakan ini hanya pada sistem yang Anda yakini bebas dari malware.",
       "confirm": "Masuk mode pembelajaran"
+    },
+    "learningDuration": {
+      "label": "Kembali ke Normal",
+      "never": "Tidak pernah (saya matikan sendiri)",
+      "minutes10": "Setelah 10 menit",
+      "minutes30": "Setelah 30 menit",
+      "hour1": "Setelah 1 jam"
+    },
+    "learningEndsAt": "{0} Kembali ke Normal pukul {1}.",
+    "learningEnded": {
+      "title": "Mode belajar telah berakhir",
+      "body": "{0} aturan ditambahkan. Pastikan masing-masing untuk program yang Anda percayai.",
+      "bodyOne": "1 aturan ditambahkan. Pastikan aturan itu untuk program yang Anda percayai.",
+      "bodyNone": "Tidak ada aturan yang ditambahkan.",
+      "review": "Tinjau aturan"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "Tanyakan detail saat menambahkan satu pengecualian",
       "askForExceptionDetailsDescription": "Menampilkan konfirmasi yang dapat disunting sebelum menambahkan satu pengecualian lewat pintasan tambah-cepat pada baki sistem. Penambahan massal (misalnya satu folder penuh) tidak pernah menanyakan.",
       "enableHotkeys": "Aktifkan pintasan papan tik global",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W langsung mengizinkan sebuah berkas eksekusi, proses, atau jendela dari mana saja.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W langsung mengizinkan sebuah berkas eksekusi, proses, atau jendela dari mana saja. Ctrl+Alt+B beralih ke Blokir semua, lalu kembali ke Normal.",
       "autoRefreshInterval": "Selang penyegaran otomatis",
       "autoRefreshIntervalDescription": "Seberapa sering halaman Koneksi memeriksa ulang selagi sakelar Segarkan otomatisnya menyala. Tidak ada yang mengirimkan perubahan kepadanya, jadi ini adalah selang penjajakan; makin singkat makin segar dan makin mahal."
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence masih berjalan",
       "body": "Menutup jendela tidak menghentikan firewall. Gunakan Keluar pada menu ini untuk menghentikannya."
     }
+  },
+  "duration": {
+    "label": "Berapa lama",
+    "permanent": "Selalu",
+    "minutes5": "Selama 5 menit",
+    "minutes30": "Selama 30 menit",
+    "hour1": "Selama 1 jam",
+    "hours4": "Selama 4 jam",
+    "hours9": "Selama 9 jam",
+    "hours24": "Selama 24 jam",
+    "untilRestart": "Sampai dinyalakan ulang",
+    "expiresAtSuffix": "{0}, sampai {1}",
+    "untilRestartSuffix": "{0}, sampai dinyalakan ulang"
   }
 }

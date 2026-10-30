@@ -114,6 +114,10 @@ namespace SimpleDeFence
         public UpdateDescriptor? Update = null;
         public FirewallMode Mode = FirewallMode.Unknown;
         public ServiceDegradation Degraded = ServiceDegradation.None;
+
+        /// <summary>Set while Learning runs with a time limit: when the service will switch back to
+        /// Normal. Null in every other mode, and in Learning without a limit.</summary>
+        public DateTime? LearningEndsAt = null;
         public List<MessageType> ClientNotifs = new();
 
         public JsonTypeInfo<ServerState> GetJsonTypeInfo()

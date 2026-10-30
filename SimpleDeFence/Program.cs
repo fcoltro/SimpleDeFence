@@ -157,6 +157,9 @@ namespace SimpleDeFence
             }
 #endif
 
+            // One-shot commands (/mode, /allow) run instead of the window, and exit.
+            if (opts.ProgramMode == StartUpMode.Controller && CommandLine.IsCommand(args))
+                return CommandLine.Run(args);
 
             switch (opts.ProgramMode)
             {

@@ -67,6 +67,21 @@
       "title": "Démarrer l'apprentissage automatique ?",
       "body": "En mode d'apprentissage automatique, SimpleDeFence autorise tout le trafic et retient quelles applications ont utilisé le réseau, puis ajoute des exceptions pour elles à la sortie du mode. Aucune règle ne peut être apprise pour les exceptions spéciales.\n\nN'utilisez ceci que sur un système dont vous êtes certain qu'il est exempt de logiciels malveillants.",
       "confirm": "Passer en mode apprentissage"
+    },
+    "learningDuration": {
+      "label": "Revenir en mode Normal",
+      "never": "Jamais (je le désactiverai moi-même)",
+      "minutes10": "Après 10 minutes",
+      "minutes30": "Après 30 minutes",
+      "hour1": "Après 1 heure"
+    },
+    "learningEndsAt": "{0} Retour en mode Normal à {1}.",
+    "learningEnded": {
+      "title": "Le mode apprentissage est terminé",
+      "body": "{0} règles ont été ajoutées. Vérifiez que chacune concerne un programme de confiance.",
+      "bodyOne": "1 règle a été ajoutée. Vérifiez qu'elle concerne un programme de confiance.",
+      "bodyNone": "Aucune règle n'a été ajoutée.",
+      "review": "Vérifier les règles"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "Demander des détails lors de l'ajout d'une seule exception",
       "askForExceptionDetailsDescription": "Affiche une confirmation modifiable avant d'ajouter une exception via les raccourcis rapides de la zone de notification. Les ajouts groupés (un dossier entier, par exemple) ne demandent jamais.",
       "enableHotkeys": "Activer les raccourcis clavier globaux",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W autorisent instantanément un exécutable, un processus ou une fenêtre depuis n'importe où.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W autorisent instantanément un exécutable, un processus ou une fenêtre depuis n'importe où. Ctrl+Alt+B passe en mode Tout bloquer, puis revient en mode Normal.",
       "autoRefreshInterval": "Intervalle d'actualisation automatique",
       "autoRefreshIntervalDescription": "À quelle fréquence la page Connexions se met à jour tant que son interrupteur d'actualisation automatique est activé. Rien ne lui envoie de changements : c'est donc un intervalle d'interrogation ; plus il est court, plus les données sont fraîches et plus cela coûte."
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence est toujours en cours d'exécution",
       "body": "Fermer la fenêtre n'arrête pas le pare-feu. Utilisez Quitter dans ce menu pour l'arrêter."
     }
+  },
+  "duration": {
+    "label": "Pendant combien de temps",
+    "permanent": "Toujours",
+    "minutes5": "Pendant 5 minutes",
+    "minutes30": "Pendant 30 minutes",
+    "hour1": "Pendant 1 heure",
+    "hours4": "Pendant 4 heures",
+    "hours9": "Pendant 9 heures",
+    "hours24": "Pendant 24 heures",
+    "untilRestart": "Jusqu'au redémarrage",
+    "expiresAtSuffix": "{0}, jusqu'à {1}",
+    "untilRestartSuffix": "{0}, jusqu'au redémarrage"
   }
 }

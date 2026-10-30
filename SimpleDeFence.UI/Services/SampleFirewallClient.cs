@@ -62,7 +62,7 @@ namespace SimpleDeFence.UI.Services
             return Task.CompletedTask;
         }
 
-        public Task<MessageType> SwitchModeAsync(FirewallMode mode)
+        public Task<MessageType> SwitchModeAsync(FirewallMode mode, int learningMinutes = 0)
         {
             // Mirrors the responses the real client can return, so the GUI's failure branches
             // are reachable while building against sample data.
@@ -74,6 +74,9 @@ namespace SimpleDeFence.UI.Services
                 return Task.FromResult(MessageType.RESPONSE_ERROR);
 
             State.Mode = mode;
+            State.LearningEndsAt = (mode == FirewallMode.Learning) && (learningMinutes > 0)
+                ? DateTime.Now.AddMinutes(learningMinutes)
+                : null;
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.MODE_SWITCH);
         }
@@ -296,9 +299,9 @@ namespace SimpleDeFence.UI.Services
             return Task.FromResult(snapshot);
         }
 
-        public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy)
+        public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy, AppExceptionTimer timer = AppExceptionTimer.Permanent)
             => CommitConfigChangesAsync(config =>
-                config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
+                config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) { Timer = timer } }));
 
         public Task<MessageType> CommitConfigChangesAsync(Action<ServerConfiguration> mutate)
         {

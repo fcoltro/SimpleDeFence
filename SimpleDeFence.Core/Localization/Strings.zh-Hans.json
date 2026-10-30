@@ -67,6 +67,21 @@
       "title": "开始自动学习？",
       "body": "在自动学习模式下，SimpleDeFence 会放行所有流量并记住哪些应用程序使用了网络，退出该模式时再为它们添加例外。特殊例外无法通过学习生成规则。\n\n请仅在你确信没有恶意软件的系统上使用此模式。",
       "confirm": "进入学习模式"
+    },
+    "learningDuration": {
+      "label": "切换回正常模式",
+      "never": "从不(我自己关闭)",
+      "minutes10": "10 分钟后",
+      "minutes30": "30 分钟后",
+      "hour1": "1 小时后"
+    },
+    "learningEndsAt": "{0} 将于 {1} 切换回正常模式。",
+    "learningEnded": {
+      "title": "学习模式已结束",
+      "body": "已添加 {0} 条规则。请确认每条规则都属于你信任的程序。",
+      "bodyOne": "已添加 1 条规则。请确认它属于你信任的程序。",
+      "bodyNone": "未添加任何规则。",
+      "review": "查看规则"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "添加单个例外时询问详细信息",
       "askForExceptionDetailsDescription": "通过托盘的快速添加快捷方式添加单个例外前，显示一个可编辑的确认框。批量添加（例如整个文件夹）从不询问。",
       "enableHotkeys": "启用全局键盘快捷键",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W 可在任何位置立即将可执行文件、进程或窗口加入白名单。",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W 可在任何位置立即将可执行文件、进程或窗口加入白名单。Ctrl+Alt+B 切换到“全部阻止”,再按一次回到正常模式。",
       "autoRefreshInterval": "自动刷新间隔",
       "autoRefreshIntervalDescription": "“连接”页面在其自动刷新开关打开时重新检查的频率。没有任何机制会主动向它推送更改，因此这是一个轮询间隔；间隔越短数据越新，开销也越大。"
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence 仍在运行",
       "body": "关闭窗口不会停止防火墙。请使用此菜单中的“退出”来停止它。"
     }
+  },
+  "duration": {
+    "label": "持续时间",
+    "permanent": "始终",
+    "minutes5": "5 分钟",
+    "minutes30": "30 分钟",
+    "hour1": "1 小时",
+    "hours4": "4 小时",
+    "hours9": "9 小时",
+    "hours24": "24 小时",
+    "untilRestart": "直到重启",
+    "expiresAtSuffix": "{0},直到 {1}",
+    "untilRestartSuffix": "{0},直到重启"
   }
 }

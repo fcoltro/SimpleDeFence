@@ -460,14 +460,14 @@ namespace SimpleDeFence.UI.Pages
             // be the one a single click applies silently, and the Rules page already offers exactly
             // these choices for the same rule after the fact; this just moves them to the point of
             // decision.
-            var policy = await AskAllowPolicyAsync(item);
-            if (policy is null)
+            if (await AskAllowPolicyAsync(item) is not { } choice)
                 return;
+            var (policy, timer) = choice;
 
             MessageType resp;
             try
             {
-                resp = await App.Firewall.AllowAsync(subject, policy);
+                resp = await App.Firewall.AllowAsync(subject, policy, timer);
             }
             catch (Exception ex)
             {
@@ -523,7 +523,7 @@ namespace SimpleDeFence.UI.Pages
         /// covers the other IP protocols. The wider grant is the deliberate one to preselect, now
         /// that it is named on screen and confirmed rather than applied behind the click.
         /// </summary>
-        private async Task<ExceptionPolicy?> AskAllowPolicyAsync(BlockedListItem item)
+        private async Task<(ExceptionPolicy Policy, AppExceptionTimer Timer)?> AskAllowPolicyAsync(BlockedListItem item)
         {
             var unrestricted = new RadioButton
             {
@@ -570,6 +570,20 @@ namespace SimpleDeFence.UI.Pages
             panel.Children.Add(unrestrictedLan);
             panel.Children.Add(blocked);
 
+            // How long the rule lasts. Permanent is preselected, which is what this dialog wrote
+            // before it asked; the shorter ones are for the installer or one-off tool that needs
+            // the network once, and should not keep it.
+            var duration = new ComboBox
+            {
+                Header = Loc.T(LocKeys.Duration.Label),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness(0, 12, 0, 0),
+            };
+            foreach (var timer in AppExceptionTimers.Offered)
+                duration.Items.Add(AppExceptionTimers.Label(timer));
+            duration.SelectedIndex = 0;
+            panel.Children.Add(duration);
+
             var dialog = new ContentDialog
             {
                 XamlRoot = Content.XamlRoot,
@@ -601,10 +615,14 @@ namespace SimpleDeFence.UI.Pages
             if (result != ContentDialogResult.Primary)
                 return null;
 
-            if (blocked.IsChecked == true)
-                return new HardBlockPolicy();
+            var chosenTimer = duration.SelectedIndex >= 0 && duration.SelectedIndex < AppExceptionTimers.Offered.Count
+                ? AppExceptionTimers.Offered[duration.SelectedIndex]
+                : AppExceptionTimer.Permanent;
 
-            return new UnrestrictedPolicy { LocalNetworkOnly = unrestrictedLan.IsChecked == true };
+            if (blocked.IsChecked == true)
+                return (new HardBlockPolicy(), chosenTimer);
+
+            return (new UnrestrictedPolicy { LocalNetworkOnly = unrestrictedLan.IsChecked == true }, chosenTimer);
         }
 
         private async Task ShowAllowResultAsync(string title, string body)

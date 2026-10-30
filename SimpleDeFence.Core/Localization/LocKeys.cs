@@ -90,6 +90,27 @@
             public const string LearningConfirmTitle = "mode.learningConfirm.title";
             public const string LearningConfirmBody = "mode.learningConfirm.body";
             public const string LearningConfirmConfirm = "mode.learningConfirm.confirm";
+
+            /// <summary>The choice in the learning confirmation of when the service switches back to
+            /// Normal by itself. Learning lets everything through, so leaving it on by mistake is the
+            /// failure this guards against.</summary>
+            public const string LearningDurationLabel = "mode.learningDuration.label";
+            public const string LearningDurationNever = "mode.learningDuration.never";
+            public const string LearningDurationMinutes10 = "mode.learningDuration.minutes10";
+            public const string LearningDurationMinutes30 = "mode.learningDuration.minutes30";
+            public const string LearningDurationHour1 = "mode.learningDuration.hour1";
+
+            /// <summary>Follows the learning description in the status line while a time limit is
+            /// set: {0} is the description, {1} the time it ends.</summary>
+            public const string LearningEndsAt = "mode.learningEndsAt";
+
+            /// <summary>Shown once when the window sees Learning end, by the time limit or by hand,
+            /// so the rules it wrote get looked at.</summary>
+            public const string LearningEndedTitle = "mode.learningEnded.title";
+            public const string LearningEndedBody = "mode.learningEnded.body";
+            public const string LearningEndedBodyOne = "mode.learningEnded.bodyOne";
+            public const string LearningEndedBodyNone = "mode.learningEnded.bodyNone";
+            public const string LearningEndedReview = "mode.learningEnded.review";
         }
 
         public static class Applications
@@ -372,6 +393,27 @@
             public const string TcpIn = "policy.tcpIn";
             public const string UdpIn = "policy.udpIn";
             public const string AllPorts = "policy.allPorts";
+        }
+
+        /// <summary>How long a rule stays in force, one per offered AppExceptionTimer value, plus
+        /// the two suffixes the Rules list adds to a rule that is not permanent.</summary>
+        public static class Duration
+        {
+            public const string Label = "duration.label";
+            public const string Permanent = "duration.permanent";
+            public const string Minutes5 = "duration.minutes5";
+            public const string Minutes30 = "duration.minutes30";
+            public const string Hour1 = "duration.hour1";
+            public const string Hours4 = "duration.hours4";
+            public const string Hours9 = "duration.hours9";
+            public const string Hours24 = "duration.hours24";
+            public const string UntilRestart = "duration.untilRestart";
+
+            /// <summary>{0} is the policy text, {1} the time the rule expires.</summary>
+            public const string ExpiresAtSuffix = "duration.expiresAtSuffix";
+
+            /// <summary>{0} is the policy text.</summary>
+            public const string UntilRestartSuffix = "duration.untilRestartSuffix";
         }
     }
 }

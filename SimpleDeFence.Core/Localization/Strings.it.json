@@ -67,6 +67,21 @@
       "title": "Avviare l'apprendimento automatico?",
       "body": "In modalità di apprendimento automatico SimpleDeFence consente tutto il traffico e ricorda quali applicazioni hanno usato la rete, poi aggiunge eccezioni per esse quando esci dalla modalità. Per le eccezioni speciali non è possibile apprendere regole.\n\nUsa questa modalità solo su un sistema che sei certo sia privo di malware.",
       "confirm": "Entra in modalità apprendimento"
+    },
+    "learningDuration": {
+      "label": "Torna a Normale",
+      "never": "Mai (lo disattivo io)",
+      "minutes10": "Dopo 10 minuti",
+      "minutes30": "Dopo 30 minuti",
+      "hour1": "Dopo 1 ora"
+    },
+    "learningEndsAt": "{0} Torna a Normale alle {1}.",
+    "learningEnded": {
+      "title": "La modalità di apprendimento è terminata",
+      "body": "Sono state aggiunte {0} regole. Verifica che ognuna riguardi un programma di cui ti fidi.",
+      "bodyOne": "È stata aggiunta 1 regola. Verifica che riguardi un programma di cui ti fidi.",
+      "bodyNone": "Non è stata aggiunta nessuna regola.",
+      "review": "Controlla le regole"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "Chiedi i dettagli quando aggiungi una singola eccezione",
       "askForExceptionDetailsDescription": "Mostra una conferma modificabile prima di aggiungere un'eccezione tramite le scorciatoie di aggiunta rapida dell'area di notifica. Le aggiunte in blocco (ad esempio un'intera cartella) non chiedono mai.",
       "enableHotkeys": "Attiva le scorciatoie da tastiera globali",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W consentono all'istante un eseguibile, un processo o una finestra da qualsiasi punto.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W consentono all'istante un eseguibile, un processo o una finestra da qualsiasi punto. Ctrl+Alt+B passa a Blocca tutto e torna a Normale.",
       "autoRefreshInterval": "Intervallo di aggiornamento automatico",
       "autoRefreshIntervalDescription": "Con quale frequenza la pagina Connessioni ricontrolla mentre il suo interruttore di aggiornamento automatico è attivo. Nessuno le invia le modifiche, quindi questo è un intervallo di polling: più breve è, più i dati sono aggiornati e più costa."
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence è ancora in esecuzione",
       "body": "Chiudere la finestra non arresta il firewall. Usa Esci in questo menu per arrestarlo."
     }
+  },
+  "duration": {
+    "label": "Per quanto tempo",
+    "permanent": "Sempre",
+    "minutes5": "Per 5 minuti",
+    "minutes30": "Per 30 minuti",
+    "hour1": "Per 1 ora",
+    "hours4": "Per 4 ore",
+    "hours9": "Per 9 ore",
+    "hours24": "Per 24 ore",
+    "untilRestart": "Fino al riavvio",
+    "expiresAtSuffix": "{0}, fino alle {1}",
+    "untilRestartSuffix": "{0}, fino al riavvio"
   }
 }

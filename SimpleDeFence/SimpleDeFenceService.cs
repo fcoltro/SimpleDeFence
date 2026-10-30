@@ -1666,6 +1666,99 @@ namespace SimpleDeFence
             return config_changed;
         }
 
+        /// <summary>
+        /// The switch itself, shared by MODE_SWITCH and by Learning's time limit running out on the
+        /// minute timer. The caller has already refused anything that is not an operating mode.
+        /// False means nothing changed: the previous mode is still the one installed and reported.
+        /// </summary>
+        private bool TrySwitchMode(FirewallMode newMode)
+        {
+            try
+            {
+                LogWatcher.Enabled = (FirewallMode.Learning == newMode);
+            }
+            catch (Exception e)
+            {
+                Utils.Log("Cannot enter auto-learn mode. Is the 'eventlog' service running? For details see next log entry.", Utils.LOG_ID_SERVICE);
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                return false;
+            }
+
+            bool save_needed = CommitLearnedRules();
+
+            // Everything below this point is undone if the install fails. PUT_SETTINGS
+            // learned this the hard way and its case says why at length: the state that
+            // matters is what WFP is actually enforcing, and InstallFirewallRules() does
+            // its work inside a transaction, so a throw before Commit() leaves the
+            // *previous* rules in force. Reporting the new mode anyway - which is what
+            // MODE_SWITCH used to do - tells the user their firewall is in a mode it is
+            // not in, and for someone switching to Block All to contain something, that
+            // is the worst possible lie to tell.
+            var previousMode = VisibleState.Mode;
+            var previousStartupMode = ActiveConfig.Service.StartupMode;
+            var previousChangeset = GlobalInstances.ServerChangeset;
+
+            VisibleState.Mode = newMode;
+
+            // GET_SETTINGS only sends VisibleState back when the client's changeset
+            // differs from ours, so mutating VisibleState without moving the changeset
+            // makes the new mode invisible to every client that is already connected:
+            // it asks, we answer "nothing changed", and it keeps showing the old mode
+            // until it is restarted. Reproduced on the VM - switching mode from the
+            // chip really did switch the service, while the running GUI went on
+            // displaying the previous mode indefinitely and a freshly launched GUI
+            // (changeset Guid.Empty, so always different) showed the new one at once.
+            GlobalInstances.ServerChangeset = Guid.NewGuid();
+            if ((ActiveConfig.Service.StartupMode != VisibleState.Mode) &&
+                (VisibleState.Mode != FirewallMode.Disabled) &&
+                (VisibleState.Mode != FirewallMode.Learning) )
+            {
+                ActiveConfig.Service.StartupMode = VisibleState.Mode;
+                save_needed = true;
+            }
+            if (save_needed)
+                ActiveConfig.Service.Save(ConfigSavePath);
+
+            try
+            {
+                InstallFirewallRules();
+            }
+            catch (Exception e)
+            {
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+
+                VisibleState.Mode = previousMode;
+                ActiveConfig.Service.StartupMode = previousStartupMode;
+                GlobalInstances.ServerChangeset = previousChangeset;
+
+                // Only worth rewriting if we changed it: on the common path save_needed
+                // is false and the file on disk still describes the mode WFP is running.
+                if (save_needed)
+                {
+                    try
+                    {
+                        ActiveConfig.Service.Save(ConfigSavePath);
+                    }
+                    catch (Exception saveError)
+                    {
+                        // Disk now disagrees with memory and with WFP, and the next
+                        // start would come up in a mode that just failed to install.
+                        // Nothing further can be done here, but it must not be silent.
+                        Utils.LogException(saveError, Utils.LOG_ID_SERVICE);
+                    }
+                }
+
+                // Auto-learn was switched on before any of this; put it back too, or the
+                // log watcher runs for a mode the service is no longer in.
+                try { LogWatcher.Enabled = (FirewallMode.Learning == previousMode); }
+                catch (Exception watcherError) { Utils.LogException(watcherError, Utils.LOG_ID_SERVICE); }
+
+                return false;
+            }
+
+            return true;
+        }
+
         private TwMessage ProcessCmd(TwMessage req)
         {
             switch (req.Type)
@@ -1708,88 +1801,16 @@ namespace SimpleDeFence
                             return TwMessageError.Instance;
                         }
 
-                        try
-                        {
-                            LogWatcher.Enabled = (FirewallMode.Learning == newMode);
-                        }
-                        catch (Exception e)
-                        {
-                            Utils.Log("Cannot enter auto-learn mode. Is the 'eventlog' service running? For details see next log entry.", Utils.LOG_ID_SERVICE);
-                            Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                        if (!TrySwitchMode(newMode))
                             return TwMessageError.Instance;
-                        }
 
-                        bool save_needed = CommitLearnedRules();
-
-                        // Everything below this point is undone if the install fails. PUT_SETTINGS
-                        // learned this the hard way and its case says why at length: the state that
-                        // matters is what WFP is actually enforcing, and InstallFirewallRules() does
-                        // its work inside a transaction, so a throw before Commit() leaves the
-                        // *previous* rules in force. Reporting the new mode anyway - which is what
-                        // this case used to do - tells the user their firewall is in a mode it is
-                        // not in, and for someone switching to Block All to contain something, that
-                        // is the worst possible lie to tell.
-                        var previousMode = VisibleState.Mode;
-                        var previousStartupMode = ActiveConfig.Service.StartupMode;
-                        var previousChangeset = GlobalInstances.ServerChangeset;
-
-                        VisibleState.Mode = newMode;
-
-                        // GET_SETTINGS only sends VisibleState back when the client's changeset
-                        // differs from ours, so mutating VisibleState without moving the changeset
-                        // makes the new mode invisible to every client that is already connected:
-                        // it asks, we answer "nothing changed", and it keeps showing the old mode
-                        // until it is restarted. Reproduced on the VM - switching mode from the
-                        // chip really did switch the service, while the running GUI went on
-                        // displaying the previous mode indefinitely and a freshly launched GUI
-                        // (changeset Guid.Empty, so always different) showed the new one at once.
-                        GlobalInstances.ServerChangeset = Guid.NewGuid();
-                        if ((ActiveConfig.Service.StartupMode != VisibleState.Mode) &&
-                            (VisibleState.Mode != FirewallMode.Disabled) &&
-                            (VisibleState.Mode != FirewallMode.Learning) )
-                        {
-                            ActiveConfig.Service.StartupMode = VisibleState.Mode;
-                            save_needed = true;
-                        }
-                        if (save_needed)
-                            ActiveConfig.Service.Save(ConfigSavePath);
-
-                        try
-                        {
-                            InstallFirewallRules();
-                        }
-                        catch (Exception e)
-                        {
-                            Utils.LogException(e, Utils.LOG_ID_SERVICE);
-
-                            VisibleState.Mode = previousMode;
-                            ActiveConfig.Service.StartupMode = previousStartupMode;
-                            GlobalInstances.ServerChangeset = previousChangeset;
-
-                            // Only worth rewriting if we changed it: on the common path save_needed
-                            // is false and the file on disk still describes the mode WFP is running.
-                            if (save_needed)
-                            {
-                                try
-                                {
-                                    ActiveConfig.Service.Save(ConfigSavePath);
-                                }
-                                catch (Exception saveError)
-                                {
-                                    // Disk now disagrees with memory and with WFP, and the next
-                                    // start would come up in a mode that just failed to install.
-                                    // Nothing further can be done here, but it must not be silent.
-                                    Utils.LogException(saveError, Utils.LOG_ID_SERVICE);
-                                }
-                            }
-
-                            // Auto-learn was switched on before any of this; put it back too, or the
-                            // log watcher runs for a mode the service is no longer in.
-                            try { LogWatcher.Enabled = (FirewallMode.Learning == previousMode); }
-                            catch (Exception watcherError) { Utils.LogException(watcherError, Utils.LOG_ID_SERVICE); }
-
-                            return TwMessageError.Instance;
-                        }
+                        // Set after the switch so a failed one leaves the old limit in place along
+                        // with the old mode. Any switch clears it; only one into Learning with a
+                        // limit sets it again. Bounded to a day: the GUI offers up to an hour, and
+                        // a larger value from anywhere else is not a time limit anyone meant.
+                        VisibleState.LearningEndsAt = (newMode == FirewallMode.Learning) && (args.LearningMinutes > 0)
+                            ? DateTime.Now.AddMinutes(Math.Min(args.LearningMinutes, 24 * 60))
+                            : null;
 
                         return args.CreateResponse(VisibleState.Mode);
                     }
@@ -2039,6 +2060,19 @@ namespace SimpleDeFence
                         {
                             PasswordLock.Locked = true;
                             GlobalInstances.ServerChangeset = Guid.NewGuid();
+                        }
+
+                        // Learning's time limit. Enforced here, in the service, rather than by a
+                        // timer in the GUI: Learning lets everything through, and closing the window
+                        // must not be a way of keeping it on. A switch that fails is retried on the
+                        // next tick, with the limit still set and the mode unchanged.
+                        if ((VisibleState.Mode == FirewallMode.Learning)
+                            && (VisibleState.LearningEndsAt is DateTime learningEnds)
+                            && (learningEnds <= DateTime.Now))
+                        {
+                            Utils.Log("Learning mode's time limit ran out; switching back to Normal.", Utils.LOG_ID_SERVICE);
+                            if (TrySwitchMode(FirewallMode.Normal))
+                                VisibleState.LearningEndsAt = null;
                         }
 
                         if (PruneExpiredRules())

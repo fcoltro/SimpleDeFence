@@ -67,6 +67,21 @@
       "title": "Start automatic learning?",
       "body": "In automatic learning mode SimpleDeFence allows all traffic and remembers which applications used the network, then adds exceptions for them when you leave the mode. Rules cannot be learned for Special Exceptions.\n\nOnly use this on a system you are confident is free of malware.",
       "confirm": "Enter learning mode"
+    },
+    "learningDuration": {
+      "label": "Switch back to Normal",
+      "never": "Never (I will switch it off myself)",
+      "minutes10": "After 10 minutes",
+      "minutes30": "After 30 minutes",
+      "hour1": "After 1 hour"
+    },
+    "learningEndsAt": "{0} It switches back to Normal at {1}.",
+    "learningEnded": {
+      "title": "Learning mode has ended",
+      "body": "It added {0} rules. Check that each one is for a program you trust.",
+      "bodyOne": "It added 1 rule. Check that it is for a program you trust.",
+      "bodyNone": "It did not add any rules.",
+      "review": "Review rules"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "Ask for details when adding a single exception",
       "askForExceptionDetailsDescription": "Show an editable confirmation before adding one exception via the tray's quick-add shortcuts. Bulk adds (e.g. a whole folder) never prompt.",
       "enableHotkeys": "Enable global keyboard shortcuts",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere. Ctrl+Alt+B switches to Block all, and back to Normal.",
       "autoRefreshInterval": "Auto-refresh interval",
       "autoRefreshIntervalDescription": "How often the Connections page re-checks while its Auto-refresh switch is on. Nothing pushes changes to it, so this is a polling interval; lower is fresher and costs more."
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence is still running",
       "body": "Closing the window does not stop the firewall. Use Quit in this menu to stop it."
     }
+  },
+  "duration": {
+    "label": "How long",
+    "permanent": "Always",
+    "minutes5": "For 5 minutes",
+    "minutes30": "For 30 minutes",
+    "hour1": "For 1 hour",
+    "hours4": "For 4 hours",
+    "hours9": "For 9 hours",
+    "hours24": "For 24 hours",
+    "untilRestart": "Until restart",
+    "expiresAtSuffix": "{0}, until {1}",
+    "untilRestartSuffix": "{0}, until restart"
   }
 }

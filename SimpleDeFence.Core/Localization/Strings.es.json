@@ -67,6 +67,21 @@
       "title": "¿Iniciar el aprendizaje automático?",
       "body": "En el modo de aprendizaje automático, SimpleDeFence permite todo el tráfico y recuerda qué aplicaciones usaron la red; al salir del modo, añade excepciones para ellas. No se pueden aprender reglas para las excepciones especiales.\n\nUsa esto solo en un sistema que estés seguro de que no tiene malware.",
       "confirm": "Entrar en modo de aprendizaje"
+    },
+    "learningDuration": {
+      "label": "Volver a Normal",
+      "never": "Nunca (lo desactivaré yo)",
+      "minutes10": "Después de 10 minutos",
+      "minutes30": "Después de 30 minutos",
+      "hour1": "Después de 1 hora"
+    },
+    "learningEndsAt": "{0} Vuelve a Normal a las {1}.",
+    "learningEnded": {
+      "title": "El modo de aprendizaje ha terminado",
+      "body": "Se añadieron {0} reglas. Comprueba que cada una sea de un programa de confianza.",
+      "bodyOne": "Se añadió 1 regla. Comprueba que sea de un programa de confianza.",
+      "bodyNone": "No se añadió ninguna regla.",
+      "review": "Revisar reglas"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "Pedir detalles al añadir una sola excepción",
       "askForExceptionDetailsDescription": "Muestra una confirmación editable antes de añadir una excepción mediante los atajos rápidos de la bandeja. Las adiciones masivas (p. ej. una carpeta entera) nunca preguntan.",
       "enableHotkeys": "Activar los atajos de teclado globales",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permiten al instante un ejecutable, proceso o ventana desde cualquier lugar.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permiten al instante un ejecutable, proceso o ventana desde cualquier lugar. Ctrl+Alt+B cambia a Bloquear todo y vuelve a Normal.",
       "autoRefreshInterval": "Intervalo de actualización automática",
       "autoRefreshIntervalDescription": "Con qué frecuencia la página Conexiones vuelve a comprobar mientras su interruptor de actualización automática está activado. Nada le envía cambios, así que este es un intervalo de sondeo; menos es más reciente y cuesta más."
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence sigue en ejecución",
       "body": "Cerrar la ventana no detiene el firewall. Usa Salir en este menú para detenerlo."
     }
+  },
+  "duration": {
+    "label": "Durante cuánto tiempo",
+    "permanent": "Siempre",
+    "minutes5": "Durante 5 minutos",
+    "minutes30": "Durante 30 minutos",
+    "hour1": "Durante 1 hora",
+    "hours4": "Durante 4 horas",
+    "hours9": "Durante 9 horas",
+    "hours24": "Durante 24 horas",
+    "untilRestart": "Hasta reiniciar",
+    "expiresAtSuffix": "{0}, hasta las {1}",
+    "untilRestartSuffix": "{0}, hasta reiniciar"
   }
 }

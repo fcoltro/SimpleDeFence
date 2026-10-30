@@ -67,6 +67,21 @@
       "title": "자동 학습을 시작할까요?",
       "body": "자동 학습 모드에서 SimpleDeFence는 모든 트래픽을 허용하고 어떤 응용 프로그램이 네트워크를 사용했는지 기억한 다음, 모드를 벗어날 때 해당 프로그램에 대한 예외를 추가합니다. 특수 예외에 대해서는 규칙을 학습할 수 없습니다.\n\n악성 코드가 없다고 확신하는 시스템에서만 사용하세요.",
       "confirm": "학습 모드 시작"
+    },
+    "learningDuration": {
+      "label": "일반 모드로 돌아가기",
+      "never": "안 함(직접 끄기)",
+      "minutes10": "10분 후",
+      "minutes30": "30분 후",
+      "hour1": "1시간 후"
+    },
+    "learningEndsAt": "{0} {1}에 일반 모드로 돌아갑니다.",
+    "learningEnded": {
+      "title": "학습 모드가 끝났습니다",
+      "body": "규칙 {0}개가 추가되었습니다. 각각 신뢰하는 프로그램의 규칙인지 확인하세요.",
+      "bodyOne": "규칙 1개가 추가되었습니다. 신뢰하는 프로그램의 규칙인지 확인하세요.",
+      "bodyNone": "추가된 규칙이 없습니다.",
+      "review": "규칙 검토"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "예외를 하나 추가할 때 세부 정보 묻기",
       "askForExceptionDetailsDescription": "트레이의 빠른 추가 바로 가기로 예외를 하나 추가하기 전에 편집 가능한 확인 창을 표시합니다. 일괄 추가(예: 폴더 전체)는 묻지 않습니다.",
       "enableHotkeys": "전역 키보드 단축키 사용",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W로 어디서나 실행 파일, 프로세스 또는 창을 즉시 허용합니다.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W로 어디서나 실행 파일, 프로세스 또는 창을 즉시 허용합니다. Ctrl+Alt+B는 모두 차단으로 전환하고 다시 일반 모드로 돌아갑니다.",
       "autoRefreshInterval": "자동 새로 고침 간격",
       "autoRefreshIntervalDescription": "연결 페이지의 자동 새로 고침 스위치가 켜져 있는 동안 다시 확인하는 주기입니다. 변경 사항을 밀어 주는 것이 없으므로 이것은 폴링 간격입니다. 짧을수록 최신이지만 비용이 더 듭니다."
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence가 계속 실행 중입니다",
       "body": "창을 닫아도 방화벽은 멈추지 않습니다. 멈추려면 이 메뉴의 종료를 사용하세요."
     }
+  },
+  "duration": {
+    "label": "기간",
+    "permanent": "항상",
+    "minutes5": "5분 동안",
+    "minutes30": "30분 동안",
+    "hour1": "1시간 동안",
+    "hours4": "4시간 동안",
+    "hours9": "9시간 동안",
+    "hours24": "24시간 동안",
+    "untilRestart": "다시 시작할 때까지",
+    "expiresAtSuffix": "{0}, {1}까지",
+    "untilRestartSuffix": "{0}, 다시 시작할 때까지"
   }
 }

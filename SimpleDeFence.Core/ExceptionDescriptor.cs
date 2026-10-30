@@ -1,4 +1,5 @@
 using SimpleDeFence.Localization;
+using System;
 using System.Collections.Generic;
 
 namespace SimpleDeFence
@@ -39,8 +40,25 @@ namespace SimpleDeFence
                 SubjectName(ex.Subject),
                 SubjectKind(ex.Subject),
                 SubjectDetail(ex.Subject),
-                DescribePolicy(ex.Policy),
+                WithDuration(DescribePolicy(ex.Policy), ex),
                 ex.Policy.PolicyType == PolicyType.HardBlock);
+        }
+
+        /// <summary>Adds when a rule stops applying, so a rule written "for 1 hour" cannot be taken
+        /// for a permanent one on the Rules page. The time is today's clock time, or a date and time
+        /// once it falls on another day (a 24-hour rule written in the evening).</summary>
+        private static string WithDuration(string policy, FirewallExceptionV3 ex)
+        {
+            if (ex.Timer == AppExceptionTimer.Until_Reboot)
+                return Loc.T(LocKeys.Duration.UntilRestartSuffix, policy);
+
+            if (AppExceptionTimers.ExpiresAt(ex) is DateTime expires)
+            {
+                string when = expires.Date == DateTime.Today ? expires.ToString("t") : expires.ToString("g");
+                return Loc.T(LocKeys.Duration.ExpiresAtSuffix, policy, when);
+            }
+
+            return policy;
         }
 
         // The subject accessors below all switch on SubjectType rather than the runtime type.

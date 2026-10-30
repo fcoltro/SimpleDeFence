@@ -67,6 +67,21 @@
       "title": "Otomatik öğrenme başlatılsın mı?",
       "body": "Otomatik öğrenme kipinde SimpleDeFence tüm trafiğe izin verir ve hangi uygulamaların ağı kullandığını hatırlar, kipten çıktığınızda da onlar için ayrıcalık ekler. Özel ayrıcalıklar için kural öğrenilemez.\n\nBunu yalnızca kötü amaçlı yazılım içermediğinden emin olduğunuz bir sistemde kullanın.",
       "confirm": "Öğrenme kipine gir"
+    },
+    "learningDuration": {
+      "label": "Normal moda dön",
+      "never": "Hiçbir zaman (kendim kapatacağım)",
+      "minutes10": "10 dakika sonra",
+      "minutes30": "30 dakika sonra",
+      "hour1": "1 saat sonra"
+    },
+    "learningEndsAt": "{0} Saat {1} itibarıyla Normal moda döner.",
+    "learningEnded": {
+      "title": "Öğrenme modu sona erdi",
+      "body": "{0} kural eklendi. Her birinin güvendiğiniz bir programa ait olduğunu kontrol edin.",
+      "bodyOne": "1 kural eklendi. Güvendiğiniz bir programa ait olduğunu kontrol edin.",
+      "bodyNone": "Hiç kural eklenmedi.",
+      "review": "Kuralları gözden geçir"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "Tek bir ayrıcalık eklerken ayrıntıları sor",
       "askForExceptionDetailsDescription": "Bildirim alanındaki hızlı ekleme kısayollarıyla tek bir ayrıcalık eklemeden önce düzenlenebilir bir onay gösterir. Toplu eklemeler (örneğin bütün bir klasör) hiçbir zaman sormaz.",
       "enableHotkeys": "Genel klavye kısayollarını etkinleştir",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W her yerden anında bir çalıştırılabilir dosyaya, işleme veya pencereye izin verir.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W her yerden anında bir çalıştırılabilir dosyaya, işleme veya pencereye izin verir. Ctrl+Alt+B Tümünü engelle moduna geçirir ve Normal moda geri döndürür.",
       "autoRefreshInterval": "Otomatik yenileme aralığı",
       "autoRefreshIntervalDescription": "Bağlantılar sayfasının otomatik yenileme anahtarı açıkken ne sıklıkta yeniden denetlediği. Değişiklikleri ona kimse iletmez, dolayısıyla bu bir yoklama aralığıdır; kısa olması daha tazedir ve daha maliyetlidir."
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence hâlâ çalışıyor",
       "body": "Pencereyi kapatmak güvenlik duvarını durdurmaz. Durdurmak için bu menüdeki Çık'ı kullanın."
     }
+  },
+  "duration": {
+    "label": "Ne kadar süre",
+    "permanent": "Her zaman",
+    "minutes5": "5 dakika boyunca",
+    "minutes30": "30 dakika boyunca",
+    "hour1": "1 saat boyunca",
+    "hours4": "4 saat boyunca",
+    "hours9": "9 saat boyunca",
+    "hours24": "24 saat boyunca",
+    "untilRestart": "Yeniden başlatılana kadar",
+    "expiresAtSuffix": "{0}, {1} saatine kadar",
+    "untilRestartSuffix": "{0}, yeniden başlatılana kadar"
   }
 }

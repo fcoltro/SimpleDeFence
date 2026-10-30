@@ -67,6 +67,21 @@
       "title": "自動学習を開始しますか？",
       "body": "自動学習モードでは、SimpleDeFence はすべての通信を許可し、どのアプリケーションがネットワークを使ったかを記憶して、モードを終了するときにそれらの例外を追加します。特別な例外についてはルールを学習できません。\n\nマルウェアに感染していないと確信できるシステムでのみ使用してください。",
       "confirm": "学習モードを開始"
+    },
+    "learningDuration": {
+      "label": "標準に戻すタイミング",
+      "never": "戻さない (自分でオフにする)",
+      "minutes10": "10 分後",
+      "minutes30": "30 分後",
+      "hour1": "1 時間後"
+    },
+    "learningEndsAt": "{0} {1} に標準に戻ります。",
+    "learningEnded": {
+      "title": "学習モードが終了しました",
+      "body": "{0} 件のルールが追加されました。それぞれが信頼できるプログラムのものか確認してください。",
+      "bodyOne": "1 件のルールが追加されました。信頼できるプログラムのものか確認してください。",
+      "bodyNone": "ルールは追加されませんでした。",
+      "review": "ルールを確認"
     }
   },
   "applications": {
@@ -258,7 +273,7 @@
       "askForExceptionDetails": "例外を 1 件追加するときに詳細を確認する",
       "askForExceptionDetailsDescription": "通知領域のクイック追加から例外を 1 件追加する前に、編集可能な確認画面を表示します。一括追加（フォルダー全体など）では確認しません。",
       "enableHotkeys": "グローバルキーボードショートカットを有効にする",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W でどこからでも実行可能ファイル、プロセス、ウィンドウを即座に許可します。",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W でどこからでも実行可能ファイル、プロセス、ウィンドウを即座に許可します。Ctrl+Alt+B で「すべてブロック」に切り替え、もう一度押すと標準に戻ります。",
       "autoRefreshInterval": "自動更新の間隔",
       "autoRefreshIntervalDescription": "「接続」ページの自動更新スイッチがオンの間、再確認する頻度です。変更が通知されることはないためこれはポーリング間隔であり、短いほど新しい情報が得られる代わりに負荷が増えます。"
     },
@@ -412,5 +427,18 @@
       "title": "SimpleDeFence は実行中です",
       "body": "ウィンドウを閉じてもファイアウォールは停止しません。停止するにはこのメニューの「終了」を使用してください。"
     }
+  },
+  "duration": {
+    "label": "期間",
+    "permanent": "常に",
+    "minutes5": "5 分間",
+    "minutes30": "30 分間",
+    "hour1": "1 時間",
+    "hours4": "4 時間",
+    "hours9": "9 時間",
+    "hours24": "24 時間",
+    "untilRestart": "再起動まで",
+    "expiresAtSuffix": "{0}、{1} まで",
+    "untilRestartSuffix": "{0}、再起動まで"
   }
 }
