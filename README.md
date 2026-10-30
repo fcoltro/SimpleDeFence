@@ -67,7 +67,8 @@ executed.
   with a configurable refresh interval and optional logging of connections to disk.
 - **Password protection** — the running configuration can be locked so it cannot be changed
   without the password, including by anything running as you.
-- **Hosts-file blocklists**, updated on request.
+- **Hosts-file blocklists**, updated on request, and your own list of blocked IP addresses and
+  networks that no program can reach, whatever its rules.
 - **Notifications** from the tray the first time an app is blocked from connecting, or starts
   accepting incoming connections. One click opens it on the Connections page. Windows' own
   components are left out, and both can be switched off in Settings.

@@ -333,7 +333,12 @@
       "enable": "Engelleme listelerini etkinleştir",
       "enableDescription": "Kötü amaçlı olduğu bilinen sunuculara ve bağlantı noktalarına giden trafiği engeller.",
       "hosts": "Kötü amaçlı sunucuları engelle",
-      "ports": "Kötü amaçlı bağlantı noktalarını engelle"
+      "ports": "Kötü amaçlı bağlantı noktalarını engelle",
+      "addresses": "Engellenen adresler",
+      "addressesDescription": "Kuralları ne derse desin, hiçbir program bu IP adresleri ve ağlarla bağlantı kuramaz. Her satıra bir tane; # ile başlayan satırlar yok sayılır.",
+      "addressesPlaceholder": "Örneğin 203.0.113.7 veya 198.51.100.0/24",
+      "addressesSave": "Adresleri kaydet",
+      "addressesInvalid": "\"{0}\" bir IP adresi veya ağ değil. Hiçbir şey kaydedilmedi."
     },
     "security": {
       "lockHostsFile": "hosts dosyasını kilitle",

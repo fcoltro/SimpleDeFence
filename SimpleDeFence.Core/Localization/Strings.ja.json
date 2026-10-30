@@ -333,7 +333,12 @@
       "enable": "ブロックリストを有効にする",
       "enableDescription": "悪意があると知られているホストやポートへの通信をブロックします。",
       "hosts": "悪意のあるホストをブロック",
-      "ports": "悪意のあるポートをブロック"
+      "ports": "悪意のあるポートをブロック",
+      "addresses": "ブロックするアドレス",
+      "addressesDescription": "ルールの内容にかかわらず、どのプログラムもこれらの IP アドレスやネットワークと接続できません。1 行に 1 つ。# で始まる行は無視されます。",
+      "addressesPlaceholder": "例: 203.0.113.7 または 198.51.100.0/24",
+      "addressesSave": "アドレスを保存",
+      "addressesInvalid": "「{0}」は IP アドレスでもネットワークでもありません。何も保存されませんでした。"
     },
     "security": {
       "lockHostsFile": "hosts ファイルをロック",

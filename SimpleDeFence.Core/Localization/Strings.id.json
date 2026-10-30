@@ -333,7 +333,12 @@
       "enable": "Aktifkan daftar blokir",
       "enableDescription": "Memblokir lalu lintas ke hos dan porta yang diketahui berbahaya.",
       "hosts": "Blokir hos berbahaya",
-      "ports": "Blokir porta berbahaya"
+      "ports": "Blokir porta berbahaya",
+      "addresses": "Alamat yang diblokir",
+      "addressesDescription": "Tidak ada program yang dapat terhubung ke atau dari alamat IP dan jaringan ini, apa pun aturannya. Satu per baris; baris yang diawali # diabaikan.",
+      "addressesPlaceholder": "Misalnya 203.0.113.7 atau 198.51.100.0/24",
+      "addressesSave": "Simpan alamat",
+      "addressesInvalid": "\"{0}\" bukan alamat IP atau jaringan. Tidak ada yang disimpan."
     },
     "security": {
       "lockHostsFile": "Kunci berkas hosts",

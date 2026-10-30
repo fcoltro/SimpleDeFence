@@ -133,6 +133,16 @@ namespace SimpleDeFence
                 }
             }
 
+            // Do we want to block addresses the user listed? One rule for all of them: WFP matches
+            // a filter when any one of several conditions on the same field matches.
+            if (ActiveConfig.Service.Blocklists.EnableBlocklists && ActiveConfig.Service.Blocklists.BlockedAddresses.Count != 0)
+            {
+                rules.Add(new RuleDef(ModeId, "Blocked addresses", GlobalSubject.Instance, RuleAction.Block, RuleDirection.InOut, Protocol.Any, (ulong)FilterWeights.Blocklist)
+                {
+                    RemoteAddresses = string.Join(",", ActiveConfig.Service.Blocklists.BlockedAddresses)
+                });
+            }
+
             // Rules specific to the selected firewall mode. The decision itself lives in
             // SimpleDeFence.Core/ModeRules.cs so it can be exercised without constructing a
             // service - "every mode that is not deliberately open still denies by default" is the

@@ -333,7 +333,12 @@
       "enable": "Activer les listes de blocage",
       "enableDescription": "Bloque le trafic vers les hôtes et les ports connus comme malveillants.",
       "hosts": "Bloquer les hôtes malveillants",
-      "ports": "Bloquer les ports malveillants"
+      "ports": "Bloquer les ports malveillants",
+      "addresses": "Adresses bloquées",
+      "addressesDescription": "Aucun programme ne peut se connecter à ces adresses IP et réseaux, ni en recevoir de connexion, quelles que soient ses règles. Une par ligne ; les lignes commençant par # sont ignorées.",
+      "addressesPlaceholder": "Par exemple 203.0.113.7 ou 198.51.100.0/24",
+      "addressesSave": "Enregistrer les adresses",
+      "addressesInvalid": "« {0} » n’est ni une adresse IP ni un réseau. Rien n’a été enregistré."
     },
     "security": {
       "lockHostsFile": "Verrouiller le fichier hosts",

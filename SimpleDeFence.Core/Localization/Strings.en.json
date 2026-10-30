@@ -333,7 +333,12 @@
       "enable": "Enable blocklists",
       "enableDescription": "Blocks traffic to known-malicious hosts and ports.",
       "hosts": "Block malicious hosts",
-      "ports": "Block malicious ports"
+      "ports": "Block malicious ports",
+      "addresses": "Blocked addresses",
+      "addressesDescription": "No program can connect to or from these IP addresses and networks, whatever its rules say. One per line; lines starting with # are ignored.",
+      "addressesPlaceholder": "For example 203.0.113.7 or 198.51.100.0/24",
+      "addressesSave": "Save addresses",
+      "addressesInvalid": "\"{0}\" is not an IP address or network. Nothing was saved."
     },
     "security": {
       "lockHostsFile": "Lock the hosts file",

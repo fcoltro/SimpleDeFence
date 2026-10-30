@@ -333,7 +333,12 @@
       "enable": "Ativar listas de bloqueio",
       "enableDescription": "Bloqueia tráfego para hosts e portas conhecidos como maliciosos.",
       "hosts": "Bloquear hosts maliciosos",
-      "ports": "Bloquear portas maliciosas"
+      "ports": "Bloquear portas maliciosas",
+      "addresses": "Endereços bloqueados",
+      "addressesDescription": "Nenhum programa pode se conectar de ou para estes endereços IP e redes, independentemente das suas regras. Um por linha; linhas que começam com # são ignoradas.",
+      "addressesPlaceholder": "Por exemplo 203.0.113.7 ou 198.51.100.0/24",
+      "addressesSave": "Salvar endereços",
+      "addressesInvalid": "\"{0}\" não é um endereço IP nem uma rede. Nada foi salvo."
     },
     "security": {
       "lockHostsFile": "Bloquear o arquivo hosts",

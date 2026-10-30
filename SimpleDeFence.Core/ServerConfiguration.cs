@@ -27,6 +27,12 @@ namespace SimpleDeFence
 
         [DataMember(EmitDefaultValue = false)]
         public bool EnableHostsBlocklist = false;
+
+        /// <summary>Addresses and networks no program may talk to, in either direction, as
+        /// normalised by CustomRuleText.TryNormalizeAddresses. Applied while EnableBlocklists is on,
+        /// in every mode, ahead of every allow rule - as the port blocklist is.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public List<string> BlockedAddresses = new List<string>();
     }
 
     [DataContract(Namespace = "SimpleDeFence")]

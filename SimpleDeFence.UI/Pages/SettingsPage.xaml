@@ -161,6 +161,24 @@
                                           OnContent="{loc:Loc Key=common.on}"
                                           OffContent="{loc:Loc Key=common.off}"/>
                         </controls:SettingsCard>
+                        <!-- A form, so in the Header slot like the password card below. -->
+                        <controls:SettingsCard IsClickEnabled="False">
+                            <controls:SettingsCard.Header>
+                                <StackPanel Spacing="8" HorizontalAlignment="Stretch" MinWidth="300" Margin="0,4">
+                                    <TextBlock Text="{loc:Loc Key=settings.blocklists.addresses}"
+                                               Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="{loc:Loc Key=settings.blocklists.addressesDescription}"
+                                               Opacity="0.8" TextWrapping="Wrap"
+                                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBox x:Name="BlockedAddressesBox" AcceptsReturn="True" TextWrapping="Wrap"
+                                             MinHeight="80" MaxHeight="240" HorizontalAlignment="Stretch"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                             PlaceholderText="{loc:Loc Key=settings.blocklists.addressesPlaceholder}"/>
+                                    <Button x:Name="SaveBlockedAddressesButton" Content="{loc:Loc Key=settings.blocklists.addressesSave}"
+                                            HorizontalAlignment="Left" Click="SaveBlockedAddressesButton_Click"/>
+                                </StackPanel>
+                            </controls:SettingsCard.Header>
+                        </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 

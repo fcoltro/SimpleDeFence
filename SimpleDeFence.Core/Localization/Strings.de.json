@@ -333,7 +333,12 @@
       "enable": "Sperrlisten aktivieren",
       "enableDescription": "Blockiert Datenverkehr zu bekannten schädlichen Hosts und Ports.",
       "hosts": "Schädliche Hosts blockieren",
-      "ports": "Schädliche Ports blockieren"
+      "ports": "Schädliche Ports blockieren",
+      "addresses": "Blockierte Adressen",
+      "addressesDescription": "Kein Programm kann Verbindungen zu oder von diesen IP-Adressen und Netzwerken herstellen, unabhängig von seinen Regeln. Eine pro Zeile; Zeilen mit # am Anfang werden ignoriert.",
+      "addressesPlaceholder": "Zum Beispiel 203.0.113.7 oder 198.51.100.0/24",
+      "addressesSave": "Adressen speichern",
+      "addressesInvalid": "„{0}“ ist keine IP-Adresse und kein Netzwerk. Es wurde nichts gespeichert."
     },
     "security": {
       "lockHostsFile": "Hosts-Datei sperren",

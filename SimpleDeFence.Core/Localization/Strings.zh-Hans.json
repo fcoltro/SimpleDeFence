@@ -333,7 +333,12 @@
       "enable": "启用阻止列表",
       "enableDescription": "阻止通往已知恶意主机和端口的流量。",
       "hosts": "阻止恶意主机",
-      "ports": "阻止恶意端口"
+      "ports": "阻止恶意端口",
+      "addresses": "阻止的地址",
+      "addressesDescription": "无论规则如何，任何程序都不能与这些 IP 地址和网络建立连接。每行一个；以 # 开头的行会被忽略。",
+      "addressesPlaceholder": "例如 203.0.113.7 或 198.51.100.0/24",
+      "addressesSave": "保存地址",
+      "addressesInvalid": "“{0}”不是 IP 地址或网络。未保存任何内容。"
     },
     "security": {
       "lockHostsFile": "锁定 hosts 文件",

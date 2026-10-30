@@ -333,7 +333,12 @@
       "enable": "차단 목록 사용",
       "enableDescription": "악성으로 알려진 호스트와 포트로 향하는 트래픽을 차단합니다.",
       "hosts": "악성 호스트 차단",
-      "ports": "악성 포트 차단"
+      "ports": "악성 포트 차단",
+      "addresses": "차단된 주소",
+      "addressesDescription": "규칙과 상관없이 어떤 프로그램도 이 IP 주소 및 네트워크와 연결할 수 없습니다. 한 줄에 하나씩, #으로 시작하는 줄은 무시됩니다.",
+      "addressesPlaceholder": "예: 203.0.113.7 또는 198.51.100.0/24",
+      "addressesSave": "주소 저장",
+      "addressesInvalid": "'{0}'은(는) IP 주소나 네트워크가 아닙니다. 아무것도 저장되지 않았습니다."
     },
     "security": {
       "lockHostsFile": "hosts 파일 잠금",

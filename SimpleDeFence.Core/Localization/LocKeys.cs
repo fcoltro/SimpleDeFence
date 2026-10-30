@@ -325,6 +325,11 @@
             public const string BlocklistsEnableDescription = "settings.blocklists.enableDescription";
             public const string BlocklistsHosts = "settings.blocklists.hosts";
             public const string BlocklistsPorts = "settings.blocklists.ports";
+            public const string BlocklistsAddresses = "settings.blocklists.addresses";
+            public const string BlocklistsAddressesDescription = "settings.blocklists.addressesDescription";
+            public const string BlocklistsAddressesPlaceholder = "settings.blocklists.addressesPlaceholder";
+            public const string BlocklistsAddressesSave = "settings.blocklists.addressesSave";
+            public const string BlocklistsAddressesInvalid = "settings.blocklists.addressesInvalid";
 
             public const string SecurityLockHostsFile = "settings.security.lockHostsFile";
             public const string SecurityLockHostsFileDescription = "settings.security.lockHostsFileDescription";

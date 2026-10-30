@@ -333,7 +333,12 @@
       "enable": "Attiva gli elenchi di blocco",
       "enableDescription": "Blocca il traffico verso host e porte noti come dannosi.",
       "hosts": "Blocca gli host dannosi",
-      "ports": "Blocca le porte dannose"
+      "ports": "Blocca le porte dannose",
+      "addresses": "Indirizzi bloccati",
+      "addressesDescription": "Nessun programma può connettersi da o verso questi indirizzi IP e reti, qualunque cosa dicano le sue regole. Uno per riga; le righe che iniziano con # vengono ignorate.",
+      "addressesPlaceholder": "Ad esempio 203.0.113.7 o 198.51.100.0/24",
+      "addressesSave": "Salva indirizzi",
+      "addressesInvalid": "«{0}» non è un indirizzo IP né una rete. Non è stato salvato nulla."
     },
     "security": {
       "lockHostsFile": "Blocca il file hosts",
