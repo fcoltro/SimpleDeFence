@@ -231,18 +231,43 @@
       "udpIn": "UDP entrada",
       "lanOnly": "Solo LAN",
       "apply": "Aplicar",
-      "customRulesReadOnly": "Las listas de reglas personalizadas todavía no se pueden editar aquí.",
+      "customRulesReadOnly": "Este tipo de regla no se puede editar aquí.",
       "applySuccess": "Directiva actualizada.",
       "applyFailed": {
         "title": "No se pudo actualizar la directiva",
         "lockedDetail": "Desbloquea la configuración antes de cambiar esta regla.",
         "staleDetail": "La configuración acaba de cambiar en otro lugar; la directiva no se cambió. Inténtalo de nuevo.",
         "genericDetail": "El servicio devolvió {0}. La directiva no se cambió."
-      }
+      },
+      "policyCustom": "Reglas personalizadas"
     },
     "multiSelectHint": "{0} reglas seleccionadas. Quitar las elimina todas; selecciona una sola regla para editarla.",
     "publishersKind": "Editores de confianza",
-    "publishersDescription": "Los programas firmados por estos editores pueden conectarse sin una regla propia, también después de una actualización. Añade uno desde Permitir en la página Conexiones."
+    "publishersDescription": "Los programas firmados por estos editores pueden conectarse sin una regla propia, también después de una actualización. Añade uno desde Permitir en la página Conexiones.",
+    "custom": {
+      "addRule": "Añadir regla",
+      "rule": "Regla {0}",
+      "removeRule": "Quitar regla",
+      "action": "Acción",
+      "allow": "Permitir",
+      "block": "Bloquear",
+      "direction": "Dirección",
+      "outgoing": "Saliente",
+      "incoming": "Entrante",
+      "both": "Ambas",
+      "protocol": "Protocolo",
+      "anyProtocol": "Cualquiera",
+      "tcpUdp": "TCP y UDP",
+      "remoteAddresses": "Direcciones remotas",
+      "remoteAddressesHint": "Cualquiera, o por ejemplo 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Puertos remotos",
+      "localPorts": "Puertos locales",
+      "portsHint": "Cualquiera, o por ejemplo 80,443,8000-8100",
+      "invalidTitle": "No se pueden guardar estas reglas",
+      "invalidPorts": "Regla {0}: «{1}» no es una lista de puertos.",
+      "invalidAddresses": "Regla {0}: «{1}» no es una lista de direcciones.",
+      "noRules": "Añade al menos una regla o elige otra opción."
+    }
   },
   "settings": {
     "title": "Configuración",

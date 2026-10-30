@@ -231,18 +231,43 @@
       "udpIn": "UDP 수신",
       "lanOnly": "LAN만",
       "apply": "적용",
-      "customRulesReadOnly": "사용자 지정 규칙 목록은 아직 여기에서 편집할 수 없습니다.",
+      "customRulesReadOnly": "이 유형의 규칙은 여기서 편집할 수 없습니다.",
       "applySuccess": "정책이 업데이트되었습니다.",
       "applyFailed": {
         "title": "정책을 업데이트할 수 없습니다",
         "lockedDetail": "이 규칙을 변경하기 전에 구성을 잠금 해제하세요.",
         "staleDetail": "구성이 방금 다른 곳에서 변경되었습니다. 정책이 변경되지 않았습니다. 다시 시도해 주세요.",
         "genericDetail": "서비스가 {0}을(를) 반환했습니다. 정책이 변경되지 않았습니다."
-      }
+      },
+      "policyCustom": "사용자 지정 규칙"
     },
     "multiSelectHint": "규칙 {0}개가 선택되었습니다. 제거하면 모두 삭제됩니다. 편집하려면 규칙을 하나만 선택하세요.",
     "publishersKind": "신뢰할 수 있는 게시자",
-    "publishersDescription": "이 게시자가 서명한 프로그램은 업데이트 후에도 별도의 규칙 없이 연결할 수 있습니다. 연결 페이지의 허용에서 추가하세요."
+    "publishersDescription": "이 게시자가 서명한 프로그램은 업데이트 후에도 별도의 규칙 없이 연결할 수 있습니다. 연결 페이지의 허용에서 추가하세요.",
+    "custom": {
+      "addRule": "규칙 추가",
+      "rule": "규칙 {0}",
+      "removeRule": "규칙 제거",
+      "action": "동작",
+      "allow": "허용",
+      "block": "차단",
+      "direction": "방향",
+      "outgoing": "나가는 연결",
+      "incoming": "들어오는 연결",
+      "both": "양방향",
+      "protocol": "프로토콜",
+      "anyProtocol": "모두",
+      "tcpUdp": "TCP 및 UDP",
+      "remoteAddresses": "원격 주소",
+      "remoteAddressesHint": "모두 또는 예: 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "원격 포트",
+      "localPorts": "로컬 포트",
+      "portsHint": "모두 또는 예: 80,443,8000-8100",
+      "invalidTitle": "이 규칙을 저장할 수 없습니다",
+      "invalidPorts": "규칙 {0}: '{1}'은(는) 포트 목록이 아닙니다.",
+      "invalidAddresses": "규칙 {0}: '{1}'은(는) 주소 목록이 아닙니다.",
+      "noRules": "규칙을 하나 이상 추가하거나 다른 옵션을 선택하세요."
+    }
   },
   "settings": {
     "title": "설정",

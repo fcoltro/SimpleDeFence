@@ -231,18 +231,43 @@
       "udpIn": "UDP entrata",
       "lanOnly": "Solo LAN",
       "apply": "Applica",
-      "customRulesReadOnly": "Gli elenchi di regole personalizzate non sono ancora modificabili qui.",
+      "customRulesReadOnly": "Questo tipo di regola non si può modificare qui.",
       "applySuccess": "Criterio aggiornato.",
       "applyFailed": {
         "title": "Impossibile aggiornare il criterio",
         "lockedDetail": "Sblocca la configurazione prima di modificare questa regola.",
         "staleDetail": "La configurazione è appena cambiata altrove; il criterio non è stato modificato. Riprova.",
         "genericDetail": "Il servizio ha restituito {0}. Il criterio non è stato modificato."
-      }
+      },
+      "policyCustom": "Regole personalizzate"
     },
     "multiSelectHint": "{0} regole selezionate. Rimuovi le elimina tutte; seleziona una sola regola per modificarla.",
     "publishersKind": "Editori attendibili",
-    "publishersDescription": "I programmi firmati da questi editori possono connettersi senza una regola propria, anche dopo un aggiornamento. Aggiungine uno con Consenti nella pagina Connessioni."
+    "publishersDescription": "I programmi firmati da questi editori possono connettersi senza una regola propria, anche dopo un aggiornamento. Aggiungine uno con Consenti nella pagina Connessioni.",
+    "custom": {
+      "addRule": "Aggiungi regola",
+      "rule": "Regola {0}",
+      "removeRule": "Rimuovi regola",
+      "action": "Azione",
+      "allow": "Consenti",
+      "block": "Blocca",
+      "direction": "Direzione",
+      "outgoing": "In uscita",
+      "incoming": "In entrata",
+      "both": "Entrambe",
+      "protocol": "Protocollo",
+      "anyProtocol": "Qualsiasi",
+      "tcpUdp": "TCP e UDP",
+      "remoteAddresses": "Indirizzi remoti",
+      "remoteAddressesHint": "Qualsiasi, oppure ad esempio 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Porte remote",
+      "localPorts": "Porte locali",
+      "portsHint": "Qualsiasi, oppure ad esempio 80,443,8000-8100",
+      "invalidTitle": "Impossibile salvare queste regole",
+      "invalidPorts": "Regola {0}: «{1}» non è un elenco di porte.",
+      "invalidAddresses": "Regola {0}: «{1}» non è un elenco di indirizzi.",
+      "noRules": "Aggiungi almeno una regola o scegli un’altra opzione."
+    }
   },
   "settings": {
     "title": "Impostazioni",

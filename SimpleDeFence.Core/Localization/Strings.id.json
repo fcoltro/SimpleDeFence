@@ -231,18 +231,43 @@
       "udpIn": "UDP masuk",
       "lanOnly": "Hanya LAN",
       "apply": "Terapkan",
-      "customRulesReadOnly": "Daftar aturan khusus belum dapat disunting di sini.",
+      "customRulesReadOnly": "Jenis aturan ini tidak dapat diedit di sini.",
       "applySuccess": "Kebijakan diperbarui.",
       "applyFailed": {
         "title": "Tidak dapat memperbarui kebijakan",
         "lockedDetail": "Buka kunci konfigurasi sebelum mengubah aturan ini.",
         "staleDetail": "Konfigurasi baru saja berubah di tempat lain; kebijakan tidak diubah. Silakan coba lagi.",
         "genericDetail": "Layanan mengembalikan {0}. Kebijakan tidak diubah."
-      }
+      },
+      "policyCustom": "Aturan khusus"
     },
     "multiSelectHint": "{0} aturan dipilih. Hapus akan menghapus semuanya; pilih satu aturan saja untuk menyuntingnya.",
     "publishersKind": "Penerbit tepercaya",
-    "publishersDescription": "Program yang ditandatangani penerbit ini dapat terhubung tanpa aturan sendiri, termasuk setelah pembaruan. Tambahkan dari Izinkan di halaman Koneksi."
+    "publishersDescription": "Program yang ditandatangani penerbit ini dapat terhubung tanpa aturan sendiri, termasuk setelah pembaruan. Tambahkan dari Izinkan di halaman Koneksi.",
+    "custom": {
+      "addRule": "Tambah aturan",
+      "rule": "Aturan {0}",
+      "removeRule": "Hapus aturan",
+      "action": "Tindakan",
+      "allow": "Izinkan",
+      "block": "Blokir",
+      "direction": "Arah",
+      "outgoing": "Keluar",
+      "incoming": "Masuk",
+      "both": "Keduanya",
+      "protocol": "Protokol",
+      "anyProtocol": "Semua",
+      "tcpUdp": "TCP dan UDP",
+      "remoteAddresses": "Alamat jarak jauh",
+      "remoteAddressesHint": "Semua, atau misalnya 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Port jarak jauh",
+      "localPorts": "Port lokal",
+      "portsHint": "Semua, atau misalnya 80,443,8000-8100",
+      "invalidTitle": "Aturan ini tidak dapat disimpan",
+      "invalidPorts": "Aturan {0}: \"{1}\" bukan daftar port.",
+      "invalidAddresses": "Aturan {0}: \"{1}\" bukan daftar alamat.",
+      "noRules": "Tambahkan setidaknya satu aturan, atau pilih opsi lain."
+    }
   },
   "settings": {
     "title": "Pengaturan",

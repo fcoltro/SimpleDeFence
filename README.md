@@ -75,6 +75,8 @@ executed.
   restart, and the rule removes itself.
 - **Learning with a time limit**: Learning mode can switch itself back to Normal after 10, 30 or
   60 minutes, and the window then points you to the rules it added.
+- **Custom rules**: beyond the presets, an app's rule can be a list of allow and block rules by
+  direction, protocol, remote address (IP, network, LocalSubnet, DNS) and port.
 - **Trusted publishers**: allow every program signed by one vendor, so an app keeps working
   through updates that install to a new folder. Only signatures Windows verifies count, and
   programs in the Windows folder are never allowed this way.

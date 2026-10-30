@@ -231,18 +231,43 @@
       "udpIn": "UDP in",
       "lanOnly": "LAN only",
       "apply": "Apply",
-      "customRulesReadOnly": "Custom rule lists can't be edited here yet.",
+      "customRulesReadOnly": "This kind of rule can't be edited here.",
       "applySuccess": "Policy updated.",
       "applyFailed": {
         "title": "Could not update the policy",
         "lockedDetail": "Unlock the configuration before changing this rule.",
         "staleDetail": "The configuration changed elsewhere just now; the policy was not changed. Please try again.",
         "genericDetail": "The service returned {0}. The policy was not changed."
-      }
+      },
+      "policyCustom": "Custom rules"
     },
     "multiSelectHint": "{0} rules selected. Remove deletes all of them; select a single rule to edit it.",
     "publishersKind": "Trusted publishers",
-    "publishersDescription": "Programs signed by these publishers can connect without a rule of their own, including after an update. Add one from Allow on the Connections page."
+    "publishersDescription": "Programs signed by these publishers can connect without a rule of their own, including after an update. Add one from Allow on the Connections page.",
+    "custom": {
+      "addRule": "Add rule",
+      "rule": "Rule {0}",
+      "removeRule": "Remove rule",
+      "action": "Action",
+      "allow": "Allow",
+      "block": "Block",
+      "direction": "Direction",
+      "outgoing": "Outgoing",
+      "incoming": "Incoming",
+      "both": "Both",
+      "protocol": "Protocol",
+      "anyProtocol": "Any",
+      "tcpUdp": "TCP and UDP",
+      "remoteAddresses": "Remote addresses",
+      "remoteAddressesHint": "Any, or for example 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Remote ports",
+      "localPorts": "Local ports",
+      "portsHint": "Any, or for example 80,443,8000-8100",
+      "invalidTitle": "These rules can't be saved",
+      "invalidPorts": "Rule {0}: \"{1}\" is not a list of ports.",
+      "invalidAddresses": "Rule {0}: \"{1}\" is not a list of addresses.",
+      "noRules": "Add at least one rule, or choose another option."
+    }
   },
   "settings": {
     "title": "Settings",

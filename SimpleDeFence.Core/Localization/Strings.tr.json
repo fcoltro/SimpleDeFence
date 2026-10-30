@@ -231,18 +231,43 @@
       "udpIn": "UDP gelen",
       "lanOnly": "Yalnızca yerel ağ",
       "apply": "Uygula",
-      "customRulesReadOnly": "Özel kural listeleri burada henüz düzenlenemiyor.",
+      "customRulesReadOnly": "Bu tür bir kural burada düzenlenemez.",
       "applySuccess": "İlke güncellendi.",
       "applyFailed": {
         "title": "İlke güncellenemedi",
         "lockedDetail": "Bu kuralı değiştirmeden önce yapılandırmanın kilidini açın.",
         "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ilke değiştirilmedi. Lütfen yeniden deneyin.",
         "genericDetail": "Hizmet {0} döndürdü. İlke değiştirilmedi."
-      }
+      },
+      "policyCustom": "Özel kurallar"
     },
     "multiSelectHint": "{0} kural seçili. Kaldır hepsini siler; düzenlemek için tek bir kural seçin.",
     "publishersKind": "Güvenilen yayımcılar",
-    "publishersDescription": "Bu yayımcıların imzaladığı programlar, güncellemeden sonra da dahil olmak üzere kendi kuralları olmadan bağlanabilir. Bağlantılar sayfasındaki İzin ver ile ekleyebilirsiniz."
+    "publishersDescription": "Bu yayımcıların imzaladığı programlar, güncellemeden sonra da dahil olmak üzere kendi kuralları olmadan bağlanabilir. Bağlantılar sayfasındaki İzin ver ile ekleyebilirsiniz.",
+    "custom": {
+      "addRule": "Kural ekle",
+      "rule": "Kural {0}",
+      "removeRule": "Kuralı kaldır",
+      "action": "Eylem",
+      "allow": "İzin ver",
+      "block": "Engelle",
+      "direction": "Yön",
+      "outgoing": "Giden",
+      "incoming": "Gelen",
+      "both": "Her ikisi",
+      "protocol": "Protokol",
+      "anyProtocol": "Tümü",
+      "tcpUdp": "TCP ve UDP",
+      "remoteAddresses": "Uzak adresler",
+      "remoteAddressesHint": "Tümü veya örneğin 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Uzak bağlantı noktaları",
+      "localPorts": "Yerel bağlantı noktaları",
+      "portsHint": "Tümü veya örneğin 80,443,8000-8100",
+      "invalidTitle": "Bu kurallar kaydedilemiyor",
+      "invalidPorts": "Kural {0}: \"{1}\" bir bağlantı noktası listesi değil.",
+      "invalidAddresses": "Kural {0}: \"{1}\" bir adres listesi değil.",
+      "noRules": "En az bir kural ekleyin veya başka bir seçenek belirleyin."
+    }
   },
   "settings": {
     "title": "Ayarlar",

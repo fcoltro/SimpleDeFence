@@ -231,18 +231,43 @@
       "udpIn": "UDP 入站",
       "lanOnly": "仅局域网",
       "apply": "应用",
-      "customRulesReadOnly": "自定义规则列表暂时无法在此编辑。",
+      "customRulesReadOnly": "此类规则无法在这里编辑。",
       "applySuccess": "策略已更新。",
       "applyFailed": {
         "title": "无法更新策略",
         "lockedDetail": "更改此规则前请先解锁配置。",
         "staleDetail": "配置刚刚在别处发生了更改；策略未被更改。请重试。",
         "genericDetail": "服务返回 {0}。策略未被更改。"
-      }
+      },
+      "policyCustom": "自定义规则"
     },
     "multiSelectHint": "已选择 {0} 条规则。“移除”会全部删除；选择单条规则才能编辑它。",
     "publishersKind": "受信任的发布者",
-    "publishersDescription": "由这些发布者签名的程序无需单独规则即可连接，更新后也是如此。可在“连接”页面的“允许”中添加。"
+    "publishersDescription": "由这些发布者签名的程序无需单独规则即可连接，更新后也是如此。可在“连接”页面的“允许”中添加。",
+    "custom": {
+      "addRule": "添加规则",
+      "rule": "规则 {0}",
+      "removeRule": "删除规则",
+      "action": "操作",
+      "allow": "允许",
+      "block": "阻止",
+      "direction": "方向",
+      "outgoing": "出站",
+      "incoming": "入站",
+      "both": "双向",
+      "protocol": "协议",
+      "anyProtocol": "任意",
+      "tcpUdp": "TCP 和 UDP",
+      "remoteAddresses": "远程地址",
+      "remoteAddressesHint": "任意，或例如 192.168.1.0/24、LocalSubnet、DNS",
+      "remotePorts": "远程端口",
+      "localPorts": "本地端口",
+      "portsHint": "任意，或例如 80,443,8000-8100",
+      "invalidTitle": "无法保存这些规则",
+      "invalidPorts": "规则 {0}：“{1}”不是端口列表。",
+      "invalidAddresses": "规则 {0}：“{1}”不是地址列表。",
+      "noRules": "请至少添加一条规则，或选择其他选项。"
+    }
   },
   "settings": {
     "title": "设置",

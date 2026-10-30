@@ -231,18 +231,43 @@
       "udpIn": "UDP ein",
       "lanOnly": "Nur LAN",
       "apply": "Übernehmen",
-      "customRulesReadOnly": "Benutzerdefinierte Regellisten lassen sich hier noch nicht bearbeiten.",
+      "customRulesReadOnly": "Diese Art von Regel lässt sich hier nicht bearbeiten.",
       "applySuccess": "Richtlinie aktualisiert.",
       "applyFailed": {
         "title": "Die Richtlinie konnte nicht aktualisiert werden",
         "lockedDetail": "Entsperre die Konfiguration, bevor du diese Regel änderst.",
         "staleDetail": "Die Konfiguration wurde soeben an anderer Stelle geändert; die Richtlinie wurde nicht geändert. Bitte versuche es erneut.",
         "genericDetail": "Der Dienst meldete {0}. Die Richtlinie wurde nicht geändert."
-      }
+      },
+      "policyCustom": "Eigene Regeln"
     },
     "multiSelectHint": "{0} Regeln ausgewählt. Entfernen löscht alle davon; wähle eine einzelne Regel, um sie zu bearbeiten.",
     "publishersKind": "Vertrauenswürdige Herausgeber",
-    "publishersDescription": "Programme, die von diesen Herausgebern signiert sind, dürfen ohne eigene Regel Verbindungen herstellen, auch nach einem Update. Hinzufügen kannst du einen über „Zulassen“ auf der Seite „Verbindungen“."
+    "publishersDescription": "Programme, die von diesen Herausgebern signiert sind, dürfen ohne eigene Regel Verbindungen herstellen, auch nach einem Update. Hinzufügen kannst du einen über „Zulassen“ auf der Seite „Verbindungen“.",
+    "custom": {
+      "addRule": "Regel hinzufügen",
+      "rule": "Regel {0}",
+      "removeRule": "Regel entfernen",
+      "action": "Aktion",
+      "allow": "Zulassen",
+      "block": "Blockieren",
+      "direction": "Richtung",
+      "outgoing": "Ausgehend",
+      "incoming": "Eingehend",
+      "both": "Beide",
+      "protocol": "Protokoll",
+      "anyProtocol": "Alle",
+      "tcpUdp": "TCP und UDP",
+      "remoteAddresses": "Remote-Adressen",
+      "remoteAddressesHint": "Alle, oder z. B. 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Remote-Ports",
+      "localPorts": "Lokale Ports",
+      "portsHint": "Alle, oder z. B. 80,443,8000-8100",
+      "invalidTitle": "Diese Regeln können nicht gespeichert werden",
+      "invalidPorts": "Regel {0}: „{1}“ ist keine Liste von Ports.",
+      "invalidAddresses": "Regel {0}: „{1}“ ist keine Liste von Adressen.",
+      "noRules": "Füge mindestens eine Regel hinzu oder wähle eine andere Option."
+    }
   },
   "settings": {
     "title": "Einstellungen",

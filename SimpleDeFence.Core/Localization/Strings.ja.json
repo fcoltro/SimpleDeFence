@@ -231,18 +231,43 @@
       "udpIn": "UDP 受信",
       "lanOnly": "LAN のみ",
       "apply": "適用",
-      "customRulesReadOnly": "カスタムルールの一覧はまだここでは編集できません。",
+      "customRulesReadOnly": "この種類のルールはここでは編集できません。",
       "applySuccess": "ポリシーを更新しました。",
       "applyFailed": {
         "title": "ポリシーを更新できませんでした",
         "lockedDetail": "このルールを変更する前に構成のロックを解除してください。",
         "staleDetail": "構成が今しがた別の場所で変更されました。ポリシーは変更されていません。もう一度お試しください。",
         "genericDetail": "サービスが {0} を返しました。ポリシーは変更されていません。"
-      }
+      },
+      "policyCustom": "カスタム ルール"
     },
     "multiSelectHint": "{0} 件のルールを選択中です。「削除」はそのすべてを消します。編集するにはルールを 1 件だけ選択してください。",
     "publishersKind": "信頼された発行元",
-    "publishersDescription": "これらの発行元が署名したプログラムは、更新後も含め、個別のルールなしで接続できます。[接続] ページの [許可] から追加できます。"
+    "publishersDescription": "これらの発行元が署名したプログラムは、更新後も含め、個別のルールなしで接続できます。[接続] ページの [許可] から追加できます。",
+    "custom": {
+      "addRule": "ルールを追加",
+      "rule": "ルール {0}",
+      "removeRule": "ルールを削除",
+      "action": "動作",
+      "allow": "許可",
+      "block": "ブロック",
+      "direction": "方向",
+      "outgoing": "送信",
+      "incoming": "受信",
+      "both": "両方",
+      "protocol": "プロトコル",
+      "anyProtocol": "すべて",
+      "tcpUdp": "TCP と UDP",
+      "remoteAddresses": "リモート アドレス",
+      "remoteAddressesHint": "すべて、または例: 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "リモート ポート",
+      "localPorts": "ローカル ポート",
+      "portsHint": "すべて、または例: 80,443,8000-8100",
+      "invalidTitle": "これらのルールは保存できません",
+      "invalidPorts": "ルール {0}: 「{1}」はポートの一覧ではありません。",
+      "invalidAddresses": "ルール {0}: 「{1}」はアドレスの一覧ではありません。",
+      "noRules": "ルールを 1 つ以上追加するか、別のオプションを選んでください。"
+    }
   },
   "settings": {
     "title": "設定",

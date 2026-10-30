@@ -121,6 +121,36 @@ namespace SimpleDeFence
             };
         }
 
+        /// <summary>
+        /// Returns a copy of <paramref name="original"/> whose policy is the given custom rules,
+        /// keeping the Id for the same reason ApplyPreset does. Unlike ApplyPreset this accepts any
+        /// original policy: the custom editor shows every rule it will write, so nothing is
+        /// discarded behind the user's back. The rules are copied, and the copies carry no
+        /// subject - the service sets that from the exception when it builds filters.
+        /// </summary>
+        public static FirewallExceptionV3 ApplyCustomRules(FirewallExceptionV3 original, IReadOnlyList<RuleDef> rules)
+        {
+            if (rules.Count == 0)
+                throw new ArgumentException("A custom rule list needs at least one rule.", nameof(rules));
+
+            var policy = new RuleListPolicy();
+            foreach (var rule in rules)
+            {
+                var copy = rule.ShallowCopy();
+                copy.SetSubject(GlobalSubject.Instance);
+                copy.ExceptionId = Guid.Empty;
+                policy.Rules.Add(copy);
+            }
+
+            return new FirewallExceptionV3(original.Subject, policy)
+            {
+                Id = original.Id,
+                CreationDate = original.CreationDate,
+                Timer = original.Timer,
+                ChildProcessesInherit = original.ChildProcessesInherit,
+            };
+        }
+
         public static void RemoveExceptions(ServerProfileConfiguration profile, IReadOnlyCollection<Guid> ids)
         {
             profile.AppExceptions.RemoveAll(ex => ids.Contains(ex.Id));

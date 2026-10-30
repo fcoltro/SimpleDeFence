@@ -199,6 +199,17 @@
                                         <TextBox x:Name="UdpInBox"/>
                                         <CheckBox x:Name="LanOnlyCheck" Content="{loc:Loc Key=rules.detail.lanOnly}"/>
                                     </StackPanel>
+
+                                    <RadioButton x:Name="PresetCustom" Content="{loc:Loc Key=rules.detail.policyCustom}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+
+                                    <!-- One editor per rule, built in code (see CustomRuleEditor in
+                                         RulesPage.xaml.cs): the number of rules is the user's. -->
+                                    <StackPanel x:Name="CustomRulesFields" Spacing="10" Margin="26,0,0,0">
+                                        <StackPanel x:Name="CustomRulesList" Spacing="10"/>
+                                        <Button x:Name="AddCustomRuleButton" Content="{loc:Loc Key=rules.custom.addRule}"
+                                                Click="AddCustomRuleButton_Click" HorizontalAlignment="Left"/>
+                                    </StackPanel>
                                 </StackPanel>
 
                                 <Button x:Name="ApplyButton" Content="{loc:Loc Key=rules.detail.apply}"

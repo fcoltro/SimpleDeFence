@@ -231,18 +231,43 @@
       "udpIn": "UDP entrant",
       "lanOnly": "LAN uniquement",
       "apply": "Appliquer",
-      "customRulesReadOnly": "Les listes de règles personnalisées ne sont pas encore modifiables ici.",
+      "customRulesReadOnly": "Ce type de règle ne peut pas être modifié ici.",
       "applySuccess": "Stratégie mise à jour.",
       "applyFailed": {
         "title": "Impossible de mettre à jour la stratégie",
         "lockedDetail": "Déverrouillez la configuration avant de modifier cette règle.",
         "staleDetail": "La configuration vient d'être modifiée ailleurs ; la stratégie n'a pas été modifiée. Veuillez réessayer.",
         "genericDetail": "Le service a renvoyé {0}. La stratégie n'a pas été modifiée."
-      }
+      },
+      "policyCustom": "Règles personnalisées"
     },
     "multiSelectHint": "{0} règles sélectionnées. Supprimer les efface toutes ; sélectionnez une seule règle pour la modifier.",
     "publishersKind": "Éditeurs approuvés",
-    "publishersDescription": "Les programmes signés par ces éditeurs peuvent se connecter sans règle propre, y compris après une mise à jour. Ajoutez-en un avec Autoriser sur la page Connexions."
+    "publishersDescription": "Les programmes signés par ces éditeurs peuvent se connecter sans règle propre, y compris après une mise à jour. Ajoutez-en un avec Autoriser sur la page Connexions.",
+    "custom": {
+      "addRule": "Ajouter une règle",
+      "rule": "Règle {0}",
+      "removeRule": "Supprimer la règle",
+      "action": "Action",
+      "allow": "Autoriser",
+      "block": "Bloquer",
+      "direction": "Sens",
+      "outgoing": "Sortant",
+      "incoming": "Entrant",
+      "both": "Les deux",
+      "protocol": "Protocole",
+      "anyProtocol": "Tous",
+      "tcpUdp": "TCP et UDP",
+      "remoteAddresses": "Adresses distantes",
+      "remoteAddressesHint": "Toutes, ou par exemple 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Ports distants",
+      "localPorts": "Ports locaux",
+      "portsHint": "Tous, ou par exemple 80,443,8000-8100",
+      "invalidTitle": "Ces règles ne peuvent pas être enregistrées",
+      "invalidPorts": "Règle {0} : « {1} » n’est pas une liste de ports.",
+      "invalidAddresses": "Règle {0} : « {1} » n’est pas une liste d’adresses.",
+      "noRules": "Ajoutez au moins une règle, ou choisissez une autre option."
+    }
   },
   "settings": {
     "title": "Paramètres",
