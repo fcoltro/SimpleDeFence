@@ -293,7 +293,7 @@ namespace SimpleDeFence
                         if (UserSubjectExes.Contains(procPath) || ChildInheritedSubjectExes.ContainsKey(procPath))
                             continue;
 
-                        if (TrustedPublisherException(procPath, TrustedPublishers) is FirewallExceptionV3 ex)
+                        if (PublisherRuleFor(procPath, TrustedPublishers) is FirewallExceptionV3 ex)
                         {
                             GetRulesForException(ex, rules, rawSocketExceptions, (ulong)FilterWeights.UserPermit, (ulong)FilterWeights.UserBlock);
                             PublisherAllowedExes.Add(procPath);
@@ -2493,7 +2493,7 @@ namespace SimpleDeFence
                 // reads and hashes the file, so it runs outside InheritanceGuard. TrustedPublishers
                 // is replaced, never changed in place, so the set taken above stays valid.
                 if (newExceptions is null && trustedPublishers is not null
-                    && TrustedPublisherException(path, trustedPublishers) is FirewallExceptionV3 publisherEx)
+                    && PublisherRuleFor(path, trustedPublishers) is FirewallExceptionV3 publisherEx)
                 {
                     lock (InheritanceGuard)
                     {
@@ -2519,7 +2519,7 @@ namespace SimpleDeFence
         /// The rule a trusted publisher gives a program: unrestricted, the same as "Allow" on the
         /// Connections page, or null when the program is not from a trusted publisher.
         /// </summary>
-        private FirewallExceptionV3? TrustedPublisherException(string path, HashSet<string> trustedPublishers)
+        private FirewallExceptionV3? PublisherRuleFor(string path, HashSet<string> trustedPublishers)
         {
             var (valid, subject) = SignatureOf(path);
             if (PublisherTrust.TrustedSubject(trustedPublishers, path, subject, valid, WindowsDirectory) is null)
