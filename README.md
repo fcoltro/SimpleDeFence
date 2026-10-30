@@ -186,12 +186,9 @@ to fail fast rather than hang. If you add one that touches those, add
 
 ## Contributing
 
-Feel free to open issues, feature- or pull-requests.
-1. Fork the Project
-1. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-1. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-1. Push to the Branch (`git push origin feature/AmazingFeature`)
-1. Open a Pull Request on GitHub
+Issues, ideas and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers reporting a
+problem, code changes, translations and the database of known applications. For common questions
+and fixes, see the [FAQ](docs/FAQ.md).
 
 Please do not report SimpleDeFence issues to TinyWall or its authors — they are the origin of this
 code, not participants in this project.
