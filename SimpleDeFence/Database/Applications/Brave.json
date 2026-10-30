@@ -19,7 +19,9 @@
         "{folder:pf32}\\BraveSoftware\\Brave-Browser\\Application",
         "{folder:LocalAppData}\\BraveSoftware\\Brave-Browser\\Application"
       ],
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "CN=\u0022Brave Software, Inc.\u0022, O=\u0022Brave Software, Inc.\u0022, L=San Francisco, S=California, C=US"
+      ]
     },
     {
       "Subject": {
@@ -38,7 +40,9 @@
         "{folder:pf32}\\BraveSoftware\\Update",
         "{folder:LocalAppData}\\BraveSoftware\\Update"
       ],
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "CN=\u0022Brave Software, Inc.\u0022, O=\u0022Brave Software, Inc.\u0022, L=San Francisco, S=California, C=US"
+      ]
     }
   ],
   "Flags": {}

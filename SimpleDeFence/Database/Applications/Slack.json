@@ -17,7 +17,9 @@
       "SearchPaths": [
         "{folder:pf64}\\Slack"
       ],
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "CN=\u0022Slack Technologies, LLC\u0022, O=\u0022Slack Technologies, LLC\u0022, L=San Francisco, S=California, C=US"
+      ]
     }
   ],
   "Flags": {}

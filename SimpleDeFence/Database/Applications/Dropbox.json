@@ -18,7 +18,9 @@
         "{folder:pf32}\\Dropbox\\Client",
         "{folder:pf64}\\Dropbox\\Client"
       ],
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "CN=\u0022Dropbox, Inc\u0022, O=\u0022Dropbox, Inc\u0022, L=San Francisco, S=California, C=US"
+      ]
     },
     {
       "Subject": {
@@ -37,7 +39,9 @@
         "{folder:pf32}\\Dropbox\\Update",
         "{folder:pf64}\\Dropbox\\Update"
       ],
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "CN=\u0022Dropbox, Inc\u0022, O=\u0022Dropbox, Inc\u0022, L=San Francisco, S=California, C=US"
+      ]
     }
   ],
   "Flags": {}

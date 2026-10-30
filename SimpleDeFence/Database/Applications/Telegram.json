@@ -14,7 +14,9 @@
         "AllowedLocalTcpListenerPorts": "",
         "AllowedLocalUdpListenerPorts": ""
       },
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "E=info@telegram.org, CN=Telegram FZ-LLC, O=Telegram FZ-LLC, L=Dubai, S=Dubai, C=AE, OID.1.3.6.1.4.1.311.60.2.1.2=Dubai, OID.1.3.6.1.4.1.311.60.2.1.3=AE, SERIALNUMBER=94349, OID.2.5.4.15=Private Organization"
+      ]
     },
     {
       "Subject": {
@@ -29,7 +31,9 @@
         "AllowedLocalTcpListenerPorts": "",
         "AllowedLocalUdpListenerPorts": ""
       },
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "E=info@telegram.org, CN=Telegram FZ-LLC, O=Telegram FZ-LLC, L=Dubai, S=Dubai, C=AE, OID.1.3.6.1.4.1.311.60.2.1.2=Dubai, OID.1.3.6.1.4.1.311.60.2.1.3=AE, SERIALNUMBER=94349, OID.2.5.4.15=Private Organization"
+      ]
     }
   ],
   "Flags": {}

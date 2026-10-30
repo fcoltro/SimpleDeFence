@@ -46,7 +46,9 @@
             "{folder:pf32}\\Battle.net",
             "{folder:pf64}\\Battle.net"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=\u0022Blizzard Entertainment, Inc.\u0022, O=\u0022Blizzard Entertainment, Inc.\u0022, L=Irvine, S=California, C=US, SERIALNUMBER=3876899, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Delaware, OID.1.3.6.1.4.1.311.60.2.1.3=US"
+          ]
         },
         {
           "Subject": {
@@ -65,7 +67,9 @@
             "{folder:pf32}\\Battle.net",
             "{folder:pf64}\\Battle.net"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=\u0022Blizzard Entertainment, Inc.\u0022, O=\u0022Blizzard Entertainment, Inc.\u0022, L=Irvine, S=California, C=US, SERIALNUMBER=3876899, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Delaware, OID.1.3.6.1.4.1.311.60.2.1.3=US"
+          ]
         }
       ],
       "Flags": {}
@@ -91,7 +95,9 @@
             "{folder:pf32}\\BraveSoftware\\Brave-Browser\\Application",
             "{folder:LocalAppData}\\BraveSoftware\\Brave-Browser\\Application"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=\u0022Brave Software, Inc.\u0022, O=\u0022Brave Software, Inc.\u0022, L=San Francisco, S=California, C=US"
+          ]
         },
         {
           "Subject": {
@@ -110,7 +116,9 @@
             "{folder:pf32}\\BraveSoftware\\Update",
             "{folder:LocalAppData}\\BraveSoftware\\Update"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=\u0022Brave Software, Inc.\u0022, O=\u0022Brave Software, Inc.\u0022, L=San Francisco, S=California, C=US"
+          ]
         }
       ],
       "Flags": {}
@@ -161,7 +169,9 @@
             "AllowedLocalTcpListenerPorts": "",
             "AllowedLocalUdpListenerPorts": ""
           },
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=Discord Inc., O=Discord Inc., L=San Francisco, S=California, C=US, SERIALNUMBER=5128862, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Delaware, OID.1.3.6.1.4.1.311.60.2.1.3=US"
+          ]
         },
         {
           "Subject": {
@@ -179,7 +189,9 @@
           "SearchPaths": [
             "{folder:LocalAppData}\\Discord"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=Discord Inc., O=Discord Inc., L=San Francisco, S=California, C=US, SERIALNUMBER=5128862, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Delaware, OID.1.3.6.1.4.1.311.60.2.1.3=US"
+          ]
         }
       ],
       "Flags": {}
@@ -204,7 +216,9 @@
             "{folder:pf32}\\Dropbox\\Client",
             "{folder:pf64}\\Dropbox\\Client"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=\u0022Dropbox, Inc\u0022, O=\u0022Dropbox, Inc\u0022, L=San Francisco, S=California, C=US"
+          ]
         },
         {
           "Subject": {
@@ -223,7 +237,9 @@
             "{folder:pf32}\\Dropbox\\Update",
             "{folder:pf64}\\Dropbox\\Update"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=\u0022Dropbox, Inc\u0022, O=\u0022Dropbox, Inc\u0022, L=San Francisco, S=California, C=US"
+          ]
         }
       ],
       "Flags": {}
@@ -248,7 +264,9 @@
             "{folder:pf32}\\Epic Games\\Launcher\\Portal\\Binaries\\Win64",
             "{folder:pf64}\\Epic Games\\Launcher\\Portal\\Binaries\\Win64"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=Epic Games Inc., O=Epic Games Inc., L=Cary, S=North Carolina, C=US, SERIALNUMBER=D03752763, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Maryland, OID.1.3.6.1.4.1.311.60.2.1.3=US"
+          ]
         },
         {
           "Subject": {
@@ -267,7 +285,9 @@
             "{folder:pf32}\\Epic Games\\Launcher\\Engine\\Binaries\\Win64",
             "{folder:pf64}\\Epic Games\\Launcher\\Engine\\Binaries\\Win64"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=Epic Games Inc., O=Epic Games Inc., L=Cary, S=North Carolina, C=US, SERIALNUMBER=D03752763, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Maryland, OID.1.3.6.1.4.1.311.60.2.1.3=US"
+          ]
         }
       ],
       "Flags": {}
@@ -597,7 +617,9 @@
             "{folder:LocalAppData}\\Programs\\Opera",
             "{folder:pf64}\\Opera"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=Opera Norway AS, O=Opera Norway AS, L=Oslo, C=NO, SERIALNUMBER=916 368 127, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.3=NO"
+          ]
         }
       ],
       "Flags": {}
@@ -656,7 +678,9 @@
           "SearchPaths": [
             "{folder:LocalAppData}\\Programs\\signal-desktop"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=\u0022Signal Messenger, LLC\u0022, O=\u0022Signal Messenger, LLC\u0022, L=Mountain View, S=California, C=US, OID.1.3.6.1.4.1.311.60.2.1.2=Delaware, OID.1.3.6.1.4.1.311.60.2.1.3=US, SERIALNUMBER=6703101, OID.2.5.4.15=Private Organization"
+          ]
         }
       ],
       "Flags": {}
@@ -680,7 +704,9 @@
           "SearchPaths": [
             "{folder:pf64}\\Slack"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=\u0022Slack Technologies, LLC\u0022, O=\u0022Slack Technologies, LLC\u0022, L=San Francisco, S=California, C=US"
+          ]
         }
       ],
       "Flags": {}
@@ -718,7 +744,9 @@
             "AllowedLocalTcpListenerPorts": "",
             "AllowedLocalUdpListenerPorts": "57621"
           },
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=Spotify AB, O=Spotify AB, L=Stockholm, C=SE, SERIALNUMBER=556703-7485, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.3=SE"
+          ]
         }
       ],
       "Flags": {}
@@ -816,7 +844,9 @@
             "AllowedLocalTcpListenerPorts": "",
             "AllowedLocalUdpListenerPorts": ""
           },
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "E=info@telegram.org, CN=Telegram FZ-LLC, O=Telegram FZ-LLC, L=Dubai, S=Dubai, C=AE, OID.1.3.6.1.4.1.311.60.2.1.2=Dubai, OID.1.3.6.1.4.1.311.60.2.1.3=AE, SERIALNUMBER=94349, OID.2.5.4.15=Private Organization"
+          ]
         },
         {
           "Subject": {
@@ -831,7 +861,9 @@
             "AllowedLocalTcpListenerPorts": "",
             "AllowedLocalUdpListenerPorts": ""
           },
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "E=info@telegram.org, CN=Telegram FZ-LLC, O=Telegram FZ-LLC, L=Dubai, S=Dubai, C=AE, OID.1.3.6.1.4.1.311.60.2.1.2=Dubai, OID.1.3.6.1.4.1.311.60.2.1.3=AE, SERIALNUMBER=94349, OID.2.5.4.15=Private Organization"
+          ]
         }
       ],
       "Flags": {}
@@ -941,7 +973,9 @@
             "{folder:pf64}\\Zoom\\bin",
             "{folder:pf32}\\Zoom\\bin"
           ],
-          "CertificateSubjects": []
+          "CertificateSubjects": [
+            "CN=\u0022Zoom Communications, Inc.\u0022, O=\u0022Zoom Communications, Inc.\u0022, L=San Jose, S=California, C=US, SERIALNUMBER=4969967, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Delaware, OID.1.3.6.1.4.1.311.60.2.1.3=US"
+          ]
         }
       ],
       "Flags": {}

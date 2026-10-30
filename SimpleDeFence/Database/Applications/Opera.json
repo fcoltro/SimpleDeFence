@@ -18,7 +18,9 @@
         "{folder:LocalAppData}\\Programs\\Opera",
         "{folder:pf64}\\Opera"
       ],
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "CN=Opera Norway AS, O=Opera Norway AS, L=Oslo, C=NO, SERIALNUMBER=916 368 127, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.3=NO"
+      ]
     }
   ],
   "Flags": {}

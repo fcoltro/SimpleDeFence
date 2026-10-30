@@ -18,7 +18,9 @@
         "{folder:pf64}\\Zoom\\bin",
         "{folder:pf32}\\Zoom\\bin"
       ],
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "CN=\u0022Zoom Communications, Inc.\u0022, O=\u0022Zoom Communications, Inc.\u0022, L=San Jose, S=California, C=US, SERIALNUMBER=4969967, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Delaware, OID.1.3.6.1.4.1.311.60.2.1.3=US"
+      ]
     }
   ],
   "Flags": {}

@@ -14,7 +14,9 @@
         "AllowedLocalTcpListenerPorts": "",
         "AllowedLocalUdpListenerPorts": "57621"
       },
-      "CertificateSubjects": []
+      "CertificateSubjects": [
+        "CN=Spotify AB, O=Spotify AB, L=Stockholm, C=SE, SERIALNUMBER=556703-7485, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.3=SE"
+      ]
     }
   ],
   "Flags": {}
