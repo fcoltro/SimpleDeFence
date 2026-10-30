@@ -20,7 +20,9 @@ namespace SimpleDeFence
     {
         /// <summary>Special exceptions (by their database Name) that are suspended on a Public
         /// network.</summary>
-        public static readonly IReadOnlyCollection<string> SuspendedSpecialExceptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        public static IReadOnlyCollection<string> SuspendedSpecialExceptions => Suspended;
+
+        private static readonly HashSet<string> Suspended = new(StringComparer.OrdinalIgnoreCase)
         {
             "File_and_Printer_Sharing",
             "Pingable_local_machine",
@@ -38,6 +40,6 @@ namespace SimpleDeFence
             => config.ActiveProfile.AllowLocalSubnet && !Applies(config, onPublicNetwork);
 
         public static bool AllowsSpecialException(ServerConfiguration config, bool onPublicNetwork, string name)
-            => !(Applies(config, onPublicNetwork) && SuspendedSpecialExceptions.Contains(name));
+            => !(Applies(config, onPublicNetwork) && Suspended.Contains(name));
     }
 }
