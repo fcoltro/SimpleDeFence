@@ -74,7 +74,7 @@ namespace SimpleDeFence.UI.Pages
         private static readonly RuleDirection[] Directions = { RuleDirection.Out, RuleDirection.In, RuleDirection.InOut };
 
         private readonly List<Protocol> _protocols = new() { Protocol.Any, Protocol.TCP, Protocol.UDP, Protocol.TcpUdp, Protocol.ICMPv4, Protocol.ICMPv6 };
-        private readonly TextBlock _header = new() { Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"] };
+        private readonly TextBlock _header = new() { Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["BodyStrongTextBlockStyle"] };
         private readonly ComboBox _action = new() { Header = Loc.T(LocKeys.Rules.CustomAction), MinWidth = 120 };
         private readonly ComboBox _direction = new() { Header = Loc.T(LocKeys.Rules.CustomDirection), MinWidth = 120 };
         private readonly ComboBox _protocol = new() { Header = Loc.T(LocKeys.Rules.CustomProtocol), MinWidth = 120 };
@@ -534,7 +534,7 @@ namespace SimpleDeFence.UI.Pages
         {
             // Choosing Custom on a preset rule starts from one rule to fill in, rather than an
             // empty list with nothing to edit.
-            if (sender == PresetCustom && _customEditors.Count == 0)
+            if (ReferenceEquals(sender, PresetCustom) && _customEditors.Count == 0)
                 AddCustomEditor(null);
             UpdateTcpUdpFieldsEnabled();
         }
