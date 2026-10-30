@@ -161,6 +161,26 @@
             public const string ConnectedHeader = "connections.connected.header";
             public const string OpenSummary = "connections.open.summary";
             public const string OpenHeader = "connections.open.header";
+
+            /// <summary>The right-click menu on every row of the three lists.</summary>
+            public const string MenuDetails = "connections.menu.details";
+            public const string MenuLookUp = "connections.menu.lookUp";
+            public const string MenuFilterApp = "connections.menu.filterApp";
+            public const string MenuCopyAddresses = "connections.menu.copyAddresses";
+            public const string MenuCopyPath = "connections.menu.copyPath";
+            public const string MenuOpenLocation = "connections.menu.openLocation";
+            public const string OpenLocationMissing = "connections.menu.openLocationMissing";
+
+            /// <summary>The details dialog behind "Show all", and its on-demand address lookup.</summary>
+            public const string DetailsAddresses = "connections.details.addresses";
+            public const string DetailsLookUpNote = "connections.details.lookUpNote";
+            public const string DetailsLookUpLimit = "connections.details.lookUpLimit";
+            public const string DetailsLocal = "connections.details.local";
+            public const string DetailsNotFound = "connections.details.notFound";
+            public const string DetailsHost = "connections.details.host";
+            public const string DetailsOwner = "connections.details.owner";
+            public const string DetailsNetwork = "connections.details.network";
+            public const string DetailsCountry = "connections.details.country";
         }
 
         public static class Subject

@@ -148,6 +148,26 @@
     "allowByPublisher": "Tous les programmes de {0}",
     "allowPublisherSuccess": {
       "body": "Les programmes signés par {0} peuvent maintenant se connecter."
+    },
+    "menu": {
+      "details": "Afficher les détails",
+      "lookUp": "Rechercher les adresses",
+      "filterApp": "Afficher uniquement cette application",
+      "copyAddresses": "Copier les adresses",
+      "copyPath": "Copier le chemin",
+      "openLocation": "Ouvrir l'emplacement du fichier",
+      "openLocationMissing": "Le fichier et le dossier du programme n'existent plus."
+    },
+    "details": {
+      "addresses": "Adresses",
+      "lookUpNote": "Trouve le nom de chaque adresse, son propriétaire et le pays où son réseau est enregistré. Rien n'est envoyé avant votre clic : les adresses partent alors vers votre serveur DNS et vers rdap.org.",
+      "lookUpLimit": "Seules les {0} premières adresses sont listées.",
+      "local": "Adresse du réseau local. Rien à rechercher.",
+      "notFound": "Rien n'a été trouvé pour cette adresse.",
+      "host": "Nom : {0}",
+      "owner": "Propriétaire : {0}",
+      "network": "Réseau : {0}",
+      "country": "Enregistrée en/au : {0}"
     }
   },
   "subject": {

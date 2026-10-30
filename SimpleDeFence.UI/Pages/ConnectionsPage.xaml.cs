@@ -1,5 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using SimpleDeFence;
 using SimpleDeFence.Localization;
@@ -8,12 +11,15 @@ using SimpleDeFence.UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleDeFence.UI.Pages
 {
-    /// <summary>One connection or listening port inside a group's "Show all" flyout.</summary>
+    /// <summary>One connection or listening port inside a group's "Show all" dialog.</summary>
     public sealed class ConnectionLine
     {
         public string Endpoint { get; init; } = string.Empty;
@@ -52,6 +58,13 @@ namespace SimpleDeFence.UI.Pages
         public bool HasMultiple => Lines.Count > 1;
         public Visibility ShowAllVisibility => HasMultiple ? Visibility.Visible : Visibility.Collapsed;
 
+        /// <summary>The distinct remote addresses in the group, for the details dialog's lookup.
+        /// Empty for listening ports, which have no remote end.</summary>
+        public IReadOnlyList<string> Addresses { get; init; } = Array.Empty<string>();
+
+        public event EventHandler? ShowAllRequested;
+        public void ShowAllButton_Click(object sender, RoutedEventArgs e) => ShowAllRequested?.Invoke(this, EventArgs.Empty);
+
         public string TruncationNote { get; init; } = string.Empty;
         public Visibility TruncationVisibility => TruncationNote.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
 
@@ -62,7 +75,7 @@ namespace SimpleDeFence.UI.Pages
         public Visibility RemoteVisibility => IsLocal ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    /// <summary>A single blocked attempt, shown in a group's "Show all" flyout.</summary>
+    /// <summary>A single blocked attempt, shown in a group's "Show all" dialog.</summary>
     public sealed class BlockedAttempt
     {
         public string Detail { get; init; } = string.Empty;
@@ -77,7 +90,7 @@ namespace SimpleDeFence.UI.Pages
     /// behind "Show all".</summary>
     public sealed class BlockedListItem
     {
-        /// <summary>Cap on what the flyout lists. A loop can rack up thousands of attempts, and
+        /// <summary>Cap on what the dialog lists. A loop can rack up thousands of attempts, and
         /// nobody reads past the recent ones - the count in the summary still reports the true
         /// total.</summary>
         public const int MaxListedAttempts = 50;
@@ -105,12 +118,18 @@ namespace SimpleDeFence.UI.Pages
 
         public IReadOnlyList<BlockedAttempt> Attempts { get; init; } = Array.Empty<BlockedAttempt>();
 
-        /// <summary>Only a group with something behind it offers the flyout; a single attempt
+        /// <summary>Only a group with something behind it offers "Show all" as a button; a single attempt
         /// already says everything it has on the row.</summary>
         public bool HasMultipleAttempts => Attempts.Count > 1;
         public Visibility ShowAllVisibility => HasMultipleAttempts ? Visibility.Visible : Visibility.Collapsed;
 
-        /// <summary>Set when the group holds more attempts than the flyout lists.</summary>
+        /// <summary>The distinct addresses the group was aimed at, most recent first.</summary>
+        public IReadOnlyList<string> Addresses { get; init; } = Array.Empty<string>();
+
+        public event EventHandler? ShowAllRequested;
+        public void ShowAllButton_Click(object sender, RoutedEventArgs e) => ShowAllRequested?.Invoke(this, EventArgs.Empty);
+
+        /// <summary>Set when the group holds more attempts than the dialog lists.</summary>
         public string TruncationNote { get; init; } = string.Empty;
         public Visibility TruncationVisibility => TruncationNote.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
 
@@ -392,16 +411,17 @@ namespace SimpleDeFence.UI.Pages
 
             foreach (var group in groups)
             {
-                // Newest first, so both the row's timestamp and the flyout lead with what just
+                // Newest first, so both the row's timestamp and the dialog lead with what just
                 // happened rather than whatever the log happened to hand us first.
                 var ordered = group.OrderByDescending(r => r.Timestamp).ToList();
                 var newest = ordered[0];
 
-                int addressCount = ordered
+                var addresses = ordered
                     .Where(r => !string.IsNullOrEmpty(r.RemoteAddress))
                     .Select(r => r.RemoteAddress!)
                     .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .Count();
+                    .ToList();
+                int addressCount = addresses.Count;
 
                 // One attempt reads better as the attempt itself than as "1 attempt"; several
                 // report how many, and how many places they were aimed at - the number that says
@@ -430,11 +450,13 @@ namespace SimpleDeFence.UI.Pages
                     AppPath = newest.AppPath,
                     PackageId = newest.PackageId,
                     Attempts = listed,
+                    Addresses = addresses,
                     TruncationNote = ordered.Count > listed.Count
                         ? Loc.T(LocKeys.Connections.ListTruncated, listed.Count)
                         : string.Empty,
                 };
                 item.AllowRequested += async (_, _) => await AllowAsync(item);
+                item.ShowAllRequested += async (_, _) => await ShowDetailsAsync(DetailsOf(item), lookUpNow: false);
                 _blocked.Add(item);
             }
         }
@@ -729,7 +751,7 @@ namespace SimpleDeFence.UI.Pages
         ///
         /// Keyed on AppPath (or PackageId) rather than the display name, for the reason the Blocked
         /// list documents: two binaries can present the same name and must not be merged.</summary>
-        private static void RebuildConnections(
+        private void RebuildConnections(
             ObservableCollection<ConnectionListItem> target, IEnumerable<ConnectionRow> rows, bool remote)
         {
             target.Clear();
@@ -765,7 +787,7 @@ namespace SimpleDeFence.UI.Pages
                     })
                     .ToList();
 
-                target.Add(new ConnectionListItem
+                var item = new ConnectionListItem
                 {
                     AppName = string.IsNullOrEmpty(first.AppName) ? Loc.T(LocKeys.Common.Unknown) : first.AppName,
                     // Every row in the group shares this by construction - it is the grouping key.
@@ -780,10 +802,18 @@ namespace SimpleDeFence.UI.Pages
                     State = single && remote ? first.State : string.Empty,
                     FlyoutHeader = Loc.T(remote ? LocKeys.Connections.ConnectedHeader : LocKeys.Connections.OpenHeader),
                     Lines = listed,
+                    Addresses = remote
+                        ? ordered.Where(r => r.RemotePort != 0 && !string.IsNullOrEmpty(r.RemoteAddress))
+                                 .Select(r => r.RemoteAddress)
+                                 .Distinct(StringComparer.OrdinalIgnoreCase)
+                                 .ToList()
+                        : Array.Empty<string>(),
                     TruncationNote = ordered.Count > listed.Count
                         ? Loc.T(LocKeys.Connections.ListTruncated, listed.Count)
                         : string.Empty,
-                });
+                };
+                item.ShowAllRequested += async (_, _) => await ShowDetailsAsync(DetailsOf(item), lookUpNow: false);
+                target.Add(item);
             }
         }
 
@@ -818,14 +848,315 @@ namespace SimpleDeFence.UI.Pages
         /// readers to keep in step, which is the kind of pairing that silently drifts.</summary>
         private static TimeSpan BlockedHistoryWindow => ClientSettings.Load().BlockedHistoryWindow;
 
-        /// <summary>FlyoutBase.Opening for the "Show all" flyouts in the row templates. See
-        /// App.ApplyShellStyling: a flyout's presenter is created in the popup root, so it inherits
-        /// neither the theme nor the flow direction the shell applies to the window content, and
-        /// the Style that carries them has to be rebuilt each time the flyout opens.</summary>
-        private void Flyout_Opening(object sender, object e)
+        /// <summary>Everything the details dialog shows, gathered from either kind of row so the
+        /// dialog is written once. Blocked is set only for a Blocked row, which is the one kind the
+        /// dialog can offer Allow for.</summary>
+        private sealed record RowDetails(
+            string AppName,
+            string? Identity,
+            string? AppPath,
+            string Header,
+            IReadOnlyList<(string Text, string When)> Lines,
+            string TruncationNote,
+            IReadOnlyList<string> Addresses,
+            BlockedListItem? Blocked);
+
+        private static RowDetails DetailsOf(BlockedListItem item)
+            => new(item.AppName, item.TooltipText, item.AppPath, Loc.T(LocKeys.Connections.BlockedAttemptsHeader),
+                   item.Attempts.Select(a => (a.Detail, a.When)).ToList(), item.TruncationNote, item.Addresses, item);
+
+        private static RowDetails DetailsOf(ConnectionListItem item)
+            => new(item.AppName, item.TooltipText, item.AppPath, item.FlyoutHeader,
+                   item.Lines.Select(l => (l.Endpoint, l.Trailing)).ToList(), item.TruncationNote, item.Addresses, null);
+
+        private bool _detailsBusy;
+
+        /// <summary>
+        /// "Show all", reached from the row's button or its right-click menu: every line behind the
+        /// row, and below them the addresses involved with a button that looks each one up.
+        ///
+        /// This used to be a flyout. It is a dialog now because the lookup needs room to say what
+        /// it found under each address, and because a flyout closes on the first click outside it
+        /// - which, while a lookup was still filling in, threw the answers away.
+        ///
+        /// Nothing is looked up until the button is clicked (or the menu's "Look up addresses",
+        /// which is the same click made in advance): see IpLookup for why that matters here.
+        /// </summary>
+        private async Task ShowDetailsAsync(RowDetails details, bool lookUpNow)
         {
-            if (sender is Microsoft.UI.Xaml.Controls.Primitives.FlyoutBase flyout)
-                App.ApplyShellStyling(flyout);
+            if (_detailsBusy)
+                return;
+
+            _detailsBusy = true;
+            var cancel = new CancellationTokenSource();
+            ContentDialogResult result;
+            try
+            {
+                var caption = (Style)Microsoft.UI.Xaml.Application.Current.Resources["CaptionTextBlockStyle"];
+                var strong = (Style)Microsoft.UI.Xaml.Application.Current.Resources["BodyStrongTextBlockStyle"];
+                var panel = new StackPanel { Spacing = 8, MinWidth = 380, MaxWidth = 540 };
+
+                if (details.Identity is { Length: > 0 } identity)
+                {
+                    panel.Children.Add(new TextBlock
+                    {
+                        Text = identity,
+                        Style = caption,
+                        Opacity = 0.8,
+                        TextWrapping = TextWrapping.Wrap,
+                        IsTextSelectionEnabled = true,
+                    });
+                }
+
+                panel.Children.Add(new TextBlock { Text = details.Header, Style = caption, Opacity = 0.7, Margin = new Thickness(0, 4, 0, 0) });
+
+                var lines = new StackPanel();
+                foreach (var (text, when) in details.Lines)
+                {
+                    var line = new Grid { ColumnSpacing = 12, Padding = new Thickness(0, 3, 0, 3) };
+                    line.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                    line.Children.Add(new TextBlock { Text = text, Style = caption, TextTrimming = TextTrimming.CharacterEllipsis, TextWrapping = TextWrapping.NoWrap, IsTextSelectionEnabled = true });
+                    var trailing = new TextBlock { Text = when, Style = caption, Opacity = 0.6, TextWrapping = TextWrapping.NoWrap };
+                    Grid.SetColumn(trailing, 1);
+                    line.Children.Add(trailing);
+                    lines.Children.Add(line);
+                }
+                panel.Children.Add(new ScrollViewer { Content = lines, MaxHeight = 200, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
+
+                if (details.TruncationNote.Length > 0)
+                    panel.Children.Add(new TextBlock { Text = details.TruncationNote, Style = caption, Opacity = 0.6, TextWrapping = TextWrapping.Wrap });
+
+                Func<Task>? lookUp = null;
+                if (details.Addresses.Count > 0)
+                {
+                    panel.Children.Add(new TextBlock { Text = Loc.T(LocKeys.Connections.DetailsAddresses), Style = strong, Margin = new Thickness(0, 8, 0, 0) });
+
+                    var button = new Button { Content = Loc.T(LocKeys.Connections.MenuLookUp) };
+                    var ring = new ProgressRing { IsActive = false, Width = 16, Height = 16, VerticalAlignment = VerticalAlignment.Center };
+                    var buttonRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                    buttonRow.Children.Add(button);
+                    buttonRow.Children.Add(ring);
+                    panel.Children.Add(buttonRow);
+                    panel.Children.Add(new TextBlock { Text = Loc.T(LocKeys.Connections.DetailsLookUpNote), Style = caption, Opacity = 0.7, TextWrapping = TextWrapping.Wrap });
+
+                    var shown = details.Addresses.Take(IpLookup.MaxPerRequest).ToList();
+                    var rows = new List<(string Address, TextBlock Info)>();
+                    var addressList = new StackPanel { Spacing = 6 };
+                    foreach (var address in shown)
+                    {
+                        var entry = new StackPanel();
+                        entry.Children.Add(new TextBlock { Text = address, Style = caption, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, IsTextSelectionEnabled = true });
+                        var info = new TextBlock { Style = caption, Opacity = 0.8, TextWrapping = TextWrapping.Wrap, IsTextSelectionEnabled = true, Visibility = Visibility.Collapsed };
+                        entry.Children.Add(info);
+                        addressList.Children.Add(entry);
+                        rows.Add((address, info));
+                    }
+                    panel.Children.Add(new ScrollViewer { Content = addressList, MaxHeight = 240, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
+
+                    if (details.Addresses.Count > shown.Count)
+                        panel.Children.Add(new TextBlock { Text = Loc.T(LocKeys.Connections.DetailsLookUpLimit, shown.Count), Style = caption, Opacity = 0.6, TextWrapping = TextWrapping.Wrap });
+
+                    lookUp = async () =>
+                    {
+                        button.IsEnabled = false;
+                        ring.IsActive = true;
+                        // A few at a time: twenty requests at once to a free service is the kind
+                        // of burst that gets an address rate-limited, and the user is reading the
+                        // first answers while the rest arrive anyway.
+                        using var gate = new SemaphoreSlim(4);
+                        await Task.WhenAll(rows.Select(async row =>
+                        {
+                            await gate.WaitAsync();
+                            try
+                            {
+                                IpDetails? found = null;
+                                try { found = await IpLookup.LookUpAsync(row.Address, cancel.Token); }
+                                catch { found = null; }
+                                row.Info.Text = Describe(found);
+                                row.Info.Visibility = Visibility.Visible;
+                            }
+                            finally
+                            {
+                                gate.Release();
+                            }
+                        }));
+                        ring.IsActive = false;
+                        button.IsEnabled = true;
+                    };
+                    button.Click += async (_, _) => await lookUp();
+                }
+
+                var dialog = new ContentDialog
+                {
+                    XamlRoot = Content.XamlRoot,
+                    FlowDirection = App.UiFlowDirection,
+                    RequestedTheme = App.UiElementTheme,
+                    Title = details.AppName,
+                    Content = panel,
+                    CloseButtonText = Loc.T(LocKeys.Common.Ok),
+                    DefaultButton = ContentDialogButton.Close,
+                };
+                if (details.Blocked is not null)
+                    dialog.PrimaryButtonText = Loc.T(LocKeys.Connections.Allow);
+                if (lookUpNow && lookUp is not null)
+                    dialog.Opened += async (_, _) => await lookUp();
+
+                try
+                {
+                    result = await dialog.ShowAsync();
+                }
+                catch (InvalidOperationException)
+                {
+                    ShowNotice(InfoBarSeverity.Informational, details.AppName, Loc.T(LocKeys.Common.AnotherDialogOpenDetail));
+                    return;
+                }
+                finally
+                {
+                    // Answers still on their way have nowhere to go once the dialog is gone.
+                    cancel.Cancel();
+                }
+            }
+            finally
+            {
+                _detailsBusy = false;
+            }
+
+            // After the dialog has closed: Allow raises a dialog of its own, and only one can be up.
+            if (result == ContentDialogResult.Primary && details.Blocked is not null)
+                await AllowAsync(details.Blocked);
+        }
+
+        /// <summary>The lines shown under an address once it has been looked up.</summary>
+        private static string Describe(IpDetails? found)
+        {
+            if (found is null)
+                return Loc.T(LocKeys.Connections.DetailsNotFound);
+            if (found.IsLocal)
+                return Loc.T(LocKeys.Connections.DetailsLocal);
+            if (!found.FoundAnything)
+                return Loc.T(LocKeys.Connections.DetailsNotFound);
+
+            var parts = new List<string>();
+            if (found.HostName is not null)
+                parts.Add(Loc.T(LocKeys.Connections.DetailsHost, found.HostName));
+            if (found.Organization is not null)
+                parts.Add(Loc.T(LocKeys.Connections.DetailsOwner, found.Organization));
+            // The network name is usually the owner in capitals; only worth a line when it says
+            // something the owner did not.
+            if (found.Network is not null
+                && (found.Organization is null || !found.Organization.Contains(found.Network, StringComparison.OrdinalIgnoreCase)))
+                parts.Add(Loc.T(LocKeys.Connections.DetailsNetwork, found.Network));
+            if (found.Country is not null)
+                parts.Add(Loc.T(LocKeys.Connections.DetailsCountry, found.Country));
+            return string.Join(Environment.NewLine, parts);
+        }
+
+        /// <summary>
+        /// Right click (or the Menu key, or Shift+F10) on any row of the three lists. The menu
+        /// carries what the row already offers - details, Allow - plus the small things that used
+        /// to need a trip elsewhere: copying an address or a path, opening the program's folder,
+        /// and narrowing the page to this one app.
+        ///
+        /// The row is found from the container rather than from DataContext on whatever element
+        /// was hit, because a keyboard request arrives from the focused ListViewItem itself and a
+        /// pointer one from somewhere inside its template; walking up to the container covers both.
+        /// </summary>
+        private void Row_ContextRequested(UIElement sender, ContextRequestedEventArgs args)
+        {
+            if (sender is not ListView list)
+                return;
+
+            ListViewItem? container = null;
+            for (var node = args.OriginalSource as DependencyObject; node is not null && !ReferenceEquals(node, list); node = VisualTreeHelper.GetParent(node))
+            {
+                if (node is ListViewItem found)
+                {
+                    container = found;
+                    break;
+                }
+            }
+
+            var details = container is null ? null : list.ItemFromContainer(container) switch
+            {
+                BlockedListItem blocked => DetailsOf(blocked),
+                ConnectionListItem connection => DetailsOf(connection),
+                _ => null,
+            };
+            if (container is null || details is null)
+                return;
+
+            var menu = BuildRowMenu(details);
+            App.ApplyShellStyling(menu);
+            if (args.TryGetPosition(container, out var point))
+                menu.ShowAt(container, new FlyoutShowOptions { Position = point });
+            else
+                menu.ShowAt(container);
+            args.Handled = true;
+        }
+
+        private MenuFlyout BuildRowMenu(RowDetails details)
+        {
+            var menu = new MenuFlyout();
+            void Add(string key, string glyph, Action action)
+            {
+                var item = new MenuFlyoutItem { Text = Loc.T(key), Icon = new FontIcon { Glyph = glyph } };
+                item.Click += (_, _) => action();
+                menu.Items.Add(item);
+            }
+
+            Add(LocKeys.Connections.MenuDetails, "", async () => await ShowDetailsAsync(details, lookUpNow: false));
+            if (details.Addresses.Any(a => !IpAddrMask.IsLocalNetwork(a)))
+                Add(LocKeys.Connections.MenuLookUp, "", async () => await ShowDetailsAsync(details, lookUpNow: true));
+            if (details.Blocked is { } blocked)
+                Add(LocKeys.Connections.Allow, "", async () => await AllowAsync(blocked));
+
+            menu.Items.Add(new MenuFlyoutSeparator());
+            Add(LocKeys.Connections.MenuFilterApp, "", () => FilterBox.Text = details.AppName);
+            if (details.Addresses.Count > 0)
+                Add(LocKeys.Connections.MenuCopyAddresses, "", () => CopyText(string.Join(Environment.NewLine, details.Addresses)));
+            if (details.AppPath is { Length: > 0 } path)
+            {
+                Add(LocKeys.Connections.MenuCopyPath, "", () => CopyText(path));
+                Add(LocKeys.Connections.MenuOpenLocation, "", () => OpenFileLocation(path));
+            }
+
+            return menu;
+        }
+
+        private static void CopyText(string text)
+        {
+            try
+            {
+                var package = new Windows.ApplicationModel.DataTransfer.DataPackage();
+                package.SetText(text);
+                Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
+            }
+            catch (Exception)
+            {
+                // Another program holding the clipboard open makes this throw; a copy that did not
+                // happen is obvious on the next paste and not worth a dialog.
+            }
+        }
+
+        /// <summary>Opens the program's folder in Explorer with the file selected. A path that no
+        /// longer exists - an uninstalled app, a temp-folder installer that cleaned up after
+        /// itself - says so instead of opening Explorer somewhere unrelated.</summary>
+        private void OpenFileLocation(string path)
+        {
+            try
+            {
+                if (File.Exists(path))
+                    Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true });
+                else if (Path.GetDirectoryName(path) is { } folder && Directory.Exists(folder))
+                    Process.Start(new ProcessStartInfo("explorer.exe", $"\"{folder}\"") { UseShellExecute = true });
+                else
+                    ShowNotice(InfoBarSeverity.Warning, Loc.T(LocKeys.Connections.MenuOpenLocation), Loc.T(LocKeys.Connections.OpenLocationMissing));
+            }
+            catch (Exception ex)
+            {
+                ShowNotice(InfoBarSeverity.Warning, Loc.T(LocKeys.Connections.MenuOpenLocation), ex.Message);
+            }
         }
 
         private void SetBusy(bool busy)

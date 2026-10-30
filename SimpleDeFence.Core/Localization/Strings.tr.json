@@ -148,6 +148,26 @@
     "allowByPublisher": "{0} tarafından yayımlanan tüm programlar",
     "allowPublisherSuccess": {
       "body": "{0} tarafından imzalanan programlar artık bağlanabilir."
+    },
+    "menu": {
+      "details": "Ayrıntıları göster",
+      "lookUp": "Adresleri sorgula",
+      "filterApp": "Yalnızca bu uygulamayı göster",
+      "copyAddresses": "Adresleri kopyala",
+      "copyPath": "Yolu kopyala",
+      "openLocation": "Dosya konumunu aç",
+      "openLocationMissing": "Programın dosyası ve klasörü artık yok."
+    },
+    "details": {
+      "addresses": "Adresler",
+      "lookUpNote": "Her adresin adını, sahibini ve ağının kayıtlı olduğu ülkeyi bulur. Siz tıklayana kadar hiçbir şey gönderilmez: tıkladığınızda adresler DNS sunucunuza ve rdap.org'a gider.",
+      "lookUpLimit": "Yalnızca ilk {0} adres listelenir.",
+      "local": "Yerel ağ adresi. Sorgulanacak bir şey yok.",
+      "notFound": "Bu adres için hiçbir şey bulunamadı.",
+      "host": "Ad: {0}",
+      "owner": "Sahibi: {0}",
+      "network": "Ağ: {0}",
+      "country": "Kayıtlı olduğu ülke: {0}"
     }
   },
   "subject": {

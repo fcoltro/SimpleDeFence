@@ -148,6 +148,26 @@
     "allowByPublisher": "来自 {0} 的所有程序",
     "allowPublisherSuccess": {
       "body": "由 {0} 签名的程序现在可以连接了。"
+    },
+    "menu": {
+      "details": "显示详细信息",
+      "lookUp": "查询地址",
+      "filterApp": "只显示此应用",
+      "copyAddresses": "复制地址",
+      "copyPath": "复制路径",
+      "openLocation": "打开文件所在位置",
+      "openLocationMissing": "该程序的文件和文件夹已不存在。"
+    },
+    "details": {
+      "addresses": "地址",
+      "lookUpNote": "查找每个地址的名称、所有者以及其网络的注册国家/地区。点击之前不会发送任何内容；点击后，这些地址会发送到你的 DNS 服务器和 rdap.org。",
+      "lookUpLimit": "仅列出前 {0} 个地址。",
+      "local": "本地网络地址，无需查询。",
+      "notFound": "未找到此地址的任何信息。",
+      "host": "名称：{0}",
+      "owner": "所有者：{0}",
+      "network": "网络：{0}",
+      "country": "注册地：{0}"
     }
   },
   "subject": {

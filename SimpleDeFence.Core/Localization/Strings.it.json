@@ -148,6 +148,26 @@
     "allowByPublisher": "Tutti i programmi di {0}",
     "allowPublisherSuccess": {
       "body": "I programmi firmati da {0} ora possono connettersi."
+    },
+    "menu": {
+      "details": "Mostra dettagli",
+      "lookUp": "Cerca indirizzi",
+      "filterApp": "Mostra solo questa app",
+      "copyAddresses": "Copia indirizzi",
+      "copyPath": "Copia percorso",
+      "openLocation": "Apri percorso file",
+      "openLocationMissing": "Il file e la cartella del programma non esistono più."
+    },
+    "details": {
+      "addresses": "Indirizzi",
+      "lookUpNote": "Trova il nome di ogni indirizzo, il proprietario e il paese in cui è registrata la sua rete. Non viene inviato nulla finché non fai clic: allora gli indirizzi vanno al tuo server DNS e a rdap.org.",
+      "lookUpLimit": "Sono elencati solo i primi {0} indirizzi.",
+      "local": "Indirizzo della rete locale. Niente da cercare.",
+      "notFound": "Nessun risultato per questo indirizzo.",
+      "host": "Nome: {0}",
+      "owner": "Proprietario: {0}",
+      "network": "Rete: {0}",
+      "country": "Registrato in: {0}"
     }
   },
   "subject": {

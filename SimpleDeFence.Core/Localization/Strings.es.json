@@ -148,6 +148,26 @@
     "allowByPublisher": "Todos los programas de {0}",
     "allowPublisherSuccess": {
       "body": "Los programas firmados por {0} ya pueden conectarse."
+    },
+    "menu": {
+      "details": "Mostrar detalles",
+      "lookUp": "Consultar direcciones",
+      "filterApp": "Mostrar solo esta aplicación",
+      "copyAddresses": "Copiar direcciones",
+      "copyPath": "Copiar ruta",
+      "openLocation": "Abrir ubicación del archivo",
+      "openLocationMissing": "El archivo y la carpeta del programa ya no existen."
+    },
+    "details": {
+      "addresses": "Direcciones",
+      "lookUpNote": "Busca el nombre de cada dirección, su propietario y el país donde está registrada su red. No se envía nada hasta que hagas clic: entonces las direcciones van a tu servidor DNS y a rdap.org.",
+      "lookUpLimit": "Solo se muestran las primeras {0} direcciones.",
+      "local": "Dirección de la red local. No hay nada que consultar.",
+      "notFound": "No se encontró nada para esta dirección.",
+      "host": "Nombre: {0}",
+      "owner": "Propietario: {0}",
+      "network": "Red: {0}",
+      "country": "Registrada en: {0}"
     }
   },
   "subject": {

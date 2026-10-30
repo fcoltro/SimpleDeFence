@@ -148,6 +148,26 @@
     "allowByPublisher": "{0}의 모든 프로그램",
     "allowPublisherSuccess": {
       "body": "이제 {0}에서 서명한 프로그램이 연결할 수 있습니다."
+    },
+    "menu": {
+      "details": "세부 정보 보기",
+      "lookUp": "주소 조회",
+      "filterApp": "이 앱만 보기",
+      "copyAddresses": "주소 복사",
+      "copyPath": "경로 복사",
+      "openLocation": "파일 위치 열기",
+      "openLocationMissing": "프로그램의 파일과 폴더가 더 이상 없습니다."
+    },
+    "details": {
+      "addresses": "주소",
+      "lookUpNote": "각 주소의 이름, 소유자, 네트워크가 등록된 국가를 찾습니다. 클릭하기 전에는 아무것도 보내지 않으며, 클릭하면 주소가 사용 중인 DNS 서버와 rdap.org로 전송됩니다.",
+      "lookUpLimit": "처음 {0}개 주소만 표시됩니다.",
+      "local": "로컬 네트워크 주소입니다. 조회할 내용이 없습니다.",
+      "notFound": "이 주소에 대한 정보를 찾지 못했습니다.",
+      "host": "이름: {0}",
+      "owner": "소유자: {0}",
+      "network": "네트워크: {0}",
+      "country": "등록 국가: {0}"
     }
   },
   "subject": {

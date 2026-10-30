@@ -148,6 +148,26 @@
     "allowByPublisher": "{0} のすべてのプログラム",
     "allowPublisherSuccess": {
       "body": "{0} が署名したプログラムが接続できるようになりました。"
+    },
+    "menu": {
+      "details": "詳細を表示",
+      "lookUp": "アドレスを調べる",
+      "filterApp": "このアプリだけを表示",
+      "copyAddresses": "アドレスをコピー",
+      "copyPath": "パスをコピー",
+      "openLocation": "ファイルの場所を開く",
+      "openLocationMissing": "プログラムのファイルとフォルダーはもうありません。"
+    },
+    "details": {
+      "addresses": "アドレス",
+      "lookUpNote": "各アドレスの名前、所有者、ネットワークが登録されている国を調べます。クリックするまで何も送信されません。クリックすると、アドレスがお使いの DNS サーバーと rdap.org に送られます。",
+      "lookUpLimit": "最初の {0} 件のアドレスだけを表示しています。",
+      "local": "ローカル ネットワークのアドレスです。調べる必要はありません。",
+      "notFound": "このアドレスの情報は見つかりませんでした。",
+      "host": "名前: {0}",
+      "owner": "所有者: {0}",
+      "network": "ネットワーク: {0}",
+      "country": "登録国: {0}"
     }
   },
   "subject": {

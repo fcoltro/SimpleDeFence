@@ -148,6 +148,26 @@
     "allowByPublisher": "Semua program dari {0}",
     "allowPublisherSuccess": {
       "body": "Program yang ditandatangani {0} kini dapat terhubung."
+    },
+    "menu": {
+      "details": "Tampilkan detail",
+      "lookUp": "Cari info alamat",
+      "filterApp": "Tampilkan hanya aplikasi ini",
+      "copyAddresses": "Salin alamat",
+      "copyPath": "Salin jalur",
+      "openLocation": "Buka lokasi file",
+      "openLocationMissing": "File dan folder program ini sudah tidak ada."
+    },
+    "details": {
+      "addresses": "Alamat",
+      "lookUpNote": "Mencari nama setiap alamat, pemiliknya, dan negara tempat jaringannya terdaftar. Tidak ada yang dikirim sebelum Anda mengklik: setelah itu alamat dikirim ke server DNS Anda dan ke rdap.org.",
+      "lookUpLimit": "Hanya {0} alamat pertama yang ditampilkan.",
+      "local": "Alamat jaringan lokal. Tidak ada yang perlu dicari.",
+      "notFound": "Tidak ada info untuk alamat ini.",
+      "host": "Nama: {0}",
+      "owner": "Pemilik: {0}",
+      "network": "Jaringan: {0}",
+      "country": "Terdaftar di: {0}"
     }
   },
   "subject": {

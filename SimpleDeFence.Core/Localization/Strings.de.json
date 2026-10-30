@@ -148,6 +148,26 @@
     "allowByPublisher": "Jedes Programm von {0}",
     "allowPublisherSuccess": {
       "body": "Von {0} signierte Programme dürfen jetzt Verbindungen herstellen."
+    },
+    "menu": {
+      "details": "Details anzeigen",
+      "lookUp": "Adressen nachschlagen",
+      "filterApp": "Nur diese App anzeigen",
+      "copyAddresses": "Adressen kopieren",
+      "copyPath": "Pfad kopieren",
+      "openLocation": "Dateispeicherort öffnen",
+      "openLocationMissing": "Die Datei und der Ordner des Programms sind nicht mehr vorhanden."
+    },
+    "details": {
+      "addresses": "Adressen",
+      "lookUpNote": "Ermittelt zu jeder Adresse den Namen, den Inhaber und das Land, in dem ihr Netz registriert ist. Erst wenn du klickst, wird etwas gesendet: Die Adressen gehen dann an deinen DNS-Server und an rdap.org.",
+      "lookUpLimit": "Nur die ersten {0} Adressen werden aufgeführt.",
+      "local": "Adresse im lokalen Netzwerk. Nichts nachzuschlagen.",
+      "notFound": "Zu dieser Adresse wurde nichts gefunden.",
+      "host": "Name: {0}",
+      "owner": "Inhaber: {0}",
+      "network": "Netz: {0}",
+      "country": "Registriert in: {0}"
     }
   },
   "subject": {

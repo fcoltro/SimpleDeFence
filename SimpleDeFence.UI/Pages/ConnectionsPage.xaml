@@ -136,38 +136,9 @@
                                VerticalAlignment="Center" Opacity="0.8"
                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
 
+                    <!-- Opens the page's details dialog, which also offers the address lookup. -->
                     <Button Grid.Row="0" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
-                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
-                        <Button.Flyout>
-                            <Flyout Opening="Flyout_Opening">
-                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
-                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
-                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                    <TextBlock Text="{loc:Loc Key=connections.blocked.attemptsHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
-                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
-                                        <ItemsControl ItemsSource="{x:Bind Attempts}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate x:DataType="local:BlockedAttempt">
-                                                    <Grid ColumnSpacing="12" Padding="0,3">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                                        <TextBlock Grid.Column="1" Text="{x:Bind When}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
-                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center" Click="{x:Bind ShowAllButton_Click}"/>
 
                     <TextBlock Grid.Row="0" Grid.Column="5" Text="{x:Bind When}"
                                Style="{StaticResource CaptionTextBlockStyle}"
@@ -216,38 +187,9 @@
                                VerticalAlignment="Center" Opacity="0.8"
                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
 
+                    <!-- Opens the page's details dialog, which also offers the address lookup. -->
                     <Button Grid.Row="1" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
-                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
-                        <Button.Flyout>
-                            <Flyout Opening="Flyout_Opening">
-                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
-                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
-                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                    <TextBlock Text="{loc:Loc Key=connections.blocked.attemptsHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
-                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
-                                        <ItemsControl ItemsSource="{x:Bind Attempts}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate x:DataType="local:BlockedAttempt">
-                                                    <Grid ColumnSpacing="12" Padding="0,3">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                                        <TextBlock Grid.Column="1" Text="{x:Bind When}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
-                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center" Click="{x:Bind ShowAllButton_Click}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="5" Text="{x:Bind When}"
                                Style="{StaticResource CaptionTextBlockStyle}"
@@ -292,38 +234,9 @@
                                VerticalAlignment="Center" Opacity="0.8"
                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
 
+                    <!-- Opens the page's details dialog, which also offers the address lookup. -->
                     <Button Grid.Row="0" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
-                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
-                        <Button.Flyout>
-                            <Flyout Opening="Flyout_Opening">
-                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
-                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
-                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                    <TextBlock Text="{x:Bind FlyoutHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
-                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
-                                        <ItemsControl ItemsSource="{x:Bind Lines}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate x:DataType="local:ConnectionLine">
-                                                    <Grid ColumnSpacing="12" Padding="0,3">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{x:Bind Endpoint}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                                        <TextBlock Grid.Column="1" Text="{x:Bind Trailing}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
-                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center" Click="{x:Bind ShowAllButton_Click}"/>
 
                     <TextBlock Grid.Row="0" Grid.Column="5" Text="{x:Bind State}"
                                Style="{StaticResource CaptionTextBlockStyle}"
@@ -364,38 +277,9 @@
                                VerticalAlignment="Center" Opacity="0.8"
                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
 
+                    <!-- Opens the page's details dialog, which also offers the address lookup. -->
                     <Button Grid.Row="1" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
-                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
-                        <Button.Flyout>
-                            <Flyout Opening="Flyout_Opening">
-                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
-                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
-                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                    <TextBlock Text="{x:Bind FlyoutHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
-                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
-                                        <ItemsControl ItemsSource="{x:Bind Lines}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate x:DataType="local:ConnectionLine">
-                                                    <Grid ColumnSpacing="12" Padding="0,3">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{x:Bind Endpoint}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                                        <TextBlock Grid.Column="1" Text="{x:Bind Trailing}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
-                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center" Click="{x:Bind ShowAllButton_Click}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="5" Text="{x:Bind State}"
                                Style="{StaticResource CaptionTextBlockStyle}"
@@ -436,38 +320,9 @@
                                VerticalAlignment="Center" Opacity="0.8"
                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
 
+                    <!-- Opens the page's details dialog, which also offers the address lookup. -->
                     <Button Grid.Row="0" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
-                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
-                        <Button.Flyout>
-                            <Flyout Opening="Flyout_Opening">
-                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
-                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
-                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                    <TextBlock Text="{x:Bind FlyoutHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
-                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
-                                        <ItemsControl ItemsSource="{x:Bind Lines}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate x:DataType="local:ConnectionLine">
-                                                    <Grid ColumnSpacing="12" Padding="0,3">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{x:Bind Endpoint}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                                        <TextBlock Grid.Column="1" Text="{x:Bind Trailing}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
-                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center" Click="{x:Bind ShowAllButton_Click}"/>
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -504,38 +359,9 @@
                                VerticalAlignment="Center" Opacity="0.8"
                                TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
 
+                    <!-- Opens the page's details dialog, which also offers the address lookup. -->
                     <Button Grid.Row="1" Grid.Column="4" Content="{loc:Loc Key=connections.showAll}"
-                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center">
-                        <Button.Flyout>
-                            <Flyout Opening="Flyout_Opening">
-                                <StackPanel Spacing="8" MinWidth="300" MaxWidth="440">
-                                    <TextBlock Text="{x:Bind AppName}" Style="{StaticResource BodyStrongTextBlockStyle}"
-                                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                    <TextBlock Text="{x:Bind FlyoutHeader}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
-                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
-                                        <ItemsControl ItemsSource="{x:Bind Lines}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate x:DataType="local:ConnectionLine">
-                                                    <Grid ColumnSpacing="12" Padding="0,3">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{x:Bind Endpoint}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-                                                        <TextBlock Grid.Column="1" Text="{x:Bind Trailing}" Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   Opacity="0.6" TextWrapping="NoWrap"/>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                    <TextBlock Text="{x:Bind TruncationNote}" Visibility="{x:Bind TruncationVisibility}"
-                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
+                            Visibility="{x:Bind ShowAllVisibility}" VerticalAlignment="Center" Click="{x:Bind ShowAllButton_Click}"/>
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -602,6 +428,10 @@
                        Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
         </StackPanel>
 
+        <!-- Every row also answers a right click (or the Menu key) with the actions that apply to
+             it: details, address lookup, Allow, copy, open the file's folder. Wired on the ListViews
+             rather than inside the six row templates, so the menu cannot differ between a wide
+             row and its folded twin. -->
         <!-- Horizontal axis disabled for the same reason SettingsPage's is: the row templates
              below use fixed-width columns, so at narrow window sizes they measure wider than the
              viewport and would otherwise grow a sideways scroll instead of letting the cells trim. -->
@@ -619,6 +449,7 @@
                         <TextBlock x:Name="BlockedEmpty" Text="{loc:Loc Key=connections.empty.blocked}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
                         <ListView x:Name="BlockedList" SelectionMode="None" IsItemClickEnabled="True"
+                                  ContextRequested="Row_ContextRequested"
                                   ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource BlockedRowWide}"/>
                     </StackPanel>
@@ -635,6 +466,7 @@
                         <TextBlock x:Name="ConnectedEmpty" Text="{loc:Loc Key=connections.empty.connected}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
                         <ListView x:Name="ConnectedList" SelectionMode="None" IsItemClickEnabled="True"
+                                  ContextRequested="Row_ContextRequested"
                                   ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource ConnectedRowWide}"/>
                     </StackPanel>
@@ -651,6 +483,7 @@
                         <TextBlock x:Name="OpenEmpty" Text="{loc:Loc Key=connections.empty.open}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
                         <ListView x:Name="OpenList" SelectionMode="None" IsItemClickEnabled="True"
+                                  ContextRequested="Row_ContextRequested"
                                   ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource OpenRowWide}"/>
                     </StackPanel>
