@@ -275,7 +275,11 @@
       "enableHotkeys": "Enable global keyboard shortcuts",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere. Ctrl+Alt+B switches to Block all, and back to Normal.",
       "autoRefreshInterval": "Auto-refresh interval",
-      "autoRefreshIntervalDescription": "How often the Connections page re-checks while its Auto-refresh switch is on. Nothing pushes changes to it, so this is a polling interval; lower is fresher and costs more."
+      "autoRefreshIntervalDescription": "How often the Connections page re-checks while its Auto-refresh switch is on. Nothing pushes changes to it, so this is a polling interval; lower is fresher and costs more.",
+      "notifyBlocked": "Tell me when an app is blocked",
+      "notifyBlockedDescription": "Once per app each session, in Normal mode. Windows components are left out.",
+      "notifyListening": "Tell me when an app starts accepting incoming connections",
+      "notifyListeningDescription": "Once per app each session. Windows components are left out."
     },
     "protection": {
       "allowLocalSubnet": "Allow local network",
@@ -440,5 +444,13 @@
     "untilRestart": "Until restart",
     "expiresAtSuffix": "{0}, until {1}",
     "untilRestartSuffix": "{0}, until restart"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} was blocked",
+    "blockedManyTitle": "{0} and {1} more were blocked",
+    "blockedBody": "It tried to connect and SimpleDeFence stopped it. Click to see it on the Connections page, where you can allow it.",
+    "listeningOneTitle": "{0} accepts incoming connections",
+    "listeningManyTitle": "{0} and {1} more accept incoming connections",
+    "listeningBody": "Remote-access tools and some malware do this, so check that it is a program you use. Click to see it on the Connections page."
   }
 }

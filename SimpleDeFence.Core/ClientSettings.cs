@@ -35,6 +35,18 @@ namespace SimpleDeFence
         [DataMember(EmitDefaultValue = false)]
         public bool TrayCloseNoticeShown { get; set; } = false;
 
+        /// <summary>A notification the first time in a session that an app is blocked from
+        /// connecting out (in Normal mode only), so a program that silently fails to connect is
+        /// not a mystery. On by default: it is how a new user finds out the firewall is the
+        /// reason.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public bool NotifyWhenBlocked { get; set; } = true;
+
+        /// <summary>A notification the first time in a session that an app starts accepting
+        /// incoming connections, which is how remote-access tools and much malware show up.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public bool NotifyWhenListening { get; set; } = true;
+
         /// <summary>How often the Connections page re-polls while its auto-refresh toggle is on.
         /// The page polls on a timer - nothing pushes connection changes to it - so this is a real
         /// trade-off between freshness and the cost of a full snapshot, and belongs to the user.

@@ -275,7 +275,11 @@
       "enableHotkeys": "Attiva le scorciatoie da tastiera globali",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W consentono all'istante un eseguibile, un processo o una finestra da qualsiasi punto. Ctrl+Alt+B passa a Blocca tutto e torna a Normale.",
       "autoRefreshInterval": "Intervallo di aggiornamento automatico",
-      "autoRefreshIntervalDescription": "Con quale frequenza la pagina Connessioni ricontrolla mentre il suo interruttore di aggiornamento automatico è attivo. Nessuno le invia le modifiche, quindi questo è un intervallo di polling: più breve è, più i dati sono aggiornati e più costa."
+      "autoRefreshIntervalDescription": "Con quale frequenza la pagina Connessioni ricontrolla mentre il suo interruttore di aggiornamento automatico è attivo. Nessuno le invia le modifiche, quindi questo è un intervallo di polling: più breve è, più i dati sono aggiornati e più costa.",
+      "notifyBlocked": "Avvisami quando un'app viene bloccata",
+      "notifyBlockedDescription": "Una volta per app in ogni sessione, in modalità Normale. I componenti di Windows sono esclusi.",
+      "notifyListening": "Avvisami quando un'app inizia ad accettare connessioni in entrata",
+      "notifyListeningDescription": "Una volta per app in ogni sessione. I componenti di Windows sono esclusi."
     },
     "protection": {
       "allowLocalSubnet": "Consenti la rete locale",
@@ -440,5 +444,13 @@
     "untilRestart": "Fino al riavvio",
     "expiresAtSuffix": "{0}, fino alle {1}",
     "untilRestartSuffix": "{0}, fino al riavvio"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} è stato bloccato",
+    "blockedManyTitle": "{0} e altri {1} sono stati bloccati",
+    "blockedBody": "Ha provato a connettersi e SimpleDeFence l'ha impedito. Fai clic per vederlo nella pagina Connessioni, dove puoi consentirlo.",
+    "listeningOneTitle": "{0} accetta connessioni in entrata",
+    "listeningManyTitle": "{0} e altri {1} accettano connessioni in entrata",
+    "listeningBody": "Lo fanno gli strumenti di accesso remoto e alcuni malware, quindi verifica che sia un programma che usi. Fai clic per vederlo nella pagina Connessioni."
   }
 }

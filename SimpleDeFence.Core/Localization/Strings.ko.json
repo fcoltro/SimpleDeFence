@@ -275,7 +275,11 @@
       "enableHotkeys": "전역 키보드 단축키 사용",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W로 어디서나 실행 파일, 프로세스 또는 창을 즉시 허용합니다. Ctrl+Alt+B는 모두 차단으로 전환하고 다시 일반 모드로 돌아갑니다.",
       "autoRefreshInterval": "자동 새로 고침 간격",
-      "autoRefreshIntervalDescription": "연결 페이지의 자동 새로 고침 스위치가 켜져 있는 동안 다시 확인하는 주기입니다. 변경 사항을 밀어 주는 것이 없으므로 이것은 폴링 간격입니다. 짧을수록 최신이지만 비용이 더 듭니다."
+      "autoRefreshIntervalDescription": "연결 페이지의 자동 새로 고침 스위치가 켜져 있는 동안 다시 확인하는 주기입니다. 변경 사항을 밀어 주는 것이 없으므로 이것은 폴링 간격입니다. 짧을수록 최신이지만 비용이 더 듭니다.",
+      "notifyBlocked": "앱이 차단되면 알림",
+      "notifyBlockedDescription": "일반 모드에서 세션마다 앱당 한 번. Windows 구성 요소는 제외됩니다.",
+      "notifyListening": "앱이 들어오는 연결을 받기 시작하면 알림",
+      "notifyListeningDescription": "세션마다 앱당 한 번. Windows 구성 요소는 제외됩니다."
     },
     "protection": {
       "allowLocalSubnet": "로컬 네트워크 허용",
@@ -440,5 +444,13 @@
     "untilRestart": "다시 시작할 때까지",
     "expiresAtSuffix": "{0}, {1}까지",
     "untilRestartSuffix": "{0}, 다시 시작할 때까지"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} 차단됨",
+    "blockedManyTitle": "{0} 외 {1}개 차단됨",
+    "blockedBody": "연결하려고 해서 SimpleDeFence가 막았습니다. 클릭하면 연결 페이지에서 보고 허용할 수 있습니다.",
+    "listeningOneTitle": "{0}이(가) 들어오는 연결을 받고 있습니다",
+    "listeningManyTitle": "{0} 외 {1}개가 들어오는 연결을 받고 있습니다",
+    "listeningBody": "원격 액세스 도구와 일부 악성 코드가 이렇게 동작하므로 사용하는 프로그램인지 확인하세요. 클릭하면 연결 페이지에서 볼 수 있습니다."
   }
 }

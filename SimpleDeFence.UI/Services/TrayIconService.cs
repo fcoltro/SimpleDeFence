@@ -73,6 +73,7 @@ namespace SimpleDeFence.UI.Services
             // how an app looks broken.
             _icon.Selected += ShowMainWindow;
             _icon.ContextMenuRequested += ShowTrayMenu;
+            _icon.NotificationClicked += OnNotificationClicked;
 
             // Icon and tooltip before Create, so the icon never appears in the notification area
             // blank and then fills in.
@@ -102,6 +103,8 @@ namespace SimpleDeFence.UI.Services
 
             try
             {
+                // A click on this one has nowhere to go; clear what an earlier notice would open.
+                _notificationClick = null;
                 _icon.ShowNotification(
                     title: Loc.T(LocKeys.Tray.StillRunningTitle),
                     message: Loc.T(LocKeys.Tray.StillRunningBody));
@@ -110,6 +113,41 @@ namespace SimpleDeFence.UI.Services
             {
                 System.Diagnostics.Debug.WriteLine($"Tray close notice failed: {e.Message}");
             }
+        }
+
+        /// <summary>What a click on the notification on screen does. One at a time, as the shell
+        /// shows them: a newer notification replaces both the toast and this.</summary>
+        private Action? _notificationClick;
+
+        /// <summary>Shows a notification about an app's network activity. A click opens the
+        /// Connections page, filtered to that app when the notification is about only one, so
+        /// it is one more click to allow it there.</summary>
+        public void ShowActivityNotification(string title, string message, string? appName)
+        {
+            if (_disposed)
+                return;
+
+            _notificationClick = () =>
+            {
+                Pages.ConnectionsPage.RequestFilter(appName ?? string.Empty);
+                ShowAndNavigate(typeof(Pages.ConnectionsPage));
+            };
+
+            try
+            {
+                _icon.ShowNotification(title, message);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Activity notification failed: {e.Message}");
+            }
+        }
+
+        private void OnNotificationClicked()
+        {
+            var click = _notificationClick;
+            _notificationClick = null;
+            click?.Invoke();
         }
 
         private static void ShowMainWindow()

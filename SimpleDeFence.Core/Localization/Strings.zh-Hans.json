@@ -275,7 +275,11 @@
       "enableHotkeys": "启用全局键盘快捷键",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W 可在任何位置立即将可执行文件、进程或窗口加入白名单。Ctrl+Alt+B 切换到“全部阻止”,再按一次回到正常模式。",
       "autoRefreshInterval": "自动刷新间隔",
-      "autoRefreshIntervalDescription": "“连接”页面在其自动刷新开关打开时重新检查的频率。没有任何机制会主动向它推送更改，因此这是一个轮询间隔；间隔越短数据越新，开销也越大。"
+      "autoRefreshIntervalDescription": "“连接”页面在其自动刷新开关打开时重新检查的频率。没有任何机制会主动向它推送更改，因此这是一个轮询间隔；间隔越短数据越新，开销也越大。",
+      "notifyBlocked": "应用被阻止时通知我",
+      "notifyBlockedDescription": "在正常模式下,每个应用每次会话通知一次。不包括 Windows 组件。",
+      "notifyListening": "应用开始接受传入连接时通知我",
+      "notifyListeningDescription": "每个应用每次会话通知一次。不包括 Windows 组件。"
     },
     "protection": {
       "allowLocalSubnet": "允许本地网络",
@@ -440,5 +444,13 @@
     "untilRestart": "直到重启",
     "expiresAtSuffix": "{0},直到 {1}",
     "untilRestartSuffix": "{0},直到重启"
+  },
+  "notifications": {
+    "blockedOneTitle": "已阻止 {0}",
+    "blockedManyTitle": "已阻止 {0} 及另外 {1} 个应用",
+    "blockedBody": "它尝试联网,已被 SimpleDeFence 阻止。点击可在“连接”页面查看,并可在那里允许它。",
+    "listeningOneTitle": "{0} 正在接受传入连接",
+    "listeningManyTitle": "{0} 及另外 {1} 个应用正在接受传入连接",
+    "listeningBody": "远程访问工具和一些恶意软件会这样做,请确认这是你在使用的程序。点击可在“连接”页面查看。"
   }
 }

@@ -275,7 +275,11 @@
       "enableHotkeys": "Activar los atajos de teclado globales",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W permiten al instante un ejecutable, proceso o ventana desde cualquier lugar. Ctrl+Alt+B cambia a Bloquear todo y vuelve a Normal.",
       "autoRefreshInterval": "Intervalo de actualización automática",
-      "autoRefreshIntervalDescription": "Con qué frecuencia la página Conexiones vuelve a comprobar mientras su interruptor de actualización automática está activado. Nada le envía cambios, así que este es un intervalo de sondeo; menos es más reciente y cuesta más."
+      "autoRefreshIntervalDescription": "Con qué frecuencia la página Conexiones vuelve a comprobar mientras su interruptor de actualización automática está activado. Nada le envía cambios, así que este es un intervalo de sondeo; menos es más reciente y cuesta más.",
+      "notifyBlocked": "Avisarme cuando se bloquee una aplicación",
+      "notifyBlockedDescription": "Una vez por aplicación en cada sesión, en modo Normal. Se excluyen los componentes de Windows.",
+      "notifyListening": "Avisarme cuando una aplicación empiece a aceptar conexiones entrantes",
+      "notifyListeningDescription": "Una vez por aplicación en cada sesión. Se excluyen los componentes de Windows."
     },
     "protection": {
       "allowLocalSubnet": "Permitir la red local",
@@ -440,5 +444,13 @@
     "untilRestart": "Hasta reiniciar",
     "expiresAtSuffix": "{0}, hasta las {1}",
     "untilRestartSuffix": "{0}, hasta reiniciar"
+  },
+  "notifications": {
+    "blockedOneTitle": "Se bloqueó {0}",
+    "blockedManyTitle": "Se bloquearon {0} y {1} más",
+    "blockedBody": "Intentó conectarse y SimpleDeFence lo impidió. Haz clic para verlo en la página Conexiones, donde puedes permitirlo.",
+    "listeningOneTitle": "{0} acepta conexiones entrantes",
+    "listeningManyTitle": "{0} y {1} más aceptan conexiones entrantes",
+    "listeningBody": "Las herramientas de acceso remoto y algunos programas maliciosos hacen esto, así que comprueba que sea un programa que usas. Haz clic para verlo en la página Conexiones."
   }
 }

@@ -275,7 +275,11 @@
       "enableHotkeys": "Aktifkan pintasan papan tik global",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W langsung mengizinkan sebuah berkas eksekusi, proses, atau jendela dari mana saja. Ctrl+Alt+B beralih ke Blokir semua, lalu kembali ke Normal.",
       "autoRefreshInterval": "Selang penyegaran otomatis",
-      "autoRefreshIntervalDescription": "Seberapa sering halaman Koneksi memeriksa ulang selagi sakelar Segarkan otomatisnya menyala. Tidak ada yang mengirimkan perubahan kepadanya, jadi ini adalah selang penjajakan; makin singkat makin segar dan makin mahal."
+      "autoRefreshIntervalDescription": "Seberapa sering halaman Koneksi memeriksa ulang selagi sakelar Segarkan otomatisnya menyala. Tidak ada yang mengirimkan perubahan kepadanya, jadi ini adalah selang penjajakan; makin singkat makin segar dan makin mahal.",
+      "notifyBlocked": "Beri tahu saya saat aplikasi diblokir",
+      "notifyBlockedDescription": "Sekali per aplikasi setiap sesi, dalam mode Normal. Komponen Windows tidak disertakan.",
+      "notifyListening": "Beri tahu saya saat aplikasi mulai menerima koneksi masuk",
+      "notifyListeningDescription": "Sekali per aplikasi setiap sesi. Komponen Windows tidak disertakan."
     },
     "protection": {
       "allowLocalSubnet": "Izinkan jaringan lokal",
@@ -440,5 +444,13 @@
     "untilRestart": "Sampai dinyalakan ulang",
     "expiresAtSuffix": "{0}, sampai {1}",
     "untilRestartSuffix": "{0}, sampai dinyalakan ulang"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} diblokir",
+    "blockedManyTitle": "{0} dan {1} lainnya diblokir",
+    "blockedBody": "Aplikasi ini mencoba terhubung dan SimpleDeFence menghentikannya. Klik untuk melihatnya di halaman Koneksi, tempat Anda dapat mengizinkannya.",
+    "listeningOneTitle": "{0} menerima koneksi masuk",
+    "listeningManyTitle": "{0} dan {1} lainnya menerima koneksi masuk",
+    "listeningBody": "Alat akses jarak jauh dan sebagian malware melakukan ini, jadi pastikan ini program yang Anda gunakan. Klik untuk melihatnya di halaman Koneksi."
   }
 }

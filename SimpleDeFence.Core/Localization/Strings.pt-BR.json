@@ -275,7 +275,11 @@
       "enableHotkeys": "Ativar atalhos de teclado globais",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W permitem instantaneamente um executável, processo ou janela a partir de qualquer lugar. Ctrl+Alt+B muda para Bloquear tudo e volta para Normal.",
       "autoRefreshInterval": "Intervalo de atualização automática",
-      "autoRefreshIntervalDescription": "Com que frequência a página Conexões verifica novamente enquanto a opção Atualização automática está ligada. Nada envia alterações para ela, então este é um intervalo de consulta; valores menores são mais atuais e custam mais."
+      "autoRefreshIntervalDescription": "Com que frequência a página Conexões verifica novamente enquanto a opção Atualização automática está ligada. Nada envia alterações para ela, então este é um intervalo de consulta; valores menores são mais atuais e custam mais.",
+      "notifyBlocked": "Avisar quando um aplicativo for bloqueado",
+      "notifyBlockedDescription": "Uma vez por aplicativo em cada sessão, no modo Normal. Componentes do Windows ficam de fora.",
+      "notifyListening": "Avisar quando um aplicativo começar a aceitar conexões de entrada",
+      "notifyListeningDescription": "Uma vez por aplicativo em cada sessão. Componentes do Windows ficam de fora."
     },
     "protection": {
       "allowLocalSubnet": "Permitir rede local",
@@ -440,5 +444,13 @@
     "untilRestart": "Até reiniciar",
     "expiresAtSuffix": "{0}, até {1}",
     "untilRestartSuffix": "{0}, até reiniciar"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} foi bloqueado",
+    "blockedManyTitle": "{0} e mais {1} foram bloqueados",
+    "blockedBody": "Ele tentou se conectar e o SimpleDeFence impediu. Clique para vê-lo na página Conexões, onde você pode permiti-lo.",
+    "listeningOneTitle": "{0} aceita conexões de entrada",
+    "listeningManyTitle": "{0} e mais {1} aceitam conexões de entrada",
+    "listeningBody": "Ferramentas de acesso remoto e alguns malwares fazem isso, então confira se é um programa que você usa. Clique para vê-lo na página Conexões."
   }
 }

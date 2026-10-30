@@ -97,6 +97,18 @@
                                           OnContent="{loc:Loc Key=common.on}"
                                           OffContent="{loc:Loc Key=common.off}"/>
                         </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.general.notifyBlocked}"
+                                                Description="{loc:Loc Key=settings.general.notifyBlockedDescription}">
+                            <ToggleSwitch x:Name="NotifyBlockedToggle" Toggled="NotifyToggle_Toggled"
+                                          OnContent="{loc:Loc Key=common.on}"
+                                          OffContent="{loc:Loc Key=common.off}"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.general.notifyListening}"
+                                                Description="{loc:Loc Key=settings.general.notifyListeningDescription}">
+                            <ToggleSwitch x:Name="NotifyListeningToggle" Toggled="NotifyToggle_Toggled"
+                                          OnContent="{loc:Loc Key=common.on}"
+                                          OffContent="{loc:Loc Key=common.off}"/>
+                        </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 

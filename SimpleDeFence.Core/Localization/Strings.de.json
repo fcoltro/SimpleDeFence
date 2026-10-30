@@ -275,7 +275,11 @@
       "enableHotkeys": "Globale Tastenkombinationen aktivieren",
       "enableHotkeysDescription": "Strg+Alt+E/P/W erlauben von überall aus sofort eine Programmdatei, einen Prozess oder ein Fenster. Strg+Alt+B schaltet auf „Alles blockieren“ und wieder zurück auf Normal.",
       "autoRefreshInterval": "Intervall der automatischen Aktualisierung",
-      "autoRefreshIntervalDescription": "Wie oft die Seite „Verbindungen“ neu prüft, solange ihr Schalter für automatische Aktualisierung an ist. Änderungen werden ihr nicht zugestellt, es handelt sich also um ein Abfrageintervall; kürzer ist aktueller und kostet mehr."
+      "autoRefreshIntervalDescription": "Wie oft die Seite „Verbindungen“ neu prüft, solange ihr Schalter für automatische Aktualisierung an ist. Änderungen werden ihr nicht zugestellt, es handelt sich also um ein Abfrageintervall; kürzer ist aktueller und kostet mehr.",
+      "notifyBlocked": "Benachrichtigen, wenn eine App blockiert wird",
+      "notifyBlockedDescription": "Einmal pro App und Sitzung, im Modus Normal. Windows-Komponenten sind ausgenommen.",
+      "notifyListening": "Benachrichtigen, wenn eine App eingehende Verbindungen annimmt",
+      "notifyListeningDescription": "Einmal pro App und Sitzung. Windows-Komponenten sind ausgenommen."
     },
     "protection": {
       "allowLocalSubnet": "Lokales Netzwerk erlauben",
@@ -440,5 +444,13 @@
     "untilRestart": "Bis zum Neustart",
     "expiresAtSuffix": "{0}, bis {1}",
     "untilRestartSuffix": "{0}, bis zum Neustart"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} wurde blockiert",
+    "blockedManyTitle": "{0} und {1} weitere wurden blockiert",
+    "blockedBody": "Es wollte eine Verbindung herstellen, und SimpleDeFence hat es verhindert. Klicken Sie, um es auf der Seite „Verbindungen“ zu sehen, wo Sie es erlauben können.",
+    "listeningOneTitle": "{0} nimmt eingehende Verbindungen an",
+    "listeningManyTitle": "{0} und {1} weitere nehmen eingehende Verbindungen an",
+    "listeningBody": "Fernwartungsprogramme und manche Schadsoftware tun das. Prüfen Sie also, ob Sie dieses Programm verwenden. Klicken Sie, um es auf der Seite „Verbindungen“ zu sehen."
   }
 }

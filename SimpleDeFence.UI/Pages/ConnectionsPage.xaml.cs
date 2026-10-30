@@ -157,6 +157,7 @@ namespace SimpleDeFence.UI.Pages
             ConnectedList.ItemsSource = _connected;
             OpenList.ItemsSource = _open;
             Loaded += ConnectionsPage_Loaded;
+            FilterRequested += ApplyRequestedFilter;
             _autoRefreshTimer.Interval = ClientSettings.Load().ConnectionsAutoRefreshInterval;
             _autoRefreshTimer.Tick += async (_, _) => await RefreshAsync();
             Unloaded += (_, _) => _autoRefreshTimer.Stop();
@@ -180,8 +181,31 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
+        // Set by a click on an activity notification, so the page opens on the app it was about.
+        // Static because the click can come before the page exists: Loaded picks it up then, and
+        // the event covers the cached page that is already there.
+        private static string? s_requestedFilter;
+        private static event Action? FilterRequested;
+
+        internal static void RequestFilter(string text)
+        {
+            s_requestedFilter = text;
+            FilterRequested?.Invoke();
+        }
+
+        private void ApplyRequestedFilter()
+        {
+            if (s_requestedFilter is not string text)
+                return;
+
+            s_requestedFilter = null;
+            FilterBox.Text = text;   // TextChanged applies it
+        }
+
         private async void ConnectionsPage_Loaded(object sender, RoutedEventArgs e)
         {
+            ApplyRequestedFilter();
+
             // Auto-refresh must survive navigation: this page is cached (NavigationCacheMode.Enabled),
             // so its instance lives on after Unloaded stops the timer. Without restarting here a user
             // who turned auto-refresh on, visited Rules, and came back would find the toggle still

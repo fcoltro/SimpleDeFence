@@ -275,7 +275,11 @@
       "enableHotkeys": "Genel klavye kısayollarını etkinleştir",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W her yerden anında bir çalıştırılabilir dosyaya, işleme veya pencereye izin verir. Ctrl+Alt+B Tümünü engelle moduna geçirir ve Normal moda geri döndürür.",
       "autoRefreshInterval": "Otomatik yenileme aralığı",
-      "autoRefreshIntervalDescription": "Bağlantılar sayfasının otomatik yenileme anahtarı açıkken ne sıklıkta yeniden denetlediği. Değişiklikleri ona kimse iletmez, dolayısıyla bu bir yoklama aralığıdır; kısa olması daha tazedir ve daha maliyetlidir."
+      "autoRefreshIntervalDescription": "Bağlantılar sayfasının otomatik yenileme anahtarı açıkken ne sıklıkta yeniden denetlediği. Değişiklikleri ona kimse iletmez, dolayısıyla bu bir yoklama aralığıdır; kısa olması daha tazedir ve daha maliyetlidir.",
+      "notifyBlocked": "Bir uygulama engellendiğinde bana bildir",
+      "notifyBlockedDescription": "Her oturumda uygulama başına bir kez, Normal modda. Windows bileşenleri dahil edilmez.",
+      "notifyListening": "Bir uygulama gelen bağlantıları kabul etmeye başladığında bana bildir",
+      "notifyListeningDescription": "Her oturumda uygulama başına bir kez. Windows bileşenleri dahil edilmez."
     },
     "protection": {
       "allowLocalSubnet": "Yerel ağa izin ver",
@@ -440,5 +444,13 @@
     "untilRestart": "Yeniden başlatılana kadar",
     "expiresAtSuffix": "{0}, {1} saatine kadar",
     "untilRestartSuffix": "{0}, yeniden başlatılana kadar"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} engellendi",
+    "blockedManyTitle": "{0} ve {1} uygulama daha engellendi",
+    "blockedBody": "Bağlanmaya çalıştı ve SimpleDeFence bunu durdurdu. Bağlantılar sayfasında görmek ve izin vermek için tıklayın.",
+    "listeningOneTitle": "{0} gelen bağlantıları kabul ediyor",
+    "listeningManyTitle": "{0} ve {1} uygulama daha gelen bağlantıları kabul ediyor",
+    "listeningBody": "Uzaktan erişim araçları ve bazı kötü amaçlı yazılımlar bunu yapar; kullandığınız bir program olduğunu kontrol edin. Bağlantılar sayfasında görmek için tıklayın."
   }
 }

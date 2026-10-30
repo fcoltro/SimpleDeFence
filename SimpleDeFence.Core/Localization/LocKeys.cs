@@ -261,6 +261,10 @@
             public const string GeneralAskForExceptionDetailsDescription = "settings.general.askForExceptionDetailsDescription";
             public const string GeneralEnableHotkeys = "settings.general.enableHotkeys";
             public const string GeneralEnableHotkeysDescription = "settings.general.enableHotkeysDescription";
+            public const string GeneralNotifyBlocked = "settings.general.notifyBlocked";
+            public const string GeneralNotifyBlockedDescription = "settings.general.notifyBlockedDescription";
+            public const string GeneralNotifyListening = "settings.general.notifyListening";
+            public const string GeneralNotifyListeningDescription = "settings.general.notifyListeningDescription";
             public const string GeneralAutoRefreshInterval = "settings.general.autoRefreshInterval";
             public const string GeneralAutoRefreshIntervalDescription = "settings.general.autoRefreshIntervalDescription";
 
@@ -393,6 +397,18 @@
             public const string TcpIn = "policy.tcpIn";
             public const string UdpIn = "policy.udpIn";
             public const string AllPorts = "policy.allPorts";
+        }
+
+        /// <summary>The tray notifications ActivityNotifier shows. {0} is an app's name, {1} how many
+        /// more apps the same notification covers.</summary>
+        public static class Notifications
+        {
+            public const string BlockedOneTitle = "notifications.blockedOneTitle";
+            public const string BlockedManyTitle = "notifications.blockedManyTitle";
+            public const string BlockedBody = "notifications.blockedBody";
+            public const string ListeningOneTitle = "notifications.listeningOneTitle";
+            public const string ListeningManyTitle = "notifications.listeningManyTitle";
+            public const string ListeningBody = "notifications.listeningBody";
         }
 
         /// <summary>How long a rule stays in force, one per offered AppExceptionTimer value, plus

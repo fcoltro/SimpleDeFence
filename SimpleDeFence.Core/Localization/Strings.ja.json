@@ -275,7 +275,11 @@
       "enableHotkeys": "グローバルキーボードショートカットを有効にする",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W でどこからでも実行可能ファイル、プロセス、ウィンドウを即座に許可します。Ctrl+Alt+B で「すべてブロック」に切り替え、もう一度押すと標準に戻ります。",
       "autoRefreshInterval": "自動更新の間隔",
-      "autoRefreshIntervalDescription": "「接続」ページの自動更新スイッチがオンの間、再確認する頻度です。変更が通知されることはないためこれはポーリング間隔であり、短いほど新しい情報が得られる代わりに負荷が増えます。"
+      "autoRefreshIntervalDescription": "「接続」ページの自動更新スイッチがオンの間、再確認する頻度です。変更が通知されることはないためこれはポーリング間隔であり、短いほど新しい情報が得られる代わりに負荷が増えます。",
+      "notifyBlocked": "アプリがブロックされたら通知する",
+      "notifyBlockedDescription": "標準モードで、セッションごとにアプリ 1 つにつき 1 回。Windows のコンポーネントは対象外です。",
+      "notifyListening": "アプリが着信接続を受け付け始めたら通知する",
+      "notifyListeningDescription": "セッションごとにアプリ 1 つにつき 1 回。Windows のコンポーネントは対象外です。"
     },
     "protection": {
       "allowLocalSubnet": "ローカルネットワークを許可",
@@ -440,5 +444,13 @@
     "untilRestart": "再起動まで",
     "expiresAtSuffix": "{0}、{1} まで",
     "untilRestartSuffix": "{0}、再起動まで"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} をブロックしました",
+    "blockedManyTitle": "{0} ほか {1} 件をブロックしました",
+    "blockedBody": "接続しようとしたため、SimpleDeFence が止めました。クリックすると [接続] ページで確認でき、そこで許可できます。",
+    "listeningOneTitle": "{0} が着信接続を受け付けています",
+    "listeningManyTitle": "{0} ほか {1} 件が着信接続を受け付けています",
+    "listeningBody": "リモート アクセス ツールや一部のマルウェアがこの動作をします。使用しているプログラムか確認してください。クリックすると [接続] ページで確認できます。"
   }
 }

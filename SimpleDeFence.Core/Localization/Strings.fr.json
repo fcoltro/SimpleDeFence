@@ -275,7 +275,11 @@
       "enableHotkeys": "Activer les raccourcis clavier globaux",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W autorisent instantanément un exécutable, un processus ou une fenêtre depuis n'importe où. Ctrl+Alt+B passe en mode Tout bloquer, puis revient en mode Normal.",
       "autoRefreshInterval": "Intervalle d'actualisation automatique",
-      "autoRefreshIntervalDescription": "À quelle fréquence la page Connexions se met à jour tant que son interrupteur d'actualisation automatique est activé. Rien ne lui envoie de changements : c'est donc un intervalle d'interrogation ; plus il est court, plus les données sont fraîches et plus cela coûte."
+      "autoRefreshIntervalDescription": "À quelle fréquence la page Connexions se met à jour tant que son interrupteur d'actualisation automatique est activé. Rien ne lui envoie de changements : c'est donc un intervalle d'interrogation ; plus il est court, plus les données sont fraîches et plus cela coûte.",
+      "notifyBlocked": "Me prévenir quand une application est bloquée",
+      "notifyBlockedDescription": "Une fois par application et par session, en mode Normal. Les composants de Windows sont exclus.",
+      "notifyListening": "Me prévenir quand une application commence à accepter des connexions entrantes",
+      "notifyListeningDescription": "Une fois par application et par session. Les composants de Windows sont exclus."
     },
     "protection": {
       "allowLocalSubnet": "Autoriser le réseau local",
@@ -440,5 +444,13 @@
     "untilRestart": "Jusqu'au redémarrage",
     "expiresAtSuffix": "{0}, jusqu'à {1}",
     "untilRestartSuffix": "{0}, jusqu'au redémarrage"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} a été bloqué",
+    "blockedManyTitle": "{0} et {1} autres ont été bloqués",
+    "blockedBody": "Il a tenté de se connecter et SimpleDeFence l'en a empêché. Cliquez pour le voir dans la page Connexions, où vous pouvez l'autoriser.",
+    "listeningOneTitle": "{0} accepte les connexions entrantes",
+    "listeningManyTitle": "{0} et {1} autres acceptent les connexions entrantes",
+    "listeningBody": "Les outils d'accès à distance et certains logiciels malveillants le font : vérifiez qu'il s'agit d'un programme que vous utilisez. Cliquez pour le voir dans la page Connexions."
   }
 }

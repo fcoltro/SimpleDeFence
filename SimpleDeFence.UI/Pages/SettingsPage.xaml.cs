@@ -102,6 +102,8 @@ namespace SimpleDeFence.UI.Pages
                 LanguageCombo.SelectedIndex = 0;
             AskForExceptionDetailsToggle.IsOn = _clientSettings.AskForExceptionDetails;
             EnableHotkeysToggle.IsOn = _clientSettings.EnableGlobalHotkeys;
+            NotifyBlockedToggle.IsOn = _clientSettings.NotifyWhenBlocked;
+            NotifyListeningToggle.IsOn = _clientSettings.NotifyWhenListening;
             // Through the clamping property, so a hand-edited or legacy 0 shows as the default
             // rather than as a NumberBox pinned to its minimum.
             AutoRefreshIntervalBox.Value = _clientSettings.ConnectionsAutoRefreshInterval.TotalSeconds;
@@ -404,6 +406,18 @@ namespace SimpleDeFence.UI.Pages
             _clientSettings.EnableGlobalHotkeys = EnableHotkeysToggle.IsOn;
             SaveClientSettings();
             (Application.Current as App)?.NotifyHotkeySettingChanged(_clientSettings.EnableGlobalHotkeys);
+        }
+
+        /// <summary>Both notification switches: client-side settings like the hotkeys, applied to
+        /// the running notifier at once.</summary>
+        private void NotifyToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding)
+                return;
+            _clientSettings.NotifyWhenBlocked = NotifyBlockedToggle.IsOn;
+            _clientSettings.NotifyWhenListening = NotifyListeningToggle.IsOn;
+            SaveClientSettings();
+            App.NotifyActivitySettingsChanged(_clientSettings);
         }
 
         /// <summary>ToggleSwitch fires Toggled synchronously from inside its own event dispatch -

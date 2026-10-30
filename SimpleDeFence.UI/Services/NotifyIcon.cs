@@ -29,6 +29,7 @@ namespace SimpleDeFence.UI.Services
         private const uint WM_LBUTTONUP = 0x0202;
         private const uint NIN_SELECT = 0x0400;          // WM_USER + 0
         private const uint NIN_KEYSELECT = 0x0401;       // WM_USER + 1
+        private const uint NIN_BALLOONUSERCLICK = 0x0405; // WM_USER + 5
 
         private const uint NIM_ADD = 0x0;
         private const uint NIM_MODIFY = 0x1;
@@ -102,6 +103,11 @@ namespace SimpleDeFence.UI.Services
         /// <summary>Right click, or the keyboard context-menu key. Carries the screen point the
         /// shell says the menu should be anchored at.</summary>
         public event Action<int, int>? ContextMenuRequested;
+
+        /// <summary>The user clicked the notification ShowNotification put up. Windows 10 and 11
+        /// show it as a toast; this still arrives through the icon's own callback, which is what
+        /// makes it work from an elevated process, where Windows App SDK app notifications do not.</summary>
+        public event Action? NotificationClicked;
 
         public NotifyIcon(IntPtr hwnd, WindowHotkeys messages)
         {
@@ -247,6 +253,10 @@ namespace SimpleDeFence.UI.Services
 
                 case WM_CONTEXTMENU:
                     ContextMenuRequested?.Invoke(x, y);
+                    break;
+
+                case NIN_BALLOONUSERCLICK:
+                    NotificationClicked?.Invoke();
                     break;
             }
         }

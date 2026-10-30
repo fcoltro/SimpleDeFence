@@ -68,6 +68,9 @@ executed.
 - **Password protection** — the running configuration can be locked so it cannot be changed
   without the password, including by anything running as you.
 - **Hosts-file blocklists**, updated on request.
+- **Notifications** from the tray the first time an app is blocked from connecting, or starts
+  accepting incoming connections. One click opens it on the Connections page. Windows' own
+  components are left out, and both can be switched off in Settings.
 - **Temporary rules**: allow (or block) an app for 5 minutes up to 24 hours, or until the next
   restart, and the rule removes itself.
 - **Learning with a time limit**: Learning mode can switch itself back to Normal after 10, 30 or
