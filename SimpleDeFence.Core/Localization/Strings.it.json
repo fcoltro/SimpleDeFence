@@ -267,6 +267,13 @@
       "invalidPorts": "Regola {0}: «{1}» non è un elenco di porte.",
       "invalidAddresses": "Regola {0}: «{1}» non è un elenco di indirizzi.",
       "noRules": "Aggiungi almeno una regola o scegli un’altra opzione."
+    },
+    "cleanUp": "Pulisci",
+    "cleanUpTooltip": "Rimuovi le regole dei programmi non più installati",
+    "cleanUpDialog": {
+      "title": "Pulisci le regole",
+      "confirmBody": "{0} regola/e riguardano programmi non più presenti su questo PC. Rimuoverle?",
+      "nothing": "Tutte le regole riguardano programmi ancora presenti su questo PC."
     }
   },
   "settings": {

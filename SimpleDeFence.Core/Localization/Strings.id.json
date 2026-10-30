@@ -267,6 +267,13 @@
       "invalidPorts": "Aturan {0}: \"{1}\" bukan daftar port.",
       "invalidAddresses": "Aturan {0}: \"{1}\" bukan daftar alamat.",
       "noRules": "Tambahkan setidaknya satu aturan, atau pilih opsi lain."
+    },
+    "cleanUp": "Bersihkan",
+    "cleanUpTooltip": "Hapus aturan untuk program yang sudah tidak terpasang",
+    "cleanUpDialog": {
+      "title": "Bersihkan aturan",
+      "confirmBody": "{0} aturan untuk program yang sudah tidak ada di PC ini. Hapus?",
+      "nothing": "Semua aturan untuk program yang masih ada di PC ini."
     }
   },
   "settings": {

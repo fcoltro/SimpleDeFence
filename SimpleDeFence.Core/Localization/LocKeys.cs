@@ -190,6 +190,11 @@
             public const string EmptyFiltered = "rules.empty.filtered";
             public const string AppMissing = "rules.appMissing";
             public const string Remove = "rules.remove";
+            public const string CleanUp = "rules.cleanUp";
+            public const string CleanUpTooltip = "rules.cleanUpTooltip";
+            public const string CleanUpTitle = "rules.cleanUpDialog.title";
+            public const string CleanUpConfirmBody = "rules.cleanUpDialog.confirmBody";
+            public const string CleanUpNothing = "rules.cleanUpDialog.nothing";
             public const string MultiSelectHint = "rules.multiSelectHint";
             public const string RemoveConfirmTitle = "rules.removeConfirm.title";
             public const string RemoveConfirmBody = "rules.removeConfirm.body";

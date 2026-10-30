@@ -267,6 +267,13 @@
       "invalidPorts": "规则 {0}：“{1}”不是端口列表。",
       "invalidAddresses": "规则 {0}：“{1}”不是地址列表。",
       "noRules": "请至少添加一条规则，或选择其他选项。"
+    },
+    "cleanUp": "清理",
+    "cleanUpTooltip": "删除已不再安装的程序的规则",
+    "cleanUpDialog": {
+      "title": "清理规则",
+      "confirmBody": "有 {0} 条规则对应的程序已不在这台电脑上。要删除吗？",
+      "nothing": "所有规则对应的程序都还在这台电脑上。"
     }
   },
   "settings": {

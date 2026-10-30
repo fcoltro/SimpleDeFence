@@ -94,6 +94,25 @@ namespace SimpleDeFence.Tests
         }
 
         [Fact]
+        public void MissingExecutableRules_reports_only_programs_whose_file_is_gone()
+        {
+            var profile = new ServerProfileConfiguration("Default");
+            var present = ExeRule(@"C:\Apps\present.exe");
+            var gone = ExeRule(@"C:\Apps\gone.exe");
+            var unplugged = ExeRule(@"E:\Tools\tool.exe");
+            var share = ExeRule(@"\\nas\apps\app.exe");
+            var package = new FirewallExceptionV3(new AppContainerSubject("S-1-15-2-1", "App", "", ""), new UnrestrictedPolicy());
+            profile.AppExceptions.AddRange(new[] { present, gone, unplugged, share, package });
+
+            var files = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { @"C:\Apps\present.exe" };
+            var roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { @"C:\" };
+
+            var missing = RuleEdit.MissingExecutableRules(profile, files.Contains, roots.Contains);
+
+            Assert.Equal(new[] { gone.Id }, missing);
+        }
+
+        [Fact]
         public void RemoveExceptions_removes_exactly_the_given_ids()
         {
             var profile = new ServerProfileConfiguration("Default");

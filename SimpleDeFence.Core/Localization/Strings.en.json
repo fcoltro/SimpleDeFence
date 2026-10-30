@@ -267,6 +267,13 @@
       "invalidPorts": "Rule {0}: \"{1}\" is not a list of ports.",
       "invalidAddresses": "Rule {0}: \"{1}\" is not a list of addresses.",
       "noRules": "Add at least one rule, or choose another option."
+    },
+    "cleanUp": "Clean up",
+    "cleanUpTooltip": "Remove the rules for programs that are no longer installed",
+    "cleanUpDialog": {
+      "title": "Clean up rules",
+      "confirmBody": "{0} rule(s) are for programs that are no longer on this PC. Remove them?",
+      "nothing": "Every rule is for a program that is still on this PC."
     }
   },
   "settings": {

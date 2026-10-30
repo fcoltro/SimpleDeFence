@@ -267,6 +267,13 @@
       "invalidPorts": "Kural {0}: \"{1}\" bir bağlantı noktası listesi değil.",
       "invalidAddresses": "Kural {0}: \"{1}\" bir adres listesi değil.",
       "noRules": "En az bir kural ekleyin veya başka bir seçenek belirleyin."
+    },
+    "cleanUp": "Temizle",
+    "cleanUpTooltip": "Artık yüklü olmayan programların kurallarını kaldır",
+    "cleanUpDialog": {
+      "title": "Kuralları temizle",
+      "confirmBody": "{0} kural artık bu bilgisayarda olmayan programlara ait. Kaldırılsın mı?",
+      "nothing": "Tüm kurallar hâlâ bu bilgisayarda olan programlara ait."
     }
   },
   "settings": {

@@ -400,6 +400,7 @@ namespace SimpleDeFence.UI.Pages
         {
             var count = AppsList.SelectedItems.Count;
             RemoveButton.IsEnabled = count > 0 && !_committing;
+            CleanUpButton.IsEnabled = !_committing;
             RemoveButton.Content = count > 0
                 ? Loc.T(LocKeys.Rules.Remove) + " " + Loc.T(LocKeys.Connections.SectionCount, count)
                 : Loc.T(LocKeys.Rules.Remove);
@@ -1320,6 +1321,57 @@ namespace SimpleDeFence.UI.Pages
 
             var ids = selected.Select(s => s.Row.Exception!.Id).ToList();
             var resp = await CommitAsync(profile => RuleEdit.RemoveExceptions(profile, ids));
+
+            if (resp == MessageType.PUT_SETTINGS)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Rules.RemoveSuccessTitle),
+                    Loc.T(LocKeys.Rules.RemoveSuccessBody, ids.Count));
+                await RefreshAsync();
+            }
+            else
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Rules.RemoveFailedTitle), FailureDetail(resp,
+                    LocKeys.Rules.RemoveFailedLockedDetail, LocKeys.Rules.RemoveFailedStaleDetail,
+                    LocKeys.Rules.RemoveFailedGenericDetail));
+            }
+        }
+
+        /// <summary>
+        /// Removes the rules for programs that are no longer on disk, after saying how many. The
+        /// file checks run off the UI thread, because a path on a slow or sleeping drive can take a
+        /// while to answer.
+        /// </summary>
+        private async void CleanUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing || App.Firewall.Config is null)
+                return;
+
+            var profile = App.Firewall.Config.ActiveProfile;
+            var ids = await Task.Run(() => RuleEdit.MissingExecutableRules(profile, System.IO.File.Exists, System.IO.Directory.Exists));
+
+            if (ids.Count == 0)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Rules.CleanUpTitle), Loc.T(LocKeys.Rules.CleanUpNothing));
+                return;
+            }
+
+            var confirmTitle = Loc.T(LocKeys.Rules.CleanUpTitle);
+            var confirmBody = Loc.T(LocKeys.Rules.CleanUpConfirmBody, ids.Count);
+            var confirm = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
+                Title = confirmTitle,
+                Content = confirmBody,
+                PrimaryButtonText = Loc.T(LocKeys.Rules.Remove),
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                DefaultButton = ContentDialogButton.Close,
+            };
+            if (await TryShowDialogAsync(confirm, confirmTitle, confirmBody) != ContentDialogResult.Primary)
+                return;
+
+            var resp = await CommitAsync(p => RuleEdit.RemoveExceptions(p, ids));
 
             if (resp == MessageType.PUT_SETTINGS)
             {

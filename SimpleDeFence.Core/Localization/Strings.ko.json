@@ -267,6 +267,13 @@
       "invalidPorts": "규칙 {0}: '{1}'은(는) 포트 목록이 아닙니다.",
       "invalidAddresses": "규칙 {0}: '{1}'은(는) 주소 목록이 아닙니다.",
       "noRules": "규칙을 하나 이상 추가하거나 다른 옵션을 선택하세요."
+    },
+    "cleanUp": "정리",
+    "cleanUpTooltip": "더 이상 설치되어 있지 않은 프로그램의 규칙을 제거합니다",
+    "cleanUpDialog": {
+      "title": "규칙 정리",
+      "confirmBody": "이 PC에 더 이상 없는 프로그램의 규칙이 {0}개 있습니다. 제거할까요?",
+      "nothing": "모든 규칙이 이 PC에 있는 프로그램에 대한 것입니다."
     }
   },
   "settings": {

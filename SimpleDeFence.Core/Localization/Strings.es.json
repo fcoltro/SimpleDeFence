@@ -267,6 +267,13 @@
       "invalidPorts": "Regla {0}: «{1}» no es una lista de puertos.",
       "invalidAddresses": "Regla {0}: «{1}» no es una lista de direcciones.",
       "noRules": "Añade al menos una regla o elige otra opción."
+    },
+    "cleanUp": "Limpiar",
+    "cleanUpTooltip": "Quitar las reglas de programas que ya no están instalados",
+    "cleanUpDialog": {
+      "title": "Limpiar reglas",
+      "confirmBody": "{0} regla(s) son de programas que ya no están en este PC. ¿Quitarlas?",
+      "nothing": "Todas las reglas son de programas que siguen en este PC."
     }
   },
   "settings": {
