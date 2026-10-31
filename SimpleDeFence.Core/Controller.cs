@@ -69,9 +69,9 @@ namespace SimpleDeFence
             return null;
         }
 
-        public MessageType SwitchFirewallMode(FirewallMode mode)
+        public MessageType SwitchFirewallMode(FirewallMode mode, int learningMinutes = 0)
         {
-            return Endpoint.QueueMessage(TwMessageModeSwitch.CreateRequest(mode)).Response.Type;
+            return Endpoint.QueueMessage(TwMessageModeSwitch.CreateRequest(mode, learningMinutes)).Response.Type;
         }
 
         public MessageType RequestServerStop()

@@ -27,6 +27,12 @@ namespace SimpleDeFence
 
         [DataMember(EmitDefaultValue = false)]
         public bool EnableHostsBlocklist = false;
+
+        /// <summary>Addresses and networks no program may talk to, in either direction, as
+        /// normalised by CustomRuleText.TryNormalizeAddresses. Applied while EnableBlocklists is on,
+        /// in every mode, ahead of every allow rule - as the port blocklist is.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public List<string> BlockedAddresses = new List<string>();
     }
 
     [DataContract(Namespace = "SimpleDeFence")]
@@ -46,6 +52,12 @@ namespace SimpleDeFence
 
         [DataMember(EmitDefaultValue = false)]
         public bool DisplayOffBlock { get; set; } = false;
+
+        /// <summary>Certificate subjects (X509Certificate.Subject, exactly as the signed file
+        /// reports it) whose validly signed programs may connect without a rule of their own. See
+        /// PublisherTrust.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public List<string> TrustedPublishers { get; set; } = new List<string>();
 
         public ServerProfileConfiguration()
         { }
@@ -175,6 +187,11 @@ namespace SimpleDeFence
 
         [DataMember(EmitDefaultValue = false)]
         public bool AutoUpdateCheck { get; set; } = true;
+
+        /// <summary>On a network Windows calls Public, leave out "Allow local subnet" and the
+        /// sharing and remote-access special exceptions. See PublicNetworkLockdown.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public bool PublicNetworkLockdown { get; set; } = false;
 
         [DataMember(EmitDefaultValue = false)]
         public FirewallMode StartupMode { get; set; } = FirewallMode.Normal;

@@ -67,6 +67,21 @@
       "title": "自動学習を開始しますか？",
       "body": "自動学習モードでは、SimpleDeFence はすべての通信を許可し、どのアプリケーションがネットワークを使ったかを記憶して、モードを終了するときにそれらの例外を追加します。特別な例外についてはルールを学習できません。\n\nマルウェアに感染していないと確信できるシステムでのみ使用してください。",
       "confirm": "学習モードを開始"
+    },
+    "learningDuration": {
+      "label": "標準に戻すタイミング",
+      "never": "戻さない (自分でオフにする)",
+      "minutes10": "10 分後",
+      "minutes30": "30 分後",
+      "hour1": "1 時間後"
+    },
+    "learningEndsAt": "{0} {1} に標準に戻ります。",
+    "learningEnded": {
+      "title": "学習モードが終了しました",
+      "body": "{0} 件のルールが追加されました。それぞれが信頼できるプログラムのものか確認してください。",
+      "bodyOne": "1 件のルールが追加されました。信頼できるプログラムのものか確認してください。",
+      "bodyNone": "ルールは追加されませんでした。",
+      "review": "ルールを確認"
     }
   },
   "applications": {
@@ -129,6 +144,30 @@
     },
     "legend": {
       "local": "強調表示された行はローカルネットワーク内にとどまりました"
+    },
+    "allowByPublisher": "{0} のすべてのプログラム",
+    "allowPublisherSuccess": {
+      "body": "{0} が署名したプログラムが接続できるようになりました。"
+    },
+    "menu": {
+      "details": "詳細を表示",
+      "lookUp": "アドレスを調べる",
+      "filterApp": "このアプリだけを表示",
+      "copyAddresses": "アドレスをコピー",
+      "copyPath": "パスをコピー",
+      "openLocation": "ファイルの場所を開く",
+      "openLocationMissing": "プログラムのファイルとフォルダーはもうありません。"
+    },
+    "details": {
+      "addresses": "アドレス",
+      "lookUpNote": "各アドレスの名前、所有者、ネットワークが登録されている国を調べます。クリックするまで何も送信されません。クリックすると、アドレスがお使いの DNS サーバーと rdap.org に送られます。",
+      "lookUpLimit": "最初の {0} 件のアドレスだけを表示しています。",
+      "local": "ローカル ネットワークのアドレスです。調べる必要はありません。",
+      "notFound": "このアドレスの情報は見つかりませんでした。",
+      "host": "名前: {0}",
+      "owner": "所有者: {0}",
+      "network": "ネットワーク: {0}",
+      "country": "登録国: {0}"
     }
   },
   "subject": {
@@ -165,7 +204,8 @@
     "empty": {
       "applications": "アプリケーションの例外はまだありません。",
       "special": "利用できる特別な例外はありません。",
-      "filtered": "現在の絞り込み条件に一致するものはありません。"
+      "filtered": "現在の絞り込み条件に一致するものはありません。",
+      "publishers": "信頼された発行元はありません。"
     },
     "appMissing": "このアプリケーションのファイルはディスク上に存在しません。アンインストールされた可能性があります。",
     "remove": "削除",
@@ -211,16 +251,50 @@
       "udpIn": "UDP 受信",
       "lanOnly": "LAN のみ",
       "apply": "適用",
-      "customRulesReadOnly": "カスタムルールの一覧はまだここでは編集できません。",
+      "customRulesReadOnly": "この種類のルールはここでは編集できません。",
       "applySuccess": "ポリシーを更新しました。",
       "applyFailed": {
         "title": "ポリシーを更新できませんでした",
         "lockedDetail": "このルールを変更する前に構成のロックを解除してください。",
         "staleDetail": "構成が今しがた別の場所で変更されました。ポリシーは変更されていません。もう一度お試しください。",
         "genericDetail": "サービスが {0} を返しました。ポリシーは変更されていません。"
-      }
+      },
+      "policyCustom": "カスタム ルール"
     },
-    "multiSelectHint": "{0} 件のルールを選択中です。「削除」はそのすべてを消します。編集するにはルールを 1 件だけ選択してください。"
+    "multiSelectHint": "{0} 件のルールを選択中です。「削除」はそのすべてを消します。編集するにはルールを 1 件だけ選択してください。",
+    "publishersKind": "信頼された発行元",
+    "publishersDescription": "これらの発行元が署名したプログラムは、更新後も含め、個別のルールなしで接続できます。[接続] ページの [許可] から追加できます。",
+    "custom": {
+      "addRule": "ルールを追加",
+      "rule": "ルール {0}",
+      "removeRule": "ルールを削除",
+      "action": "動作",
+      "allow": "許可",
+      "block": "ブロック",
+      "direction": "方向",
+      "outgoing": "送信",
+      "incoming": "受信",
+      "both": "両方",
+      "protocol": "プロトコル",
+      "anyProtocol": "すべて",
+      "tcpUdp": "TCP と UDP",
+      "remoteAddresses": "リモート アドレス",
+      "remoteAddressesHint": "すべて、または例: 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "リモート ポート",
+      "localPorts": "ローカル ポート",
+      "portsHint": "すべて、または例: 80,443,8000-8100",
+      "invalidTitle": "これらのルールは保存できません",
+      "invalidPorts": "ルール {0}: 「{1}」はポートの一覧ではありません。",
+      "invalidAddresses": "ルール {0}: 「{1}」はアドレスの一覧ではありません。",
+      "noRules": "ルールを 1 つ以上追加するか、別のオプションを選んでください。"
+    },
+    "cleanUp": "クリーンアップ",
+    "cleanUpTooltip": "インストールされていないプログラムのルールを削除します",
+    "cleanUpDialog": {
+      "title": "ルールのクリーンアップ",
+      "confirmBody": "この PC にもう存在しないプログラムのルールが {0} 件あります。削除しますか?",
+      "nothing": "すべてのルールはこの PC にあるプログラムのものです。"
+    }
   },
   "settings": {
     "title": "設定",
@@ -258,21 +332,33 @@
       "askForExceptionDetails": "例外を 1 件追加するときに詳細を確認する",
       "askForExceptionDetailsDescription": "通知領域のクイック追加から例外を 1 件追加する前に、編集可能な確認画面を表示します。一括追加（フォルダー全体など）では確認しません。",
       "enableHotkeys": "グローバルキーボードショートカットを有効にする",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W でどこからでも実行可能ファイル、プロセス、ウィンドウを即座に許可します。",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W でどこからでも実行可能ファイル、プロセス、ウィンドウを即座に許可します。Ctrl+Alt+B で「すべてブロック」に切り替え、もう一度押すと標準に戻ります。",
       "autoRefreshInterval": "自動更新の間隔",
-      "autoRefreshIntervalDescription": "「接続」ページの自動更新スイッチがオンの間、再確認する頻度です。変更が通知されることはないためこれはポーリング間隔であり、短いほど新しい情報が得られる代わりに負荷が増えます。"
+      "autoRefreshIntervalDescription": "「接続」ページの自動更新スイッチがオンの間、再確認する頻度です。変更が通知されることはないためこれはポーリング間隔であり、短いほど新しい情報が得られる代わりに負荷が増えます。",
+      "notifyBlocked": "アプリがブロックされたら通知する",
+      "notifyBlockedDescription": "標準モードで、セッションごとにアプリ 1 つにつき 1 回。Windows のコンポーネントは対象外です。",
+      "notifyListening": "アプリが着信接続を受け付け始めたら通知する",
+      "notifyListeningDescription": "セッションごとにアプリ 1 つにつき 1 回。Windows のコンポーネントは対象外です。"
     },
     "protection": {
       "allowLocalSubnet": "ローカルネットワークを許可",
       "allowLocalSubnetDescription": "ローカルネットワーク上の他のデバイスとの通信を常に許可します。",
       "displayOffBlock": "ディスプレイがオフのときにネットワークをブロック",
-      "displayOffBlockDescription": "画面がオフの間、すべてのネットワーク通信をブロックします。"
+      "displayOffBlockDescription": "画面がオフの間、すべてのネットワーク通信をブロックします。",
+      "publicNetworkLockdown": "パブリック ネットワークでロックダウン",
+      "publicNetworkLockdownDescription": "Windows がパブリックとしているネットワーク (カフェやホテルの Wi-Fi など) では、「ローカルネットワークを許可」を無視し、ファイルとプリンターの共有、ネットワーク探索、ping、リモート アクセスをオフにします。",
+      "publicNetworkNow": "現在パブリック ネットワークに接続しています。"
     },
     "blocklists": {
       "enable": "ブロックリストを有効にする",
       "enableDescription": "悪意があると知られているホストやポートへの通信をブロックします。",
       "hosts": "悪意のあるホストをブロック",
-      "ports": "悪意のあるポートをブロック"
+      "ports": "悪意のあるポートをブロック",
+      "addresses": "ブロックするアドレス",
+      "addressesDescription": "ルールの内容にかかわらず、どのプログラムもこれらの IP アドレスやネットワークと接続できません。1 行に 1 つ。# で始まる行は無視されます。",
+      "addressesPlaceholder": "例: 203.0.113.7 または 198.51.100.0/24",
+      "addressesSave": "アドレスを保存",
+      "addressesInvalid": "「{0}」は IP アドレスでもネットワークでもありません。何も保存されませんでした。"
     },
     "security": {
       "lockHostsFile": "hosts ファイルをロック",
@@ -412,5 +498,26 @@
       "title": "SimpleDeFence は実行中です",
       "body": "ウィンドウを閉じてもファイアウォールは停止しません。停止するにはこのメニューの「終了」を使用してください。"
     }
+  },
+  "duration": {
+    "label": "期間",
+    "permanent": "常に",
+    "minutes5": "5 分間",
+    "minutes30": "30 分間",
+    "hour1": "1 時間",
+    "hours4": "4 時間",
+    "hours9": "9 時間",
+    "hours24": "24 時間",
+    "untilRestart": "再起動まで",
+    "expiresAtSuffix": "{0}、{1} まで",
+    "untilRestartSuffix": "{0}、再起動まで"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} をブロックしました",
+    "blockedManyTitle": "{0} ほか {1} 件をブロックしました",
+    "blockedBody": "接続しようとしたため、SimpleDeFence が止めました。クリックすると [接続] ページで確認でき、そこで許可できます。",
+    "listeningOneTitle": "{0} が着信接続を受け付けています",
+    "listeningManyTitle": "{0} ほか {1} 件が着信接続を受け付けています",
+    "listeningBody": "リモート アクセス ツールや一部のマルウェアがこの動作をします。使用しているプログラムか確認してください。クリックすると [接続] ページで確認できます。"
   }
 }

@@ -174,11 +174,24 @@
                      not enforcing what it was told to is a fact about the whole app, and the mode
                      chip below cannot say it - a firewall that failed to install its rules still
                      reports the mode it was asked for. -->
-                <InfoBar Grid.Row="0" Severity="Warning" Margin="24,16,24,0"
-                         IsOpen="{x:Bind Shell.IsDegraded, Mode=OneWay}"
-                         IsClosable="False"
-                         Title="{loc:Loc Key=status.degraded.title}"
-                         Message="{x:Bind Shell.DegradedMessage, Mode=OneWay}"/>
+                <StackPanel Grid.Row="0">
+                    <InfoBar Severity="Warning" Margin="24,16,24,0"
+                             IsOpen="{x:Bind Shell.IsDegraded, Mode=OneWay}"
+                             IsClosable="False"
+                             Title="{loc:Loc Key=status.degraded.title}"
+                             Message="{x:Bind Shell.DegradedMessage, Mode=OneWay}"/>
+
+                    <!-- Learning writes its rules as it ends, which is often on its own timer with
+                         nobody watching, so the window says so the next time it can and offers the
+                         way to the rules it wrote. Closable: it is news, not a state. -->
+                    <InfoBar x:Name="LearningEndedBar" Severity="Success" Margin="24,16,24,0"
+                             IsOpen="False" IsClosable="True"
+                             Title="{loc:Loc Key=mode.learningEnded.title}">
+                        <InfoBar.ActionButton>
+                            <Button Content="{loc:Loc Key=mode.learningEnded.review}" Click="LearningEndedReview_Click"/>
+                        </InfoBar.ActionButton>
+                    </InfoBar>
+                </StackPanel>
 
                 <Frame x:Name="ContentFrame" Grid.Row="1"/>
             </Grid>

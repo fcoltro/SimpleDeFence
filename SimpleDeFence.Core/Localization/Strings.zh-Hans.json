@@ -67,6 +67,21 @@
       "title": "开始自动学习？",
       "body": "在自动学习模式下，SimpleDeFence 会放行所有流量并记住哪些应用程序使用了网络，退出该模式时再为它们添加例外。特殊例外无法通过学习生成规则。\n\n请仅在你确信没有恶意软件的系统上使用此模式。",
       "confirm": "进入学习模式"
+    },
+    "learningDuration": {
+      "label": "切换回正常模式",
+      "never": "从不(我自己关闭)",
+      "minutes10": "10 分钟后",
+      "minutes30": "30 分钟后",
+      "hour1": "1 小时后"
+    },
+    "learningEndsAt": "{0} 将于 {1} 切换回正常模式。",
+    "learningEnded": {
+      "title": "学习模式已结束",
+      "body": "已添加 {0} 条规则。请确认每条规则都属于你信任的程序。",
+      "bodyOne": "已添加 1 条规则。请确认它属于你信任的程序。",
+      "bodyNone": "未添加任何规则。",
+      "review": "查看规则"
     }
   },
   "applications": {
@@ -129,6 +144,30 @@
     },
     "legend": {
       "local": "高亮显示的行未离开你的本地网络"
+    },
+    "allowByPublisher": "来自 {0} 的所有程序",
+    "allowPublisherSuccess": {
+      "body": "由 {0} 签名的程序现在可以连接了。"
+    },
+    "menu": {
+      "details": "显示详细信息",
+      "lookUp": "查询地址",
+      "filterApp": "只显示此应用",
+      "copyAddresses": "复制地址",
+      "copyPath": "复制路径",
+      "openLocation": "打开文件所在位置",
+      "openLocationMissing": "该程序的文件和文件夹已不存在。"
+    },
+    "details": {
+      "addresses": "地址",
+      "lookUpNote": "查找每个地址的名称、所有者以及其网络的注册国家/地区。点击之前不会发送任何内容；点击后，这些地址会发送到你的 DNS 服务器和 rdap.org。",
+      "lookUpLimit": "仅列出前 {0} 个地址。",
+      "local": "本地网络地址，无需查询。",
+      "notFound": "未找到此地址的任何信息。",
+      "host": "名称：{0}",
+      "owner": "所有者：{0}",
+      "network": "网络：{0}",
+      "country": "注册地：{0}"
     }
   },
   "subject": {
@@ -165,7 +204,8 @@
     "empty": {
       "applications": "尚无应用程序例外。",
       "special": "没有可用的特殊例外。",
-      "filtered": "没有符合当前筛选条件的内容。"
+      "filtered": "没有符合当前筛选条件的内容。",
+      "publishers": "没有受信任的发布者。"
     },
     "appMissing": "此应用程序的文件已不在磁盘上，可能已被卸载。",
     "remove": "移除",
@@ -211,16 +251,50 @@
       "udpIn": "UDP 入站",
       "lanOnly": "仅局域网",
       "apply": "应用",
-      "customRulesReadOnly": "自定义规则列表暂时无法在此编辑。",
+      "customRulesReadOnly": "此类规则无法在这里编辑。",
       "applySuccess": "策略已更新。",
       "applyFailed": {
         "title": "无法更新策略",
         "lockedDetail": "更改此规则前请先解锁配置。",
         "staleDetail": "配置刚刚在别处发生了更改；策略未被更改。请重试。",
         "genericDetail": "服务返回 {0}。策略未被更改。"
-      }
+      },
+      "policyCustom": "自定义规则"
     },
-    "multiSelectHint": "已选择 {0} 条规则。“移除”会全部删除；选择单条规则才能编辑它。"
+    "multiSelectHint": "已选择 {0} 条规则。“移除”会全部删除；选择单条规则才能编辑它。",
+    "publishersKind": "受信任的发布者",
+    "publishersDescription": "由这些发布者签名的程序无需单独规则即可连接，更新后也是如此。可在“连接”页面的“允许”中添加。",
+    "custom": {
+      "addRule": "添加规则",
+      "rule": "规则 {0}",
+      "removeRule": "删除规则",
+      "action": "操作",
+      "allow": "允许",
+      "block": "阻止",
+      "direction": "方向",
+      "outgoing": "出站",
+      "incoming": "入站",
+      "both": "双向",
+      "protocol": "协议",
+      "anyProtocol": "任意",
+      "tcpUdp": "TCP 和 UDP",
+      "remoteAddresses": "远程地址",
+      "remoteAddressesHint": "任意，或例如 192.168.1.0/24、LocalSubnet、DNS",
+      "remotePorts": "远程端口",
+      "localPorts": "本地端口",
+      "portsHint": "任意，或例如 80,443,8000-8100",
+      "invalidTitle": "无法保存这些规则",
+      "invalidPorts": "规则 {0}：“{1}”不是端口列表。",
+      "invalidAddresses": "规则 {0}：“{1}”不是地址列表。",
+      "noRules": "请至少添加一条规则，或选择其他选项。"
+    },
+    "cleanUp": "清理",
+    "cleanUpTooltip": "删除已不再安装的程序的规则",
+    "cleanUpDialog": {
+      "title": "清理规则",
+      "confirmBody": "有 {0} 条规则对应的程序已不在这台电脑上。要删除吗？",
+      "nothing": "所有规则对应的程序都还在这台电脑上。"
+    }
   },
   "settings": {
     "title": "设置",
@@ -258,21 +332,33 @@
       "askForExceptionDetails": "添加单个例外时询问详细信息",
       "askForExceptionDetailsDescription": "通过托盘的快速添加快捷方式添加单个例外前，显示一个可编辑的确认框。批量添加（例如整个文件夹）从不询问。",
       "enableHotkeys": "启用全局键盘快捷键",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W 可在任何位置立即将可执行文件、进程或窗口加入白名单。",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W 可在任何位置立即将可执行文件、进程或窗口加入白名单。Ctrl+Alt+B 切换到“全部阻止”,再按一次回到正常模式。",
       "autoRefreshInterval": "自动刷新间隔",
-      "autoRefreshIntervalDescription": "“连接”页面在其自动刷新开关打开时重新检查的频率。没有任何机制会主动向它推送更改，因此这是一个轮询间隔；间隔越短数据越新，开销也越大。"
+      "autoRefreshIntervalDescription": "“连接”页面在其自动刷新开关打开时重新检查的频率。没有任何机制会主动向它推送更改，因此这是一个轮询间隔；间隔越短数据越新，开销也越大。",
+      "notifyBlocked": "应用被阻止时通知我",
+      "notifyBlockedDescription": "在正常模式下,每个应用每次会话通知一次。不包括 Windows 组件。",
+      "notifyListening": "应用开始接受传入连接时通知我",
+      "notifyListeningDescription": "每个应用每次会话通知一次。不包括 Windows 组件。"
     },
     "protection": {
       "allowLocalSubnet": "允许本地网络",
       "allowLocalSubnetDescription": "始终允许与本地网络中其他设备之间的流量。",
       "displayOffBlock": "显示器关闭时阻止网络",
-      "displayOffBlockDescription": "在屏幕关闭期间阻止所有网络流量。"
+      "displayOffBlockDescription": "在屏幕关闭期间阻止所有网络流量。",
+      "publicNetworkLockdown": "在公用网络上锁定",
+      "publicNetworkLockdownDescription": "在 Windows 标记为公用的网络上（例如咖啡馆或酒店的 Wi-Fi），忽略“允许本地网络”，并关闭文件和打印机共享、网络发现、ping 和远程访问。",
+      "publicNetworkNow": "你当前连接的是公用网络。"
     },
     "blocklists": {
       "enable": "启用阻止列表",
       "enableDescription": "阻止通往已知恶意主机和端口的流量。",
       "hosts": "阻止恶意主机",
-      "ports": "阻止恶意端口"
+      "ports": "阻止恶意端口",
+      "addresses": "阻止的地址",
+      "addressesDescription": "无论规则如何，任何程序都不能与这些 IP 地址和网络建立连接。每行一个；以 # 开头的行会被忽略。",
+      "addressesPlaceholder": "例如 203.0.113.7 或 198.51.100.0/24",
+      "addressesSave": "保存地址",
+      "addressesInvalid": "“{0}”不是 IP 地址或网络。未保存任何内容。"
     },
     "security": {
       "lockHostsFile": "锁定 hosts 文件",
@@ -412,5 +498,26 @@
       "title": "SimpleDeFence 仍在运行",
       "body": "关闭窗口不会停止防火墙。请使用此菜单中的“退出”来停止它。"
     }
+  },
+  "duration": {
+    "label": "持续时间",
+    "permanent": "始终",
+    "minutes5": "5 分钟",
+    "minutes30": "30 分钟",
+    "hour1": "1 小时",
+    "hours4": "4 小时",
+    "hours9": "9 小时",
+    "hours24": "24 小时",
+    "untilRestart": "直到重启",
+    "expiresAtSuffix": "{0},直到 {1}",
+    "untilRestartSuffix": "{0},直到重启"
+  },
+  "notifications": {
+    "blockedOneTitle": "已阻止 {0}",
+    "blockedManyTitle": "已阻止 {0} 及另外 {1} 个应用",
+    "blockedBody": "它尝试联网,已被 SimpleDeFence 阻止。点击可在“连接”页面查看,并可在那里允许它。",
+    "listeningOneTitle": "{0} 正在接受传入连接",
+    "listeningManyTitle": "{0} 及另外 {1} 个应用正在接受传入连接",
+    "listeningBody": "远程访问工具和一些恶意软件会这样做,请确认这是你在使用的程序。点击可在“连接”页面查看。"
   }
 }

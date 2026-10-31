@@ -138,3 +138,27 @@ jobs:
         # Without this the job goes green while uploading nothing, which is how
         # the stale path above went unnoticed.
         if-no-files-found: error
+
+  # Compiles and publishes for ARM64 Windows, without packaging. No ARM64 installer ships yet;
+  # this keeps the code ready for one, so that an x64-only assumption (a P/Invoke struct layout,
+  # a native dependency) shows up here rather than on the day an ARM64 MSI is attempted.
+  arm64:
+    name: ARM64 publish
+    runs-on: windows-2022
+
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+    - name: Publish for win-arm64
+      run: dotnet publish SimpleDeFence/SimpleDeFence.csproj -c Release -r win-arm64 -p:SelfContained=true -o arm64-publish
+
+    - name: Check the output
+      shell: pwsh
+      run: |
+        $exe = 'arm64-publish/SimpleDeFence.exe'
+        if (-not (Test-Path $exe)) { throw "publish output missing at $exe" }
+        # IMAGE_FILE_MACHINE_ARM64 is 0xAA64, at the PE header's Machine field.
+        $bytes = [IO.File]::ReadAllBytes($exe)
+        $pe = [BitConverter]::ToInt32($bytes, 0x3C)
+        $machine = [BitConverter]::ToUInt16($bytes, $pe + 4)
+        if ($machine -ne 0xAA64) { throw ("SimpleDeFence.exe machine type is 0x{0:X4}, not ARM64" -f $machine) }

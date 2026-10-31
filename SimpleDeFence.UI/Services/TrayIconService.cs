@@ -37,11 +37,13 @@ namespace SimpleDeFence.UI.Services
         private const int HOTKEY_EXECUTABLE = 1;
         private const int HOTKEY_PROCESS = 2;
         private const int HOTKEY_WINDOW = 3;
+        private const int HOTKEY_BLOCK_ALL = 4;
         private const uint MOD_CONTROL = 0x2;
         private const uint MOD_ALT = 0x1;
         private const uint VK_E = 0x45;
         private const uint VK_P = 0x50;
         private const uint VK_W = 0x57;
+        private const uint VK_B = 0x42;
 
         public TrayIconService()
         {
@@ -71,6 +73,7 @@ namespace SimpleDeFence.UI.Services
             // how an app looks broken.
             _icon.Selected += ShowMainWindow;
             _icon.ContextMenuRequested += ShowTrayMenu;
+            _icon.NotificationClicked += OnNotificationClicked;
 
             // Icon and tooltip before Create, so the icon never appears in the notification area
             // blank and then fills in.
@@ -100,6 +103,8 @@ namespace SimpleDeFence.UI.Services
 
             try
             {
+                // A click on this one has nowhere to go; clear what an earlier notice would open.
+                _notificationClick = null;
                 _icon.ShowNotification(
                     title: Loc.T(LocKeys.Tray.StillRunningTitle),
                     message: Loc.T(LocKeys.Tray.StillRunningBody));
@@ -108,6 +113,41 @@ namespace SimpleDeFence.UI.Services
             {
                 System.Diagnostics.Debug.WriteLine($"Tray close notice failed: {e.Message}");
             }
+        }
+
+        /// <summary>What a click on the notification on screen does. One at a time, as the shell
+        /// shows them: a newer notification replaces both the toast and this.</summary>
+        private Action? _notificationClick;
+
+        /// <summary>Shows a notification about an app's network activity. A click opens the
+        /// Connections page, filtered to that app when the notification is about only one, so
+        /// it is one more click to allow it there.</summary>
+        public void ShowActivityNotification(string title, string message, string? appName)
+        {
+            if (_disposed)
+                return;
+
+            _notificationClick = () =>
+            {
+                Pages.ConnectionsPage.RequestFilter(appName ?? string.Empty);
+                ShowAndNavigate(typeof(Pages.ConnectionsPage));
+            };
+
+            try
+            {
+                _icon.ShowNotification(title, message);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Activity notification failed: {e.Message}");
+            }
+        }
+
+        private void OnNotificationClicked()
+        {
+            var click = _notificationClick;
+            _notificationClick = null;
+            click?.Invoke();
         }
 
         private static void ShowMainWindow()
@@ -127,7 +167,7 @@ namespace SimpleDeFence.UI.Services
         }
 
         /// <summary>Called from the Settings page when the user flips "Enable global hotkeys" -
-        /// registers/unregisters all three at once, matching SimpleDeFenceController's
+        /// registers/unregisters all of them at once, matching SimpleDeFenceController's
         /// ApplyControllerSettings/SetHotkey all-or-nothing behavior for this toggle.</summary>
         public void ApplyHotkeySetting(bool enabled)
         {
@@ -136,12 +176,14 @@ namespace SimpleDeFence.UI.Services
                 Register(HOTKEY_EXECUTABLE, VK_E, () => _ = WhitelistByExecutableAsync());
                 Register(HOTKEY_PROCESS, VK_P, () => _ = WhitelistByProcessAsync());
                 Register(HOTKEY_WINDOW, VK_W, () => _ = WhitelistByWindowAsync());
+                Register(HOTKEY_BLOCK_ALL, VK_B, () => _ = ToggleBlockAllAsync());
             }
             else
             {
                 _hotkeys.UnregisterHotkey(HOTKEY_EXECUTABLE);
                 _hotkeys.UnregisterHotkey(HOTKEY_PROCESS);
                 _hotkeys.UnregisterHotkey(HOTKEY_WINDOW);
+                _hotkeys.UnregisterHotkey(HOTKEY_BLOCK_ALL);
             }
         }
 
@@ -370,6 +412,19 @@ namespace SimpleDeFence.UI.Services
         {
             if (App.MainWindow is MainWindow window)
                 await window.ApplyModeAsync(mode);
+        }
+
+        /// <summary>Ctrl+Alt+B: Block all, and the same keys again to go back to Normal. Back to
+        /// Normal rather than to whatever ran before, because the mode before could have been
+        /// Learning or Disabled, and the way out of an emergency should not reopen everything.
+        /// Nothing is asked in either direction: Learning is the only mode switch that asks first.</summary>
+        private static async Task ToggleBlockAllAsync()
+        {
+            if (App.MainWindow is MainWindow window)
+            {
+                var target = window.Shell.CurrentMode == FirewallMode.BlockAll ? FirewallMode.Normal : FirewallMode.BlockAll;
+                await window.ApplyModeAsync(target);
+            }
         }
 
         private static async Task LockAsync()

@@ -67,6 +67,21 @@
       "title": "¿Iniciar el aprendizaje automático?",
       "body": "En el modo de aprendizaje automático, SimpleDeFence permite todo el tráfico y recuerda qué aplicaciones usaron la red; al salir del modo, añade excepciones para ellas. No se pueden aprender reglas para las excepciones especiales.\n\nUsa esto solo en un sistema que estés seguro de que no tiene malware.",
       "confirm": "Entrar en modo de aprendizaje"
+    },
+    "learningDuration": {
+      "label": "Volver a Normal",
+      "never": "Nunca (lo desactivaré yo)",
+      "minutes10": "Después de 10 minutos",
+      "minutes30": "Después de 30 minutos",
+      "hour1": "Después de 1 hora"
+    },
+    "learningEndsAt": "{0} Vuelve a Normal a las {1}.",
+    "learningEnded": {
+      "title": "El modo de aprendizaje ha terminado",
+      "body": "Se añadieron {0} reglas. Comprueba que cada una sea de un programa de confianza.",
+      "bodyOne": "Se añadió 1 regla. Comprueba que sea de un programa de confianza.",
+      "bodyNone": "No se añadió ninguna regla.",
+      "review": "Revisar reglas"
     }
   },
   "applications": {
@@ -129,6 +144,30 @@
     },
     "legend": {
       "local": "Las filas resaltadas se quedaron en tu red local"
+    },
+    "allowByPublisher": "Todos los programas de {0}",
+    "allowPublisherSuccess": {
+      "body": "Los programas firmados por {0} ya pueden conectarse."
+    },
+    "menu": {
+      "details": "Mostrar detalles",
+      "lookUp": "Consultar direcciones",
+      "filterApp": "Mostrar solo esta aplicación",
+      "copyAddresses": "Copiar direcciones",
+      "copyPath": "Copiar ruta",
+      "openLocation": "Abrir ubicación del archivo",
+      "openLocationMissing": "El archivo y la carpeta del programa ya no existen."
+    },
+    "details": {
+      "addresses": "Direcciones",
+      "lookUpNote": "Busca el nombre de cada dirección, su propietario y el país donde está registrada su red. No se envía nada hasta que hagas clic: entonces las direcciones van a tu servidor DNS y a rdap.org.",
+      "lookUpLimit": "Solo se muestran las primeras {0} direcciones.",
+      "local": "Dirección de la red local. No hay nada que consultar.",
+      "notFound": "No se encontró nada para esta dirección.",
+      "host": "Nombre: {0}",
+      "owner": "Propietario: {0}",
+      "network": "Red: {0}",
+      "country": "Registrada en: {0}"
     }
   },
   "subject": {
@@ -165,7 +204,8 @@
     "empty": {
       "applications": "Todavía no hay excepciones de aplicaciones.",
       "special": "No hay excepciones especiales disponibles.",
-      "filtered": "Nada coincide con el filtro actual."
+      "filtered": "Nada coincide con el filtro actual.",
+      "publishers": "No hay editores de confianza."
     },
     "appMissing": "El archivo de esta aplicación ya no existe en el disco; es posible que se haya desinstalado.",
     "remove": "Quitar",
@@ -211,16 +251,50 @@
       "udpIn": "UDP entrada",
       "lanOnly": "Solo LAN",
       "apply": "Aplicar",
-      "customRulesReadOnly": "Las listas de reglas personalizadas todavía no se pueden editar aquí.",
+      "customRulesReadOnly": "Este tipo de regla no se puede editar aquí.",
       "applySuccess": "Directiva actualizada.",
       "applyFailed": {
         "title": "No se pudo actualizar la directiva",
         "lockedDetail": "Desbloquea la configuración antes de cambiar esta regla.",
         "staleDetail": "La configuración acaba de cambiar en otro lugar; la directiva no se cambió. Inténtalo de nuevo.",
         "genericDetail": "El servicio devolvió {0}. La directiva no se cambió."
-      }
+      },
+      "policyCustom": "Reglas personalizadas"
     },
-    "multiSelectHint": "{0} reglas seleccionadas. Quitar las elimina todas; selecciona una sola regla para editarla."
+    "multiSelectHint": "{0} reglas seleccionadas. Quitar las elimina todas; selecciona una sola regla para editarla.",
+    "publishersKind": "Editores de confianza",
+    "publishersDescription": "Los programas firmados por estos editores pueden conectarse sin una regla propia, también después de una actualización. Añade uno desde Permitir en la página Conexiones.",
+    "custom": {
+      "addRule": "Añadir regla",
+      "rule": "Regla {0}",
+      "removeRule": "Quitar regla",
+      "action": "Acción",
+      "allow": "Permitir",
+      "block": "Bloquear",
+      "direction": "Dirección",
+      "outgoing": "Saliente",
+      "incoming": "Entrante",
+      "both": "Ambas",
+      "protocol": "Protocolo",
+      "anyProtocol": "Cualquiera",
+      "tcpUdp": "TCP y UDP",
+      "remoteAddresses": "Direcciones remotas",
+      "remoteAddressesHint": "Cualquiera, o por ejemplo 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Puertos remotos",
+      "localPorts": "Puertos locales",
+      "portsHint": "Cualquiera, o por ejemplo 80,443,8000-8100",
+      "invalidTitle": "No se pueden guardar estas reglas",
+      "invalidPorts": "Regla {0}: «{1}» no es una lista de puertos.",
+      "invalidAddresses": "Regla {0}: «{1}» no es una lista de direcciones.",
+      "noRules": "Añade al menos una regla o elige otra opción."
+    },
+    "cleanUp": "Limpiar",
+    "cleanUpTooltip": "Quitar las reglas de programas que ya no están instalados",
+    "cleanUpDialog": {
+      "title": "Limpiar reglas",
+      "confirmBody": "{0} regla(s) son de programas que ya no están en este PC. ¿Quitarlas?",
+      "nothing": "Todas las reglas son de programas que siguen en este PC."
+    }
   },
   "settings": {
     "title": "Configuración",
@@ -258,21 +332,33 @@
       "askForExceptionDetails": "Pedir detalles al añadir una sola excepción",
       "askForExceptionDetailsDescription": "Muestra una confirmación editable antes de añadir una excepción mediante los atajos rápidos de la bandeja. Las adiciones masivas (p. ej. una carpeta entera) nunca preguntan.",
       "enableHotkeys": "Activar los atajos de teclado globales",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permiten al instante un ejecutable, proceso o ventana desde cualquier lugar.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W permiten al instante un ejecutable, proceso o ventana desde cualquier lugar. Ctrl+Alt+B cambia a Bloquear todo y vuelve a Normal.",
       "autoRefreshInterval": "Intervalo de actualización automática",
-      "autoRefreshIntervalDescription": "Con qué frecuencia la página Conexiones vuelve a comprobar mientras su interruptor de actualización automática está activado. Nada le envía cambios, así que este es un intervalo de sondeo; menos es más reciente y cuesta más."
+      "autoRefreshIntervalDescription": "Con qué frecuencia la página Conexiones vuelve a comprobar mientras su interruptor de actualización automática está activado. Nada le envía cambios, así que este es un intervalo de sondeo; menos es más reciente y cuesta más.",
+      "notifyBlocked": "Avisarme cuando se bloquee una aplicación",
+      "notifyBlockedDescription": "Una vez por aplicación en cada sesión, en modo Normal. Se excluyen los componentes de Windows.",
+      "notifyListening": "Avisarme cuando una aplicación empiece a aceptar conexiones entrantes",
+      "notifyListeningDescription": "Una vez por aplicación en cada sesión. Se excluyen los componentes de Windows."
     },
     "protection": {
       "allowLocalSubnet": "Permitir la red local",
       "allowLocalSubnetDescription": "Permite siempre el tráfico hacia y desde otros dispositivos de tu red local.",
       "displayOffBlock": "Bloquear la red cuando la pantalla esté apagada",
-      "displayOffBlockDescription": "Bloquea todo el tráfico de red mientras la pantalla está apagada."
+      "displayOffBlockDescription": "Bloquea todo el tráfico de red mientras la pantalla está apagada.",
+      "publicNetworkLockdown": "Bloquear en redes públicas",
+      "publicNetworkLockdownDescription": "En las redes que Windows marca como públicas, como el Wi-Fi de una cafetería o un hotel, se ignora «Permitir la red local» y se desactivan el uso compartido de archivos e impresoras, la detección de redes, el ping y el acceso remoto.",
+      "publicNetworkNow": "Ahora mismo estás en una red pública."
     },
     "blocklists": {
       "enable": "Activar las listas de bloqueo",
       "enableDescription": "Bloquea el tráfico hacia hosts y puertos conocidos como maliciosos.",
       "hosts": "Bloquear hosts maliciosos",
-      "ports": "Bloquear puertos maliciosos"
+      "ports": "Bloquear puertos maliciosos",
+      "addresses": "Direcciones bloqueadas",
+      "addressesDescription": "Ningún programa puede conectarse con estas direcciones IP y redes, digan lo que digan sus reglas. Una por línea; las líneas que empiezan por # se ignoran.",
+      "addressesPlaceholder": "Por ejemplo 203.0.113.7 o 198.51.100.0/24",
+      "addressesSave": "Guardar direcciones",
+      "addressesInvalid": "«{0}» no es una dirección IP ni una red. No se guardó nada."
     },
     "security": {
       "lockHostsFile": "Bloquear el archivo hosts",
@@ -412,5 +498,26 @@
       "title": "SimpleDeFence sigue en ejecución",
       "body": "Cerrar la ventana no detiene el firewall. Usa Salir en este menú para detenerlo."
     }
+  },
+  "duration": {
+    "label": "Durante cuánto tiempo",
+    "permanent": "Siempre",
+    "minutes5": "Durante 5 minutos",
+    "minutes30": "Durante 30 minutos",
+    "hour1": "Durante 1 hora",
+    "hours4": "Durante 4 horas",
+    "hours9": "Durante 9 horas",
+    "hours24": "Durante 24 horas",
+    "untilRestart": "Hasta reiniciar",
+    "expiresAtSuffix": "{0}, hasta las {1}",
+    "untilRestartSuffix": "{0}, hasta reiniciar"
+  },
+  "notifications": {
+    "blockedOneTitle": "Se bloqueó {0}",
+    "blockedManyTitle": "Se bloquearon {0} y {1} más",
+    "blockedBody": "Intentó conectarse y SimpleDeFence lo impidió. Haz clic para verlo en la página Conexiones, donde puedes permitirlo.",
+    "listeningOneTitle": "{0} acepta conexiones entrantes",
+    "listeningManyTitle": "{0} y {1} más aceptan conexiones entrantes",
+    "listeningBody": "Las herramientas de acceso remoto y algunos programas maliciosos hacen esto, así que comprueba que sea un programa que usas. Haz clic para verlo en la página Conexiones."
   }
 }

@@ -38,6 +38,7 @@ namespace SimpleDeFence.UI
             SetTitleBar(AppTitleBar);
 
             ContentFrame.Navigate(typeof(ConnectionsPage));
+            Shell.LearningEnded += OnLearningEnded;
             _ = Shell.RefreshAsync();
 
             // NavigationView starts in whatever DisplayMode its initial width lands on, but
@@ -314,14 +315,20 @@ namespace SimpleDeFence.UI
             if (mode == Shell.CurrentMode)
                 return;
 
-            // Learning lets all traffic through, so it keeps the confirmation the WinForms GUI shows.
-            if (mode == FirewallMode.Learning && !await ConfirmLearningModeAsync())
-                return;
+            // Learning lets all traffic through, so it keeps the confirmation the WinForms GUI shows,
+            // which now also asks when it should switch itself off.
+            int learningMinutes = 0;
+            if (mode == FirewallMode.Learning)
+            {
+                if (await ConfirmLearningModeAsync() is not int minutes)
+                    return;
+                learningMinutes = minutes;
+            }
 
             MessageType resp;
             try
             {
-                resp = await Shell.SwitchModeAsync(mode);
+                resp = await Shell.SwitchModeAsync(mode, learningMinutes);
             }
             catch (Exception ex)
             {
@@ -347,15 +354,42 @@ namespace SimpleDeFence.UI
             }
         }
 
-        private async System.Threading.Tasks.Task<bool> ConfirmLearningModeAsync()
+        /// <summary>The time limits offered, in minutes; 0 is "leave it on". Thirty minutes is
+        /// preselected: long enough to start the programs whose rules are wanted, short enough that
+        /// forgetting about it does not leave the machine open for the evening.</summary>
+        private static readonly (int Minutes, string Key)[] LearningDurations =
         {
+            (10, LocKeys.Mode.LearningDurationMinutes10),
+            (30, LocKeys.Mode.LearningDurationMinutes30),
+            (60, LocKeys.Mode.LearningDurationHour1),
+            (0, LocKeys.Mode.LearningDurationNever),
+        };
+
+        /// <summary>Asks before Learning, and when it should end. Returns the chosen limit in
+        /// minutes (0 for none), or null when the user said no.</summary>
+        private async System.Threading.Tasks.Task<int?> ConfirmLearningModeAsync()
+        {
+            var duration = new ComboBox
+            {
+                Header = Loc.T(LocKeys.Mode.LearningDurationLabel),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness(0, 16, 0, 0),
+            };
+            foreach (var (_, key) in LearningDurations)
+                duration.Items.Add(Loc.T(key));
+            duration.SelectedIndex = 1;
+
+            var panel = new StackPanel { MinWidth = 320 };
+            panel.Children.Add(new TextBlock { Text = Loc.T(LocKeys.Mode.LearningConfirmBody), TextWrapping = TextWrapping.Wrap });
+            panel.Children.Add(duration);
+
             var dialog = new ContentDialog
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
                 RequestedTheme = App.UiElementTheme,
                 Title = Loc.T(LocKeys.Mode.LearningConfirmTitle),
-                Content = Loc.T(LocKeys.Mode.LearningConfirmBody),
+                Content = panel,
                 PrimaryButtonText = Loc.T(LocKeys.Mode.LearningConfirmConfirm),
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
                 DefaultButton = ContentDialogButton.Close,
@@ -367,12 +401,33 @@ namespace SimpleDeFence.UI
             App.BringMainWindowForward();
             try
             {
-                return await dialog.ShowAsync() == ContentDialogResult.Primary;
+                if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+                    return null;
             }
             catch (InvalidOperationException)
             {
-                return false;
+                return null;
             }
+
+            int index = duration.SelectedIndex;
+            return index >= 0 && index < LearningDurations.Length ? LearningDurations[index].Minutes : 0;
+        }
+
+        private void OnLearningEnded(int added)
+        {
+            LearningEndedBar.Message = added switch
+            {
+                0 => Loc.T(LocKeys.Mode.LearningEndedBodyNone),
+                1 => Loc.T(LocKeys.Mode.LearningEndedBodyOne),
+                _ => Loc.T(LocKeys.Mode.LearningEndedBody, added),
+            };
+            LearningEndedBar.IsOpen = true;
+        }
+
+        private void LearningEndedReview_Click(object sender, RoutedEventArgs e)
+        {
+            LearningEndedBar.IsOpen = false;
+            NavigateTo(typeof(RulesPage));
         }
 
         private async System.Threading.Tasks.Task ShowMessageAsync(string title, string body)

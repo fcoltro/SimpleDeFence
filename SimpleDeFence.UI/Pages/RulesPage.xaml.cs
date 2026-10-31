@@ -63,11 +63,178 @@ namespace SimpleDeFence.UI.Pages
         public event EventHandler<bool>? ToggleRequested;
     }
 
+    /// <summary>
+    /// The editor for one rule of a custom rule list: what it does, which way, which protocol,
+    /// and which addresses and ports. Built in code because the list is as long as the user makes
+    /// it. Fields the editor does not show (local addresses, ICMP types) are carried through from
+    /// the rule it was seeded with, so editing a database-made rule list does not lose them.
+    /// </summary>
+    internal sealed class CustomRuleEditor
+    {
+        private static readonly RuleDirection[] Directions = { RuleDirection.Out, RuleDirection.In, RuleDirection.InOut };
+
+        private readonly List<Protocol> _protocols = new() { Protocol.Any, Protocol.TCP, Protocol.UDP, Protocol.TcpUdp, Protocol.ICMPv4, Protocol.ICMPv6 };
+        private readonly TextBlock _header = new() { Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["BodyStrongTextBlockStyle"] };
+        private readonly ComboBox _action = new() { Header = Loc.T(LocKeys.Rules.CustomAction), MinWidth = 120 };
+        private readonly ComboBox _direction = new() { Header = Loc.T(LocKeys.Rules.CustomDirection), MinWidth = 120 };
+        private readonly ComboBox _protocol = new() { Header = Loc.T(LocKeys.Rules.CustomProtocol), MinWidth = 120 };
+        private readonly TextBox _remoteAddresses = new() { Header = Loc.T(LocKeys.Rules.CustomRemoteAddresses), PlaceholderText = Loc.T(LocKeys.Rules.CustomRemoteAddressesHint) };
+        private readonly TextBox _remotePorts = new() { Header = Loc.T(LocKeys.Rules.CustomRemotePorts), PlaceholderText = Loc.T(LocKeys.Rules.CustomPortsHint) };
+        private readonly TextBox _localPorts = new() { Header = Loc.T(LocKeys.Rules.CustomLocalPorts), PlaceholderText = Loc.T(LocKeys.Rules.CustomPortsHint) };
+        private readonly string _name;
+        private readonly string? _localAddresses;
+        private readonly string? _icmpTypesAndCodes;
+
+        public UIElement Root { get; }
+        public event EventHandler? RemoveRequested;
+
+        public CustomRuleEditor(RuleDef? seed, string defaultName)
+        {
+            _name = seed?.Name ?? defaultName;
+            _localAddresses = seed?.LocalAddresses;
+            _icmpTypesAndCodes = seed?.IcmpTypesAndCodes;
+
+            _action.Items.Add(Loc.T(LocKeys.Rules.CustomAllow));
+            _action.Items.Add(Loc.T(LocKeys.Rules.CustomBlock));
+            _action.SelectedIndex = seed?.Action == RuleAction.Block ? 1 : 0;
+
+            _direction.Items.Add(Loc.T(LocKeys.Rules.CustomOutgoing));
+            _direction.Items.Add(Loc.T(LocKeys.Rules.CustomIncoming));
+            _direction.Items.Add(Loc.T(LocKeys.Rules.CustomBoth));
+            _direction.SelectedIndex = Math.Max(0, Array.IndexOf(Directions, seed?.Direction ?? RuleDirection.Out));
+
+            // A protocol the list does not offer (GRE, say, from the app database) is added for
+            // this rule, so seeding never silently turns it into something else.
+            var protocol = seed?.Protocol ?? Protocol.Any;
+            if (!_protocols.Contains(protocol))
+                _protocols.Add(protocol);
+            foreach (var p in _protocols)
+            {
+                _protocol.Items.Add(p switch
+                {
+                    Protocol.Any => Loc.T(LocKeys.Rules.CustomAnyProtocol),
+                    Protocol.TcpUdp => Loc.T(LocKeys.Rules.CustomTcpUdp),
+                    _ => p.ToString(),
+                });
+            }
+            _protocol.SelectedIndex = _protocols.IndexOf(protocol);
+            _protocol.SelectionChanged += (_, _) => UpdatePortsEnabled();
+
+            _remoteAddresses.Text = seed?.RemoteAddresses ?? string.Empty;
+            _remotePorts.Text = seed?.RemotePorts ?? string.Empty;
+            _localPorts.Text = seed?.LocalPorts ?? string.Empty;
+            UpdatePortsEnabled();
+
+            var remove = new Button { Content = Loc.T(LocKeys.Rules.CustomRemoveRule) };
+            remove.Click += (_, _) => RemoveRequested?.Invoke(this, EventArgs.Empty);
+
+            var headerRow = new Grid { ColumnSpacing = 8 };
+            headerRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            headerRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            _header.VerticalAlignment = VerticalAlignment.Center;
+            headerRow.Children.Add(_header);
+            Grid.SetColumn(remove, 1);
+            headerRow.Children.Add(remove);
+
+            var choices = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            choices.Children.Add(_action);
+            choices.Children.Add(_direction);
+            choices.Children.Add(_protocol);
+
+            var body = new StackPanel { Spacing = 6 };
+            body.Children.Add(headerRow);
+            body.Children.Add(choices);
+            body.Children.Add(_remoteAddresses);
+            body.Children.Add(_remotePorts);
+            body.Children.Add(_localPorts);
+
+            Root = new Border
+            {
+                Child = body,
+                Padding = new Thickness(10),
+                CornerRadius = new CornerRadius(4),
+                BorderThickness = new Thickness(1),
+                // A fixed grey that reads on both themes. Not a ThemeResource looked up from code,
+                // which follows the application's theme rather than the page's (see RowBackground).
+                BorderBrush = new global::Microsoft.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(0x40, 0x80, 0x80, 0x80)),
+            };
+        }
+
+        /// <summary>Numbers the editor as it appears in the list, from 1.</summary>
+        public void SetNumber(int number) => _header.Text = Loc.T(LocKeys.Rules.CustomRule, number);
+
+        private Protocol SelectedProtocol
+            => _protocol.SelectedIndex >= 0 ? _protocols[_protocol.SelectedIndex] : Protocol.Any;
+
+        private void UpdatePortsEnabled()
+        {
+            bool ports = CustomRuleText.HasPorts(SelectedProtocol);
+            _remotePorts.IsEnabled = ports;
+            _localPorts.IsEnabled = ports;
+        }
+
+        /// <summary>The rule as entered, or null with error set to what to tell the user.</summary>
+        public RuleDef? TryBuild(int number, out string? error)
+        {
+            error = null;
+            var protocol = SelectedProtocol;
+
+            if (!CustomRuleText.TryNormalizeAddresses(_remoteAddresses.Text, out var remoteAddresses))
+            {
+                error = Loc.T(LocKeys.Rules.CustomInvalidAddresses, number, _remoteAddresses.Text);
+                return null;
+            }
+
+            string? remotePorts = null, localPorts = null;
+            if (CustomRuleText.HasPorts(protocol))
+            {
+                if (!CustomRuleText.TryNormalizePorts(_remotePorts.Text, out remotePorts))
+                {
+                    error = Loc.T(LocKeys.Rules.CustomInvalidPorts, number, _remotePorts.Text);
+                    return null;
+                }
+                if (!CustomRuleText.TryNormalizePorts(_localPorts.Text, out localPorts))
+                {
+                    error = Loc.T(LocKeys.Rules.CustomInvalidPorts, number, _localPorts.Text);
+                    return null;
+                }
+            }
+
+            return new RuleDef
+            {
+                Name = _name,
+                Action = _action.SelectedIndex == 1 ? RuleAction.Block : RuleAction.Allow,
+                Direction = Directions[Math.Max(0, _direction.SelectedIndex)],
+                Protocol = protocol,
+                RemoteAddresses = remoteAddresses,
+                RemotePorts = remotePorts,
+                LocalPorts = localPorts,
+                LocalAddresses = _localAddresses,
+                IcmpTypesAndCodes = protocol is Protocol.ICMPv4 or Protocol.ICMPv6 ? _icmpTypesAndCodes : null,
+            };
+        }
+    }
+
+    /// <summary>One trusted-publisher row with its Remove button.</summary>
+    public sealed class PublisherListItem
+    {
+        public string Subject { get; init; } = string.Empty;
+        public string Name => PublisherTrust.DisplayName(Subject);
+        public string RemoveText => Loc.T(LocKeys.Rules.Remove);
+
+        public void Remove() => RemoveRequested?.Invoke(this, EventArgs.Empty);
+
+        public event EventHandler? RemoveRequested;
+    }
+
     public sealed partial class RulesPage : Page
     {
         private readonly ObservableCollection<RuleListItem> _apps = new();
         private readonly ObservableCollection<SpecialListItem> _specialRecommended = new();
         private readonly ObservableCollection<SpecialListItem> _specialOptional = new();
+        private readonly ObservableCollection<PublisherListItem> _publishers = new();
+        private IReadOnlyList<string> _publisherSubjects = Array.Empty<string>();
+        private readonly List<CustomRuleEditor> _customEditors = new();
         private IReadOnlyList<RuleRow> _rows = Array.Empty<RuleRow>();
         private bool _busy;
         private bool _committing;
@@ -106,6 +273,7 @@ namespace SimpleDeFence.UI.Pages
             AppsList.ItemsSource = _apps;
             SpecialRecommendedList.ItemsSource = _specialRecommended;
             SpecialOptionalList.ItemsSource = _specialOptional;
+            PublishersList.ItemsSource = _publishers;
             Loaded += async (_, _) => await RefreshAsync();
         }
 
@@ -124,10 +292,12 @@ namespace SimpleDeFence.UI.Pages
                     ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Status.NotConnected),
                         App.Firewall.LastError ?? string.Empty);
                     _rows = Array.Empty<RuleRow>();
+                    _publisherSubjects = Array.Empty<string>();
                 }
                 else
                 {
                     Notice.IsOpen = false;
+                    _publisherSubjects = App.Firewall.Config.ActiveProfile.TrustedPublishers.ToList();
                     var db = await App.Firewall.GetAppDatabaseAsync();
                     _rows = RuleListBuilder.Build(App.Firewall.Config.ActiveProfile, db ?? new AppDatabase());
                 }
@@ -169,6 +339,19 @@ namespace SimpleDeFence.UI.Pages
             SetEmpty(AppsEmpty, _apps.Count, LocKeys.Rules.EmptyApplications, term);
             var specialCount = _specialRecommended.Count + _specialOptional.Count;
             SetEmpty(SpecialEmpty, specialCount, LocKeys.Rules.EmptySpecial, term);
+
+            _publishers.Clear();
+            foreach (var subject in _publisherSubjects)
+            {
+                var item = new PublisherListItem { Subject = subject };
+                if (term.Length != 0
+                    && item.Name.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) < 0
+                    && subject.IndexOf(term, StringComparison.CurrentCultureIgnoreCase) < 0)
+                    continue;
+                item.RemoveRequested += (_, _) => DispatcherQueue.TryEnqueue(() => _ = RemovePublisherAsync(item));
+                _publishers.Add(item);
+            }
+            SetEmpty(PublishersEmpty, _publishers.Count, LocKeys.Rules.EmptyPublishers, term);
 
             UpdateRemoveButton();
         }
@@ -217,6 +400,7 @@ namespace SimpleDeFence.UI.Pages
         {
             var count = AppsList.SelectedItems.Count;
             RemoveButton.IsEnabled = count > 0 && !_committing;
+            CleanUpButton.IsEnabled = !_committing;
             RemoveButton.Content = count > 0
                 ? Loc.T(LocKeys.Rules.Remove) + " " + Loc.T(LocKeys.Connections.SectionCount, count)
                 : Loc.T(LocKeys.Rules.Remove);
@@ -284,6 +468,15 @@ namespace SimpleDeFence.UI.Pages
                 TcpInBox.Text = string.Empty;
                 UdpInBox.Text = string.Empty;
                 LanOnlyCheck.IsChecked = false;
+                ClearCustomEditors();
+
+                // A custom rule list can be edited, but not turned into a preset: the presets
+                // cannot hold what it says, and RuleEdit.ApplyPreset refuses the swap.
+                bool isRuleList = policy is RuleListPolicy;
+                PresetBlocked.IsEnabled = !isRuleList;
+                PresetUnrestricted.IsEnabled = !isRuleList;
+                PresetUnrestrictedLan.IsEnabled = !isRuleList;
+                PresetTcpUdp.IsEnabled = !isRuleList;
 
                 // Pattern-matched against the actual ExceptionPolicy subclass shapes in
                 // SimpleDeFence.Core/ExceptionPolicy.cs - not the PolicyType enum - so this stays
@@ -309,6 +502,11 @@ namespace SimpleDeFence.UI.Pages
                         UdpInBox.Text = tcpUdp.AllowedLocalUdpListenerPorts ?? string.Empty;
                         LanOnlyCheck.IsChecked = tcpUdp.LocalNetworkOnly;
                         break;
+                    case RuleListPolicy ruleList:
+                        foreach (var rule in ruleList.Rules)
+                            AddCustomEditor(rule);
+                        PresetCustom.IsChecked = true;
+                        break;
                 }
             }
 
@@ -326,12 +524,48 @@ namespace SimpleDeFence.UI.Pages
             HardBlockPolicy => true,
             UnrestrictedPolicy => true,
             TcpUdpPolicy => true,
+            RuleListPolicy => true,
             _ => false,
         };
 
         /// <summary>Local UI state only (which fields are enabled) - fires from a RadioButton's own
         /// Checked event, so per the Task 4 reentrancy fix it must never commit or show a dialog.</summary>
-        private void PresetRadio_Checked(object sender, RoutedEventArgs e) => UpdateTcpUdpFieldsEnabled();
+        private void PresetRadio_Checked(object sender, RoutedEventArgs e)
+        {
+            // Choosing Custom on a preset rule starts from one rule to fill in, rather than an
+            // empty list with nothing to edit.
+            if (ReferenceEquals(sender, PresetCustom) && _customEditors.Count == 0)
+                AddCustomEditor(null);
+            UpdateTcpUdpFieldsEnabled();
+        }
+
+        private void AddCustomRuleButton_Click(object sender, RoutedEventArgs e) => AddCustomEditor(null);
+
+        private void AddCustomEditor(RuleDef? seed)
+        {
+            var editor = new CustomRuleEditor(seed, _selectedDetailItem?.Row.Name ?? string.Empty);
+            editor.RemoveRequested += (_, _) =>
+            {
+                _customEditors.Remove(editor);
+                CustomRulesList.Children.Remove(editor.Root);
+                RenumberCustomEditors();
+            };
+            _customEditors.Add(editor);
+            CustomRulesList.Children.Add(editor.Root);
+            RenumberCustomEditors();
+        }
+
+        private void ClearCustomEditors()
+        {
+            _customEditors.Clear();
+            CustomRulesList.Children.Clear();
+        }
+
+        private void RenumberCustomEditors()
+        {
+            for (int i = 0; i < _customEditors.Count; ++i)
+                _customEditors[i].SetNumber(i + 1);
+        }
 
         private void UpdateTcpUdpFieldsEnabled()
         {
@@ -343,6 +577,8 @@ namespace SimpleDeFence.UI.Pages
             TcpInBox.IsEnabled = enabled;
             UdpInBox.IsEnabled = enabled;
             LanOnlyCheck.IsEnabled = enabled;
+
+            CustomRulesFields.Visibility = PresetCustom.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void UpdateApplyButtonEnabled()
@@ -1101,6 +1337,57 @@ namespace SimpleDeFence.UI.Pages
         }
 
         /// <summary>
+        /// Removes the rules for programs that are no longer on disk, after saying how many. The
+        /// file checks run off the UI thread, because a path on a slow or sleeping drive can take a
+        /// while to answer.
+        /// </summary>
+        private async void CleanUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing || App.Firewall.Config is null)
+                return;
+
+            var profile = App.Firewall.Config.ActiveProfile;
+            var ids = await Task.Run(() => RuleEdit.MissingExecutableRules(profile, System.IO.File.Exists, System.IO.Directory.Exists));
+
+            if (ids.Count == 0)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Rules.CleanUpTitle), Loc.T(LocKeys.Rules.CleanUpNothing));
+                return;
+            }
+
+            var confirmTitle = Loc.T(LocKeys.Rules.CleanUpTitle);
+            var confirmBody = Loc.T(LocKeys.Rules.CleanUpConfirmBody, ids.Count);
+            var confirm = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
+                Title = confirmTitle,
+                Content = confirmBody,
+                PrimaryButtonText = Loc.T(LocKeys.Rules.Remove),
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                DefaultButton = ContentDialogButton.Close,
+            };
+            if (await TryShowDialogAsync(confirm, confirmTitle, confirmBody) != ContentDialogResult.Primary)
+                return;
+
+            var resp = await CommitAsync(p => RuleEdit.RemoveExceptions(p, ids));
+
+            if (resp == MessageType.PUT_SETTINGS)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Rules.RemoveSuccessTitle),
+                    Loc.T(LocKeys.Rules.RemoveSuccessBody, ids.Count));
+                await RefreshAsync();
+            }
+            else
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Rules.RemoveFailedTitle), FailureDetail(resp,
+                    LocKeys.Rules.RemoveFailedLockedDetail, LocKeys.Rules.RemoveFailedStaleDetail,
+                    LocKeys.Rules.RemoveFailedGenericDetail));
+            }
+        }
+
+        /// <summary>
         /// Plain Button.Click handler - the same safe shape RemoveButton_Click already uses. This is
         /// the only place in the detail pane allowed to call CommitAsync/show a dialog; the
         /// RadioButton/CheckBox handlers above only ever touch local UI state, per the Task 4
@@ -1121,19 +1408,42 @@ namespace SimpleDeFence.UI.Pages
             // AppsList_SelectionChanged -> UpdateDetailPane) nulls _selectedDetailItem out from
             // under this handler.
             var rowName = _selectedDetailItem.Row.Name;
-            var newPolicy = BuildPolicyFromEditor();
 
             FirewallExceptionV3 edited;
-            try
+            if (PresetCustom.IsChecked == true)
             {
-                edited = RuleEdit.ApplyPreset(original, newPolicy);
+                // Checked before anything is committed, so a typo is reported against the rule
+                // it is in rather than installed as a filter that matches something else.
+                var customRules = new List<RuleDef>();
+                for (int i = 0; i < _customEditors.Count; ++i)
+                {
+                    if (_customEditors[i].TryBuild(i + 1, out var error) is not RuleDef rule)
+                    {
+                        await ShowResultAsync(Loc.T(LocKeys.Rules.CustomInvalidTitle), error ?? string.Empty);
+                        return;
+                    }
+                    customRules.Add(rule);
+                }
+                if (customRules.Count == 0)
+                {
+                    await ShowResultAsync(Loc.T(LocKeys.Rules.CustomInvalidTitle), Loc.T(LocKeys.Rules.CustomNoRules));
+                    return;
+                }
+                edited = RuleEdit.ApplyCustomRules(original, customRules);
             }
-            catch (InvalidOperationException ex)
+            else
             {
-                // Unreachable given the guard above, but a thrown exception must not look like
-                // nothing happened.
-                await ShowResultAsync(Loc.T(LocKeys.Rules.DetailApplyFailedTitle), ex.Message);
-                return;
+                try
+                {
+                    edited = RuleEdit.ApplyPreset(original, BuildPolicyFromEditor());
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // A rule list with a preset chosen. The preset radios are disabled for rule
+                    // lists, but a thrown exception must not look like nothing happened.
+                    await ShowResultAsync(Loc.T(LocKeys.Rules.DetailApplyFailedTitle), ex.Message);
+                    return;
+                }
             }
 
             var resp = await CommitAsync(profile =>
@@ -1162,8 +1472,9 @@ namespace SimpleDeFence.UI.Pages
 
         /// <summary>Reads the preset editor's current state into the matching ExceptionPolicy
         /// subclass. TCP/UDP is the fallback branch: it is the only preset besides the mutually
-        /// exclusive radios above, and exactly one of the four is always checked once a row has been
-        /// seeded (SeedDetailPane always sets one).</summary>
+        /// exclusive radios above, and exactly one of the five is always checked once a row has been
+        /// seeded (SeedDetailPane always sets one). Not called with Custom checked:
+        /// ApplyButton_Click builds that one from the rule editors, which can refuse.</summary>
         private ExceptionPolicy BuildPolicyFromEditor()
         {
             if (PresetBlocked.IsChecked == true)
@@ -1222,6 +1533,24 @@ namespace SimpleDeFence.UI.Pages
                 await ShowResultAsync(Loc.T(LocKeys.Rules.SpecialToggleFailedTitle), FailureDetail(resp,
                     LocKeys.Rules.SpecialToggleFailedLockedDetail, LocKeys.Rules.SpecialToggleFailedStaleDetail,
                     LocKeys.Rules.SpecialToggleFailedGenericDetail));
+            }
+        }
+
+        private async Task RemovePublisherAsync(PublisherListItem item)
+        {
+            // Serialized with every other commit on this page, and refused rather than queued.
+            if (_committing)
+                return;
+
+            var resp = await CommitAsync(profile =>
+                profile.TrustedPublishers.RemoveAll(s => string.Equals(s, item.Subject, StringComparison.OrdinalIgnoreCase)));
+
+            await RefreshAsync();
+            if (resp != MessageType.PUT_SETTINGS)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Rules.RemoveFailedTitle), FailureDetail(resp,
+                    LocKeys.Rules.RemoveFailedLockedDetail, LocKeys.Rules.RemoveFailedStaleDetail,
+                    LocKeys.Rules.RemoveFailedGenericDetail));
             }
         }
 

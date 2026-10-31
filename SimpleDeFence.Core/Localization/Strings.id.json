@@ -67,6 +67,21 @@
       "title": "Mulai pembelajaran otomatis?",
       "body": "Dalam mode pembelajaran otomatis, SimpleDeFence mengizinkan seluruh lalu lintas dan mengingat aplikasi mana yang memakai jaringan, lalu menambahkan pengecualian untuk aplikasi tersebut saat Anda keluar dari mode ini. Aturan tidak dapat dipelajari untuk Pengecualian Khusus.\n\nGunakan ini hanya pada sistem yang Anda yakini bebas dari malware.",
       "confirm": "Masuk mode pembelajaran"
+    },
+    "learningDuration": {
+      "label": "Kembali ke Normal",
+      "never": "Tidak pernah (saya matikan sendiri)",
+      "minutes10": "Setelah 10 menit",
+      "minutes30": "Setelah 30 menit",
+      "hour1": "Setelah 1 jam"
+    },
+    "learningEndsAt": "{0} Kembali ke Normal pukul {1}.",
+    "learningEnded": {
+      "title": "Mode belajar telah berakhir",
+      "body": "{0} aturan ditambahkan. Pastikan masing-masing untuk program yang Anda percayai.",
+      "bodyOne": "1 aturan ditambahkan. Pastikan aturan itu untuk program yang Anda percayai.",
+      "bodyNone": "Tidak ada aturan yang ditambahkan.",
+      "review": "Tinjau aturan"
     }
   },
   "applications": {
@@ -129,6 +144,30 @@
     },
     "legend": {
       "local": "Baris yang disorot tetap berada di jaringan lokal Anda"
+    },
+    "allowByPublisher": "Semua program dari {0}",
+    "allowPublisherSuccess": {
+      "body": "Program yang ditandatangani {0} kini dapat terhubung."
+    },
+    "menu": {
+      "details": "Tampilkan detail",
+      "lookUp": "Cari info alamat",
+      "filterApp": "Tampilkan hanya aplikasi ini",
+      "copyAddresses": "Salin alamat",
+      "copyPath": "Salin jalur",
+      "openLocation": "Buka lokasi file",
+      "openLocationMissing": "File dan folder program ini sudah tidak ada."
+    },
+    "details": {
+      "addresses": "Alamat",
+      "lookUpNote": "Mencari nama setiap alamat, pemiliknya, dan negara tempat jaringannya terdaftar. Tidak ada yang dikirim sebelum Anda mengklik: setelah itu alamat dikirim ke server DNS Anda dan ke rdap.org.",
+      "lookUpLimit": "Hanya {0} alamat pertama yang ditampilkan.",
+      "local": "Alamat jaringan lokal. Tidak ada yang perlu dicari.",
+      "notFound": "Tidak ada info untuk alamat ini.",
+      "host": "Nama: {0}",
+      "owner": "Pemilik: {0}",
+      "network": "Jaringan: {0}",
+      "country": "Terdaftar di: {0}"
     }
   },
   "subject": {
@@ -165,7 +204,8 @@
     "empty": {
       "applications": "Belum ada pengecualian aplikasi.",
       "special": "Tidak ada pengecualian khusus yang tersedia.",
-      "filtered": "Tidak ada yang cocok dengan saringan saat ini."
+      "filtered": "Tidak ada yang cocok dengan saringan saat ini.",
+      "publishers": "Belum ada penerbit tepercaya."
     },
     "appMissing": "File aplikasi ini sudah tidak ada lagi di disk - mungkin telah dihapus instalannya.",
     "remove": "Hapus",
@@ -211,16 +251,50 @@
       "udpIn": "UDP masuk",
       "lanOnly": "Hanya LAN",
       "apply": "Terapkan",
-      "customRulesReadOnly": "Daftar aturan khusus belum dapat disunting di sini.",
+      "customRulesReadOnly": "Jenis aturan ini tidak dapat diedit di sini.",
       "applySuccess": "Kebijakan diperbarui.",
       "applyFailed": {
         "title": "Tidak dapat memperbarui kebijakan",
         "lockedDetail": "Buka kunci konfigurasi sebelum mengubah aturan ini.",
         "staleDetail": "Konfigurasi baru saja berubah di tempat lain; kebijakan tidak diubah. Silakan coba lagi.",
         "genericDetail": "Layanan mengembalikan {0}. Kebijakan tidak diubah."
-      }
+      },
+      "policyCustom": "Aturan khusus"
     },
-    "multiSelectHint": "{0} aturan dipilih. Hapus akan menghapus semuanya; pilih satu aturan saja untuk menyuntingnya."
+    "multiSelectHint": "{0} aturan dipilih. Hapus akan menghapus semuanya; pilih satu aturan saja untuk menyuntingnya.",
+    "publishersKind": "Penerbit tepercaya",
+    "publishersDescription": "Program yang ditandatangani penerbit ini dapat terhubung tanpa aturan sendiri, termasuk setelah pembaruan. Tambahkan dari Izinkan di halaman Koneksi.",
+    "custom": {
+      "addRule": "Tambah aturan",
+      "rule": "Aturan {0}",
+      "removeRule": "Hapus aturan",
+      "action": "Tindakan",
+      "allow": "Izinkan",
+      "block": "Blokir",
+      "direction": "Arah",
+      "outgoing": "Keluar",
+      "incoming": "Masuk",
+      "both": "Keduanya",
+      "protocol": "Protokol",
+      "anyProtocol": "Semua",
+      "tcpUdp": "TCP dan UDP",
+      "remoteAddresses": "Alamat jarak jauh",
+      "remoteAddressesHint": "Semua, atau misalnya 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Port jarak jauh",
+      "localPorts": "Port lokal",
+      "portsHint": "Semua, atau misalnya 80,443,8000-8100",
+      "invalidTitle": "Aturan ini tidak dapat disimpan",
+      "invalidPorts": "Aturan {0}: \"{1}\" bukan daftar port.",
+      "invalidAddresses": "Aturan {0}: \"{1}\" bukan daftar alamat.",
+      "noRules": "Tambahkan setidaknya satu aturan, atau pilih opsi lain."
+    },
+    "cleanUp": "Bersihkan",
+    "cleanUpTooltip": "Hapus aturan untuk program yang sudah tidak terpasang",
+    "cleanUpDialog": {
+      "title": "Bersihkan aturan",
+      "confirmBody": "{0} aturan untuk program yang sudah tidak ada di PC ini. Hapus?",
+      "nothing": "Semua aturan untuk program yang masih ada di PC ini."
+    }
   },
   "settings": {
     "title": "Pengaturan",
@@ -258,21 +332,33 @@
       "askForExceptionDetails": "Tanyakan detail saat menambahkan satu pengecualian",
       "askForExceptionDetailsDescription": "Menampilkan konfirmasi yang dapat disunting sebelum menambahkan satu pengecualian lewat pintasan tambah-cepat pada baki sistem. Penambahan massal (misalnya satu folder penuh) tidak pernah menanyakan.",
       "enableHotkeys": "Aktifkan pintasan papan tik global",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W langsung mengizinkan sebuah berkas eksekusi, proses, atau jendela dari mana saja.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W langsung mengizinkan sebuah berkas eksekusi, proses, atau jendela dari mana saja. Ctrl+Alt+B beralih ke Blokir semua, lalu kembali ke Normal.",
       "autoRefreshInterval": "Selang penyegaran otomatis",
-      "autoRefreshIntervalDescription": "Seberapa sering halaman Koneksi memeriksa ulang selagi sakelar Segarkan otomatisnya menyala. Tidak ada yang mengirimkan perubahan kepadanya, jadi ini adalah selang penjajakan; makin singkat makin segar dan makin mahal."
+      "autoRefreshIntervalDescription": "Seberapa sering halaman Koneksi memeriksa ulang selagi sakelar Segarkan otomatisnya menyala. Tidak ada yang mengirimkan perubahan kepadanya, jadi ini adalah selang penjajakan; makin singkat makin segar dan makin mahal.",
+      "notifyBlocked": "Beri tahu saya saat aplikasi diblokir",
+      "notifyBlockedDescription": "Sekali per aplikasi setiap sesi, dalam mode Normal. Komponen Windows tidak disertakan.",
+      "notifyListening": "Beri tahu saya saat aplikasi mulai menerima koneksi masuk",
+      "notifyListeningDescription": "Sekali per aplikasi setiap sesi. Komponen Windows tidak disertakan."
     },
     "protection": {
       "allowLocalSubnet": "Izinkan jaringan lokal",
       "allowLocalSubnetDescription": "Selalu izinkan lalu lintas dari dan ke perangkat lain di jaringan lokal Anda.",
       "displayOffBlock": "Blokir jaringan saat layar mati",
-      "displayOffBlockDescription": "Memblokir seluruh lalu lintas jaringan selagi layar mati."
+      "displayOffBlockDescription": "Memblokir seluruh lalu lintas jaringan selagi layar mati.",
+      "publicNetworkLockdown": "Kunci di jaringan publik",
+      "publicNetworkLockdownDescription": "Di jaringan yang ditandai Windows sebagai Publik, seperti Wi-Fi kafe atau hotel, abaikan \"Izinkan jaringan lokal\" dan matikan berbagi file dan printer, penemuan jaringan, ping, serta akses jarak jauh.",
+      "publicNetworkNow": "Anda sedang terhubung ke jaringan Publik."
     },
     "blocklists": {
       "enable": "Aktifkan daftar blokir",
       "enableDescription": "Memblokir lalu lintas ke hos dan porta yang diketahui berbahaya.",
       "hosts": "Blokir hos berbahaya",
-      "ports": "Blokir porta berbahaya"
+      "ports": "Blokir porta berbahaya",
+      "addresses": "Alamat yang diblokir",
+      "addressesDescription": "Tidak ada program yang dapat terhubung ke atau dari alamat IP dan jaringan ini, apa pun aturannya. Satu per baris; baris yang diawali # diabaikan.",
+      "addressesPlaceholder": "Misalnya 203.0.113.7 atau 198.51.100.0/24",
+      "addressesSave": "Simpan alamat",
+      "addressesInvalid": "\"{0}\" bukan alamat IP atau jaringan. Tidak ada yang disimpan."
     },
     "security": {
       "lockHostsFile": "Kunci berkas hosts",
@@ -412,5 +498,26 @@
       "title": "SimpleDeFence masih berjalan",
       "body": "Menutup jendela tidak menghentikan firewall. Gunakan Keluar pada menu ini untuk menghentikannya."
     }
+  },
+  "duration": {
+    "label": "Berapa lama",
+    "permanent": "Selalu",
+    "minutes5": "Selama 5 menit",
+    "minutes30": "Selama 30 menit",
+    "hour1": "Selama 1 jam",
+    "hours4": "Selama 4 jam",
+    "hours9": "Selama 9 jam",
+    "hours24": "Selama 24 jam",
+    "untilRestart": "Sampai dinyalakan ulang",
+    "expiresAtSuffix": "{0}, sampai {1}",
+    "untilRestartSuffix": "{0}, sampai dinyalakan ulang"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} diblokir",
+    "blockedManyTitle": "{0} dan {1} lainnya diblokir",
+    "blockedBody": "Aplikasi ini mencoba terhubung dan SimpleDeFence menghentikannya. Klik untuk melihatnya di halaman Koneksi, tempat Anda dapat mengizinkannya.",
+    "listeningOneTitle": "{0} menerima koneksi masuk",
+    "listeningManyTitle": "{0} dan {1} lainnya menerima koneksi masuk",
+    "listeningBody": "Alat akses jarak jauh dan sebagian malware melakukan ini, jadi pastikan ini program yang Anda gunakan. Klik untuk melihatnya di halaman Koneksi."
   }
 }

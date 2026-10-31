@@ -98,8 +98,8 @@ namespace SimpleDeFence.UI.Services
             return response;
         }
 
-        public Task<MessageType> SwitchModeAsync(FirewallMode mode)
-            => CommandAsync(() => _controller.SwitchFirewallMode(mode));
+        public Task<MessageType> SwitchModeAsync(FirewallMode mode, int learningMinutes = 0)
+            => CommandAsync(() => _controller.SwitchFirewallMode(mode, learningMinutes));
 
         public Task<MessageType> LockAsync()
             => CommandAsync(() => _controller.LockServer());
@@ -192,9 +192,9 @@ namespace SimpleDeFence.UI.Services
             });
         }
 
-        public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy)
+        public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy, AppExceptionTimer timer = AppExceptionTimer.Permanent)
             => CommitConfigChangesAsync(config =>
-                config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) }));
+                config.ActiveProfile.AddExceptions(new List<FirewallExceptionV3> { new(subject, policy) { Timer = timer } }));
 
         /// <summary>
         /// Taken under the same gate as RefreshAsync, and followed by Changed on every path.

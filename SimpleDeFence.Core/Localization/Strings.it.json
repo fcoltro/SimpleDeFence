@@ -67,6 +67,21 @@
       "title": "Avviare l'apprendimento automatico?",
       "body": "In modalità di apprendimento automatico SimpleDeFence consente tutto il traffico e ricorda quali applicazioni hanno usato la rete, poi aggiunge eccezioni per esse quando esci dalla modalità. Per le eccezioni speciali non è possibile apprendere regole.\n\nUsa questa modalità solo su un sistema che sei certo sia privo di malware.",
       "confirm": "Entra in modalità apprendimento"
+    },
+    "learningDuration": {
+      "label": "Torna a Normale",
+      "never": "Mai (lo disattivo io)",
+      "minutes10": "Dopo 10 minuti",
+      "minutes30": "Dopo 30 minuti",
+      "hour1": "Dopo 1 ora"
+    },
+    "learningEndsAt": "{0} Torna a Normale alle {1}.",
+    "learningEnded": {
+      "title": "La modalità di apprendimento è terminata",
+      "body": "Sono state aggiunte {0} regole. Verifica che ognuna riguardi un programma di cui ti fidi.",
+      "bodyOne": "È stata aggiunta 1 regola. Verifica che riguardi un programma di cui ti fidi.",
+      "bodyNone": "Non è stata aggiunta nessuna regola.",
+      "review": "Controlla le regole"
     }
   },
   "applications": {
@@ -129,6 +144,30 @@
     },
     "legend": {
       "local": "Le righe evidenziate sono rimaste nella tua rete locale"
+    },
+    "allowByPublisher": "Tutti i programmi di {0}",
+    "allowPublisherSuccess": {
+      "body": "I programmi firmati da {0} ora possono connettersi."
+    },
+    "menu": {
+      "details": "Mostra dettagli",
+      "lookUp": "Cerca indirizzi",
+      "filterApp": "Mostra solo questa app",
+      "copyAddresses": "Copia indirizzi",
+      "copyPath": "Copia percorso",
+      "openLocation": "Apri percorso file",
+      "openLocationMissing": "Il file e la cartella del programma non esistono più."
+    },
+    "details": {
+      "addresses": "Indirizzi",
+      "lookUpNote": "Trova il nome di ogni indirizzo, il proprietario e il paese in cui è registrata la sua rete. Non viene inviato nulla finché non fai clic: allora gli indirizzi vanno al tuo server DNS e a rdap.org.",
+      "lookUpLimit": "Sono elencati solo i primi {0} indirizzi.",
+      "local": "Indirizzo della rete locale. Niente da cercare.",
+      "notFound": "Nessun risultato per questo indirizzo.",
+      "host": "Nome: {0}",
+      "owner": "Proprietario: {0}",
+      "network": "Rete: {0}",
+      "country": "Registrato in: {0}"
     }
   },
   "subject": {
@@ -165,7 +204,8 @@
     "empty": {
       "applications": "Non ci sono ancora eccezioni per le applicazioni.",
       "special": "Nessuna eccezione speciale disponibile.",
-      "filtered": "Niente corrisponde al filtro attuale."
+      "filtered": "Niente corrisponde al filtro attuale.",
+      "publishers": "Nessun editore attendibile."
     },
     "appMissing": "Il file di questa applicazione non esiste più sul disco: potrebbe essere stata disinstallata.",
     "remove": "Rimuovi",
@@ -211,16 +251,50 @@
       "udpIn": "UDP entrata",
       "lanOnly": "Solo LAN",
       "apply": "Applica",
-      "customRulesReadOnly": "Gli elenchi di regole personalizzate non sono ancora modificabili qui.",
+      "customRulesReadOnly": "Questo tipo di regola non si può modificare qui.",
       "applySuccess": "Criterio aggiornato.",
       "applyFailed": {
         "title": "Impossibile aggiornare il criterio",
         "lockedDetail": "Sblocca la configurazione prima di modificare questa regola.",
         "staleDetail": "La configurazione è appena cambiata altrove; il criterio non è stato modificato. Riprova.",
         "genericDetail": "Il servizio ha restituito {0}. Il criterio non è stato modificato."
-      }
+      },
+      "policyCustom": "Regole personalizzate"
     },
-    "multiSelectHint": "{0} regole selezionate. Rimuovi le elimina tutte; seleziona una sola regola per modificarla."
+    "multiSelectHint": "{0} regole selezionate. Rimuovi le elimina tutte; seleziona una sola regola per modificarla.",
+    "publishersKind": "Editori attendibili",
+    "publishersDescription": "I programmi firmati da questi editori possono connettersi senza una regola propria, anche dopo un aggiornamento. Aggiungine uno con Consenti nella pagina Connessioni.",
+    "custom": {
+      "addRule": "Aggiungi regola",
+      "rule": "Regola {0}",
+      "removeRule": "Rimuovi regola",
+      "action": "Azione",
+      "allow": "Consenti",
+      "block": "Blocca",
+      "direction": "Direzione",
+      "outgoing": "In uscita",
+      "incoming": "In entrata",
+      "both": "Entrambe",
+      "protocol": "Protocollo",
+      "anyProtocol": "Qualsiasi",
+      "tcpUdp": "TCP e UDP",
+      "remoteAddresses": "Indirizzi remoti",
+      "remoteAddressesHint": "Qualsiasi, oppure ad esempio 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Porte remote",
+      "localPorts": "Porte locali",
+      "portsHint": "Qualsiasi, oppure ad esempio 80,443,8000-8100",
+      "invalidTitle": "Impossibile salvare queste regole",
+      "invalidPorts": "Regola {0}: «{1}» non è un elenco di porte.",
+      "invalidAddresses": "Regola {0}: «{1}» non è un elenco di indirizzi.",
+      "noRules": "Aggiungi almeno una regola o scegli un’altra opzione."
+    },
+    "cleanUp": "Pulisci",
+    "cleanUpTooltip": "Rimuovi le regole dei programmi non più installati",
+    "cleanUpDialog": {
+      "title": "Pulisci le regole",
+      "confirmBody": "{0} regola/e riguardano programmi non più presenti su questo PC. Rimuoverle?",
+      "nothing": "Tutte le regole riguardano programmi ancora presenti su questo PC."
+    }
   },
   "settings": {
     "title": "Impostazioni",
@@ -258,21 +332,33 @@
       "askForExceptionDetails": "Chiedi i dettagli quando aggiungi una singola eccezione",
       "askForExceptionDetailsDescription": "Mostra una conferma modificabile prima di aggiungere un'eccezione tramite le scorciatoie di aggiunta rapida dell'area di notifica. Le aggiunte in blocco (ad esempio un'intera cartella) non chiedono mai.",
       "enableHotkeys": "Attiva le scorciatoie da tastiera globali",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W consentono all'istante un eseguibile, un processo o una finestra da qualsiasi punto.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W consentono all'istante un eseguibile, un processo o una finestra da qualsiasi punto. Ctrl+Alt+B passa a Blocca tutto e torna a Normale.",
       "autoRefreshInterval": "Intervallo di aggiornamento automatico",
-      "autoRefreshIntervalDescription": "Con quale frequenza la pagina Connessioni ricontrolla mentre il suo interruttore di aggiornamento automatico è attivo. Nessuno le invia le modifiche, quindi questo è un intervallo di polling: più breve è, più i dati sono aggiornati e più costa."
+      "autoRefreshIntervalDescription": "Con quale frequenza la pagina Connessioni ricontrolla mentre il suo interruttore di aggiornamento automatico è attivo. Nessuno le invia le modifiche, quindi questo è un intervallo di polling: più breve è, più i dati sono aggiornati e più costa.",
+      "notifyBlocked": "Avvisami quando un'app viene bloccata",
+      "notifyBlockedDescription": "Una volta per app in ogni sessione, in modalità Normale. I componenti di Windows sono esclusi.",
+      "notifyListening": "Avvisami quando un'app inizia ad accettare connessioni in entrata",
+      "notifyListeningDescription": "Una volta per app in ogni sessione. I componenti di Windows sono esclusi."
     },
     "protection": {
       "allowLocalSubnet": "Consenti la rete locale",
       "allowLocalSubnetDescription": "Consenti sempre il traffico da e verso gli altri dispositivi della tua rete locale.",
       "displayOffBlock": "Blocca la rete quando lo schermo è spento",
-      "displayOffBlockDescription": "Blocca tutto il traffico di rete mentre lo schermo è spento."
+      "displayOffBlockDescription": "Blocca tutto il traffico di rete mentre lo schermo è spento.",
+      "publicNetworkLockdown": "Blocca sulle reti pubbliche",
+      "publicNetworkLockdownDescription": "Sulle reti che Windows segna come pubbliche, come il Wi-Fi di un bar o di un hotel, ignora «Consenti la rete locale» e disattiva la condivisione di file e stampanti, l’individuazione di rete, il ping e l’accesso remoto.",
+      "publicNetworkNow": "In questo momento sei su una rete pubblica."
     },
     "blocklists": {
       "enable": "Attiva gli elenchi di blocco",
       "enableDescription": "Blocca il traffico verso host e porte noti come dannosi.",
       "hosts": "Blocca gli host dannosi",
-      "ports": "Blocca le porte dannose"
+      "ports": "Blocca le porte dannose",
+      "addresses": "Indirizzi bloccati",
+      "addressesDescription": "Nessun programma può connettersi da o verso questi indirizzi IP e reti, qualunque cosa dicano le sue regole. Uno per riga; le righe che iniziano con # vengono ignorate.",
+      "addressesPlaceholder": "Ad esempio 203.0.113.7 o 198.51.100.0/24",
+      "addressesSave": "Salva indirizzi",
+      "addressesInvalid": "«{0}» non è un indirizzo IP né una rete. Non è stato salvato nulla."
     },
     "security": {
       "lockHostsFile": "Blocca il file hosts",
@@ -412,5 +498,26 @@
       "title": "SimpleDeFence è ancora in esecuzione",
       "body": "Chiudere la finestra non arresta il firewall. Usa Esci in questo menu per arrestarlo."
     }
+  },
+  "duration": {
+    "label": "Per quanto tempo",
+    "permanent": "Sempre",
+    "minutes5": "Per 5 minuti",
+    "minutes30": "Per 30 minuti",
+    "hour1": "Per 1 ora",
+    "hours4": "Per 4 ore",
+    "hours9": "Per 9 ore",
+    "hours24": "Per 24 ore",
+    "untilRestart": "Fino al riavvio",
+    "expiresAtSuffix": "{0}, fino alle {1}",
+    "untilRestartSuffix": "{0}, fino al riavvio"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} è stato bloccato",
+    "blockedManyTitle": "{0} e altri {1} sono stati bloccati",
+    "blockedBody": "Ha provato a connettersi e SimpleDeFence l'ha impedito. Fai clic per vederlo nella pagina Connessioni, dove puoi consentirlo.",
+    "listeningOneTitle": "{0} accetta connessioni in entrata",
+    "listeningManyTitle": "{0} e altri {1} accettano connessioni in entrata",
+    "listeningBody": "Lo fanno gli strumenti di accesso remoto e alcuni malware, quindi verifica che sia un programma che usi. Fai clic per vederlo nella pagina Connessioni."
   }
 }

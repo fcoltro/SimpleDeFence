@@ -67,6 +67,21 @@
       "title": "Start automatic learning?",
       "body": "In automatic learning mode SimpleDeFence allows all traffic and remembers which applications used the network, then adds exceptions for them when you leave the mode. Rules cannot be learned for Special Exceptions.\n\nOnly use this on a system you are confident is free of malware.",
       "confirm": "Enter learning mode"
+    },
+    "learningDuration": {
+      "label": "Switch back to Normal",
+      "never": "Never (I will switch it off myself)",
+      "minutes10": "After 10 minutes",
+      "minutes30": "After 30 minutes",
+      "hour1": "After 1 hour"
+    },
+    "learningEndsAt": "{0} It switches back to Normal at {1}.",
+    "learningEnded": {
+      "title": "Learning mode has ended",
+      "body": "It added {0} rules. Check that each one is for a program you trust.",
+      "bodyOne": "It added 1 rule. Check that it is for a program you trust.",
+      "bodyNone": "It did not add any rules.",
+      "review": "Review rules"
     }
   },
   "applications": {
@@ -129,6 +144,30 @@
     },
     "legend": {
       "local": "Highlighted rows stayed on your local network"
+    },
+    "allowByPublisher": "Every program from {0}",
+    "allowPublisherSuccess": {
+      "body": "Programs signed by {0} can now connect."
+    },
+    "menu": {
+      "details": "Show details",
+      "lookUp": "Look up addresses",
+      "filterApp": "Show only this app",
+      "copyAddresses": "Copy addresses",
+      "copyPath": "Copy path",
+      "openLocation": "Open file location",
+      "openLocationMissing": "The program's file and folder are no longer there."
+    },
+    "details": {
+      "addresses": "Addresses",
+      "lookUpNote": "Finds each address's name, owner and the country where its network is registered. Nothing is sent until you click: the addresses then go to your DNS server and to rdap.org.",
+      "lookUpLimit": "Only the first {0} addresses are listed.",
+      "local": "Local network address. Nothing to look up.",
+      "notFound": "Nothing found for this address.",
+      "host": "Name: {0}",
+      "owner": "Owner: {0}",
+      "network": "Network: {0}",
+      "country": "Registered in: {0}"
     }
   },
   "subject": {
@@ -165,7 +204,8 @@
     "empty": {
       "applications": "No application exceptions yet.",
       "special": "No special exceptions available.",
-      "filtered": "Nothing matches the current filter."
+      "filtered": "Nothing matches the current filter.",
+      "publishers": "No trusted publishers."
     },
     "appMissing": "This application's file no longer exists on disk - it may have been uninstalled.",
     "remove": "Remove",
@@ -211,16 +251,50 @@
       "udpIn": "UDP in",
       "lanOnly": "LAN only",
       "apply": "Apply",
-      "customRulesReadOnly": "Custom rule lists can't be edited here yet.",
+      "customRulesReadOnly": "This kind of rule can't be edited here.",
       "applySuccess": "Policy updated.",
       "applyFailed": {
         "title": "Could not update the policy",
         "lockedDetail": "Unlock the configuration before changing this rule.",
         "staleDetail": "The configuration changed elsewhere just now; the policy was not changed. Please try again.",
         "genericDetail": "The service returned {0}. The policy was not changed."
-      }
+      },
+      "policyCustom": "Custom rules"
     },
-    "multiSelectHint": "{0} rules selected. Remove deletes all of them; select a single rule to edit it."
+    "multiSelectHint": "{0} rules selected. Remove deletes all of them; select a single rule to edit it.",
+    "publishersKind": "Trusted publishers",
+    "publishersDescription": "Programs signed by these publishers can connect without a rule of their own, including after an update. Add one from Allow on the Connections page.",
+    "custom": {
+      "addRule": "Add rule",
+      "rule": "Rule {0}",
+      "removeRule": "Remove rule",
+      "action": "Action",
+      "allow": "Allow",
+      "block": "Block",
+      "direction": "Direction",
+      "outgoing": "Outgoing",
+      "incoming": "Incoming",
+      "both": "Both",
+      "protocol": "Protocol",
+      "anyProtocol": "Any",
+      "tcpUdp": "TCP and UDP",
+      "remoteAddresses": "Remote addresses",
+      "remoteAddressesHint": "Any, or for example 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Remote ports",
+      "localPorts": "Local ports",
+      "portsHint": "Any, or for example 80,443,8000-8100",
+      "invalidTitle": "These rules can't be saved",
+      "invalidPorts": "Rule {0}: \"{1}\" is not a list of ports.",
+      "invalidAddresses": "Rule {0}: \"{1}\" is not a list of addresses.",
+      "noRules": "Add at least one rule, or choose another option."
+    },
+    "cleanUp": "Clean up",
+    "cleanUpTooltip": "Remove the rules for programs that are no longer installed",
+    "cleanUpDialog": {
+      "title": "Clean up rules",
+      "confirmBody": "{0} rule(s) are for programs that are no longer on this PC. Remove them?",
+      "nothing": "Every rule is for a program that is still on this PC."
+    }
   },
   "settings": {
     "title": "Settings",
@@ -258,21 +332,33 @@
       "askForExceptionDetails": "Ask for details when adding a single exception",
       "askForExceptionDetailsDescription": "Show an editable confirmation before adding one exception via the tray's quick-add shortcuts. Bulk adds (e.g. a whole folder) never prompt.",
       "enableHotkeys": "Enable global keyboard shortcuts",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere. Ctrl+Alt+B switches to Block all, and back to Normal.",
       "autoRefreshInterval": "Auto-refresh interval",
-      "autoRefreshIntervalDescription": "How often the Connections page re-checks while its Auto-refresh switch is on. Nothing pushes changes to it, so this is a polling interval; lower is fresher and costs more."
+      "autoRefreshIntervalDescription": "How often the Connections page re-checks while its Auto-refresh switch is on. Nothing pushes changes to it, so this is a polling interval; lower is fresher and costs more.",
+      "notifyBlocked": "Tell me when an app is blocked",
+      "notifyBlockedDescription": "Once per app each session, in Normal mode. Windows components are left out.",
+      "notifyListening": "Tell me when an app starts accepting incoming connections",
+      "notifyListeningDescription": "Once per app each session. Windows components are left out."
     },
     "protection": {
       "allowLocalSubnet": "Allow local network",
       "allowLocalSubnetDescription": "Always allow traffic to and from other devices on your local network.",
       "displayOffBlock": "Block network when display is off",
-      "displayOffBlockDescription": "Blocks all network traffic while the screen is off."
+      "displayOffBlockDescription": "Blocks all network traffic while the screen is off.",
+      "publicNetworkLockdown": "Lock down on public networks",
+      "publicNetworkLockdownDescription": "On networks Windows marks as Public, such as café or hotel Wi-Fi, ignore \"Allow local network\" and turn off file and printer sharing, network discovery, ping and remote access.",
+      "publicNetworkNow": "You are on a Public network right now."
     },
     "blocklists": {
       "enable": "Enable blocklists",
       "enableDescription": "Blocks traffic to known-malicious hosts and ports.",
       "hosts": "Block malicious hosts",
-      "ports": "Block malicious ports"
+      "ports": "Block malicious ports",
+      "addresses": "Blocked addresses",
+      "addressesDescription": "No program can connect to or from these IP addresses and networks, whatever its rules say. One per line; lines starting with # are ignored.",
+      "addressesPlaceholder": "For example 203.0.113.7 or 198.51.100.0/24",
+      "addressesSave": "Save addresses",
+      "addressesInvalid": "\"{0}\" is not an IP address or network. Nothing was saved."
     },
     "security": {
       "lockHostsFile": "Lock the hosts file",
@@ -412,5 +498,26 @@
       "title": "SimpleDeFence is still running",
       "body": "Closing the window does not stop the firewall. Use Quit in this menu to stop it."
     }
+  },
+  "duration": {
+    "label": "How long",
+    "permanent": "Always",
+    "minutes5": "For 5 minutes",
+    "minutes30": "For 30 minutes",
+    "hour1": "For 1 hour",
+    "hours4": "For 4 hours",
+    "hours9": "For 9 hours",
+    "hours24": "For 24 hours",
+    "untilRestart": "Until restart",
+    "expiresAtSuffix": "{0}, until {1}",
+    "untilRestartSuffix": "{0}, until restart"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} was blocked",
+    "blockedManyTitle": "{0} and {1} more were blocked",
+    "blockedBody": "It tried to connect and SimpleDeFence stopped it. Click to see it on the Connections page, where you can allow it.",
+    "listeningOneTitle": "{0} accepts incoming connections",
+    "listeningManyTitle": "{0} and {1} more accept incoming connections",
+    "listeningBody": "Remote-access tools and some malware do this, so check that it is a program you use. Click to see it on the Connections page."
   }
 }

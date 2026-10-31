@@ -30,6 +30,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" x:Name="FilterBox" PlaceholderText="{loc:Loc Key=rules.filterPlaceholder}"
                      TextChanged="FilterBox_TextChanged" MaxWidth="360" HorizontalAlignment="Left"/>
@@ -49,8 +50,10 @@
             </SplitButton>
             <Button Grid.Column="2" x:Name="RemoveButton" Content="{loc:Loc Key=rules.remove}"
                     Click="RemoveButton_Click" IsEnabled="False"/>
-            <Button Grid.Column="3" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"/>
-            <ProgressRing Grid.Column="4" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
+            <Button Grid.Column="3" x:Name="CleanUpButton" Content="{loc:Loc Key=rules.cleanUp}"
+                    Click="CleanUpButton_Click" ToolTipService.ToolTip="{loc:Loc Key=rules.cleanUpTooltip}"/>
+            <Button Grid.Column="4" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"/>
+            <ProgressRing Grid.Column="5" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
         </Grid>
 
         <!-- Horizontal axis disabled for the same reason SettingsPage's is: the row templates
@@ -199,6 +202,17 @@
                                         <TextBox x:Name="UdpInBox"/>
                                         <CheckBox x:Name="LanOnlyCheck" Content="{loc:Loc Key=rules.detail.lanOnly}"/>
                                     </StackPanel>
+
+                                    <RadioButton x:Name="PresetCustom" Content="{loc:Loc Key=rules.detail.policyCustom}"
+                                                 GroupName="RulesDetailPreset" Checked="PresetRadio_Checked"/>
+
+                                    <!-- One editor per rule, built in code (see CustomRuleEditor in
+                                         RulesPage.xaml.cs): the number of rules is the user's. -->
+                                    <StackPanel x:Name="CustomRulesFields" Spacing="10" Margin="26,0,0,0">
+                                        <StackPanel x:Name="CustomRulesList" Spacing="10"/>
+                                        <Button x:Name="AddCustomRuleButton" Content="{loc:Loc Key=rules.custom.addRule}"
+                                                Click="AddCustomRuleButton_Click" HorizontalAlignment="Left"/>
+                                    </StackPanel>
                                 </StackPanel>
 
                                 <Button x:Name="ApplyButton" Content="{loc:Loc Key=rules.detail.apply}"
@@ -241,6 +255,36 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="{x:Bind Name}" VerticalAlignment="Center" TextWrapping="NoWrap"/>
                                         <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsOn, Mode=TwoWay}" OnContent="" OffContent=""/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Trusted publishers: added from the Connections page's Allow dialog, removed
+                     here. Each row is a certificate subject, shown by its common name with the
+                     full subject as a tooltip. -->
+                <Expander IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{loc:Loc Key=rules.publishersKind}"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Key=rules.publishersDescription}" Style="{StaticResource BodyTextBlockStyle}"
+                                   TextWrapping="Wrap" Opacity="0.8" Margin="0,4,0,8"/>
+                        <TextBlock x:Name="PublishersEmpty" Style="{StaticResource BodyTextBlockStyle}"
+                                   Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
+                        <ListView x:Name="PublishersList" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="local:PublisherListItem">
+                                    <Grid Padding="0,4" ColumnSpacing="14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{x:Bind Name}" ToolTipService.ToolTip="{x:Bind Subject}"
+                                                   VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                                        <Button Grid.Column="1" Content="{x:Bind RemoveText}" Click="{x:Bind Remove}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>

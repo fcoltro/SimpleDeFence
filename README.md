@@ -67,8 +67,29 @@ executed.
   with a configurable refresh interval and optional logging of connections to disk.
 - **Password protection** — the running configuration can be locked so it cannot be changed
   without the password, including by anything running as you.
-- **Hosts-file blocklists**, updated on request.
-- **Global hotkeys** for allowing an executable, a running process or a visible window.
+- **Hosts-file blocklists**, updated on request, and your own list of blocked IP addresses and
+  networks that no program can reach, whatever its rules.
+- **Notifications** from the tray the first time an app is blocked from connecting, or starts
+  accepting incoming connections. One click opens it on the Connections page. Windows' own
+  components are left out, and both can be switched off in Settings.
+- **Temporary rules**: allow (or block) an app for 5 minutes up to 24 hours, or until the next
+  restart, and the rule removes itself.
+- **Learning with a time limit**: Learning mode can switch itself back to Normal after 10, 30 or
+  60 minutes, and the window then points you to the rules it added.
+- **Custom rules**: beyond the presets, an app's rule can be a list of allow and block rules by
+  direction, protocol, remote address (IP, network, LocalSubnet, DNS) and port.
+- **Trusted publishers**: allow every program signed by one vendor, so an app keeps working
+  through updates that install to a new folder. Only signatures Windows verifies count, and
+  programs in the Windows folder are never allowed this way.
+- **Public network lockdown**: on networks Windows marks as Public, such as café or hotel Wi-Fi,
+  "Allow local network", file and printer sharing, network discovery, ping and remote access are
+  turned off, and come back on the next network that is not Public.
+- **Global hotkeys** for allowing an executable, a running process or a visible window, and
+  Ctrl+Alt+B to switch to Block all (and back to Normal) from anywhere.
+- **A command line** for scripts and scheduled tasks:
+  `SimpleDeFence.exe /mode normal|blockall|allowoutgoing|disabled`,
+  `SimpleDeFence.exe /mode learning /minutes 30` and `SimpleDeFence.exe /allow "C:\path\to\app.exe"`.
+  Exit code 0 means done, 1 refused or failed, 2 a command line it could not understand.
 - **Sixteen languages**: Arabic, Bengali, Chinese (Simplified), English, Farsi, French, German,
   Hindi, Indonesian, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Spanish and Turkish —
   with right-to-left layout where the language calls for it.
@@ -165,12 +186,9 @@ to fail fast rather than hang. If you add one that touches those, add
 
 ## Contributing
 
-Feel free to open issues, feature- or pull-requests.
-1. Fork the Project
-1. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-1. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-1. Push to the Branch (`git push origin feature/AmazingFeature`)
-1. Open a Pull Request on GitHub
+Issues, ideas and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers reporting a
+problem, code changes, translations and the database of known applications. For common questions
+and fixes, see the [FAQ](docs/FAQ.md).
 
 Please do not report SimpleDeFence issues to TinyWall or its authors — they are the origin of this
 code, not participants in this project.

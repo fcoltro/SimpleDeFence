@@ -90,6 +90,27 @@
             public const string LearningConfirmTitle = "mode.learningConfirm.title";
             public const string LearningConfirmBody = "mode.learningConfirm.body";
             public const string LearningConfirmConfirm = "mode.learningConfirm.confirm";
+
+            /// <summary>The choice in the learning confirmation of when the service switches back to
+            /// Normal by itself. Learning lets everything through, so leaving it on by mistake is the
+            /// failure this guards against.</summary>
+            public const string LearningDurationLabel = "mode.learningDuration.label";
+            public const string LearningDurationNever = "mode.learningDuration.never";
+            public const string LearningDurationMinutes10 = "mode.learningDuration.minutes10";
+            public const string LearningDurationMinutes30 = "mode.learningDuration.minutes30";
+            public const string LearningDurationHour1 = "mode.learningDuration.hour1";
+
+            /// <summary>Follows the learning description in the status line while a time limit is
+            /// set: {0} is the description, {1} the time it ends.</summary>
+            public const string LearningEndsAt = "mode.learningEndsAt";
+
+            /// <summary>Shown once when the window sees Learning end, by the time limit or by hand,
+            /// so the rules it wrote get looked at.</summary>
+            public const string LearningEndedTitle = "mode.learningEnded.title";
+            public const string LearningEndedBody = "mode.learningEnded.body";
+            public const string LearningEndedBodyOne = "mode.learningEnded.bodyOne";
+            public const string LearningEndedBodyNone = "mode.learningEnded.bodyNone";
+            public const string LearningEndedReview = "mode.learningEnded.review";
         }
 
         public static class Applications
@@ -122,6 +143,8 @@
             public const string AllowDialogBody = "connections.allowDialog.body";
             public const string AllowSuccessTitle = "connections.allowSuccess.title";
             public const string AllowSuccessBody = "connections.allowSuccess.body";
+            public const string AllowPublisherSuccessBody = "connections.allowPublisherSuccess.body";
+            public const string AllowByPublisher = "connections.allowByPublisher";
             public const string AllowFailedTitle = "connections.allowFailed.title";
             public const string AllowFailedLockedDetail = "connections.allowFailed.lockedDetail";
             public const string AllowFailedStaleDetail = "connections.allowFailed.staleDetail";
@@ -138,6 +161,26 @@
             public const string ConnectedHeader = "connections.connected.header";
             public const string OpenSummary = "connections.open.summary";
             public const string OpenHeader = "connections.open.header";
+
+            /// <summary>The right-click menu on every row of the three lists.</summary>
+            public const string MenuDetails = "connections.menu.details";
+            public const string MenuLookUp = "connections.menu.lookUp";
+            public const string MenuFilterApp = "connections.menu.filterApp";
+            public const string MenuCopyAddresses = "connections.menu.copyAddresses";
+            public const string MenuCopyPath = "connections.menu.copyPath";
+            public const string MenuOpenLocation = "connections.menu.openLocation";
+            public const string OpenLocationMissing = "connections.menu.openLocationMissing";
+
+            /// <summary>The details dialog behind "Show all", and its on-demand address lookup.</summary>
+            public const string DetailsAddresses = "connections.details.addresses";
+            public const string DetailsLookUpNote = "connections.details.lookUpNote";
+            public const string DetailsLookUpLimit = "connections.details.lookUpLimit";
+            public const string DetailsLocal = "connections.details.local";
+            public const string DetailsNotFound = "connections.details.notFound";
+            public const string DetailsHost = "connections.details.host";
+            public const string DetailsOwner = "connections.details.owner";
+            public const string DetailsNetwork = "connections.details.network";
+            public const string DetailsCountry = "connections.details.country";
         }
 
         public static class Subject
@@ -161,9 +204,17 @@
             public const string FilterPlaceholder = "rules.filterPlaceholder";
             public const string EmptyApplications = "rules.empty.applications";
             public const string EmptySpecial = "rules.empty.special";
+            public const string EmptyPublishers = "rules.empty.publishers";
+            public const string PublishersKind = "rules.publishersKind";
+            public const string PublishersDescription = "rules.publishersDescription";
             public const string EmptyFiltered = "rules.empty.filtered";
             public const string AppMissing = "rules.appMissing";
             public const string Remove = "rules.remove";
+            public const string CleanUp = "rules.cleanUp";
+            public const string CleanUpTooltip = "rules.cleanUpTooltip";
+            public const string CleanUpTitle = "rules.cleanUpDialog.title";
+            public const string CleanUpConfirmBody = "rules.cleanUpDialog.confirmBody";
+            public const string CleanUpNothing = "rules.cleanUpDialog.nothing";
             public const string MultiSelectHint = "rules.multiSelectHint";
             public const string RemoveConfirmTitle = "rules.removeConfirm.title";
             public const string RemoveConfirmBody = "rules.removeConfirm.body";
@@ -200,6 +251,29 @@
             public const string DetailLanOnly = "rules.detail.lanOnly";
             public const string DetailApply = "rules.detail.apply";
             public const string DetailCustomRulesReadOnly = "rules.detail.customRulesReadOnly";
+            public const string DetailPolicyCustom = "rules.detail.policyCustom";
+            public const string CustomAddRule = "rules.custom.addRule";
+            public const string CustomRule = "rules.custom.rule";
+            public const string CustomRemoveRule = "rules.custom.removeRule";
+            public const string CustomAction = "rules.custom.action";
+            public const string CustomAllow = "rules.custom.allow";
+            public const string CustomBlock = "rules.custom.block";
+            public const string CustomDirection = "rules.custom.direction";
+            public const string CustomOutgoing = "rules.custom.outgoing";
+            public const string CustomIncoming = "rules.custom.incoming";
+            public const string CustomBoth = "rules.custom.both";
+            public const string CustomProtocol = "rules.custom.protocol";
+            public const string CustomAnyProtocol = "rules.custom.anyProtocol";
+            public const string CustomTcpUdp = "rules.custom.tcpUdp";
+            public const string CustomRemoteAddresses = "rules.custom.remoteAddresses";
+            public const string CustomRemoteAddressesHint = "rules.custom.remoteAddressesHint";
+            public const string CustomRemotePorts = "rules.custom.remotePorts";
+            public const string CustomLocalPorts = "rules.custom.localPorts";
+            public const string CustomPortsHint = "rules.custom.portsHint";
+            public const string CustomInvalidTitle = "rules.custom.invalidTitle";
+            public const string CustomInvalidPorts = "rules.custom.invalidPorts";
+            public const string CustomInvalidAddresses = "rules.custom.invalidAddresses";
+            public const string CustomNoRules = "rules.custom.noRules";
             public const string DetailApplySuccess = "rules.detail.applySuccess";
             public const string DetailApplyFailedTitle = "rules.detail.applyFailed.title";
             public const string DetailApplyFailedLockedDetail = "rules.detail.applyFailed.lockedDetail";
@@ -240,6 +314,10 @@
             public const string GeneralAskForExceptionDetailsDescription = "settings.general.askForExceptionDetailsDescription";
             public const string GeneralEnableHotkeys = "settings.general.enableHotkeys";
             public const string GeneralEnableHotkeysDescription = "settings.general.enableHotkeysDescription";
+            public const string GeneralNotifyBlocked = "settings.general.notifyBlocked";
+            public const string GeneralNotifyBlockedDescription = "settings.general.notifyBlockedDescription";
+            public const string GeneralNotifyListening = "settings.general.notifyListening";
+            public const string GeneralNotifyListeningDescription = "settings.general.notifyListeningDescription";
             public const string GeneralAutoRefreshInterval = "settings.general.autoRefreshInterval";
             public const string GeneralAutoRefreshIntervalDescription = "settings.general.autoRefreshIntervalDescription";
 
@@ -259,11 +337,19 @@
             public const string ProtectionAllowLocalSubnetDescription = "settings.protection.allowLocalSubnetDescription";
             public const string ProtectionDisplayOffBlock = "settings.protection.displayOffBlock";
             public const string ProtectionDisplayOffBlockDescription = "settings.protection.displayOffBlockDescription";
+            public const string ProtectionPublicNetworkLockdown = "settings.protection.publicNetworkLockdown";
+            public const string ProtectionPublicNetworkLockdownDescription = "settings.protection.publicNetworkLockdownDescription";
+            public const string ProtectionPublicNetworkNow = "settings.protection.publicNetworkNow";
 
             public const string BlocklistsEnable = "settings.blocklists.enable";
             public const string BlocklistsEnableDescription = "settings.blocklists.enableDescription";
             public const string BlocklistsHosts = "settings.blocklists.hosts";
             public const string BlocklistsPorts = "settings.blocklists.ports";
+            public const string BlocklistsAddresses = "settings.blocklists.addresses";
+            public const string BlocklistsAddressesDescription = "settings.blocklists.addressesDescription";
+            public const string BlocklistsAddressesPlaceholder = "settings.blocklists.addressesPlaceholder";
+            public const string BlocklistsAddressesSave = "settings.blocklists.addressesSave";
+            public const string BlocklistsAddressesInvalid = "settings.blocklists.addressesInvalid";
 
             public const string SecurityLockHostsFile = "settings.security.lockHostsFile";
             public const string SecurityLockHostsFileDescription = "settings.security.lockHostsFileDescription";
@@ -372,6 +458,39 @@
             public const string TcpIn = "policy.tcpIn";
             public const string UdpIn = "policy.udpIn";
             public const string AllPorts = "policy.allPorts";
+        }
+
+        /// <summary>The tray notifications ActivityNotifier shows. {0} is an app's name, {1} how many
+        /// more apps the same notification covers.</summary>
+        public static class Notifications
+        {
+            public const string BlockedOneTitle = "notifications.blockedOneTitle";
+            public const string BlockedManyTitle = "notifications.blockedManyTitle";
+            public const string BlockedBody = "notifications.blockedBody";
+            public const string ListeningOneTitle = "notifications.listeningOneTitle";
+            public const string ListeningManyTitle = "notifications.listeningManyTitle";
+            public const string ListeningBody = "notifications.listeningBody";
+        }
+
+        /// <summary>How long a rule stays in force, one per offered AppExceptionTimer value, plus
+        /// the two suffixes the Rules list adds to a rule that is not permanent.</summary>
+        public static class Duration
+        {
+            public const string Label = "duration.label";
+            public const string Permanent = "duration.permanent";
+            public const string Minutes5 = "duration.minutes5";
+            public const string Minutes30 = "duration.minutes30";
+            public const string Hour1 = "duration.hour1";
+            public const string Hours4 = "duration.hours4";
+            public const string Hours9 = "duration.hours9";
+            public const string Hours24 = "duration.hours24";
+            public const string UntilRestart = "duration.untilRestart";
+
+            /// <summary>{0} is the policy text, {1} the time the rule expires.</summary>
+            public const string ExpiresAtSuffix = "duration.expiresAtSuffix";
+
+            /// <summary>{0} is the policy text.</summary>
+            public const string UntilRestartSuffix = "duration.untilRestartSuffix";
         }
     }
 }

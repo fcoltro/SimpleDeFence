@@ -67,6 +67,21 @@
       "title": "Otomatik öğrenme başlatılsın mı?",
       "body": "Otomatik öğrenme kipinde SimpleDeFence tüm trafiğe izin verir ve hangi uygulamaların ağı kullandığını hatırlar, kipten çıktığınızda da onlar için ayrıcalık ekler. Özel ayrıcalıklar için kural öğrenilemez.\n\nBunu yalnızca kötü amaçlı yazılım içermediğinden emin olduğunuz bir sistemde kullanın.",
       "confirm": "Öğrenme kipine gir"
+    },
+    "learningDuration": {
+      "label": "Normal moda dön",
+      "never": "Hiçbir zaman (kendim kapatacağım)",
+      "minutes10": "10 dakika sonra",
+      "minutes30": "30 dakika sonra",
+      "hour1": "1 saat sonra"
+    },
+    "learningEndsAt": "{0} Saat {1} itibarıyla Normal moda döner.",
+    "learningEnded": {
+      "title": "Öğrenme modu sona erdi",
+      "body": "{0} kural eklendi. Her birinin güvendiğiniz bir programa ait olduğunu kontrol edin.",
+      "bodyOne": "1 kural eklendi. Güvendiğiniz bir programa ait olduğunu kontrol edin.",
+      "bodyNone": "Hiç kural eklenmedi.",
+      "review": "Kuralları gözden geçir"
     }
   },
   "applications": {
@@ -129,6 +144,30 @@
     },
     "legend": {
       "local": "Vurgulanan satırlar yerel ağınızın içinde kaldı"
+    },
+    "allowByPublisher": "{0} tarafından yayımlanan tüm programlar",
+    "allowPublisherSuccess": {
+      "body": "{0} tarafından imzalanan programlar artık bağlanabilir."
+    },
+    "menu": {
+      "details": "Ayrıntıları göster",
+      "lookUp": "Adresleri sorgula",
+      "filterApp": "Yalnızca bu uygulamayı göster",
+      "copyAddresses": "Adresleri kopyala",
+      "copyPath": "Yolu kopyala",
+      "openLocation": "Dosya konumunu aç",
+      "openLocationMissing": "Programın dosyası ve klasörü artık yok."
+    },
+    "details": {
+      "addresses": "Adresler",
+      "lookUpNote": "Her adresin adını, sahibini ve ağının kayıtlı olduğu ülkeyi bulur. Siz tıklayana kadar hiçbir şey gönderilmez: tıkladığınızda adresler DNS sunucunuza ve rdap.org'a gider.",
+      "lookUpLimit": "Yalnızca ilk {0} adres listelenir.",
+      "local": "Yerel ağ adresi. Sorgulanacak bir şey yok.",
+      "notFound": "Bu adres için hiçbir şey bulunamadı.",
+      "host": "Ad: {0}",
+      "owner": "Sahibi: {0}",
+      "network": "Ağ: {0}",
+      "country": "Kayıtlı olduğu ülke: {0}"
     }
   },
   "subject": {
@@ -165,7 +204,8 @@
     "empty": {
       "applications": "Henüz uygulama ayrıcalığı yok.",
       "special": "Kullanılabilir özel ayrıcalık yok.",
-      "filtered": "Geçerli süzgeçle eşleşen bir şey yok."
+      "filtered": "Geçerli süzgeçle eşleşen bir şey yok.",
+      "publishers": "Güvenilen yayımcı yok."
     },
     "appMissing": "Bu uygulamanın dosyası artık diskte yok - kaldırılmış olabilir.",
     "remove": "Kaldır",
@@ -211,16 +251,50 @@
       "udpIn": "UDP gelen",
       "lanOnly": "Yalnızca yerel ağ",
       "apply": "Uygula",
-      "customRulesReadOnly": "Özel kural listeleri burada henüz düzenlenemiyor.",
+      "customRulesReadOnly": "Bu tür bir kural burada düzenlenemez.",
       "applySuccess": "İlke güncellendi.",
       "applyFailed": {
         "title": "İlke güncellenemedi",
         "lockedDetail": "Bu kuralı değiştirmeden önce yapılandırmanın kilidini açın.",
         "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ilke değiştirilmedi. Lütfen yeniden deneyin.",
         "genericDetail": "Hizmet {0} döndürdü. İlke değiştirilmedi."
-      }
+      },
+      "policyCustom": "Özel kurallar"
     },
-    "multiSelectHint": "{0} kural seçili. Kaldır hepsini siler; düzenlemek için tek bir kural seçin."
+    "multiSelectHint": "{0} kural seçili. Kaldır hepsini siler; düzenlemek için tek bir kural seçin.",
+    "publishersKind": "Güvenilen yayımcılar",
+    "publishersDescription": "Bu yayımcıların imzaladığı programlar, güncellemeden sonra da dahil olmak üzere kendi kuralları olmadan bağlanabilir. Bağlantılar sayfasındaki İzin ver ile ekleyebilirsiniz.",
+    "custom": {
+      "addRule": "Kural ekle",
+      "rule": "Kural {0}",
+      "removeRule": "Kuralı kaldır",
+      "action": "Eylem",
+      "allow": "İzin ver",
+      "block": "Engelle",
+      "direction": "Yön",
+      "outgoing": "Giden",
+      "incoming": "Gelen",
+      "both": "Her ikisi",
+      "protocol": "Protokol",
+      "anyProtocol": "Tümü",
+      "tcpUdp": "TCP ve UDP",
+      "remoteAddresses": "Uzak adresler",
+      "remoteAddressesHint": "Tümü veya örneğin 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Uzak bağlantı noktaları",
+      "localPorts": "Yerel bağlantı noktaları",
+      "portsHint": "Tümü veya örneğin 80,443,8000-8100",
+      "invalidTitle": "Bu kurallar kaydedilemiyor",
+      "invalidPorts": "Kural {0}: \"{1}\" bir bağlantı noktası listesi değil.",
+      "invalidAddresses": "Kural {0}: \"{1}\" bir adres listesi değil.",
+      "noRules": "En az bir kural ekleyin veya başka bir seçenek belirleyin."
+    },
+    "cleanUp": "Temizle",
+    "cleanUpTooltip": "Artık yüklü olmayan programların kurallarını kaldır",
+    "cleanUpDialog": {
+      "title": "Kuralları temizle",
+      "confirmBody": "{0} kural artık bu bilgisayarda olmayan programlara ait. Kaldırılsın mı?",
+      "nothing": "Tüm kurallar hâlâ bu bilgisayarda olan programlara ait."
+    }
   },
   "settings": {
     "title": "Ayarlar",
@@ -258,21 +332,33 @@
       "askForExceptionDetails": "Tek bir ayrıcalık eklerken ayrıntıları sor",
       "askForExceptionDetailsDescription": "Bildirim alanındaki hızlı ekleme kısayollarıyla tek bir ayrıcalık eklemeden önce düzenlenebilir bir onay gösterir. Toplu eklemeler (örneğin bütün bir klasör) hiçbir zaman sormaz.",
       "enableHotkeys": "Genel klavye kısayollarını etkinleştir",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W her yerden anında bir çalıştırılabilir dosyaya, işleme veya pencereye izin verir.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W her yerden anında bir çalıştırılabilir dosyaya, işleme veya pencereye izin verir. Ctrl+Alt+B Tümünü engelle moduna geçirir ve Normal moda geri döndürür.",
       "autoRefreshInterval": "Otomatik yenileme aralığı",
-      "autoRefreshIntervalDescription": "Bağlantılar sayfasının otomatik yenileme anahtarı açıkken ne sıklıkta yeniden denetlediği. Değişiklikleri ona kimse iletmez, dolayısıyla bu bir yoklama aralığıdır; kısa olması daha tazedir ve daha maliyetlidir."
+      "autoRefreshIntervalDescription": "Bağlantılar sayfasının otomatik yenileme anahtarı açıkken ne sıklıkta yeniden denetlediği. Değişiklikleri ona kimse iletmez, dolayısıyla bu bir yoklama aralığıdır; kısa olması daha tazedir ve daha maliyetlidir.",
+      "notifyBlocked": "Bir uygulama engellendiğinde bana bildir",
+      "notifyBlockedDescription": "Her oturumda uygulama başına bir kez, Normal modda. Windows bileşenleri dahil edilmez.",
+      "notifyListening": "Bir uygulama gelen bağlantıları kabul etmeye başladığında bana bildir",
+      "notifyListeningDescription": "Her oturumda uygulama başına bir kez. Windows bileşenleri dahil edilmez."
     },
     "protection": {
       "allowLocalSubnet": "Yerel ağa izin ver",
       "allowLocalSubnetDescription": "Yerel ağınızdaki diğer aygıtlara giden ve onlardan gelen trafiğe her zaman izin ver.",
       "displayOffBlock": "Ekran kapalıyken ağı engelle",
-      "displayOffBlockDescription": "Ekran kapalıyken tüm ağ trafiğini engeller."
+      "displayOffBlockDescription": "Ekran kapalıyken tüm ağ trafiğini engeller.",
+      "publicNetworkLockdown": "Ortak ağlarda kilitle",
+      "publicNetworkLockdownDescription": "Windows'un Ortak olarak işaretlediği ağlarda, örneğin kafe veya otel Wi-Fi'ında, \"Yerel ağa izin ver\" yok sayılır; dosya ve yazıcı paylaşımı, ağ bulma, ping ve uzaktan erişim kapatılır.",
+      "publicNetworkNow": "Şu anda Ortak bir ağdasınız."
     },
     "blocklists": {
       "enable": "Engelleme listelerini etkinleştir",
       "enableDescription": "Kötü amaçlı olduğu bilinen sunuculara ve bağlantı noktalarına giden trafiği engeller.",
       "hosts": "Kötü amaçlı sunucuları engelle",
-      "ports": "Kötü amaçlı bağlantı noktalarını engelle"
+      "ports": "Kötü amaçlı bağlantı noktalarını engelle",
+      "addresses": "Engellenen adresler",
+      "addressesDescription": "Kuralları ne derse desin, hiçbir program bu IP adresleri ve ağlarla bağlantı kuramaz. Her satıra bir tane; # ile başlayan satırlar yok sayılır.",
+      "addressesPlaceholder": "Örneğin 203.0.113.7 veya 198.51.100.0/24",
+      "addressesSave": "Adresleri kaydet",
+      "addressesInvalid": "\"{0}\" bir IP adresi veya ağ değil. Hiçbir şey kaydedilmedi."
     },
     "security": {
       "lockHostsFile": "hosts dosyasını kilitle",
@@ -412,5 +498,26 @@
       "title": "SimpleDeFence hâlâ çalışıyor",
       "body": "Pencereyi kapatmak güvenlik duvarını durdurmaz. Durdurmak için bu menüdeki Çık'ı kullanın."
     }
+  },
+  "duration": {
+    "label": "Ne kadar süre",
+    "permanent": "Her zaman",
+    "minutes5": "5 dakika boyunca",
+    "minutes30": "30 dakika boyunca",
+    "hour1": "1 saat boyunca",
+    "hours4": "4 saat boyunca",
+    "hours9": "9 saat boyunca",
+    "hours24": "24 saat boyunca",
+    "untilRestart": "Yeniden başlatılana kadar",
+    "expiresAtSuffix": "{0}, {1} saatine kadar",
+    "untilRestartSuffix": "{0}, yeniden başlatılana kadar"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} engellendi",
+    "blockedManyTitle": "{0} ve {1} uygulama daha engellendi",
+    "blockedBody": "Bağlanmaya çalıştı ve SimpleDeFence bunu durdurdu. Bağlantılar sayfasında görmek ve izin vermek için tıklayın.",
+    "listeningOneTitle": "{0} gelen bağlantıları kabul ediyor",
+    "listeningManyTitle": "{0} ve {1} uygulama daha gelen bağlantıları kabul ediyor",
+    "listeningBody": "Uzaktan erişim araçları ve bazı kötü amaçlı yazılımlar bunu yapar; kullandığınız bir program olduğunu kontrol edin. Bağlantılar sayfasında görmek için tıklayın."
   }
 }

@@ -1,0 +1,48 @@
+{
+  "Name": "Dropbox",
+  "Components": [
+    {
+      "Subject": {
+        "SubjectType": 2,
+        "ExecutablePath": "Dropbox.exe"
+      },
+      "Policy": {
+        "PolicyType": 3,
+        "LocalNetworkOnly": false,
+        "AllowedRemoteTcpConnectPorts": "*",
+        "AllowedRemoteUdpConnectPorts": "*",
+        "AllowedLocalTcpListenerPorts": "17500",
+        "AllowedLocalUdpListenerPorts": "17500"
+      },
+      "SearchPaths": [
+        "{folder:pf32}\\Dropbox\\Client",
+        "{folder:pf64}\\Dropbox\\Client"
+      ],
+      "CertificateSubjects": [
+        "CN=\u0022Dropbox, Inc\u0022, O=\u0022Dropbox, Inc\u0022, L=San Francisco, S=California, C=US"
+      ]
+    },
+    {
+      "Subject": {
+        "SubjectType": 2,
+        "ExecutablePath": "DropboxUpdate.exe"
+      },
+      "Policy": {
+        "PolicyType": 3,
+        "LocalNetworkOnly": false,
+        "AllowedRemoteTcpConnectPorts": "*",
+        "AllowedRemoteUdpConnectPorts": "",
+        "AllowedLocalTcpListenerPorts": "",
+        "AllowedLocalUdpListenerPorts": ""
+      },
+      "SearchPaths": [
+        "{folder:pf32}\\Dropbox\\Update",
+        "{folder:pf64}\\Dropbox\\Update"
+      ],
+      "CertificateSubjects": [
+        "CN=\u0022Dropbox, Inc\u0022, O=\u0022Dropbox, Inc\u0022, L=San Francisco, S=California, C=US"
+      ]
+    }
+  ],
+  "Flags": {}
+}

@@ -121,6 +121,67 @@ namespace SimpleDeFence
             };
         }
 
+        /// <summary>
+        /// Returns a copy of <paramref name="original"/> whose policy is the given custom rules,
+        /// keeping the Id for the same reason ApplyPreset does. Unlike ApplyPreset this accepts any
+        /// original policy: the custom editor shows every rule it will write, so nothing is
+        /// discarded behind the user's back. The rules are copied, and the copies carry no
+        /// subject - the service sets that from the exception when it builds filters.
+        /// </summary>
+        public static FirewallExceptionV3 ApplyCustomRules(FirewallExceptionV3 original, IReadOnlyList<RuleDef> rules)
+        {
+            if (rules.Count == 0)
+                throw new ArgumentException("A custom rule list needs at least one rule.", nameof(rules));
+
+            var policy = new RuleListPolicy();
+            foreach (var rule in rules)
+            {
+                var copy = rule.ShallowCopy();
+                copy.SetSubject(GlobalSubject.Instance);
+                copy.ExceptionId = Guid.Empty;
+                policy.Rules.Add(copy);
+            }
+
+            return new FirewallExceptionV3(original.Subject, policy)
+            {
+                Id = original.Id,
+                CreationDate = original.CreationDate,
+                Timer = original.Timer,
+                ChildProcessesInherit = original.ChildProcessesInherit,
+            };
+        }
+
+        /// <summary>
+        /// The rules whose program is gone: an executable or service subject whose file
+        /// <paramref name="fileExists"/> says is missing. What is left after an app is uninstalled,
+        /// and what the Rules page shows in the "missing" colour.
+        ///
+        /// A path whose drive or share cannot be reached right now is not missing, only out of
+        /// reach: an unplugged USB disk or a NAS that is asleep must not cost the rules for the
+        /// programs on it. <paramref name="rootExists"/> is asked about the path's root first, and
+        /// a rule is only reported when the root is there and the file is not.
+        /// </summary>
+        public static List<Guid> MissingExecutableRules(ServerProfileConfiguration profile, Func<string, bool> fileExists, Func<string, bool> rootExists)
+        {
+            var ids = new List<Guid>();
+            foreach (var ex in profile.AppExceptions)
+            {
+                if (ex.Subject is not ExecutableSubject exe || string.IsNullOrEmpty(exe.ExecutablePath))
+                    continue;
+
+                var path = exe.ExecutablePath;
+                string? root;
+                try { root = System.IO.Path.GetPathRoot(path); }
+                catch (ArgumentException) { continue; }
+                if (string.IsNullOrEmpty(root) || !rootExists(root))
+                    continue;
+
+                if (!fileExists(path))
+                    ids.Add(ex.Id);
+            }
+            return ids;
+        }
+
         public static void RemoveExceptions(ServerProfileConfiguration profile, IReadOnlyCollection<Guid> ids)
         {
             profile.AppExceptions.RemoveAll(ex => ids.Contains(ex.Id));

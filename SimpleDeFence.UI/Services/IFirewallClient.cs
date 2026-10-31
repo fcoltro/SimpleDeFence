@@ -21,14 +21,18 @@ namespace SimpleDeFence.UI.Services
         event EventHandler? Changed;
 
         Task RefreshAsync();
-        Task<MessageType> SwitchModeAsync(FirewallMode mode);
+        /// <summary>learningMinutes only matters for a switch to Learning: the service switches
+        /// back to Normal by itself after that many minutes. Zero leaves Learning on until the
+        /// next switch.</summary>
+        Task<MessageType> SwitchModeAsync(FirewallMode mode, int learningMinutes = 0);
 
         /// <summary>Blocked/Connected/Open, gathered fresh on every call - no caching, this is a
         /// point-in-time view of live network state.</summary>
         Task<ConnectionsSnapshot> GetConnectionsAsync();
 
-        /// <summary>Commits a new exception for the given subject with the given policy.</summary>
-        Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy);
+        /// <summary>Commits a new exception for the given subject with the given policy, lasting as
+        /// long as <paramref name="timer"/> says (permanent unless told otherwise).</summary>
+        Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy, AppExceptionTimer timer = AppExceptionTimer.Permanent);
 
         /// <summary>Locks the configuration server-side. A no-op on the wire (still returns
         /// MessageType.LOCK) when no password is set - PasswordLock's own Locked setter is gated

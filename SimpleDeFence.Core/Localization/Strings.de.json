@@ -67,6 +67,21 @@
       "title": "Automatisches Lernen starten?",
       "body": "Im automatischen Lernmodus lässt SimpleDeFence sämtlichen Datenverkehr zu und merkt sich, welche Anwendungen das Netzwerk genutzt haben; beim Verlassen des Modus legt es Ausnahmen für sie an. Für Sonderausnahmen können keine Regeln gelernt werden.\n\nVerwende dies nur auf einem System, bei dem du sicher bist, dass es frei von Schadsoftware ist.",
       "confirm": "Lernmodus starten"
+    },
+    "learningDuration": {
+      "label": "Zurück zu Normal",
+      "never": "Nie (ich schalte es selbst aus)",
+      "minutes10": "Nach 10 Minuten",
+      "minutes30": "Nach 30 Minuten",
+      "hour1": "Nach 1 Stunde"
+    },
+    "learningEndsAt": "{0} Um {1} wird wieder auf Normal umgeschaltet.",
+    "learningEnded": {
+      "title": "Der Lernmodus ist beendet",
+      "body": "Es wurden {0} Regeln hinzugefügt. Prüfen Sie, ob jede zu einem Programm gehört, dem Sie vertrauen.",
+      "bodyOne": "Es wurde 1 Regel hinzugefügt. Prüfen Sie, ob sie zu einem Programm gehört, dem Sie vertrauen.",
+      "bodyNone": "Es wurden keine Regeln hinzugefügt.",
+      "review": "Regeln prüfen"
     }
   },
   "applications": {
@@ -129,6 +144,30 @@
     },
     "legend": {
       "local": "Hervorgehobene Zeilen blieben in deinem lokalen Netzwerk"
+    },
+    "allowByPublisher": "Jedes Programm von {0}",
+    "allowPublisherSuccess": {
+      "body": "Von {0} signierte Programme dürfen jetzt Verbindungen herstellen."
+    },
+    "menu": {
+      "details": "Details anzeigen",
+      "lookUp": "Adressen nachschlagen",
+      "filterApp": "Nur diese App anzeigen",
+      "copyAddresses": "Adressen kopieren",
+      "copyPath": "Pfad kopieren",
+      "openLocation": "Dateispeicherort öffnen",
+      "openLocationMissing": "Die Datei und der Ordner des Programms sind nicht mehr vorhanden."
+    },
+    "details": {
+      "addresses": "Adressen",
+      "lookUpNote": "Ermittelt zu jeder Adresse den Namen, den Inhaber und das Land, in dem ihr Netz registriert ist. Erst wenn du klickst, wird etwas gesendet: Die Adressen gehen dann an deinen DNS-Server und an rdap.org.",
+      "lookUpLimit": "Nur die ersten {0} Adressen werden aufgeführt.",
+      "local": "Adresse im lokalen Netzwerk. Nichts nachzuschlagen.",
+      "notFound": "Zu dieser Adresse wurde nichts gefunden.",
+      "host": "Name: {0}",
+      "owner": "Inhaber: {0}",
+      "network": "Netz: {0}",
+      "country": "Registriert in: {0}"
     }
   },
   "subject": {
@@ -165,7 +204,8 @@
     "empty": {
       "applications": "Noch keine Anwendungsausnahmen.",
       "special": "Keine Sonderausnahmen verfügbar.",
-      "filtered": "Nichts entspricht dem aktuellen Filter."
+      "filtered": "Nichts entspricht dem aktuellen Filter.",
+      "publishers": "Keine vertrauenswürdigen Herausgeber."
     },
     "appMissing": "Die Datei dieser Anwendung existiert nicht mehr auf der Festplatte - sie wurde möglicherweise deinstalliert.",
     "remove": "Entfernen",
@@ -211,16 +251,50 @@
       "udpIn": "UDP ein",
       "lanOnly": "Nur LAN",
       "apply": "Übernehmen",
-      "customRulesReadOnly": "Benutzerdefinierte Regellisten lassen sich hier noch nicht bearbeiten.",
+      "customRulesReadOnly": "Diese Art von Regel lässt sich hier nicht bearbeiten.",
       "applySuccess": "Richtlinie aktualisiert.",
       "applyFailed": {
         "title": "Die Richtlinie konnte nicht aktualisiert werden",
         "lockedDetail": "Entsperre die Konfiguration, bevor du diese Regel änderst.",
         "staleDetail": "Die Konfiguration wurde soeben an anderer Stelle geändert; die Richtlinie wurde nicht geändert. Bitte versuche es erneut.",
         "genericDetail": "Der Dienst meldete {0}. Die Richtlinie wurde nicht geändert."
-      }
+      },
+      "policyCustom": "Eigene Regeln"
     },
-    "multiSelectHint": "{0} Regeln ausgewählt. Entfernen löscht alle davon; wähle eine einzelne Regel, um sie zu bearbeiten."
+    "multiSelectHint": "{0} Regeln ausgewählt. Entfernen löscht alle davon; wähle eine einzelne Regel, um sie zu bearbeiten.",
+    "publishersKind": "Vertrauenswürdige Herausgeber",
+    "publishersDescription": "Programme, die von diesen Herausgebern signiert sind, dürfen ohne eigene Regel Verbindungen herstellen, auch nach einem Update. Hinzufügen kannst du einen über „Zulassen“ auf der Seite „Verbindungen“.",
+    "custom": {
+      "addRule": "Regel hinzufügen",
+      "rule": "Regel {0}",
+      "removeRule": "Regel entfernen",
+      "action": "Aktion",
+      "allow": "Zulassen",
+      "block": "Blockieren",
+      "direction": "Richtung",
+      "outgoing": "Ausgehend",
+      "incoming": "Eingehend",
+      "both": "Beide",
+      "protocol": "Protokoll",
+      "anyProtocol": "Alle",
+      "tcpUdp": "TCP und UDP",
+      "remoteAddresses": "Remote-Adressen",
+      "remoteAddressesHint": "Alle, oder z. B. 192.168.1.0/24, LocalSubnet, DNS",
+      "remotePorts": "Remote-Ports",
+      "localPorts": "Lokale Ports",
+      "portsHint": "Alle, oder z. B. 80,443,8000-8100",
+      "invalidTitle": "Diese Regeln können nicht gespeichert werden",
+      "invalidPorts": "Regel {0}: „{1}“ ist keine Liste von Ports.",
+      "invalidAddresses": "Regel {0}: „{1}“ ist keine Liste von Adressen.",
+      "noRules": "Füge mindestens eine Regel hinzu oder wähle eine andere Option."
+    },
+    "cleanUp": "Aufräumen",
+    "cleanUpTooltip": "Regeln für Programme entfernen, die nicht mehr installiert sind",
+    "cleanUpDialog": {
+      "title": "Regeln aufräumen",
+      "confirmBody": "{0} Regel(n) gehören zu Programmen, die nicht mehr auf diesem PC sind. Entfernen?",
+      "nothing": "Alle Regeln gehören zu Programmen, die noch auf diesem PC sind."
+    }
   },
   "settings": {
     "title": "Einstellungen",
@@ -258,21 +332,33 @@
       "askForExceptionDetails": "Beim Hinzufügen einer einzelnen Ausnahme nach Details fragen",
       "askForExceptionDetailsDescription": "Zeigt eine bearbeitbare Bestätigung, bevor über die Schnellbefehle im Infobereich eine Ausnahme hinzugefügt wird. Sammelvorgänge (z. B. ein ganzer Ordner) fragen nie nach.",
       "enableHotkeys": "Globale Tastenkombinationen aktivieren",
-      "enableHotkeysDescription": "Strg+Alt+E/P/W erlauben von überall aus sofort eine Programmdatei, einen Prozess oder ein Fenster.",
+      "enableHotkeysDescription": "Strg+Alt+E/P/W erlauben von überall aus sofort eine Programmdatei, einen Prozess oder ein Fenster. Strg+Alt+B schaltet auf „Alles blockieren“ und wieder zurück auf Normal.",
       "autoRefreshInterval": "Intervall der automatischen Aktualisierung",
-      "autoRefreshIntervalDescription": "Wie oft die Seite „Verbindungen“ neu prüft, solange ihr Schalter für automatische Aktualisierung an ist. Änderungen werden ihr nicht zugestellt, es handelt sich also um ein Abfrageintervall; kürzer ist aktueller und kostet mehr."
+      "autoRefreshIntervalDescription": "Wie oft die Seite „Verbindungen“ neu prüft, solange ihr Schalter für automatische Aktualisierung an ist. Änderungen werden ihr nicht zugestellt, es handelt sich also um ein Abfrageintervall; kürzer ist aktueller und kostet mehr.",
+      "notifyBlocked": "Benachrichtigen, wenn eine App blockiert wird",
+      "notifyBlockedDescription": "Einmal pro App und Sitzung, im Modus Normal. Windows-Komponenten sind ausgenommen.",
+      "notifyListening": "Benachrichtigen, wenn eine App eingehende Verbindungen annimmt",
+      "notifyListeningDescription": "Einmal pro App und Sitzung. Windows-Komponenten sind ausgenommen."
     },
     "protection": {
       "allowLocalSubnet": "Lokales Netzwerk erlauben",
       "allowLocalSubnetDescription": "Datenverkehr zu und von anderen Geräten in deinem lokalen Netzwerk immer erlauben.",
       "displayOffBlock": "Netzwerk bei ausgeschaltetem Bildschirm blockieren",
-      "displayOffBlockDescription": "Blockiert den gesamten Netzwerkverkehr, solange der Bildschirm aus ist."
+      "displayOffBlockDescription": "Blockiert den gesamten Netzwerkverkehr, solange der Bildschirm aus ist.",
+      "publicNetworkLockdown": "In öffentlichen Netzwerken abschotten",
+      "publicNetworkLockdownDescription": "In Netzwerken, die Windows als öffentlich einstuft, etwa im Café oder Hotel, wird „Lokales Netzwerk erlauben“ ignoriert, und Datei- und Druckerfreigabe, Netzwerkerkennung, Ping und Fernzugriff werden ausgeschaltet.",
+      "publicNetworkNow": "Du bist gerade mit einem öffentlichen Netzwerk verbunden."
     },
     "blocklists": {
       "enable": "Sperrlisten aktivieren",
       "enableDescription": "Blockiert Datenverkehr zu bekannten schädlichen Hosts und Ports.",
       "hosts": "Schädliche Hosts blockieren",
-      "ports": "Schädliche Ports blockieren"
+      "ports": "Schädliche Ports blockieren",
+      "addresses": "Blockierte Adressen",
+      "addressesDescription": "Kein Programm kann Verbindungen zu oder von diesen IP-Adressen und Netzwerken herstellen, unabhängig von seinen Regeln. Eine pro Zeile; Zeilen mit # am Anfang werden ignoriert.",
+      "addressesPlaceholder": "Zum Beispiel 203.0.113.7 oder 198.51.100.0/24",
+      "addressesSave": "Adressen speichern",
+      "addressesInvalid": "„{0}“ ist keine IP-Adresse und kein Netzwerk. Es wurde nichts gespeichert."
     },
     "security": {
       "lockHostsFile": "Hosts-Datei sperren",
@@ -412,5 +498,26 @@
       "title": "SimpleDeFence läuft weiterhin",
       "body": "Das Schließen des Fensters beendet die Firewall nicht. Verwende „Beenden“ in diesem Menü, um sie zu stoppen."
     }
+  },
+  "duration": {
+    "label": "Wie lange",
+    "permanent": "Immer",
+    "minutes5": "Für 5 Minuten",
+    "minutes30": "Für 30 Minuten",
+    "hour1": "Für 1 Stunde",
+    "hours4": "Für 4 Stunden",
+    "hours9": "Für 9 Stunden",
+    "hours24": "Für 24 Stunden",
+    "untilRestart": "Bis zum Neustart",
+    "expiresAtSuffix": "{0}, bis {1}",
+    "untilRestartSuffix": "{0}, bis zum Neustart"
+  },
+  "notifications": {
+    "blockedOneTitle": "{0} wurde blockiert",
+    "blockedManyTitle": "{0} und {1} weitere wurden blockiert",
+    "blockedBody": "Es wollte eine Verbindung herstellen, und SimpleDeFence hat es verhindert. Klicken Sie, um es auf der Seite „Verbindungen“ zu sehen, wo Sie es erlauben können.",
+    "listeningOneTitle": "{0} nimmt eingehende Verbindungen an",
+    "listeningManyTitle": "{0} und {1} weitere nehmen eingehende Verbindungen an",
+    "listeningBody": "Fernwartungsprogramme und manche Schadsoftware tun das. Prüfen Sie also, ob Sie dieses Programm verwenden. Klicken Sie, um es auf der Seite „Verbindungen“ zu sehen."
   }
 }

@@ -114,6 +114,15 @@ namespace SimpleDeFence
         public UpdateDescriptor? Update = null;
         public FirewallMode Mode = FirewallMode.Unknown;
         public ServiceDegradation Degraded = ServiceDegradation.None;
+
+        /// <summary>Set while Learning runs with a time limit: when the service will switch back to
+        /// Normal. Null in every other mode, and in Learning without a limit.</summary>
+        public DateTime? LearningEndsAt = null;
+
+        /// <summary>A connected network is in Windows' Public category. Reported whether or not
+        /// public network lockdown is on, so the Settings page can say what turning it on would
+        /// do right now.</summary>
+        public bool OnPublicNetwork = false;
         public List<MessageType> ClientNotifs = new();
 
         public JsonTypeInfo<ServerState> GetJsonTypeInfo()

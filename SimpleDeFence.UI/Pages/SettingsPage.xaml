@@ -97,6 +97,18 @@
                                           OnContent="{loc:Loc Key=common.on}"
                                           OffContent="{loc:Loc Key=common.off}"/>
                         </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.general.notifyBlocked}"
+                                                Description="{loc:Loc Key=settings.general.notifyBlockedDescription}">
+                            <ToggleSwitch x:Name="NotifyBlockedToggle" Toggled="NotifyToggle_Toggled"
+                                          OnContent="{loc:Loc Key=common.on}"
+                                          OffContent="{loc:Loc Key=common.off}"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.general.notifyListening}"
+                                                Description="{loc:Loc Key=settings.general.notifyListeningDescription}">
+                            <ToggleSwitch x:Name="NotifyListeningToggle" Toggled="NotifyToggle_Toggled"
+                                          OnContent="{loc:Loc Key=common.on}"
+                                          OffContent="{loc:Loc Key=common.off}"/>
+                        </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
@@ -108,6 +120,14 @@
                         <controls:SettingsCard Header="{loc:Loc Key=settings.protection.allowLocalSubnet}"
                                                 Description="{loc:Loc Key=settings.protection.allowLocalSubnetDescription}">
                             <ToggleSwitch x:Name="AllowLocalSubnetToggle" Toggled="AllowLocalSubnetToggle_Toggled"
+                                          OnContent="{loc:Loc Key=common.on}"
+                                          OffContent="{loc:Loc Key=common.off}"/>
+                        </controls:SettingsCard>
+                        <!-- Description is set in SeedControls: it adds a line when a Public
+                             network is connected now, so the switch says what it would do. -->
+                        <controls:SettingsCard x:Name="PublicNetworkLockdownCard"
+                                                Header="{loc:Loc Key=settings.protection.publicNetworkLockdown}">
+                            <ToggleSwitch x:Name="PublicNetworkLockdownToggle" Toggled="PublicNetworkLockdownToggle_Toggled"
                                           OnContent="{loc:Loc Key=common.on}"
                                           OffContent="{loc:Loc Key=common.off}"/>
                         </controls:SettingsCard>
@@ -140,6 +160,24 @@
                             <ToggleSwitch x:Name="EnablePortBlocklistToggle" Toggled="EnablePortBlocklistToggle_Toggled"
                                           OnContent="{loc:Loc Key=common.on}"
                                           OffContent="{loc:Loc Key=common.off}"/>
+                        </controls:SettingsCard>
+                        <!-- A form, so in the Header slot like the password card below. -->
+                        <controls:SettingsCard IsClickEnabled="False">
+                            <controls:SettingsCard.Header>
+                                <StackPanel Spacing="8" HorizontalAlignment="Stretch" MinWidth="300" Margin="0,4">
+                                    <TextBlock Text="{loc:Loc Key=settings.blocklists.addresses}"
+                                               Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="{loc:Loc Key=settings.blocklists.addressesDescription}"
+                                               Opacity="0.8" TextWrapping="Wrap"
+                                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBox x:Name="BlockedAddressesBox" AcceptsReturn="True" TextWrapping="Wrap"
+                                             MinHeight="80" MaxHeight="240" HorizontalAlignment="Stretch"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                             PlaceholderText="{loc:Loc Key=settings.blocklists.addressesPlaceholder}"/>
+                                    <Button x:Name="SaveBlockedAddressesButton" Content="{loc:Loc Key=settings.blocklists.addressesSave}"
+                                            HorizontalAlignment="Left" Click="SaveBlockedAddressesButton_Click"/>
+                                </StackPanel>
+                            </controls:SettingsCard.Header>
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>

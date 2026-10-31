@@ -102,6 +102,8 @@ namespace SimpleDeFence.UI.Pages
                 LanguageCombo.SelectedIndex = 0;
             AskForExceptionDetailsToggle.IsOn = _clientSettings.AskForExceptionDetails;
             EnableHotkeysToggle.IsOn = _clientSettings.EnableGlobalHotkeys;
+            NotifyBlockedToggle.IsOn = _clientSettings.NotifyWhenBlocked;
+            NotifyListeningToggle.IsOn = _clientSettings.NotifyWhenListening;
             // Through the clamping property, so a hand-edited or legacy 0 shows as the default
             // rather than as a NumberBox pinned to its minimum.
             AutoRefreshIntervalBox.Value = _clientSettings.ConnectionsAutoRefreshInterval.TotalSeconds;
@@ -122,10 +124,16 @@ namespace SimpleDeFence.UI.Pages
             var config = App.Firewall.Config!;
             AllowLocalSubnetToggle.IsOn = config.ActiveProfile.AllowLocalSubnet;
             DisplayOffBlockToggle.IsOn = config.ActiveProfile.DisplayOffBlock;
+            PublicNetworkLockdownToggle.IsOn = config.PublicNetworkLockdown;
+            var lockdownDescription = Loc.T(LocKeys.Settings.ProtectionPublicNetworkLockdownDescription);
+            PublicNetworkLockdownCard.Description = App.Firewall.State?.OnPublicNetwork == true
+                ? lockdownDescription + "\n" + Loc.T(LocKeys.Settings.ProtectionPublicNetworkNow)
+                : lockdownDescription;
 
             EnableBlocklistsToggle.IsOn = config.Blocklists.EnableBlocklists;
             EnableHostsBlocklistToggle.IsOn = config.Blocklists.EnableHostsBlocklist;
             EnablePortBlocklistToggle.IsOn = config.Blocklists.EnablePortBlocklist;
+            BlockedAddressesBox.Text = string.Join("\r", config.Blocklists.BlockedAddresses);
             UpdateBlocklistSubTogglesEnabled();
 
             LockHostsFileToggle.IsOn = config.LockHostsFile;
@@ -173,6 +181,8 @@ namespace SimpleDeFence.UI.Pages
             var enabled = EnableBlocklistsToggle.IsOn;
             EnableHostsBlocklistToggle.IsEnabled = enabled;
             EnablePortBlocklistToggle.IsEnabled = enabled;
+            BlockedAddressesBox.IsEnabled = enabled;
+            SaveBlockedAddressesButton.IsEnabled = enabled;
         }
 
         /// <summary>ComboBox.SelectionChanged is a plain top-level event, not nested inside
@@ -406,6 +416,18 @@ namespace SimpleDeFence.UI.Pages
             (Application.Current as App)?.NotifyHotkeySettingChanged(_clientSettings.EnableGlobalHotkeys);
         }
 
+        /// <summary>Both notification switches: client-side settings like the hotkeys, applied to
+        /// the running notifier at once.</summary>
+        private void NotifyToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding)
+                return;
+            _clientSettings.NotifyWhenBlocked = NotifyBlockedToggle.IsOn;
+            _clientSettings.NotifyWhenListening = NotifyListeningToggle.IsOn;
+            SaveClientSettings();
+            App.NotifyActivitySettingsChanged(_clientSettings);
+        }
+
         /// <summary>ToggleSwitch fires Toggled synchronously from inside its own event dispatch -
         /// deferring via DispatcherQueue.TryEnqueue before committing is the same fix Rules Task 4
         /// applied for the identical reentrancy hazard (see this plan's Global Constraints).</summary>
@@ -428,6 +450,14 @@ namespace SimpleDeFence.UI.Pages
             if (_committing) { RevertDroppedToggle(); return; }
             var value = DisplayOffBlockToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.ActiveProfile.DisplayOffBlock = value));
+        }
+
+        private void PublicNetworkLockdownToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_seeding) return;
+            if (_committing) { RevertDroppedToggle(); return; }
+            var value = PublicNetworkLockdownToggle.IsOn;
+            DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.PublicNetworkLockdown = value));
         }
 
         private void EnableBlocklistsToggle_Toggled(object sender, RoutedEventArgs e)
@@ -453,6 +483,39 @@ namespace SimpleDeFence.UI.Pages
             if (_committing) { RevertDroppedToggle(); return; }
             var value = EnablePortBlocklistToggle.IsOn;
             DispatcherQueue.TryEnqueue(() => _ = CommitToggleAsync(config => config.Blocklists.EnablePortBlocklist = value));
+        }
+
+        /// <summary>
+        /// One address or network per line (commas work too). Every entry is checked before
+        /// anything is sent: a list that saved some lines and dropped others would block less than
+        /// it says. A plain Button.Click, so committing from here is safe.
+        /// </summary>
+        private async void SaveBlockedAddressesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing)
+                return;
+
+            var entries = new List<string>();
+            foreach (var line in BlockedAddressesBox.Text.Split(new[] { '\r', '\n', ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var entry = line.Trim();
+                if (entry.Length == 0 || entry.StartsWith('#'))
+                    continue;
+
+                // Keywords such as LocalSubnet are for rules, not for a blocklist: blocking the
+                // local network or the DNS servers for every program is never what a pasted list
+                // of bad addresses means.
+                if (!CustomRuleText.TryNormalizeAddresses(entry, out var normalized) || normalized is null
+                    || CustomRuleText.AddressKeywords.Contains(normalized, StringComparer.OrdinalIgnoreCase))
+                {
+                    await ShowResultAsync(Loc.T(LocKeys.Settings.CommitFailedTitle), Loc.T(LocKeys.Settings.BlocklistsAddressesInvalid, entry));
+                    return;
+                }
+                if (!entries.Contains(normalized, StringComparer.OrdinalIgnoreCase))
+                    entries.Add(normalized);
+            }
+
+            await CommitToggleAsync(config => config.Blocklists.BlockedAddresses = entries);
         }
 
         private void LockHostsFileToggle_Toggled(object sender, RoutedEventArgs e)
@@ -550,6 +613,7 @@ namespace SimpleDeFence.UI.Pages
             var resp = await CommitAsync(config =>
             {
                 config.LockHostsFile = imported.Service.LockHostsFile;
+                config.PublicNetworkLockdown = imported.Service.PublicNetworkLockdown;
                 config.AutoUpdateCheck = imported.Service.AutoUpdateCheck;
                 config.StartupMode = imported.Service.StartupMode;
                 config.Blocklists = imported.Service.Blocklists;

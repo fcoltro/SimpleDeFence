@@ -292,16 +292,22 @@ namespace SimpleDeFence
     {
         public FirewallMode Mode { get; }
 
+        /// <summary>For a switch to Learning: how many minutes until the service switches back to
+        /// Normal by itself. Zero means no limit, which is also what a request from a GUI that
+        /// predates the field deserializes to.</summary>
+        public int LearningMinutes { get; }
+
         [JsonConstructor]
-        public TwMessageModeSwitch(FirewallMode mode) :
+        public TwMessageModeSwitch(FirewallMode mode, int learningMinutes = 0) :
             base(MessageType.MODE_SWITCH)
         {
             Mode = mode;
+            LearningMinutes = learningMinutes;
         }
 
-        public static TwMessageModeSwitch CreateRequest(FirewallMode mode)
+        public static TwMessageModeSwitch CreateRequest(FirewallMode mode, int learningMinutes = 0)
         {
-            return new TwMessageModeSwitch(mode);
+            return new TwMessageModeSwitch(mode, learningMinutes);
         }
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression

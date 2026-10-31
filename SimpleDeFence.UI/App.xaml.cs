@@ -38,6 +38,13 @@ namespace SimpleDeFence.UI
         internal static void NotifyConnectionLogSettingsChanged(ClientSettings settings)
             => _connectionLog?.ApplySettings(settings);
 
+        private static ActivityNotifier? _activity;
+
+        /// <summary>Same arrangement as NotifyConnectionLogSettingsChanged, for the Settings page's
+        /// two notification switches.</summary>
+        internal static void NotifyActivitySettingsChanged(ClientSettings settings)
+            => _activity?.ApplySettings(settings);
+
         /// <summary>
         /// Selects the UI language for this process. One place rather than three: the app's own
         /// startup, the uninstall prompt's host and the Settings picker all resolve "auto" the same
@@ -248,6 +255,9 @@ namespace SimpleDeFence.UI
             // record is worth having. Reads its own enabled/interval settings; off by default.
             _connectionLog = new ConnectionLogService(m_window.DispatcherQueue);
 
+            // After the tray, which it shows its notifications through.
+            _activity = new ActivityNotifier(m_window.DispatcherQueue);
+
             // Closing the main window (title-bar X, Alt+F4) ends the process the same way Quit
             // does - WinUI's default behavior when the last window closes - but unlike Quit, that
             // path never touched the tray icon on its own. Without this, closing the window this
@@ -258,6 +268,7 @@ namespace SimpleDeFence.UI
             {
                 _tray?.Dispose();
                 _connectionLog?.Dispose();
+                _activity?.Dispose();
             };
         }
 

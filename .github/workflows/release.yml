@@ -10,8 +10,10 @@ name: Release
 # The tag must match <Version> in SimpleDeFence/SimpleDeFence.csproj, and the release notes are
 # read from docs/release-notes/<tag>.md, so both have to be on that commit first.
 #
-# The SHA-256 of the uploaded MSI is printed in the run summary. updates/update.json needs that
-# exact value: MSI builds are not reproducible, so a rebuild of the same commit hashes differently.
+# The SHA-256 of the uploaded MSI is printed in the run summary, uploaded beside it as
+# SHA256SUMS.txt, and written into a ready-made updates/update.json in the summary. update.json
+# needs that exact value: MSI builds are not reproducible, so a rebuild of the same commit hashes
+# differently.
 #
 # A release created with GITHUB_TOKEN does not trigger other workflows, so "Publish to winget"
 # does not start on its own from here. Run it by hand with the same tag.
@@ -101,6 +103,29 @@ jobs:
         "SHA-256 of SimpleDeFence_x64.msi for $($env:TAG): ``$hash``" >> $env:GITHUB_STEP_SUMMARY
         Write-Host "SHA256 $hash"
 
+        # Uploaded with the MSI, in the format sha256sum -c reads, so a download can be checked
+        # without trusting the release page's own text.
+        "$hash  SimpleDeFence_x64.msi" | Out-File -FilePath MsiSetup/bin/Release/SHA256SUMS.txt -Encoding ascii
+
+        # The updates/update.json this release would need, ready to paste once the MSI has been
+        # install-tested. Deliberately not committed from here: pointing update.json at a release
+        # offers it to every installed copy, and that step stays a person's decision.
+        $version = $env:TAG.Substring(1)
+        $descriptor = [ordered]@{
+          MagicWord = 'SimpleDeFence Update Descriptor'
+          Modules = @([ordered]@{
+            Component = 'SimpleDeFence_x64'
+            ComponentVersion = $version
+            DownloadHash = $hash
+            UpdateURL = "https://github.com/$env:GITHUB_REPOSITORY/releases/download/$env:TAG/SimpleDeFence_x64.msi"
+          })
+        }
+        "" >> $env:GITHUB_STEP_SUMMARY
+        "updates/update.json for this release, to commit only after an install test:" >> $env:GITHUB_STEP_SUMMARY
+        '```json' >> $env:GITHUB_STEP_SUMMARY
+        ($descriptor | ConvertTo-Json -Depth 4) >> $env:GITHUB_STEP_SUMMARY
+        '```' >> $env:GITHUB_STEP_SUMMARY
+
     # Only on a manual run with "replace" ticked, for rebuilding a release that nobody has been
     # offered in-app yet. Once updates/update.json names a release, bump the version instead:
     # installed clients only move to a higher version.
@@ -123,7 +148,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        gh release create $env:TAG MsiSetup/bin/Release/SimpleDeFence_x64.msi `
+        gh release create $env:TAG MsiSetup/bin/Release/SimpleDeFence_x64.msi MsiSetup/bin/Release/SHA256SUMS.txt `
           --title "SimpleDeFence $($env:TAG.Substring(1))" `
           --notes-file "docs/release-notes/$env:TAG.md" `
           --target $env:GITHUB_SHA
