@@ -28,6 +28,8 @@ namespace SimpleDeFence
                 MessageType.LOCK => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.STOP_SERVICE => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.MINUTE_TIMER => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
+                MessageType.BACKGROUND_ITEMS => (TwMessage?)JsonSerializer.Deserialize<TwMessageBackgroundItems>(ref reader, SourceGenerationContext.Default.TwMessageBackgroundItems),
+                MessageType.SET_BACKGROUND_ITEMS => (TwMessage?)JsonSerializer.Deserialize<TwMessageBackgroundItems>(ref reader, SourceGenerationContext.Default.TwMessageBackgroundItems),
                 MessageType.TELEMETRY_APPLY => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.TELEMETRY_UNDO => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.ADD_TEMPORARY_EXCEPTION => (TwMessage?)JsonSerializer.Deserialize<TwMessageAddTempException>(ref reader, SourceGenerationContext.Default.TwMessageAddTempException),
@@ -64,6 +66,8 @@ namespace SimpleDeFence
                     JsonSerializer.Serialize<TwMessageSetPassword>(writer, typedVal, SourceGenerationContext.Default.TwMessageSetPassword); break;
                 case TwMessageSimple typedVal:
                     JsonSerializer.Serialize<TwMessageSimple>(writer, typedVal, SourceGenerationContext.Default.TwMessageSimple); break;
+                case TwMessageBackgroundItems typedVal:
+                    JsonSerializer.Serialize<TwMessageBackgroundItems>(writer, typedVal, SourceGenerationContext.Default.TwMessageBackgroundItems); break;
                 case TwMessageAddTempException typedVal:
                     JsonSerializer.Serialize<TwMessageAddTempException>(writer, typedVal, SourceGenerationContext.Default.TwMessageAddTempException); break;
                 default:
@@ -365,6 +369,39 @@ namespace SimpleDeFence
         {
             return new TwMessageSimple(Type);
         }
+    }
+
+    /// <summary>
+    /// "Stop it trying": BACKGROUND_ITEMS lists the services, scheduled tasks and startup entries
+    /// from the publisher of AppPath; SET_BACKGROUND_ITEMS applies Changes first and then lists
+    /// them again. Publisher is empty in the reply when the program's publisher could not be told,
+    /// or is one whose items are never offered (see BackgroundItemRules.MayQuiet).
+    /// </summary>
+    public record TwMessageBackgroundItems : TwMessage
+    {
+        public string AppPath { get; }
+        public string Publisher { get; }
+        public BackgroundItem[] Items { get; }
+        public BackgroundItemChange[] Changes { get; }
+
+        [JsonConstructor]
+        public TwMessageBackgroundItems(MessageType type, string appPath, string publisher, BackgroundItem[] items, BackgroundItemChange[] changes) :
+            base(type)
+        {
+            AppPath = appPath;
+            Publisher = publisher;
+            Items = items;
+            Changes = changes;
+        }
+
+        public static TwMessageBackgroundItems CreateListRequest(string appPath)
+            => new(MessageType.BACKGROUND_ITEMS, appPath, string.Empty, Array.Empty<BackgroundItem>(), Array.Empty<BackgroundItemChange>());
+
+        public static TwMessageBackgroundItems CreateSetRequest(string appPath, BackgroundItemChange[] changes)
+            => new(MessageType.SET_BACKGROUND_ITEMS, appPath, string.Empty, Array.Empty<BackgroundItem>(), changes);
+
+        public TwMessageBackgroundItems CreateResponse(string publisher, BackgroundItem[] items)
+            => new(Type, AppPath, publisher, items, Array.Empty<BackgroundItemChange>());
     }
 
     public record TwMessageAddTempException : TwMessage

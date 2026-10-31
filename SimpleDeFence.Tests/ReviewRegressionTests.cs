@@ -62,6 +62,10 @@ namespace SimpleDeFence.Tests
         [InlineData("https://github.com.evil.example/fcoltro/SimpleDeFence/x.msi", false)]
         [InlineData("https://user@github.com/fcoltro/SimpleDeFence/x.msi", false)]
         [InlineData("https://github.com:8443/fcoltro/SimpleDeFence/x.msi", false)]
+        [InlineData("https://github.com/fcoltro/SimpleDeFence/files/12345/SimpleDeFence_x64.msi", false)]
+        [InlineData("https://github.com/fcoltro/SimpleDeFence/raw/main/x.msi", false)]
+        [InlineData("https://github.com/fcoltro/SimpleDeFence/releases/download/../../../files/1/x.msi", false)]
+        [InlineData("https://github.com/fcoltro/SimpleDeFence/releases/download/%2e%2e/%2e%2e/files/1/x.msi", false)]
         [InlineData("", false)]
         [InlineData(null, false)]
         public void Update_urls_are_pinned_to_this_projects_https_locations(string? url, bool allowed)

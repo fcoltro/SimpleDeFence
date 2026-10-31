@@ -21,6 +21,12 @@ namespace SimpleDeFence.UI.Services
     {
         private readonly DispatcherQueueTimer _timer;
         private readonly HashSet<string> _seen = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, (DateTime Latest, DateTime LoggedAt)> _blockedLogged = new(StringComparer.Ordinal);
+
+        /// <summary>How often one program retrying the same address gets a line. A blocked app in a
+        /// retry loop used to add a line for every attempt, then one for every poll; one line a
+        /// minute, carrying the attempt count, says the same thing.</summary>
+        private static readonly TimeSpan BlockedLineInterval = TimeSpan.FromMinutes(1);
         private ClientSettings _settings = new();
         private bool _polling;
         private bool _disposed;
@@ -78,18 +84,23 @@ namespace SimpleDeFence.UI.Services
                 var snapshot = await App.Firewall.GetConnectionsAsync();
                 var lines = new List<string>();
 
+                var now = DateTime.Now;
                 foreach (var row in snapshot.Blocked)
                 {
-                    // Blocked rows carry their own timestamp, so identity includes it and a repeat
-                    // attempt by the same app to the same place is correctly logged as a new event.
+                    // A row stands for every attempt by this app to this place in the last five
+                    // minutes, and its timestamp is the newest one. A line is written when there
+                    // has been a new attempt since the last line, at most once a minute, and says
+                    // how many attempts the five minutes held.
                     var key = string.Create(CultureInfo.InvariantCulture,
-                        $"B|{row.Timestamp.Ticks}|{row.ProcessId}|{row.AppName}|{row.Protocol}|{row.Direction}|{row.RemoteAddress}|{row.RemotePort}");
-                    if (!_seen.Add(key))
+                        $"B|{row.ProcessId}|{row.AppName}|{row.Protocol}|{row.Direction}|{row.RemoteAddress}|{row.RemotePort}");
+                    if (_blockedLogged.TryGetValue(key, out var last)
+                        && (row.Timestamp <= last.Latest || now - last.LoggedAt < BlockedLineInterval))
                         continue;
+                    _blockedLogged[key] = (row.Timestamp, now);
 
                     lines.Add(Csv(row.Timestamp, "Blocked", row.AppName, row.ProcessId, row.Protocol,
                         row.Direction, string.Empty, Endpoint(row.RemoteAddress, row.RemotePort),
-                        string.Empty, row.AppPath ?? string.Empty));
+                        string.Empty, row.AppPath ?? string.Empty, Math.Max(1, row.Count)));
                 }
 
                 foreach (var row in snapshot.Connected)
@@ -101,7 +112,7 @@ namespace SimpleDeFence.UI.Services
 
                     lines.Add(Csv(DateTime.Now, "Connected", row.AppName, row.ProcessId, row.Protocol,
                         "Out", Endpoint(row.LocalAddress, row.LocalPort),
-                        Endpoint(row.RemoteAddress, row.RemotePort), row.State, row.AppPath));
+                        Endpoint(row.RemoteAddress, row.RemotePort), row.State, row.AppPath, null));
                 }
 
                 // Cleared wholesale rather than pruned: the only thing the set is protecting
@@ -109,6 +120,8 @@ namespace SimpleDeFence.UI.Services
                 // is at worst one duplicate row per still-live connection, once.
                 if (_seen.Count > MaxSeenKeys)
                     _seen.Clear();
+                if (_blockedLogged.Count > MaxSeenKeys)
+                    _blockedLogged.Clear();
 
                 if (lines.Count > 0)
                     Append(lines);
@@ -135,7 +148,7 @@ namespace SimpleDeFence.UI.Services
             var writeHeader = !File.Exists(path) || new FileInfo(path).Length == 0;
             var text = new StringBuilder();
             if (writeHeader)
-                text.AppendLine("Timestamp,Event,Application,PID,Protocol,Direction,Local,Remote,State,Path");
+                text.AppendLine("Timestamp,Event,Application,PID,Protocol,Direction,Local,Remote,State,Path,Attempts in last 5 min");
             foreach (var line in lines)
                 text.AppendLine(line);
 
@@ -168,13 +181,15 @@ namespace SimpleDeFence.UI.Services
                                              : string.Create(CultureInfo.InvariantCulture, $"{address}:{port}");
 
         private static string Csv(DateTime timestamp, string kind, string app, uint pid, string protocol,
-                                  string direction, string local, string remote, string state, string path)
+                                  string direction, string local, string remote, string state, string path, int? attempts)
         {
+            // Attempts is last so a file started before the column existed still lines up.
             var fields = new[]
             {
                 timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
                 kind, app, pid.ToString(CultureInfo.InvariantCulture), protocol,
                 direction, local, remote, state, path,
+                attempts?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
             };
 
             var sb = new StringBuilder();

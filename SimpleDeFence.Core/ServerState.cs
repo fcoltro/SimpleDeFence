@@ -116,7 +116,7 @@ namespace SimpleDeFence
         public ServiceDegradation Degraded = ServiceDegradation.None;
 
         /// <summary>Set while Learning runs with a time limit: when the service will switch back to
-        /// Normal. Null in every other mode, and in Learning without a limit.</summary>
+        /// Normal, in UTC. Null in every other mode, and in Learning without a limit.</summary>
         public DateTime? LearningEndsAt = null;
 
         /// <summary>A connected network is in Windows' Public category. Reported whether or not

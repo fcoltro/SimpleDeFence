@@ -23,6 +23,7 @@
         GET_PROCESS_PATH,
         READ_FW_LOG,
         IS_LOCKED,
+        BACKGROUND_ITEMS,
 
         // Unprivileged write commands (>1023)
         UNLOCK = 1024,
@@ -39,6 +40,9 @@
 
         // Service-to-client messages
         DATABASE_UPDATED,
+
+        // Privileged write, added after DATABASE_UPDATED so no existing number moves
+        SET_BACKGROUND_ITEMS,
 
         // Privileged too (>2047). Numbered explicitly so commands added above cannot move them.
         TELEMETRY_APPLY = 3000,

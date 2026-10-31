@@ -158,6 +158,23 @@
       "openLocation": "Ouvrir l'emplacement du fichier",
       "openLocationMissing": "Le fichier et le dossier du programme n'existent plus."
     },
+    "stopTrying": {
+      "menu": "L'empêcher de réessayer…",
+      "title": "Empêcher {0} de réessayer",
+      "intro": "Ces éléments lancent en arrière-plan des programmes de {0} qui essaient sans cesse de se connecter. Décochez ceux que vous voulez désactiver. Ceux qui tournent maintenant sont fermés et ne redémarreront pas tant que vous ne les aurez pas recochés.",
+      "needed": "Vérification de licence. Les apps {0} risquent de ne pas s'ouvrir sans elle.",
+      "kindService": "Service",
+      "kindTask": "Tâche planifiée",
+      "kindStartup": "Démarre avec Windows",
+      "apply": "Appliquer",
+      "allOn": "Tout réactiver",
+      "none": "Rien de {0} ne démarre en arrière-plan.",
+      "unsigned": "SimpleDeFence ne peut pas savoir qui a créé ce programme, car il n'a pas de signature valide. Seuls les programmes signés peuvent être reliés à leurs composants en arrière-plan. Les programmes de Windows lui-même ne sont jamais proposés.",
+      "unreachable": "Le service n'a pas répondu. Est-il en cours d'exécution ?",
+      "done": "Terminé. {0} désactivé(s), {1} réactivé(s).",
+      "failed": "Certaines modifications n'ont pas pu être appliquées. Le journal du service contient les détails.",
+      "locked": "Déverrouillez d'abord la configuration."
+    },
     "details": {
       "addresses": "Adresses",
       "lookUpNote": "Trouve le nom de chaque adresse, son propriétaire et le pays où son réseau est enregistré. Rien n'est envoyé avant votre clic : les adresses partent alors vers votre serveur DNS et vers rdap.org.",

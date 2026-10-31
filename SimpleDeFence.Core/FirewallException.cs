@@ -62,7 +62,9 @@ namespace SimpleDeFence
             if (minutes <= 0 || ex.Timer == AppExceptionTimer.Invalid)
                 return null;
 
-            return ex.CreationDate.AddMinutes(minutes);
+            // Counted in UTC so a daylight-saving change in between neither adds nor takes away
+            // an hour; CreationDate is local time.
+            return ex.CreationDate.ToUniversalTime().AddMinutes(minutes).ToLocalTime();
         }
     }
 

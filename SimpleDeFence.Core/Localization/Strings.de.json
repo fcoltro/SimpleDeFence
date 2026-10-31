@@ -158,6 +158,23 @@
       "openLocation": "Dateispeicherort öffnen",
       "openLocationMissing": "Die Datei und der Ordner des Programms sind nicht mehr vorhanden."
     },
+    "stopTrying": {
+      "menu": "Versuche stoppen…",
+      "title": "{0} am Verbinden hindern",
+      "intro": "Diese Einträge starten Programme von {0} im Hintergrund, die immer wieder versuchen, eine Verbindung aufzubauen. Entfernen Sie das Häkchen bei allem, was ausgeschaltet werden soll. Laufende Programme werden sofort beendet und starten erst wieder, wenn Sie das Häkchen wieder setzen.",
+      "needed": "Lizenzprüfung. Apps von {0} öffnen sich ohne sie möglicherweise nicht.",
+      "kindService": "Dienst",
+      "kindTask": "Geplante Aufgabe",
+      "kindStartup": "Startet mit Windows",
+      "apply": "Übernehmen",
+      "allOn": "Alle wieder einschalten",
+      "none": "Von {0} startet nichts im Hintergrund.",
+      "unsigned": "SimpleDeFence kann nicht erkennen, von wem dieses Programm stammt, da es keine gültige Signatur hat. Nur signierte Programme lassen sich ihren Hintergrundteilen zuordnen. Programme von Windows selbst werden nie angeboten.",
+      "unreachable": "Der Dienst hat nicht geantwortet. Läuft er?",
+      "done": "Fertig. {0} ausgeschaltet, {1} wieder eingeschaltet.",
+      "failed": "Einige Änderungen konnten nicht vorgenommen werden. Details stehen im Dienstprotokoll.",
+      "locked": "Entsperren Sie zuerst die Konfiguration."
+    },
     "details": {
       "addresses": "Adressen",
       "lookUpNote": "Ermittelt zu jeder Adresse den Namen, den Inhaber und das Land, in dem ihr Netz registriert ist. Erst wenn du klickst, wird etwas gesendet: Die Adressen gehen dann an deinen DNS-Server und an rdap.org.",

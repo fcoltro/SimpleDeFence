@@ -7,6 +7,8 @@
     A free, lightweight and non-intrusive firewall for Windows
     <br />
     Built on <a href="https://github.com/pylorak/TinyWall">TinyWall</a> as its original code base.
+    <br />
+    <a href="https://fcoltro.github.io/SimpleDeFence/"><strong>fcoltro.github.io/SimpleDeFence</strong></a>
   </p>
 
   <p>
@@ -53,6 +55,9 @@ Updates are offered in-app and verified against a SHA-256 published in this repo
 anything is run, so an installer that does not match what was published is refused rather than
 executed.
 
+Code signing for Windows releases is provided free of charge by the SignPath Foundation; see the
+[code signing policy](#code-signing-policy).
+
 ## What it does
 
 - **Five modes**, switchable from the tray or the window:
@@ -69,6 +74,11 @@ executed.
 - **Address lookup**: "Show all" lists the addresses an app tried to reach, and one click shows
   each one's name, owner and the country where its network is registered. Nothing is sent until
   you click; then only those addresses go to your DNS server and to [rdap.org](https://rdap.org).
+- **Stop it trying**: blocked apps from big suites (Adobe Creative Cloud, Autodesk) keep retrying
+  in the background. Right-click one and SimpleDeFence lists every service, scheduled task and
+  startup entry signed by the same company. Untick what you don't want and it stops and won't
+  start again. Licence checkers are marked, Windows' own parts are never listed, and one button
+  switches everything back on.
 - **Clean up**: one button on the Rules page removes the rules for programs that are no longer
   installed.
 - **Password protection** — the running configuration can be locked so it cannot be changed
@@ -202,6 +212,37 @@ and fixes, see the [FAQ](docs/FAQ.md).
 
 Please do not report SimpleDeFence issues to TinyWall or its authors — they are the origin of this
 code, not participants in this project.
+
+## Privacy
+
+SimpleDeFence collects no personal data and sends no telemetry. It has no account, no analytics
+and no crash reporting. Rules, settings and logs stay on your computer.
+
+It only goes online in these cases:
+
+- **Update check:** it reads `updates/update.json` from this repository on GitHub. Updates to the
+  app, its database of known applications and the hosts blocklist are downloaded from this
+  repository and its releases. It can be switched off in Settings.
+- **Look up addresses:** only when you click it on the Connections page. The selected addresses
+  then go to your own DNS server and to [rdap.org](https://rdap.org).
+
+GitHub and rdap.org see your IP address when these requests are made, as with any website.
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by
+[SignPath Foundation](https://signpath.org).
+
+- **Committers and reviewers:** [fcoltro](https://github.com/fcoltro)
+- **Approvers:** [fcoltro](https://github.com/fcoltro)
+
+Only the installer built by this repository's
+[Release workflow](.github/workflows/release.yml) from this repository's source is signed, and each
+signing request is approved by hand. Changes from people outside the team are reviewed before
+they are merged. Signed releases start with the first version after the SignPath application is
+approved; earlier releases are not signed.
+
+The [Privacy](#privacy) section above is this project's privacy policy.
 
 ## License
 

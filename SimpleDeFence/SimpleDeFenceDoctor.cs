@@ -499,6 +499,40 @@ namespace SimpleDeFence
             }
         }
 
+        private static readonly SecurityIdentifier TrustedInstallerSid = new("S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464");
+
+        /// <summary>
+        /// Whether only SYSTEM, Administrators and TrustedInstaller can change or replace the file:
+        /// the file and its folder are owned by one of them, and neither grants anyone else write,
+        /// delete or permission rights. False when that cannot be read - unknown is not safe.
+        /// Used to decide whether a signature check may be remembered: a file a standard user can
+        /// swap must be checked again every time.
+        /// </summary>
+        internal static bool OnlyAdminsCanChange(string path)
+        {
+            try
+            {
+                var file = new FileInfo(path);
+                if (file.Directory is not DirectoryInfo folder)
+                    return false;
+
+                var fileAcl = file.GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
+                var folderAcl = folder.GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
+                return OwnedByAdmins(fileAcl) && OwnedByAdmins(folderAcl)
+                    && !GrantsWriteToNonAdmins(fileAcl) && !GrantsWriteToNonAdmins(folderAcl);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool OwnedByAdmins(FileSystemSecurity acl)
+            => acl.GetOwner(typeof(SecurityIdentifier)) is SecurityIdentifier owner
+                && (owner.IsWellKnown(WellKnownSidType.LocalSystemSid)
+                    || owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)
+                    || owner.Equals(TrustedInstallerSid));
+
         /// <summary>True if any allow rule on <paramref name="acl"/> gives write, delete or
         /// permission-changing rights to someone other than SYSTEM, Administrators, TrustedInstaller
         /// or CREATOR OWNER (which only ever names whoever created the item).</summary>
@@ -508,8 +542,6 @@ namespace SimpleDeFence
                 | FileSystemRights.WriteExtendedAttributes | FileSystemRights.WriteAttributes
                 | FileSystemRights.Delete | FileSystemRights.DeleteSubdirectoriesAndFiles
                 | FileSystemRights.ChangePermissions | FileSystemRights.TakeOwnership;
-
-            var trustedInstaller = new SecurityIdentifier("S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464");
 
             foreach (FileSystemAccessRule rule in acl.GetAccessRules(true, true, typeof(SecurityIdentifier)))
             {
@@ -522,7 +554,7 @@ namespace SimpleDeFence
                 if (sid.IsWellKnown(WellKnownSidType.LocalSystemSid)
                     || sid.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)
                     || sid.IsWellKnown(WellKnownSidType.CreatorOwnerSid)
-                    || sid.Equals(trustedInstaller))
+                    || sid.Equals(TrustedInstallerSid))
                     continue;
 
                 return true;

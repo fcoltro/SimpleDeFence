@@ -158,6 +158,23 @@
       "openLocation": "Dosya konumunu aç",
       "openLocationMissing": "Programın dosyası ve klasörü artık yok."
     },
+    "stopTrying": {
+      "menu": "Denemesini durdur…",
+      "title": "{0} denemelerini durdur",
+      "intro": "Bunlar {0} programlarını arka planda başlatır ve bu programlar sürekli bağlanmaya çalışır. Kapatmak istediklerinizin işaretini kaldırın. Şu anda çalışanlar hemen kapatılır ve siz yeniden işaretleyene kadar başlamaz.",
+      "needed": "Lisans denetimi. {0} uygulamaları bu olmadan açılmayabilir.",
+      "kindService": "Hizmet",
+      "kindTask": "Zamanlanmış görev",
+      "kindStartup": "Windows ile başlar",
+      "apply": "Uygula",
+      "allOn": "Hepsini yeniden aç",
+      "none": "{0} tarafından arka planda başlayan bir şey yok.",
+      "unsigned": "Bu programın geçerli bir imzası olmadığı için SimpleDeFence onu kimin yaptığını bilemiyor. Yalnızca imzalı programlar arka plan parçalarıyla eşleştirilebilir. Windows'un kendi programları hiçbir zaman sunulmaz.",
+      "unreachable": "Hizmet yanıt vermedi. Çalışıyor mu?",
+      "done": "Tamam. {0} kapatıldı, {1} yeniden açıldı.",
+      "failed": "Bazı değişiklikler yapılamadı. Ayrıntılar hizmet günlüğünde.",
+      "locked": "Önce yapılandırmanın kilidini açın."
+    },
     "details": {
       "addresses": "Adresler",
       "lookUpNote": "Her adresin adını, sahibini ve ağının kayıtlı olduğu ülkeyi bulur. Siz tıklayana kadar hiçbir şey gönderilmez: tıkladığınızda adresler DNS sunucunuza ve rdap.org'a gider.",

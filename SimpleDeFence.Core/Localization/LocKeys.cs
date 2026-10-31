@@ -171,6 +171,23 @@
             public const string MenuOpenLocation = "connections.menu.openLocation";
             public const string OpenLocationMissing = "connections.menu.openLocationMissing";
 
+            // "Stop it trying": switch off a blocked app's background parts
+            public const string StopMenu = "connections.stopTrying.menu";
+            public const string StopTitle = "connections.stopTrying.title";
+            public const string StopIntro = "connections.stopTrying.intro";
+            public const string StopNeeded = "connections.stopTrying.needed";
+            public const string StopKindService = "connections.stopTrying.kindService";
+            public const string StopKindTask = "connections.stopTrying.kindTask";
+            public const string StopKindStartup = "connections.stopTrying.kindStartup";
+            public const string StopApply = "connections.stopTrying.apply";
+            public const string StopAllOn = "connections.stopTrying.allOn";
+            public const string StopNone = "connections.stopTrying.none";
+            public const string StopUnsigned = "connections.stopTrying.unsigned";
+            public const string StopUnreachable = "connections.stopTrying.unreachable";
+            public const string StopDone = "connections.stopTrying.done";
+            public const string StopFailed = "connections.stopTrying.failed";
+            public const string StopLocked = "connections.stopTrying.locked";
+
             /// <summary>The details dialog behind "Show all", and its on-demand address lookup.</summary>
             public const string DetailsAddresses = "connections.details.addresses";
             public const string DetailsLookUpNote = "connections.details.lookUpNote";
