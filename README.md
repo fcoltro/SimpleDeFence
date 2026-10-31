@@ -64,7 +64,13 @@ executed.
 - **Application rules** with a built-in database of known programs, so common software can be
   allowed without hunting for executables by hand.
 - **A live connections view** showing what is connected, what is listening, and what was blocked —
-  with a configurable refresh interval and optional logging of connections to disk.
+  with a configurable refresh interval and optional logging of connections to disk. Right-click any
+  row to allow the app, copy its address or path, open its folder, or show only that app.
+- **Address lookup**: "Show all" lists the addresses an app tried to reach, and one click shows
+  each one's name, owner and the country where its network is registered. Nothing is sent until
+  you click; then only those addresses go to your DNS server and to [rdap.org](https://rdap.org).
+- **Clean up**: one button on the Rules page removes the rules for programs that are no longer
+  installed.
 - **Password protection** — the running configuration can be locked so it cannot be changed
   without the password, including by anything running as you.
 - **Hosts-file blocklists**, updated on request, and your own list of blocked IP addresses and
