@@ -2538,6 +2538,10 @@ namespace SimpleDeFence
         /// Whether a file's signature verifies, and who signed it, remembered per path until the
         /// file changes. Verifying means hashing the whole file, and the process snapshot names
         /// the same few dozen programs at every 30-minute reload.
+        ///
+        /// Only remembered for files a standard user cannot change. Anyone who can write a file
+        /// can also put its old timestamp back, so for a program in a user's own folders the
+        /// timestamp proves nothing and the signature is checked again every time.
         /// </summary>
         private (bool Valid, string? Subject) SignatureOf(string path)
         {
@@ -2545,9 +2549,10 @@ namespace SimpleDeFence
             try { lastWrite = File.GetLastWriteTimeUtc(path); }
             catch { return (false, null); }
 
+            bool cacheable = SimpleDeFenceDoctor.OnlyAdminsCanChange(path);
             lock (SignatureCache)
             {
-                if (SignatureCache.TryGetValue(path, out var cached) && cached.LastWriteUtc == lastWrite)
+                if (cacheable && SignatureCache.TryGetValue(path, out var cached) && cached.LastWriteUtc == lastWrite)
                     return (cached.Valid, cached.Subject);
             }
 
@@ -2555,12 +2560,15 @@ namespace SimpleDeFence
             bool valid = exe.CertValid;
             string? subject = valid ? exe.CertSubject : null;
 
-            lock (SignatureCache)
+            if (cacheable)
             {
-                // A long-running service sees many paths come and go; this is a cache, not a record.
-                if (SignatureCache.Count > 4096)
-                    SignatureCache.Clear();
-                SignatureCache[path] = (lastWrite, valid, subject);
+                lock (SignatureCache)
+                {
+                    // A long-running service sees many paths come and go; this is a cache, not a record.
+                    if (SignatureCache.Count > 4096)
+                        SignatureCache.Clear();
+                    SignatureCache[path] = (lastWrite, valid, subject);
+                }
             }
             return (valid, subject);
         }
