@@ -2052,21 +2052,6 @@ namespace SimpleDeFence
                         else
                             return args.CreateResponse(path);
                     }
-                case MessageType.BACKGROUND_ITEMS:
-                case MessageType.SET_BACKGROUND_ITEMS:
-                    {
-                        var args = (TwMessageBackgroundItems)req;
-                        var manager = new BackgroundItemsManager(SignatureOf, WindowsDirectory);
-                        var publisher = manager.PublisherOf(args.AppPath);
-                        if (publisher.Length == 0)
-                            return args.CreateResponse(string.Empty, Array.Empty<BackgroundItem>());
-
-                        if (args.Type == MessageType.SET_BACKGROUND_ITEMS
-                            && !manager.Apply(publisher, args.Changes ?? Array.Empty<BackgroundItemChange>()))
-                            return TwMessageError.Instance;
-
-                        return args.CreateResponse(publisher, manager.List(publisher));
-                    }
                 case MessageType.SET_PASSPHRASE:
                     {
                         var args = (TwMessageSetPassword)req;
@@ -2704,12 +2689,42 @@ namespace SimpleDeFence
                 if ((int)reqMsg.Type >= (int)MessageType.UNLOCK)
                     LastControllerCommandTime = DateTime.Now;
 
+                // Answered here, on the pipe's thread, not by the worker: the first listing checks
+                // the signature of every candidate program, which can take seconds, and the worker
+                // is what installs the rules for programs as they start. Nothing here touches the
+                // firewall's state, and SignatureOf is safe to call from any thread.
+                if (reqMsg is TwMessageBackgroundItems backgroundItems)
+                    return ProcessBackgroundItems(backgroundItems);
+
                 // Process and wait for response
                 var req = new TwRequest(reqMsg);
                 Q.Add(req);
 
                 // Send response back to pipe
                 return req.Response;
+            }
+        }
+
+        /// <summary>BACKGROUND_ITEMS and SET_BACKGROUND_ITEMS, for "Stop it trying".</summary>
+        private TwMessage ProcessBackgroundItems(TwMessageBackgroundItems args)
+        {
+            try
+            {
+                var manager = new BackgroundItemsManager(SignatureOf, WindowsDirectory);
+                var publisher = manager.PublisherOf(args.AppPath);
+                if (publisher.Length == 0)
+                    return args.CreateResponse(string.Empty, Array.Empty<BackgroundItem>());
+
+                if (args.Type == MessageType.SET_BACKGROUND_ITEMS
+                    && !manager.Apply(publisher, args.Changes ?? Array.Empty<BackgroundItemChange>()))
+                    return TwMessageError.Instance;
+
+                return args.CreateResponse(publisher, manager.List(publisher));
+            }
+            catch (Exception e)
+            {
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                return TwMessageError.Instance;
             }
         }
 
