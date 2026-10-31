@@ -34,7 +34,8 @@ namespace SimpleDeFence
         bool? GetTaskEnabled(string taskPath);
         void SetTaskEnabled(string taskPath, bool enabled);
 
-        /// <summary>A DWORD under HKEY_LOCAL_MACHINE, or null when the value is not there.</summary>
+        /// <summary>A DWORD under HKEY_LOCAL_MACHINE, or null when the value is not there.
+        /// Throws when it is there but is not a DWORD, so it is never mistaken for absent.</summary>
         int? GetPolicyValue(string key, string name);
 
         /// <summary>Null deletes the value.</summary>
@@ -64,6 +65,10 @@ namespace SimpleDeFence
         /// <summary><see cref="TelemetryPolicyValue.BackupKey"/> to the original value, null
         /// when the value did not exist (Undo deletes it again).</summary>
         public Dictionary<string, int?> Policies = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Set when an Undo could not put everything back. What is left is still
+        /// listed above, but the user asked for it off, so it no longer reads as On.</summary>
+        public bool UndoIncomplete;
 
         public bool IsEmpty => (Services.Count == 0) && (Tasks.Count == 0) && (Policies.Count == 0);
 
@@ -144,10 +149,16 @@ namespace SimpleDeFence
         /// second apply the existing backup is kept as it is and only items it does not list yet
         /// are added: reading them again would record the mitigation's own values as the
         /// "originals", and Undo would then restore nothing.
+        ///
+        /// A policy value that cannot be read, or is there under another type, is left out - and
+        /// so left alone by Apply and Undo - rather than recorded as absent, which would have
+        /// Undo delete a value somebody else set. Each one is described in
+        /// <paramref name="failures"/>.
         /// </summary>
-        public static TelemetryBackup CaptureOriginals(ITelemetrySystem sys, TelemetryBackup? existing)
+        public static TelemetryBackup CaptureOriginals(ITelemetrySystem sys, TelemetryBackup? existing, List<string> failures)
         {
             var backup = existing ?? new TelemetryBackup();
+            backup.UndoIncomplete = false;
 
             foreach (var service in Services)
             {
@@ -163,8 +174,17 @@ namespace SimpleDeFence
 
             foreach (var policy in Policies)
             {
-                if (!backup.Policies.ContainsKey(policy.BackupKey))
-                    backup.Policies[policy.BackupKey] = Try(() => sys.GetPolicyValue(policy.Key, policy.Name));
+                if (backup.Policies.ContainsKey(policy.BackupKey))
+                    continue;
+
+                try
+                {
+                    backup.Policies[policy.BackupKey] = sys.GetPolicyValue(policy.Key, policy.Name);
+                }
+                catch (Exception e)
+                {
+                    failures.Add($"policy {policy.BackupKey} (left as it is): {e.Message}");
+                }
             }
 
             return backup;
@@ -222,6 +242,8 @@ namespace SimpleDeFence
                     backup.Policies.Remove(policy.BackupKey);
                 }
             }
+
+            backup.UndoIncomplete = !backup.IsEmpty;
         }
 
         /// <summary>On when every item the backup lists is still the way the mitigation set it.
@@ -230,6 +252,8 @@ namespace SimpleDeFence
         {
             if (backup is null)
                 return TelemetryStatus.Off;
+            if (backup.UndoIncomplete)
+                return TelemetryStatus.Partial;
 
             foreach (var service in backup.Services.Keys)
             {

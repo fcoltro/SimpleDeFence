@@ -910,6 +910,10 @@ namespace SimpleDeFence.UI.Pages
             }
             catch (Exception ex)
             {
+                // A timeout is not proof nothing happened: the service may still be working
+                // through the list. Refreshed so the card shows what it got to.
+                _committing = false;
+                await RefreshAsync();
                 await ShowResultAsync(Loc.T(failedTitleKey), ex.Message);
                 return;
             }

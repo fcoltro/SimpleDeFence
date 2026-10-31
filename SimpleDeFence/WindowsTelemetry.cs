@@ -46,8 +46,10 @@ namespace SimpleDeFence
             if (sc.Status is ServiceControllerStatus.Stopped or ServiceControllerStatus.StopPending)
                 return;
 
+            // Not waited for. The client gives a command 20 seconds, and two services that are
+            // slow to stop could use all of it on an Apply that worked. Disabled is what counts;
+            // the service finishes stopping on its own.
             sc.Stop();
-            sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(15));
         }
 
         public bool? GetTaskEnabled(string taskPath)
@@ -70,7 +72,16 @@ namespace SimpleDeFence
         public int? GetPolicyValue(string key, string name)
         {
             using var k = Registry.LocalMachine.OpenSubKey(key);
-            return k?.GetValue(name) is int value ? value : null;
+            if (k is null)
+                return null;
+
+            object? value = k.GetValue(name);
+            if (value is null)
+                return null;
+            if (k.GetValueKind(name) == RegistryValueKind.DWord)
+                return (int)value;
+
+            throw new InvalidDataException($"{key}\\{name} is a {k.GetValueKind(name)}, not a DWORD.");
         }
 
         public void SetPolicyValue(string key, string name, int? value)
@@ -115,22 +126,31 @@ namespace SimpleDeFence
 
         public TelemetryStatus Status { get; private set; } = TelemetryStatus.Off;
 
-        /// <summary>Re-reads the machine.</summary>
+        /// <summary>Re-reads the machine. A backup that cannot be read means something is
+        /// changed that this service cannot describe, which is Partial, not Off.</summary>
         public void Refresh()
         {
-            Status = TelemetryMitigation.StatusOf(Machine, LoadBackup());
+            try
+            {
+                Status = TelemetryMitigation.StatusOf(Machine, LoadBackup());
+            }
+            catch (InvalidDataException)
+            {
+                Status = TelemetryStatus.Partial;
+                throw;
+            }
         }
 
         /// <summary>False when anything was refused; what was, is in the service log.</summary>
         public bool Apply()
         {
-            var backup = TelemetryMitigation.CaptureOriginals(Machine, LoadBackup());
+            var failures = new List<string>();
+            var backup = TelemetryMitigation.CaptureOriginals(Machine, LoadBackup(), failures);
 
             // Saved before the first change, or a failure half way would leave changes that
             // nothing knows how to undo.
             SerializationHelper.SerializeToFile(backup, BackupPath);
 
-            var failures = new List<string>();
             TelemetryMitigation.Apply(Machine, backup, failures);
             Log("Turned on Windows telemetry reduction", failures);
             Refresh();
@@ -194,10 +214,11 @@ namespace SimpleDeFence
             }
             catch (Exception e)
             {
-                // Kept on disk: it may still be readable by hand, and deleting it would throw away
-                // the only record of what the machine looked like.
-                Utils.LogException(e, Utils.LOG_ID_SERVICE);
-                return new TelemetryBackup();
+                // Refused rather than treated as empty. Empty would let Apply record the reduced
+                // values as the "originals" and Undo delete the file, and the file is the only
+                // record of what the machine looked like. Left on disk untouched, so it can still
+                // be read by hand; Apply and Undo both stop here until it is fixed or removed.
+                throw new InvalidDataException($"{BackupPath} could not be read; leaving it and the system as they are.", e);
             }
         }
 

@@ -15,6 +15,9 @@ namespace SimpleDeFence.Tests
             public readonly Dictionary<string, int> Policies = new(StringComparer.OrdinalIgnoreCase);
             public readonly HashSet<string> Refuse = new(StringComparer.OrdinalIgnoreCase);
 
+            /// <summary>Policy values present under another type, such as a REG_SZ.</summary>
+            public readonly HashSet<string> WrongType = new(StringComparer.OrdinalIgnoreCase);
+
             public uint? GetServiceStartMode(string service) => Services.TryGetValue(service, out var m) ? m : null;
 
             public void SetServiceStartMode(string service, uint startMode)
@@ -33,7 +36,11 @@ namespace SimpleDeFence.Tests
                 Tasks[taskPath] = enabled;
             }
 
-            public int? GetPolicyValue(string key, string name) => Policies.TryGetValue(key + "|" + name, out var v) ? v : null;
+            public int? GetPolicyValue(string key, string name)
+            {
+                if (WrongType.Contains(key + "|" + name)) throw new System.IO.InvalidDataException("not a DWORD");
+                return Policies.TryGetValue(key + "|" + name, out var v) ? v : null;
+            }
 
             public void SetPolicyValue(string key, string name, int? value)
             {
@@ -61,8 +68,9 @@ namespace SimpleDeFence.Tests
 
         private static TelemetryBackup TurnOn(FakeSystem sys, List<string>? failures = null)
         {
-            var backup = TelemetryMitigation.CaptureOriginals(sys, null);
-            TelemetryMitigation.Apply(sys, backup, failures ?? new List<string>());
+            failures ??= new List<string>();
+            var backup = TelemetryMitigation.CaptureOriginals(sys, null, failures);
+            TelemetryMitigation.Apply(sys, backup, failures);
             return backup;
         }
 
@@ -153,7 +161,7 @@ namespace SimpleDeFence.Tests
 
             // Windows turns a task back on, and the user applies again.
             sys.Tasks[Appraiser] = true;
-            var again = TelemetryMitigation.CaptureOriginals(sys, backup);
+            var again = TelemetryMitigation.CaptureOriginals(sys, backup, new List<string>());
             TelemetryMitigation.Apply(sys, again, new List<string>());
             Assert.Equal(TelemetryStatus.On, TelemetryMitigation.StatusOf(sys, again));
 
@@ -194,6 +202,31 @@ namespace SimpleDeFence.Tests
             Assert.True(backup.Services.ContainsKey("DiagTrack"));
             Assert.Single(backup.Services);
             Assert.Empty(backup.Tasks);
+
+            // The user asked for it off, so what is left does not read as On.
+            Assert.Equal(TelemetryStatus.Partial, TelemetryMitigation.StatusOf(sys, backup));
+        }
+
+        [Fact]
+        public void A_policy_value_of_another_type_is_left_alone_by_apply_and_undo()
+        {
+            const string AllowTelemetry = @"SOFTWARE\Policies\Microsoft\Windows\DataCollection|AllowTelemetry";
+            var sys = TypicalMachine();
+            sys.Policies.Remove(AllowTelemetry);
+            sys.WrongType.Add(AllowTelemetry);
+
+            var failures = new List<string>();
+            var backup = TurnOn(sys, failures);
+
+            Assert.Single(failures);
+            Assert.False(backup.Policies.ContainsKey(AllowTelemetry));
+            Assert.False(sys.Policies.ContainsKey(AllowTelemetry));
+
+            // Undo must not delete a value it never recorded.
+            sys.WrongType.Clear();
+            sys.Policies[AllowTelemetry] = 7;
+            TelemetryMitigation.Undo(sys, backup, new List<string>());
+            Assert.Equal(7, sys.Policies[AllowTelemetry]);
         }
     }
 }
