@@ -7,6 +7,8 @@
     A free, lightweight and non-intrusive firewall for Windows
     <br />
     Built on <a href="https://github.com/pylorak/TinyWall">TinyWall</a> as its original code base.
+    <br />
+    <a href="https://fcoltro.github.io/SimpleDeFence/"><strong>fcoltro.github.io/SimpleDeFence</strong></a>
   </p>
 
   <p>
