@@ -76,7 +76,7 @@ namespace SimpleDeFence.UI.Services
 
             State.Mode = mode;
             State.LearningEndsAt = (mode == FirewallMode.Learning) && (learningMinutes > 0)
-                ? DateTime.Now.AddMinutes(learningMinutes)
+                ? DateTime.UtcNow.AddMinutes(learningMinutes)
                 : null;
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.MODE_SWITCH);

@@ -1708,7 +1708,7 @@ namespace SimpleDeFence
                     exs.RemoveAt(i);
                     config_changed = true;
                 }
-                else if (((int)exs[i].Timer > 0) && (exs[i].CreationDate.AddMinutes((double)exs[i].Timer) <= DateTime.Now))
+                else if (AppExceptionTimers.ExpiresAt(exs[i]) is DateTime expires && expires.ToUniversalTime() <= DateTime.UtcNow)
                 {
                     exs.RemoveAt(i);
                     config_changed = true;
@@ -1754,7 +1754,6 @@ namespace SimpleDeFence
             // is the worst possible lie to tell.
             var previousMode = VisibleState.Mode;
             var previousStartupMode = ActiveConfig.Service.StartupMode;
-            var previousChangeset = GlobalInstances.ServerChangeset;
 
             VisibleState.Mode = newMode;
 
@@ -1787,7 +1786,11 @@ namespace SimpleDeFence
 
                 VisibleState.Mode = previousMode;
                 ActiveConfig.Service.StartupMode = previousStartupMode;
-                GlobalInstances.ServerChangeset = previousChangeset;
+
+                // A fresh changeset, not the previous one: CommitLearnedRules above may already
+                // have added the rules Learning collected, and those stay. Handing back the old
+                // changeset told open windows nothing had changed, so they never showed them.
+                GlobalInstances.ServerChangeset = Guid.NewGuid();
 
                 // Only worth rewriting if we changed it: on the common path save_needed
                 // is false and the file on disk still describes the mode WFP is running.
@@ -1867,7 +1870,7 @@ namespace SimpleDeFence
                         // limit sets it again. Bounded to a day: the GUI offers up to an hour, and
                         // a larger value from anywhere else is not a time limit anyone meant.
                         VisibleState.LearningEndsAt = (newMode == FirewallMode.Learning) && (args.LearningMinutes > 0)
-                            ? DateTime.Now.AddMinutes(Math.Min(args.LearningMinutes, 24 * 60))
+                            ? DateTime.UtcNow.AddMinutes(Math.Min(args.LearningMinutes, 24 * 60))
                             : null;
 
                         return args.CreateResponse(VisibleState.Mode);
@@ -2126,7 +2129,7 @@ namespace SimpleDeFence
                         // next tick, with the limit still set and the mode unchanged.
                         if ((VisibleState.Mode == FirewallMode.Learning)
                             && (VisibleState.LearningEndsAt is DateTime learningEnds)
-                            && (learningEnds <= DateTime.Now))
+                            && (learningEnds.ToUniversalTime() <= DateTime.UtcNow))
                         {
                             Utils.Log("Learning mode's time limit ran out; switching back to Normal.", Utils.LOG_ID_SERVICE);
                             if (TrySwitchMode(FirewallMode.Normal))
@@ -2674,9 +2677,11 @@ namespace SimpleDeFence
                 // Notify that we need to be unlocked first
                 return TwMessageLocked.Instance;
             }
-            if (((int)reqMsg.Type > 4095))
+            if (((int)reqMsg.Type > 4095)
+                || reqMsg.Type is MessageType.MINUTE_TIMER or MessageType.REENUMERATE_ADDRESSES or MessageType.DATABASE_UPDATED)
             {
-                // We cannot receive this from the client
+                // We cannot receive this from the client. The three named here sit below 4096 for
+                // historical reasons, but only the service's own timer and watchers send them.
                 return TwMessageError.Instance;
             }
             else
