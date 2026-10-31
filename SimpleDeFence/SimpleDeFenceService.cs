@@ -2052,6 +2052,21 @@ namespace SimpleDeFence
                         else
                             return args.CreateResponse(path);
                     }
+                case MessageType.BACKGROUND_ITEMS:
+                case MessageType.SET_BACKGROUND_ITEMS:
+                    {
+                        var args = (TwMessageBackgroundItems)req;
+                        var manager = new BackgroundItemsManager(SignatureOf, WindowsDirectory);
+                        var publisher = manager.PublisherOf(args.AppPath);
+                        if (publisher.Length == 0)
+                            return args.CreateResponse(string.Empty, Array.Empty<BackgroundItem>());
+
+                        if (args.Type == MessageType.SET_BACKGROUND_ITEMS
+                            && !manager.Apply(publisher, args.Changes ?? Array.Empty<BackgroundItemChange>()))
+                            return TwMessageError.Instance;
+
+                        return args.CreateResponse(publisher, manager.List(publisher));
+                    }
                 case MessageType.SET_PASSPHRASE:
                     {
                         var args = (TwMessageSetPassword)req;

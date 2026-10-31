@@ -1118,6 +1118,8 @@ namespace SimpleDeFence.UI.Pages
                 Add(LocKeys.Connections.MenuLookUp, "", async () => await ShowDetailsAsync(details, lookUpNow: true));
             if (details.Blocked is { } blocked)
                 Add(LocKeys.Connections.Allow, "", async () => await AllowAsync(blocked));
+            if (details.AppPath is { Length: > 0 } stopPath)
+                Add(LocKeys.Connections.StopMenu, "", async () => await StopTryingAsync(details.AppName, stopPath));
 
             menu.Items.Add(new MenuFlyoutSeparator());
             Add(LocKeys.Connections.MenuFilterApp, "", () => FilterBox.Text = details.AppName);

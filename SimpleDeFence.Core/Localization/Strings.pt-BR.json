@@ -158,6 +158,23 @@
       "openLocation": "Abrir local do arquivo",
       "openLocationMissing": "O arquivo e a pasta do programa não existem mais."
     },
+    "stopTrying": {
+      "menu": "Fazer parar de tentar…",
+      "title": "Fazer {0} parar de tentar",
+      "intro": "Estes itens iniciam programas da {0} em segundo plano que ficam tentando se conectar. Desmarque os que quer desligar. Os que estiverem em execução serão fechados agora e só voltarão a iniciar quando você marcá-los de novo.",
+      "needed": "Verificação de licença. Os apps da {0} podem não abrir sem ela.",
+      "kindService": "Serviço",
+      "kindTask": "Tarefa agendada",
+      "kindStartup": "Inicia com o Windows",
+      "apply": "Aplicar",
+      "allOn": "Religar tudo",
+      "none": "Nada da {0} inicia em segundo plano.",
+      "unsigned": "O SimpleDeFence não consegue saber quem fez este programa, porque ele não tem uma assinatura válida. Só programas assinados podem ser ligados às suas partes em segundo plano. Programas do próprio Windows nunca são oferecidos.",
+      "unreachable": "O serviço não respondeu. Ele está em execução?",
+      "done": "Pronto. {0} desligados, {1} religados.",
+      "failed": "Algumas alterações não puderam ser feitas. O log do serviço tem os detalhes.",
+      "locked": "Desbloqueie a configuração primeiro."
+    },
     "details": {
       "addresses": "Endereços",
       "lookUpNote": "Descobre o nome de cada endereço, o dono e o país onde a rede dele está registrada. Nada é enviado até você clicar: aí os endereços vão para o seu servidor DNS e para rdap.org.",

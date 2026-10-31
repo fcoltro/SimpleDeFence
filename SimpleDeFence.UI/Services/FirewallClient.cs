@@ -320,6 +320,27 @@ namespace SimpleDeFence.UI.Services
             });
         }
 
+        public Task<TwMessageBackgroundItems?> GetBackgroundItemsAsync(string appPath)
+            => Task.Run(() =>
+            {
+                try { return _controller.GetBackgroundItems(appPath); }
+                catch (Exception) { return null; }
+            });
+
+        public Task<(MessageType Result, TwMessageBackgroundItems? Items)> SetBackgroundItemsAsync(string appPath, BackgroundItemChange[] changes)
+            => Task.Run(() =>
+            {
+                try
+                {
+                    var resp = _controller.SetBackgroundItems(appPath, changes);
+                    return (resp.Type, resp as TwMessageBackgroundItems);
+                }
+                catch (Exception)
+                {
+                    return (MessageType.COM_ERROR, (TwMessageBackgroundItems?)null);
+                }
+            });
+
         public Task<IReadOnlyList<WindowListEntry>> GetTopLevelWindowsAsync()
         {
             return Task.Run(() =>

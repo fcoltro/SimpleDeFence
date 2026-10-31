@@ -158,6 +158,23 @@
       "openLocation": "Apri percorso file",
       "openLocationMissing": "Il file e la cartella del programma non esistono più."
     },
+    "stopTrying": {
+      "menu": "Fallo smettere di provare…",
+      "title": "Fai smettere {0} di provare",
+      "intro": "Questi elementi avviano in background programmi di {0} che continuano a tentare di connettersi. Togli la spunta a quelli da disattivare. Quelli in esecuzione vengono chiusi subito e non ripartiranno finché non rimetti la spunta.",
+      "needed": "Controllo della licenza. Le app di {0} potrebbero non aprirsi senza.",
+      "kindService": "Servizio",
+      "kindTask": "Attività pianificata",
+      "kindStartup": "Si avvia con Windows",
+      "apply": "Applica",
+      "allOn": "Riattiva tutto",
+      "none": "Nessun programma di {0} si avvia in background.",
+      "unsigned": "SimpleDeFence non può sapere chi ha creato questo programma, perché non ha una firma valida. Solo i programmi firmati possono essere ricondotti ai loro componenti in background. I programmi di Windows non vengono mai proposti.",
+      "unreachable": "Il servizio non ha risposto. È in esecuzione?",
+      "done": "Fatto. {0} disattivati, {1} riattivati.",
+      "failed": "Alcune modifiche non sono state applicate. I dettagli sono nel registro del servizio.",
+      "locked": "Sblocca prima la configurazione."
+    },
     "details": {
       "addresses": "Indirizzi",
       "lookUpNote": "Trova il nome di ogni indirizzo, il proprietario e il paese in cui è registrata la sua rete. Non viene inviato nulla finché non fai clic: allora gli indirizzi vanno al tuo server DNS e a rdap.org.",

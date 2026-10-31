@@ -71,5 +71,14 @@ namespace SimpleDeFence.UI.Services
 
         /// <summary>Visible top-level windows, for the window picker.</summary>
         Task<IReadOnlyList<WindowListEntry>> GetTopLevelWindowsAsync();
+
+        /// <summary>"Stop it trying": the services, scheduled tasks and startup entries from the
+        /// same publisher as <paramref name="appPath"/>. Null when the service did not answer.
+        /// An empty Publisher in the reply means the program's publisher could not be told.</summary>
+        Task<TwMessageBackgroundItems?> GetBackgroundItemsAsync(string appPath);
+
+        /// <summary>Switches the listed items on or off. Result is SET_BACKGROUND_ITEMS on
+        /// success, with Items the list as it now stands; anything else is a failure to show.</summary>
+        Task<(MessageType Result, TwMessageBackgroundItems? Items)> SetBackgroundItemsAsync(string appPath, BackgroundItemChange[] changes);
     }
 }

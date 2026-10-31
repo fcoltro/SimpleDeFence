@@ -69,6 +69,11 @@ executed.
 - **Address lookup**: "Show all" lists the addresses an app tried to reach, and one click shows
   each one's name, owner and the country where its network is registered. Nothing is sent until
   you click; then only those addresses go to your DNS server and to [rdap.org](https://rdap.org).
+- **Stop it trying**: blocked apps from big suites (Adobe Creative Cloud, Autodesk) keep retrying
+  in the background. Right-click one and SimpleDeFence lists every service, scheduled task and
+  startup entry signed by the same company. Untick what you don't want and it stops and won't
+  start again. Licence checkers are marked, Windows' own parts are never listed, and one button
+  switches everything back on.
 - **Clean up**: one button on the Rules page removes the rules for programs that are no longer
   installed.
 - **Password protection** — the running configuration can be locked so it cannot be changed
