@@ -319,6 +319,7 @@
       "general": "Umum",
       "protection": "Perlindungan",
       "blocklists": "Daftar blokir",
+      "privacy": "Privasi",
       "security": "Keamanan",
       "updates": "Pembaruan",
       "maintenance": "Pemeliharaan",
@@ -376,6 +377,24 @@
       "addressesPlaceholder": "Misalnya 203.0.113.7 atau 198.51.100.0/24",
       "addressesSave": "Simpan alamat",
       "addressesInvalid": "\"{0}\" bukan alamat IP atau jaringan. Tidak ada yang disimpan."
+    },
+    "privacy": {
+      "telemetry": "Kurangi telemetri Windows",
+      "telemetryDescription": "Mematikan layanan, tugas terjadwal, dan pengaturan Windows yang mengumpulkan data diagnostik, serta memblokir program yang mengirimnya. Tidak ada yang dihapus, dan Urungkan mengembalikan semuanya.",
+      "statusOff": "Status: mati.",
+      "statusOn": "Status: aktif. Telemetri dimatikan dan diblokir.",
+      "statusPartial": "Status: sebagian diurungkan. Windows, biasanya saat pembaruan besar, menyalakan kembali sebagian. Terapkan lagi untuk memperbaikinya.",
+      "apply": "Aktifkan",
+      "applyAgain": "Terapkan lagi",
+      "undo": "Urungkan",
+      "confirm": {
+        "title": "Kurangi telemetri Windows?",
+        "body": "SimpleDeFence akan mematikan layanan dan tugas terjadwal telemetri, menyetel data diagnostik ke tingkat terendah, dan memblokir program yang mengirimnya.\n\nSelama ini aktif, Windows Insider, Feedback Hub, dan pelaporan kesalahan tidak berfungsi. Di Home dan Pro, Windows tetap menyimpan data diagnostik wajib minimum, tetapi pengirimannya diblokir.\n\nAnda dapat mengurungkannya kapan saja.",
+        "confirm": "Aktifkan"
+      },
+      "failedTitle": "Beberapa perubahan tidak dapat dilakukan",
+      "failedDetail": "SimpleDeFence membuat semua perubahan yang diizinkan Windows. Log layanan mencantumkan apa yang ditolak. Coba lagi, atau mulai ulang komputer lalu coba lagi.",
+      "undoFailedTitle": "Urungkan tidak dapat diselesaikan"
     },
     "security": {
       "lockHostsFile": "Kunci berkas hosts",

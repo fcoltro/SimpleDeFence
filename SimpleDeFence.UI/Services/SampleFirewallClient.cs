@@ -124,6 +124,30 @@ namespace SimpleDeFence.UI.Services
             return Task.FromResult(MessageType.SET_PASSPHRASE);
         }
 
+        public Task<MessageType> ApplyTelemetryMitigationAsync()
+        {
+            if (_locked)
+                return Task.FromResult(MessageType.RESPONSE_LOCKED);
+            if (State is null)
+                return Task.FromResult(MessageType.RESPONSE_ERROR);
+
+            State.Telemetry = TelemetryStatus.On;
+            Changed?.Invoke(this, EventArgs.Empty);
+            return Task.FromResult(MessageType.TELEMETRY_APPLY);
+        }
+
+        public Task<MessageType> UndoTelemetryMitigationAsync()
+        {
+            if (_locked)
+                return Task.FromResult(MessageType.RESPONSE_LOCKED);
+            if (State is null)
+                return Task.FromResult(MessageType.RESPONSE_ERROR);
+
+            State.Telemetry = TelemetryStatus.Off;
+            Changed?.Invoke(this, EventArgs.Empty);
+            return Task.FromResult(MessageType.TELEMETRY_UNDO);
+        }
+
         /// <summary>One app holding several connections plus one holding a single connection, so
         /// both shapes the Connected list renders - collapsed with "Show all", and the lone entry
         /// shown as itself - are visible under --sample-data.</summary>

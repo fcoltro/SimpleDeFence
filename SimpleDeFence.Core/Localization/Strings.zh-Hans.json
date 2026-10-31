@@ -319,6 +319,7 @@
       "general": "常规",
       "protection": "保护",
       "blocklists": "阻止列表",
+      "privacy": "隐私",
       "security": "安全",
       "updates": "更新",
       "maintenance": "维护",
@@ -376,6 +377,24 @@
       "addressesPlaceholder": "例如 203.0.113.7 或 198.51.100.0/24",
       "addressesSave": "保存地址",
       "addressesInvalid": "“{0}”不是 IP 地址或网络。未保存任何内容。"
+    },
+    "privacy": {
+      "telemetry": "减少 Windows 遥测",
+      "telemetryDescription": "关闭收集诊断数据的 Windows 服务、计划任务和设置，并阻止发送这些数据的程序。不会删除任何内容，“撤销”可恢复一切。",
+      "statusOff": "状态：关闭。",
+      "statusOn": "状态：开启。遥测已关闭并被阻止。",
+      "statusPartial": "状态：部分已被撤销。Windows（通常在大型更新期间）重新开启了其中一部分。再次应用即可修复。",
+      "apply": "开启",
+      "applyAgain": "再次应用",
+      "undo": "撤销",
+      "confirm": {
+        "title": "减少 Windows 遥测？",
+        "body": "SimpleDeFence 将关闭遥测服务和计划任务，将诊断数据设为最低级别，并阻止发送这些数据的程序。\n\n开启期间，Windows 预览体验计划、反馈中心和错误报告将无法使用。在家庭版和专业版中，Windows 会保留最低限度的必需诊断数据，但其发送会被阻止。\n\n你可以随时撤销。",
+        "confirm": "开启"
+      },
+      "failedTitle": "部分更改未能完成",
+      "failedDetail": "SimpleDeFence 已完成 Windows 允许的所有更改。服务日志列出了被拒绝的内容。请重试，或重启计算机后再试。",
+      "undoFailedTitle": "撤销未能完成"
     },
     "security": {
       "lockHostsFile": "锁定 hosts 文件",

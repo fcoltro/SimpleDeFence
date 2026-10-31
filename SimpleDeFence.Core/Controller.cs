@@ -101,6 +101,16 @@ namespace SimpleDeFence
             return Endpoint.QueueMessage(TwMessageUnlock.CreateRequest(pwd)).Response.Type;
         }
 
+        public MessageType ApplyTelemetryMitigation()
+        {
+            return Endpoint.QueueMessage(TwMessageSimple.CreateRequest(MessageType.TELEMETRY_APPLY)).Response.Type;
+        }
+
+        public MessageType UndoTelemetryMitigation()
+        {
+            return Endpoint.QueueMessage(TwMessageSimple.CreateRequest(MessageType.TELEMETRY_UNDO)).Response.Type;
+        }
+
         public MessageType LockServer()
         {
             return Endpoint.QueueMessage(TwMessageSimple.CreateRequest(MessageType.LOCK)).Response.Type;

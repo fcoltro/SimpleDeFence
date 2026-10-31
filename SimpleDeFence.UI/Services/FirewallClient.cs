@@ -110,6 +110,12 @@ namespace SimpleDeFence.UI.Services
         public Task<MessageType> SetPasswordAsync(string password)
             => CommandAsync(() => _controller.SetPassphrase(password));
 
+        public Task<MessageType> ApplyTelemetryMitigationAsync()
+            => CommandAsync(() => _controller.ApplyTelemetryMitigation());
+
+        public Task<MessageType> UndoTelemetryMitigationAsync()
+            => CommandAsync(() => _controller.UndoTelemetryMitigation());
+
         public Task<ConnectionsSnapshot> GetConnectionsAsync()
         {
             return Task.Run(() =>

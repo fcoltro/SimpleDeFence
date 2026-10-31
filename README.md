@@ -100,6 +100,10 @@ Code signing for Windows releases is provided free of charge by the SignPath Fou
 - **Public network lockdown**: on networks Windows marks as Public, such as café or hotel Wi-Fi,
   "Allow local network", file and printer sharing, network discovery, ping and remote access are
   turned off, and come back on the next network that is not Public.
+- **Reduce Windows telemetry**: one button in Settings switches off the Windows telemetry
+  services, scheduled tasks and policy settings, and blocks the programs that send diagnostic
+  data. Nothing is deleted, and Undo puts back exactly what was there before. Settings shows
+  when a Windows update has turned part of it back on, with a button to apply it again.
 - **Global hotkeys** for allowing an executable, a running process or a visible window, and
   Ctrl+Alt+B to switch to Block all (and back to Normal) from anywhere.
 - **A command line** for scripts and scheduled tasks:

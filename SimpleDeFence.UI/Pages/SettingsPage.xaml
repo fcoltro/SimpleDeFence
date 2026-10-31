@@ -182,6 +182,23 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
+                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.privacy}" IsExpanded="True">
+                    <controls:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE8D7;"/>
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <!-- Description is set in SeedControls: it ends with where the mitigation
+                             stands, and which buttons show depends on that too. -->
+                        <controls:SettingsCard x:Name="TelemetryCard" IsClickEnabled="False"
+                                                Header="{loc:Loc Key=settings.privacy.telemetry}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="ApplyTelemetryButton" Content="{loc:Loc Key=settings.privacy.apply}" Click="ApplyTelemetryButton_Click"/>
+                                <Button x:Name="UndoTelemetryButton" Content="{loc:Loc Key=settings.privacy.undo}" Click="UndoTelemetryButton_Click"/>
+                            </StackPanel>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+
                 <controls:SettingsExpander Header="{loc:Loc Key=settings.section.security}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE72E;"/>

@@ -319,6 +319,7 @@
       "general": "全般",
       "protection": "保護",
       "blocklists": "ブロックリスト",
+      "privacy": "プライバシー",
       "security": "セキュリティ",
       "updates": "更新",
       "maintenance": "メンテナンス",
@@ -376,6 +377,24 @@
       "addressesPlaceholder": "例: 203.0.113.7 または 198.51.100.0/24",
       "addressesSave": "アドレスを保存",
       "addressesInvalid": "「{0}」は IP アドレスでもネットワークでもありません。何も保存されませんでした。"
+    },
+    "privacy": {
+      "telemetry": "Windows のテレメトリを減らす",
+      "telemetryDescription": "診断データを収集する Windows のサービス、スケジュールされたタスク、設定をオフにし、データを送信するプログラムをブロックします。何も削除されず、「元に戻す」ですべて元どおりになります。",
+      "statusOff": "状態: オフ。",
+      "statusOn": "状態: オン。テレメトリはオフになり、ブロックされています。",
+      "statusPartial": "状態: 一部が元に戻っています。Windows が (通常は大型更新の際に) 一部をオンに戻しました。もう一度適用すると修正されます。",
+      "apply": "オンにする",
+      "applyAgain": "もう一度適用",
+      "undo": "元に戻す",
+      "confirm": {
+        "title": "Windows のテレメトリを減らしますか?",
+        "body": "SimpleDeFence はテレメトリのサービスとスケジュールされたタスクをオフにし、診断データを最低レベルに設定し、データを送信するプログラムをブロックします。\n\nこれがオンの間は、Windows Insider、フィードバック Hub、エラー報告は動作しません。Home と Pro では Windows が最低限の必須診断データを保持しますが、送信はブロックされます。\n\nいつでも元に戻せます。",
+        "confirm": "オンにする"
+      },
+      "failedTitle": "一部の変更を行えませんでした",
+      "failedDetail": "SimpleDeFence は Windows が許可したすべての変更を行いました。拒否された内容はサービスのログに記録されています。もう一度試すか、コンピューターを再起動してからもう一度試してください。",
+      "undoFailedTitle": "元に戻す操作を完了できませんでした"
     },
     "security": {
       "lockHostsFile": "hosts ファイルをロック",

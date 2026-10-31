@@ -319,6 +319,7 @@
       "general": "Geral",
       "protection": "Proteção",
       "blocklists": "Listas de bloqueio",
+      "privacy": "Privacidade",
       "security": "Segurança",
       "updates": "Atualizações",
       "maintenance": "Manutenção",
@@ -376,6 +377,24 @@
       "addressesPlaceholder": "Por exemplo 203.0.113.7 ou 198.51.100.0/24",
       "addressesSave": "Salvar endereços",
       "addressesInvalid": "\"{0}\" não é um endereço IP nem uma rede. Nada foi salvo."
+    },
+    "privacy": {
+      "telemetry": "Reduzir a telemetria do Windows",
+      "telemetryDescription": "Desativa os serviços, tarefas agendadas e configurações do Windows que coletam dados de diagnóstico, e bloqueia os programas que os enviam. Nada é excluído, e Desfazer restaura tudo.",
+      "statusOff": "Status: desativado.",
+      "statusOn": "Status: ativado. A telemetria está desativada e bloqueada.",
+      "statusPartial": "Status: desfeito em parte. O Windows, geralmente durante uma grande atualização, reativou uma parte. Aplique novamente para corrigir.",
+      "apply": "Ativar",
+      "applyAgain": "Aplicar novamente",
+      "undo": "Desfazer",
+      "confirm": {
+        "title": "Reduzir a telemetria do Windows?",
+        "body": "O SimpleDeFence vai desativar os serviços e tarefas agendadas de telemetria, colocar os dados de diagnóstico no nível mais baixo e bloquear os programas que os enviam.\n\nEnquanto estiver ativado, o Windows Insider, o Hub de Feedback e o relatório de erros param de funcionar. No Home e no Pro, o Windows mantém um mínimo de dados de diagnóstico obrigatórios, mas o envio deles é bloqueado.\n\nVocê pode desfazer a qualquer momento.",
+        "confirm": "Ativar"
+      },
+      "failedTitle": "Algumas alterações não puderam ser feitas",
+      "failedDetail": "O SimpleDeFence fez todas as alterações que o Windows permitiu. O log do serviço lista o que foi recusado. Tente novamente, ou reinicie o computador e tente novamente.",
+      "undoFailedTitle": "Não foi possível concluir o Desfazer"
     },
     "security": {
       "lockHostsFile": "Bloquear o arquivo hosts",

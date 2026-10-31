@@ -309,6 +309,7 @@
             public const string SectionMaintenance = "settings.section.maintenance";
             public const string SectionAbout = "settings.section.about";
             public const string SectionLogging = "settings.section.logging";
+            public const string SectionPrivacy = "settings.section.privacy";
 
             public const string CommitFailedTitle = "settings.commitFailed.title";
             public const string CommitFailedLockedDetail = "settings.commitFailed.lockedDetail";
@@ -357,6 +358,21 @@
             public const string ProtectionPublicNetworkLockdown = "settings.protection.publicNetworkLockdown";
             public const string ProtectionPublicNetworkLockdownDescription = "settings.protection.publicNetworkLockdownDescription";
             public const string ProtectionPublicNetworkNow = "settings.protection.publicNetworkNow";
+
+            public const string PrivacyTelemetry = "settings.privacy.telemetry";
+            public const string PrivacyTelemetryDescription = "settings.privacy.telemetryDescription";
+            public const string PrivacyStatusOff = "settings.privacy.statusOff";
+            public const string PrivacyStatusOn = "settings.privacy.statusOn";
+            public const string PrivacyStatusPartial = "settings.privacy.statusPartial";
+            public const string PrivacyApply = "settings.privacy.apply";
+            public const string PrivacyApplyAgain = "settings.privacy.applyAgain";
+            public const string PrivacyUndo = "settings.privacy.undo";
+            public const string PrivacyConfirmTitle = "settings.privacy.confirm.title";
+            public const string PrivacyConfirmBody = "settings.privacy.confirm.body";
+            public const string PrivacyConfirmConfirm = "settings.privacy.confirm.confirm";
+            public const string PrivacyFailedTitle = "settings.privacy.failedTitle";
+            public const string PrivacyFailedDetail = "settings.privacy.failedDetail";
+            public const string PrivacyUndoFailedTitle = "settings.privacy.undoFailedTitle";
 
             public const string BlocklistsEnable = "settings.blocklists.enable";
             public const string BlocklistsEnableDescription = "settings.blocklists.enableDescription";

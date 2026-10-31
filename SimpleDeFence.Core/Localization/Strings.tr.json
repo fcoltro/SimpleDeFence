@@ -319,6 +319,7 @@
       "general": "Genel",
       "protection": "Koruma",
       "blocklists": "Engelleme listeleri",
+      "privacy": "Gizlilik",
       "security": "Güvenlik",
       "updates": "Güncelleştirmeler",
       "maintenance": "Bakım",
@@ -376,6 +377,24 @@
       "addressesPlaceholder": "Örneğin 203.0.113.7 veya 198.51.100.0/24",
       "addressesSave": "Adresleri kaydet",
       "addressesInvalid": "\"{0}\" bir IP adresi veya ağ değil. Hiçbir şey kaydedilmedi."
+    },
+    "privacy": {
+      "telemetry": "Windows telemetrisini azalt",
+      "telemetryDescription": "Tanılama verisi toplayan Windows hizmetlerini, zamanlanmış görevlerini ve ayarlarını kapatır, bu verileri gönderen programları engeller. Hiçbir şey silinmez ve Geri al her şeyi eski haline getirir.",
+      "statusOff": "Durum: kapalı.",
+      "statusOn": "Durum: açık. Telemetri kapatıldı ve engellendi.",
+      "statusPartial": "Durum: kısmen geri alındı. Windows, genellikle büyük bir güncelleme sırasında, bir kısmını yeniden açtı. Düzeltmek için yeniden uygulayın.",
+      "apply": "Aç",
+      "applyAgain": "Yeniden uygula",
+      "undo": "Geri al",
+      "confirm": {
+        "title": "Windows telemetrisi azaltılsın mı?",
+        "body": "SimpleDeFence telemetri hizmetlerini ve zamanlanmış görevlerini kapatacak, tanılama verilerini en düşük düzeye ayarlayacak ve bunları gönderen programları engelleyecek.\n\nBu açıkken Windows Insider, Geri Bildirim Merkezi ve hata raporlama çalışmaz. Home ve Pro sürümlerinde Windows en az düzeyde gerekli tanılama verisini tutar, ancak gönderilmesi engellenir.\n\nBunu istediğiniz zaman geri alabilirsiniz.",
+        "confirm": "Aç"
+      },
+      "failedTitle": "Bazı değişiklikler yapılamadı",
+      "failedDetail": "SimpleDeFence, Windows'un izin verdiği tüm değişiklikleri yaptı. Hizmet günlüğü reddedilenleri listeler. Yeniden deneyin ya da bilgisayarı yeniden başlatıp tekrar deneyin.",
+      "undoFailedTitle": "Geri alma tamamlanamadı"
     },
     "security": {
       "lockHostsFile": "hosts dosyasını kilitle",

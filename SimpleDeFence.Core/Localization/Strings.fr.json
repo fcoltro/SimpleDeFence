@@ -319,6 +319,7 @@
       "general": "Général",
       "protection": "Protection",
       "blocklists": "Listes de blocage",
+      "privacy": "Confidentialité",
       "security": "Sécurité",
       "updates": "Mises à jour",
       "maintenance": "Maintenance",
@@ -376,6 +377,24 @@
       "addressesPlaceholder": "Par exemple 203.0.113.7 ou 198.51.100.0/24",
       "addressesSave": "Enregistrer les adresses",
       "addressesInvalid": "« {0} » n’est ni une adresse IP ni un réseau. Rien n’a été enregistré."
+    },
+    "privacy": {
+      "telemetry": "Réduire la télémétrie de Windows",
+      "telemetryDescription": "Désactive les services, tâches planifiées et paramètres de Windows qui collectent des données de diagnostic, et bloque les programmes qui les envoient. Rien n'est supprimé, et Annuler remet tout en place.",
+      "statusOff": "État : désactivé.",
+      "statusOn": "État : activé. La télémétrie est désactivée et bloquée.",
+      "statusPartial": "État : en partie annulé. Windows, généralement lors d'une grosse mise à jour, en a réactivé une partie. Appliquez-le à nouveau pour corriger.",
+      "apply": "Activer",
+      "applyAgain": "Appliquer à nouveau",
+      "undo": "Annuler",
+      "confirm": {
+        "title": "Réduire la télémétrie de Windows ?",
+        "body": "SimpleDeFence va désactiver les services et tâches planifiées de télémétrie, régler les données de diagnostic au niveau le plus bas et bloquer les programmes qui les envoient.\n\nTant que c'est activé, Windows Insider, le Hub de commentaires et le rapport d'erreurs ne fonctionnent plus. Sous Famille et Professionnel, Windows conserve un minimum de données de diagnostic obligatoires, mais leur envoi est bloqué.\n\nVous pouvez annuler à tout moment.",
+        "confirm": "Activer"
+      },
+      "failedTitle": "Certaines modifications n'ont pas pu être appliquées",
+      "failedDetail": "SimpleDeFence a appliqué toutes les modifications que Windows a autorisées. Le journal du service indique ce qui a été refusé. Réessayez, ou redémarrez l'ordinateur et réessayez.",
+      "undoFailedTitle": "L'annulation n'a pas pu se terminer"
     },
     "security": {
       "lockHostsFile": "Verrouiller le fichier hosts",

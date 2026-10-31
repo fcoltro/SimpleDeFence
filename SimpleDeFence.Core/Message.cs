@@ -30,6 +30,8 @@ namespace SimpleDeFence
                 MessageType.MINUTE_TIMER => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.BACKGROUND_ITEMS => (TwMessage?)JsonSerializer.Deserialize<TwMessageBackgroundItems>(ref reader, SourceGenerationContext.Default.TwMessageBackgroundItems),
                 MessageType.SET_BACKGROUND_ITEMS => (TwMessage?)JsonSerializer.Deserialize<TwMessageBackgroundItems>(ref reader, SourceGenerationContext.Default.TwMessageBackgroundItems),
+                MessageType.TELEMETRY_APPLY => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
+                MessageType.TELEMETRY_UNDO => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.ADD_TEMPORARY_EXCEPTION => (TwMessage?)JsonSerializer.Deserialize<TwMessageAddTempException>(ref reader, SourceGenerationContext.Default.TwMessageAddTempException),
                 _ => throw new JsonException($"Tried to deserialize unsupported type with discriminator {(MessageType)discriminator}."),
             };

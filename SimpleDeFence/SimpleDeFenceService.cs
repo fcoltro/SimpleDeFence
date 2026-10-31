@@ -67,6 +67,8 @@ namespace SimpleDeFence
         private readonly BlockedLog FirewallLogEntries = new(500);
         private readonly FileLocker FileLocker = new();
         private readonly HostsFileManager HostsFileManager = new();
+        private readonly TelemetryMitigationHost Telemetry = new();
+        private int MinutesSinceTelemetryCheck;
         private DateTime LastControllerCommandTime = DateTime.Now;
         private DateTime LastRuleReloadTime = DateTime.Now;
 
@@ -145,6 +147,10 @@ namespace SimpleDeFence
                     RemoteAddresses = string.Join(",", ActiveConfig.Service.Blocklists.BlockedAddresses)
                 });
             }
+
+            // "Reduce Windows telemetry" is on (or not fully undone): keep its programs blocked
+            // in every mode, the same way the blocklists above are.
+            Telemetry.AddBlockRules(rules, ModeId);
 
             // Rules specific to the selected firewall mode. The decision itself lives in
             // SimpleDeFence.Core/ModeRules.cs so it can be exercised without constructing a
@@ -1337,7 +1343,25 @@ namespace SimpleDeFence
                 ActiveConfig.Service.Save(ConfigSavePath);
 
             ReapplySettings();
+            RefreshTelemetryStatus();
             InstallFirewallRules();
+        }
+
+        /// <summary>Re-reads where "Reduce Windows telemetry" stands. A check that fails is
+        /// logged and leaves the last answer in place.</summary>
+        private void RefreshTelemetryStatus()
+        {
+            MinutesSinceTelemetryCheck = 0;
+            try
+            {
+                Telemetry.Refresh();
+            }
+            catch (Exception e)
+            {
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+            }
+
+            VisibleState.Telemetry = Telemetry.Status;
         }
 
 
@@ -2142,6 +2166,18 @@ namespace SimpleDeFence
                             rule_reload_needed = true;
                         }
 
+                        // A feature update can turn telemetry tasks back on. Every ten minutes is
+                        // soon enough to show it, and keeps Task Scheduler out of every tick.
+                        if (++MinutesSinceTelemetryCheck >= 10)
+                        {
+                            var before = VisibleState.Telemetry;
+                            RefreshTelemetryStatus();
+
+                            // Clients only receive VisibleState when the changeset moves.
+                            if (VisibleState.Telemetry != before)
+                                GlobalInstances.ServerChangeset = Guid.NewGuid();
+                        }
+
                         // Changing a network from Private to Public in Settings does not touch its
                         // addresses, so the interface watcher says nothing. A minute's delay is
                         // the price of not subscribing to Network List Manager events.
@@ -2185,6 +2221,28 @@ namespace SimpleDeFence
                         }
 
                         return args.CreateResponse();
+                    }
+                case MessageType.TELEMETRY_APPLY:
+                case MessageType.TELEMETRY_UNDO:
+                    {
+                        var args = (TwMessageSimple)req;
+                        bool ok;
+                        try
+                        {
+                            ok = (req.Type == MessageType.TELEMETRY_APPLY) ? Telemetry.Apply() : Telemetry.Undo();
+                        }
+                        catch (Exception e)
+                        {
+                            // Only reachable when the backup itself could not be written or read;
+                            // Apply makes no change before it has been saved.
+                            Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                            ok = false;
+                        }
+
+                        VisibleState.Telemetry = Telemetry.Status;
+                        GlobalInstances.ServerChangeset = Guid.NewGuid();
+                        InstallFirewallRules();
+                        return ok ? args.CreateResponse() : TwMessageError.Instance;
                     }
                 case MessageType.REENUMERATE_ADDRESSES:
                     {
