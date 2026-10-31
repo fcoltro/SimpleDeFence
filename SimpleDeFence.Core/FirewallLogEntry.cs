@@ -38,6 +38,11 @@ namespace SimpleDeFence
         public string? AppPath;
         public string? PackageId;
 
+        /// <summary>How many attempts this entry stands for. Repeats of the same blocked attempt
+        /// are merged into one entry - see BlockedLog - so one app retrying in a loop does not
+        /// push every other block out of the log. 1 when it came from an older service.</summary>
+        public int Count = 1;
+
         public int GetHashCode(bool includeTimestamp)
         {
             unchecked

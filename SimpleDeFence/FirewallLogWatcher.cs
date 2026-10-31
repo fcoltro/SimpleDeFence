@@ -67,6 +67,10 @@ namespace SimpleDeFence
                 // to own - see SimpleDeFenceService.Run.
                 if (value != LogWatcher.Enabled)
                     LogWatcher.Enabled = value;
+
+                // This watcher is the only reader of allowed-connection events, so Windows only
+                // has to write them while it listens. See AuditPolicy.LogAllowedConnections.
+                AuditPolicy.LogAllowedConnections = value;
             }
         }
 
@@ -263,8 +267,62 @@ namespace SimpleDeFence
             /// </summary>
             private static readonly Dictionary<Guid, AuditSetting> PreviousSettings = new();
 
-            internal static void Enable() => EnableLogging();
-            internal static void Disable() => DisableLogging();
+            private static readonly object Sync = new();
+            private static bool Enabled;
+            private static bool _LogAllowedConnections;
+
+            /// <summary>
+            /// Whether Windows should also write an event for every connection it lets through
+            /// (5156/5158). Only Learning mode reads those. Outside it they were written for every
+            /// connection on the machine and thrown away unread, which cost the Event Log service
+            /// work on each one and pushed real security events out of the Security log. Blocked
+            /// attempts are always logged, because the Blocked list is built from them.
+            /// </summary>
+            internal static bool LogAllowedConnections
+            {
+                get { lock (Sync) return _LogAllowedConnections; }
+                set
+                {
+                    lock (Sync)
+                    {
+                        if (_LogAllowedConnections == value)
+                            return;
+                        _LogAllowedConnections = value;
+                        if (Enabled)
+                            ApplyLogging();
+                    }
+                }
+            }
+
+            internal static void Enable()
+            {
+                lock (Sync)
+                {
+                    EnableLogging();
+                    Enabled = true;
+                }
+            }
+
+            internal static void Disable()
+            {
+                lock (Sync)
+                {
+                    Enabled = false;
+                    DisableLogging();
+                }
+            }
+
+            /// <summary>
+            /// What a subcategory is set to while the service runs. Drops are always audited.
+            /// Successes only where Learning mode needs them, or where somebody else had them on
+            /// before we came along - we turn on what we need, never off what we found.
+            /// </summary>
+            internal static AuditSetting Wanted(Guid subcategory, AuditSetting? previous, bool logAllowedConnections)
+            {
+                bool success = (previous?.Success ?? false)
+                    || (logAllowedConnections && subcategory == CONNECTION_LOGGING_AUDIT_SUBCAT);
+                return new AuditSetting(success, true);
+            }
 
             internal static void RememberPrevious(Guid subcategory, AuditSetting? setting)
             {
@@ -295,8 +353,27 @@ namespace SimpleDeFence
                         // alone; enabling still goes ahead, because the Blocked list depends on it.
                         try { AuditPolicy.RememberPrevious(subcat, AuditQuerySystemPolicy(subcat)); }
                         catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_SERVICE); }
+                    }
+                }, null);
+            }
+            catch { }
 
-                        AuditSetSystemPolicy(subcat, true, true);
+            ApplyLogging();
+        }
+
+        /// <summary>Sets both subcategories to what <see cref="AuditPolicy.Wanted"/> says. Called
+        /// with AuditPolicy's lock held.</summary>
+        private static void ApplyLogging()
+        {
+            try
+            {
+                Privilege.RunWithPrivilege(Privilege.Security, true, delegate (object? state)
+                {
+                    foreach (var subcat in LoggingAuditSubcategories)
+                    {
+                        AuditSetting? previous = AuditPolicy.TryGetPrevious(subcat, out var p) ? p : null;
+                        var wanted = AuditPolicy.Wanted(subcat, previous, AuditPolicy.LogAllowedConnections);
+                        AuditSetSystemPolicy(subcat, wanted.Success, wanted.Failure);
                     }
                 }, null);
             }

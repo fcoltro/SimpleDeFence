@@ -60,8 +60,11 @@ namespace SimpleDeFence
         /// blocked entries needed: on an ordinary network the inbound broadcast and multicast
         /// traffic that EventMatchAnyKeywords asks for arrives constantly, and it was evicting the
         /// outbound application blocks the user opened the screen to find.
+        ///
+        /// Repeats are merged as well - see BlockedLog. A blocked app retrying in a loop used to
+        /// take every slot by itself within seconds.
         /// </summary>
-        private readonly CircularBuffer<FirewallLogEntry> FirewallLogEntries = new(500);
+        private readonly BlockedLog FirewallLogEntries = new(500);
         private readonly FileLocker FileLocker = new();
         private readonly HostsFileManager HostsFileManager = new();
         private DateTime LastControllerCommandTime = DateTime.Now;
@@ -2604,7 +2607,7 @@ namespace SimpleDeFence
             {
                 lock (FirewallLogEntries)
                 {
-                    FirewallLogEntries.Enqueue(entry);
+                    FirewallLogEntries.Add(entry);
                 }
             }
         }

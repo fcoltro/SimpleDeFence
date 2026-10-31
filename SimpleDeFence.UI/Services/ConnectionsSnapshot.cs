@@ -29,6 +29,10 @@ namespace SimpleDeFence.UI.Services
         public string Direction { get; init; } = string.Empty;
         public string RemoteAddress { get; init; } = string.Empty;
         public int RemotePort { get; init; }
+
+        /// <summary>How many tries this row stands for - the service merges repeats of the same
+        /// attempt into one entry.</summary>
+        public int Count { get; init; } = 1;
     }
 
     /// <summary>One row of the process picker: a running process with its resolved path.</summary>

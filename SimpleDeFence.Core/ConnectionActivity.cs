@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -47,11 +47,38 @@ namespace SimpleDeFence
         private static readonly TimeSpan ClockSkewTolerance = TimeSpan.FromMinutes(1);
 
         /// <summary>
+        /// Whether two entries are the same attempt made again: same app, process, direction,
+        /// protocol and remote address, and the same port on the side that names the service.
+        ///
+        /// The other port is left out on purpose. An outgoing connection gets a new local port
+        /// from Windows on every try, so comparing it made each retry of a blocked app its own
+        /// row. For an incoming one it is the remote port that changes.
+        /// </summary>
+        public static bool SameAttempt(FirewallLogEntry a, FirewallLogEntry b)
+        {
+            if (a.Event != b.Event
+                || a.ProcessId != b.ProcessId
+                || a.Protocol != b.Protocol
+                || a.Direction != b.Direction
+                || !string.Equals(a.RemoteIp, b.RemoteIp, StringComparison.Ordinal)
+                || !string.Equals(a.AppPath, b.AppPath, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(a.PackageId, b.PackageId, StringComparison.Ordinal))
+                return false;
+
+            return a.Direction switch
+            {
+                RuleDirection.Out => a.RemotePort == b.RemotePort,
+                RuleDirection.In => a.LocalPort == b.LocalPort,
+                _ => a.RemotePort == b.RemotePort && a.LocalPort == b.LocalPort,
+            };
+        }
+
+        /// <summary>
         /// The blocked attempts worth showing right now: collapsed to BLOCKED/ALLOWED, restricted to
         /// entries within <paramref name="window"/> of <paramref name="now"/> (allowing for a little
         /// clock skew on the near edge - see <see cref="ClockSkewTolerance"/>), deduplicated
-        /// (repeated attempts matching on everything but timestamp collapse into one row keeping the
-        /// latest time), and newest first.
+        /// (repeats of the same attempt - see <see cref="SameAttempt"/> - collapse into one row
+        /// keeping the latest time and adding up their counts), and newest first.
         /// </summary>
         public static IReadOnlyList<FirewallLogEntry> RecentBlocked(
             IEnumerable<FirewallLogEntry> entries, DateTime now, TimeSpan window)
@@ -69,11 +96,15 @@ namespace SimpleDeFence
                 if (collapsed.Event != EventLogEvent.BLOCKED)
                     continue;
 
-                var existingIndex = deduped.FindIndex(e => e.Equals(collapsed, includeTimestamp: false));
+                var existingIndex = deduped.FindIndex(e => SameAttempt(e, collapsed));
                 if (existingIndex < 0)
                     deduped.Add(collapsed);
-                else if (collapsed.Timestamp > deduped[existingIndex].Timestamp)
-                    deduped[existingIndex] = collapsed;
+                else
+                {
+                    var existing = deduped[existingIndex];
+                    var newer = collapsed.Timestamp > existing.Timestamp ? collapsed : existing;
+                    deduped[existingIndex] = newer with { Count = existing.Count + collapsed.Count };
+                }
             }
 
             return deduped.OrderByDescending(e => e.Timestamp).ToList();

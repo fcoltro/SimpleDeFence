@@ -513,6 +513,7 @@ namespace SimpleDeFence.UI.Services
                 Direction = entry.Direction.ToString(),
                 RemoteAddress = entry.RemoteIp ?? string.Empty,
                 RemotePort = entry.RemotePort,
+                Count = Math.Max(1, entry.Count),
             };
         }
     }

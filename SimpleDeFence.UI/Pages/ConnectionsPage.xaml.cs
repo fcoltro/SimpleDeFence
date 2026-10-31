@@ -423,18 +423,26 @@ namespace SimpleDeFence.UI.Pages
                     .ToList();
                 int addressCount = addresses.Count;
 
+                // Each row can stand for many tries, because the service merges repeats of the same
+                // attempt; the summary counts tries, not rows.
+                int attemptCount = ordered.Sum(r => Math.Max(1, r.Count));
+
                 // One attempt reads better as the attempt itself than as "1 attempt"; several
                 // report how many, and how many places they were aimed at - the number that says
                 // whether this is one stubborn connection or a scan.
-                string detail = ordered.Count == 1
+                string detail = attemptCount == 1
                     ? DetailFor(newest)
                     : addressCount > 1
-                        ? Loc.T(LocKeys.Connections.BlockedAttempts, ordered.Count, addressCount)
-                        : Loc.T(LocKeys.Connections.BlockedAttemptsOneAddress, ordered.Count);
+                        ? Loc.T(LocKeys.Connections.BlockedAttempts, attemptCount, addressCount)
+                        : Loc.T(LocKeys.Connections.BlockedAttemptsOneAddress, attemptCount);
 
                 var listed = ordered
                     .Take(BlockedListItem.MaxListedAttempts)
-                    .Select(r => new BlockedAttempt { Detail = DetailFor(r), When = r.Timestamp.ToString("HH:mm:ss") })
+                    .Select(r => new BlockedAttempt
+                    {
+                        Detail = r.Count > 1 ? $"{DetailFor(r)}  ×{r.Count}" : DetailFor(r),
+                        When = r.Timestamp.ToString("HH:mm:ss"),
+                    })
                     .ToList();
 
                 var item = new BlockedListItem
