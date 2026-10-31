@@ -302,6 +302,7 @@
       "general": "Allgemein",
       "protection": "Schutz",
       "blocklists": "Sperrlisten",
+      "privacy": "Datenschutz",
       "security": "Sicherheit",
       "updates": "Updates",
       "maintenance": "Wartung",
@@ -359,6 +360,24 @@
       "addressesPlaceholder": "Zum Beispiel 203.0.113.7 oder 198.51.100.0/24",
       "addressesSave": "Adressen speichern",
       "addressesInvalid": "„{0}“ ist keine IP-Adresse und kein Netzwerk. Es wurde nichts gespeichert."
+    },
+    "privacy": {
+      "telemetry": "Windows-Telemetrie reduzieren",
+      "telemetryDescription": "Schaltet die Windows-Dienste, geplanten Aufgaben und Einstellungen ab, die Diagnosedaten sammeln, und blockiert die Programme, die sie senden. Es wird nichts gelöscht, und „Rückgängig“ stellt alles wieder her.",
+      "statusOff": "Status: aus.",
+      "statusOn": "Status: an. Telemetrie ist abgeschaltet und blockiert.",
+      "statusPartial": "Status: teilweise rückgängig gemacht. Windows hat, meist bei einem großen Update, einen Teil wieder eingeschaltet. Erneut anwenden, um das zu beheben.",
+      "apply": "Einschalten",
+      "applyAgain": "Erneut anwenden",
+      "undo": "Rückgängig",
+      "confirm": {
+        "title": "Windows-Telemetrie reduzieren?",
+        "body": "SimpleDeFence schaltet die Telemetrie-Dienste und geplanten Aufgaben ab, setzt die Diagnosedaten auf die niedrigste Stufe und blockiert die Programme, die sie senden.\n\nSolange dies aktiv ist, funktionieren Windows Insider, Feedback-Hub und die Fehlerberichterstattung nicht. Unter Home und Pro behält Windows ein Minimum an erforderlichen Diagnosedaten, deren Versand wird aber blockiert.\n\nSie können dies jederzeit rückgängig machen.",
+        "confirm": "Einschalten"
+      },
+      "failedTitle": "Einige Änderungen konnten nicht vorgenommen werden",
+      "failedDetail": "SimpleDeFence hat alle Änderungen vorgenommen, die Windows zugelassen hat. Das Dienstprotokoll listet auf, was abgelehnt wurde. Versuchen Sie es erneut oder starten Sie den Computer neu und versuchen Sie es dann noch einmal.",
+      "undoFailedTitle": "Rückgängig machen konnte nicht abgeschlossen werden"
     },
     "security": {
       "lockHostsFile": "Hosts-Datei sperren",

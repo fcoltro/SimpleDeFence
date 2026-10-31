@@ -55,6 +55,7 @@ namespace SimpleDeFence
     [JsonSerializable(typeof(ConfigExport))]
     [JsonSerializable(typeof(UpdateDescriptor))]
     [JsonSerializable(typeof(ServerState))]
+    [JsonSerializable(typeof(TelemetryBackup))]
     [JsonSerializable(typeof(DatabaseClasses.AppDatabase))]
     [JsonSerializable(typeof(DatabaseClasses.Application))]
     [JsonSerializable(typeof(DatabaseClasses.SubjectIdentity))]

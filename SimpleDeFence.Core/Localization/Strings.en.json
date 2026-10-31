@@ -302,6 +302,7 @@
       "general": "General",
       "protection": "Protection",
       "blocklists": "Blocklists",
+      "privacy": "Privacy",
       "security": "Security",
       "updates": "Updates",
       "maintenance": "Maintenance",
@@ -359,6 +360,24 @@
       "addressesPlaceholder": "For example 203.0.113.7 or 198.51.100.0/24",
       "addressesSave": "Save addresses",
       "addressesInvalid": "\"{0}\" is not an IP address or network. Nothing was saved."
+    },
+    "privacy": {
+      "telemetry": "Reduce Windows telemetry",
+      "telemetryDescription": "Turns off the Windows services, scheduled tasks and settings that collect diagnostic data, and blocks the programs that send it. Nothing is deleted, and Undo puts everything back.",
+      "statusOff": "Status: off.",
+      "statusOn": "Status: on. Telemetry is switched off and blocked.",
+      "statusPartial": "Status: partly undone. Windows, usually during a big update, turned some of it back on. Apply it again to fix it.",
+      "apply": "Turn on",
+      "applyAgain": "Apply again",
+      "undo": "Undo",
+      "confirm": {
+        "title": "Reduce Windows telemetry?",
+        "body": "SimpleDeFence will switch off the telemetry services and scheduled tasks, set diagnostic data to its lowest level, and block the programs that send it.\n\nWhile this is on, Windows Insider, Feedback Hub and error reporting stop working. On Home and Pro, Windows keeps a minimum of required diagnostic data, but it is blocked from being sent.\n\nYou can undo this at any time.",
+        "confirm": "Turn on"
+      },
+      "failedTitle": "Some changes could not be made",
+      "failedDetail": "SimpleDeFence made every change Windows allowed. The service log lists what was refused. Try again, or restart the computer and try again.",
+      "undoFailedTitle": "Undo could not finish"
     },
     "security": {
       "lockHostsFile": "Lock the hosts file",

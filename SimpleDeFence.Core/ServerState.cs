@@ -123,6 +123,10 @@ namespace SimpleDeFence
         /// public network lockdown is on, so the Settings page can say what turning it on would
         /// do right now.</summary>
         public bool OnPublicNetwork = false;
+
+        /// <summary>Where "Reduce Windows telemetry" stands. Checked again every ten minutes, so
+        /// a feature update that turns something back on shows up as Partial.</summary>
+        public TelemetryStatus Telemetry = TelemetryStatus.Off;
         public List<MessageType> ClientNotifs = new();
 
         public JsonTypeInfo<ServerState> GetJsonTypeInfo()

@@ -130,6 +130,8 @@ namespace SimpleDeFence.UI.Pages
                 ? lockdownDescription + "\n" + Loc.T(LocKeys.Settings.ProtectionPublicNetworkNow)
                 : lockdownDescription;
 
+            SeedTelemetryCard();
+
             EnableBlocklistsToggle.IsOn = config.Blocklists.EnableBlocklists;
             EnableHostsBlocklistToggle.IsOn = config.Blocklists.EnableHostsBlocklist;
             EnablePortBlocklistToggle.IsOn = config.Blocklists.EnablePortBlocklist;
@@ -170,6 +172,25 @@ namespace SimpleDeFence.UI.Pages
 
             AboutVersionCard.Header = Loc.T(LocKeys.Settings.AboutVersion, version);
             AboutVersionCard.Description = Loc.T(LocKeys.Settings.AboutTagline);
+        }
+
+        /// <summary>The card says where "Reduce Windows telemetry" stands, and offers what makes
+        /// sense from there: turn it on, apply it again after Windows undid part of it, or undo
+        /// it.</summary>
+        private void SeedTelemetryCard()
+        {
+            var status = App.Firewall.State?.Telemetry ?? TelemetryStatus.Off;
+            var statusKey = status switch
+            {
+                TelemetryStatus.On => LocKeys.Settings.PrivacyStatusOn,
+                TelemetryStatus.Partial => LocKeys.Settings.PrivacyStatusPartial,
+                _ => LocKeys.Settings.PrivacyStatusOff,
+            };
+            TelemetryCard.Description = Loc.T(LocKeys.Settings.PrivacyTelemetryDescription) + "\n" + Loc.T(statusKey);
+
+            ApplyTelemetryButton.Content = Loc.T(status == TelemetryStatus.Partial ? LocKeys.Settings.PrivacyApplyAgain : LocKeys.Settings.PrivacyApply);
+            ApplyTelemetryButton.Visibility = (status == TelemetryStatus.On) ? Visibility.Collapsed : Visibility.Visible;
+            UndoTelemetryButton.Visibility = (status == TelemetryStatus.Off) ? Visibility.Collapsed : Visibility.Visible;
         }
 
         /// <summary>Hosts/Ports blocklist toggles are only meaningful while the master toggle is
@@ -843,6 +864,74 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
+        private async void ApplyTelemetryButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing) return;
+
+            // Confirmed the first time only. "Apply again" repeats a choice already made.
+            if ((App.Firewall.State?.Telemetry ?? TelemetryStatus.Off) == TelemetryStatus.Off)
+            {
+                var confirmTitle = Loc.T(LocKeys.Settings.PrivacyConfirmTitle);
+                var confirmBody = Loc.T(LocKeys.Settings.PrivacyConfirmBody);
+                var confirm = new ContentDialog
+                {
+                    XamlRoot = Content.XamlRoot,
+                    FlowDirection = App.UiFlowDirection,
+                    RequestedTheme = App.UiElementTheme,
+                    Title = confirmTitle,
+                    Content = new TextBlock { Text = confirmBody, TextWrapping = TextWrapping.Wrap },
+                    PrimaryButtonText = Loc.T(LocKeys.Settings.PrivacyConfirmConfirm),
+                    CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                    DefaultButton = ContentDialogButton.Close,
+                };
+                if (await TryShowDialogAsync(confirm, confirmTitle, confirmBody) != ContentDialogResult.Primary)
+                    return;
+            }
+
+            await RunTelemetryCommandAsync(App.Firewall.ApplyTelemetryMitigationAsync, MessageType.TELEMETRY_APPLY, LocKeys.Settings.PrivacyFailedTitle);
+        }
+
+        private async void UndoTelemetryButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_committing) return;
+            await RunTelemetryCommandAsync(App.Firewall.UndoTelemetryMitigationAsync, MessageType.TELEMETRY_UNDO, LocKeys.Settings.PrivacyUndoFailedTitle);
+        }
+
+        /// <summary>Both telemetry buttons: the same _committing guard as Lock now, then a refresh
+        /// so the card shows where things stand even when the command failed part way.</summary>
+        private async Task RunTelemetryCommandAsync(Func<Task<MessageType>> command, MessageType success, string failedTitleKey)
+        {
+            _committing = true;
+            UpdateControlsEnabled();
+            MessageType resp;
+            try
+            {
+                resp = await command();
+            }
+            catch (Exception ex)
+            {
+                await ShowResultAsync(Loc.T(failedTitleKey), ex.Message);
+                return;
+            }
+            finally
+            {
+                _committing = false;
+                UpdateControlsEnabled();
+            }
+
+            await RefreshAsync();
+            if (resp != success)
+            {
+                // RESPONSE_ERROR is the service saying some steps were refused, which has its own
+                // wording; locked and the rest read the same as any other command here.
+                var detail = (resp == MessageType.RESPONSE_ERROR)
+                    ? Loc.T(LocKeys.Settings.PrivacyFailedDetail)
+                    : FailureDetail(resp, LocKeys.Settings.CommitFailedLockedDetail, LocKeys.Settings.CommitFailedStaleDetail,
+                        LocKeys.Settings.CommitFailedGenericDetail);
+                await ShowResultAsync(Loc.T(failedTitleKey), detail);
+            }
+        }
+
         private async void UnlockButton_Click(object sender, RoutedEventArgs e)
         {
             if (_committing) return;
@@ -1002,6 +1091,8 @@ namespace SimpleDeFence.UI.Pages
             UnlockButton.IsEnabled = !_committing;
             ImportButton.IsEnabled = !_committing;
             ExportButton.IsEnabled = !_committing;
+            ApplyTelemetryButton.IsEnabled = !_committing;
+            UndoTelemetryButton.IsEnabled = !_committing;
         }
 
         private static string FailureDetail(MessageType resp, string lockedKey, string staleKey, string genericKey) => resp switch

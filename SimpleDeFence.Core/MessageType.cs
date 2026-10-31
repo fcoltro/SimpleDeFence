@@ -40,6 +40,10 @@
         // Service-to-client messages
         DATABASE_UPDATED,
 
+        // Privileged too (>2047). Numbered explicitly so commands added above cannot move them.
+        TELEMETRY_APPLY = 3000,
+        TELEMETRY_UNDO = 3001,
+
         // Service-to-service only (>4095)
         ADD_TEMPORARY_EXCEPTION = 4096,
         RELOAD_WFP_FILTERS,

@@ -49,6 +49,15 @@ namespace SimpleDeFence.UI.Services
         /// configuration. Success is exactly MessageType.SET_PASSPHRASE.</summary>
         Task<MessageType> SetPasswordAsync(string password);
 
+        /// <summary>Turns on "Reduce Windows telemetry", or applies it again after Windows turned
+        /// part of it back on. Success is exactly MessageType.TELEMETRY_APPLY; State.Telemetry
+        /// says where it stands either way.</summary>
+        Task<MessageType> ApplyTelemetryMitigationAsync();
+
+        /// <summary>Puts back everything "Reduce Windows telemetry" changed. Success is exactly
+        /// MessageType.TELEMETRY_UNDO.</summary>
+        Task<MessageType> UndoTelemetryMitigationAsync();
+
         /// <summary>
         /// The one commit path: clone the cached config, mutate the whole clone, put it back. A
         /// returned type of PUT_SETTINGS alone is NOT sufficient to mean the change took - the

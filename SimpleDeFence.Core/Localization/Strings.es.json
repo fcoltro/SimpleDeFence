@@ -302,6 +302,7 @@
       "general": "General",
       "protection": "Protección",
       "blocklists": "Listas de bloqueo",
+      "privacy": "Privacidad",
       "security": "Seguridad",
       "updates": "Actualizaciones",
       "maintenance": "Mantenimiento",
@@ -359,6 +360,24 @@
       "addressesPlaceholder": "Por ejemplo 203.0.113.7 o 198.51.100.0/24",
       "addressesSave": "Guardar direcciones",
       "addressesInvalid": "«{0}» no es una dirección IP ni una red. No se guardó nada."
+    },
+    "privacy": {
+      "telemetry": "Reducir la telemetría de Windows",
+      "telemetryDescription": "Desactiva los servicios, tareas programadas y opciones de Windows que recopilan datos de diagnóstico, y bloquea los programas que los envían. No se elimina nada, y Deshacer lo restaura todo.",
+      "statusOff": "Estado: desactivado.",
+      "statusOn": "Estado: activado. La telemetría está desactivada y bloqueada.",
+      "statusPartial": "Estado: deshecho en parte. Windows, normalmente durante una actualización grande, volvió a activar una parte. Vuelve a aplicarlo para corregirlo.",
+      "apply": "Activar",
+      "applyAgain": "Aplicar de nuevo",
+      "undo": "Deshacer",
+      "confirm": {
+        "title": "¿Reducir la telemetría de Windows?",
+        "body": "SimpleDeFence desactivará los servicios y tareas programadas de telemetría, pondrá los datos de diagnóstico en el nivel más bajo y bloqueará los programas que los envían.\n\nMientras esté activado, Windows Insider, el Centro de opiniones y el informe de errores no funcionarán. En Home y Pro, Windows mantiene un mínimo de datos de diagnóstico obligatorios, pero se bloquea su envío.\n\nPuedes deshacerlo en cualquier momento.",
+        "confirm": "Activar"
+      },
+      "failedTitle": "No se pudieron aplicar algunos cambios",
+      "failedDetail": "SimpleDeFence hizo todos los cambios que Windows permitió. El registro del servicio indica lo que se rechazó. Vuelve a intentarlo, o reinicia el equipo y vuelve a intentarlo.",
+      "undoFailedTitle": "No se pudo completar Deshacer"
     },
     "security": {
       "lockHostsFile": "Bloquear el archivo hosts",

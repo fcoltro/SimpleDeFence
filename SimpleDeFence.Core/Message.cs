@@ -28,6 +28,8 @@ namespace SimpleDeFence
                 MessageType.LOCK => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.STOP_SERVICE => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.MINUTE_TIMER => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
+                MessageType.TELEMETRY_APPLY => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
+                MessageType.TELEMETRY_UNDO => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.ADD_TEMPORARY_EXCEPTION => (TwMessage?)JsonSerializer.Deserialize<TwMessageAddTempException>(ref reader, SourceGenerationContext.Default.TwMessageAddTempException),
                 _ => throw new JsonException($"Tried to deserialize unsupported type with discriminator {(MessageType)discriminator}."),
             };

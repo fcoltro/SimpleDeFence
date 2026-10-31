@@ -302,6 +302,7 @@
       "general": "일반",
       "protection": "보호",
       "blocklists": "차단 목록",
+      "privacy": "개인 정보",
       "security": "보안",
       "updates": "업데이트",
       "maintenance": "유지 관리",
@@ -359,6 +360,24 @@
       "addressesPlaceholder": "예: 203.0.113.7 또는 198.51.100.0/24",
       "addressesSave": "주소 저장",
       "addressesInvalid": "'{0}'은(는) IP 주소나 네트워크가 아닙니다. 아무것도 저장되지 않았습니다."
+    },
+    "privacy": {
+      "telemetry": "Windows 원격 분석 줄이기",
+      "telemetryDescription": "진단 데이터를 수집하는 Windows 서비스, 예약된 작업, 설정을 끄고 데이터를 보내는 프로그램을 차단합니다. 아무것도 삭제되지 않으며, 실행 취소로 모두 되돌릴 수 있습니다.",
+      "statusOff": "상태: 꺼짐.",
+      "statusOn": "상태: 켜짐. 원격 분석이 꺼지고 차단되었습니다.",
+      "statusPartial": "상태: 일부 되돌려짐. Windows가 (보통 대규모 업데이트 중에) 일부를 다시 켰습니다. 다시 적용하면 해결됩니다.",
+      "apply": "켜기",
+      "applyAgain": "다시 적용",
+      "undo": "실행 취소",
+      "confirm": {
+        "title": "Windows 원격 분석을 줄일까요?",
+        "body": "SimpleDeFence가 원격 분석 서비스와 예약된 작업을 끄고, 진단 데이터를 가장 낮은 수준으로 설정하며, 데이터를 보내는 프로그램을 차단합니다.\n\n이 기능이 켜져 있는 동안 Windows 참가자 프로그램, 피드백 허브, 오류 보고가 작동하지 않습니다. Home과 Pro에서는 Windows가 최소한의 필수 진단 데이터를 유지하지만 전송은 차단됩니다.\n\n언제든지 실행 취소할 수 있습니다.",
+        "confirm": "켜기"
+      },
+      "failedTitle": "일부 변경 사항을 적용할 수 없습니다",
+      "failedDetail": "SimpleDeFence가 Windows에서 허용한 모든 변경을 적용했습니다. 거부된 항목은 서비스 로그에 나와 있습니다. 다시 시도하거나 컴퓨터를 다시 시작한 후 다시 시도하세요.",
+      "undoFailedTitle": "실행 취소를 완료할 수 없습니다"
     },
     "security": {
       "lockHostsFile": "hosts 파일 잠금",

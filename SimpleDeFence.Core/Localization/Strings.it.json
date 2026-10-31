@@ -302,6 +302,7 @@
       "general": "Generali",
       "protection": "Protezione",
       "blocklists": "Elenchi di blocco",
+      "privacy": "Privacy",
       "security": "Sicurezza",
       "updates": "Aggiornamenti",
       "maintenance": "Manutenzione",
@@ -359,6 +360,24 @@
       "addressesPlaceholder": "Ad esempio 203.0.113.7 o 198.51.100.0/24",
       "addressesSave": "Salva indirizzi",
       "addressesInvalid": "«{0}» non è un indirizzo IP né una rete. Non è stato salvato nulla."
+    },
+    "privacy": {
+      "telemetry": "Riduci la telemetria di Windows",
+      "telemetryDescription": "Disattiva i servizi, le attività pianificate e le impostazioni di Windows che raccolgono dati di diagnostica, e blocca i programmi che li inviano. Non viene eliminato nulla, e Annulla ripristina tutto.",
+      "statusOff": "Stato: disattivato.",
+      "statusOn": "Stato: attivo. La telemetria è disattivata e bloccata.",
+      "statusPartial": "Stato: in parte annullato. Windows, di solito durante un grande aggiornamento, ne ha riattivato una parte. Applicalo di nuovo per sistemarlo.",
+      "apply": "Attiva",
+      "applyAgain": "Applica di nuovo",
+      "undo": "Annulla",
+      "confirm": {
+        "title": "Ridurre la telemetria di Windows?",
+        "body": "SimpleDeFence disattiverà i servizi e le attività pianificate di telemetria, porterà i dati di diagnostica al livello più basso e bloccherà i programmi che li inviano.\n\nFinché è attivo, Windows Insider, Hub di Feedback e la segnalazione errori non funzionano. Nelle edizioni Home e Pro, Windows conserva un minimo di dati di diagnostica obbligatori, ma il loro invio viene bloccato.\n\nPuoi annullare in qualsiasi momento.",
+        "confirm": "Attiva"
+      },
+      "failedTitle": "Alcune modifiche non sono state applicate",
+      "failedDetail": "SimpleDeFence ha applicato tutte le modifiche consentite da Windows. Il log del servizio elenca quelle rifiutate. Riprova, oppure riavvia il computer e riprova.",
+      "undoFailedTitle": "Impossibile completare l'annullamento"
     },
     "security": {
       "lockHostsFile": "Blocca il file hosts",
