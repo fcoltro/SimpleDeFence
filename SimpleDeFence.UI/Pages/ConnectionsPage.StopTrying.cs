@@ -99,13 +99,17 @@ namespace SimpleDeFence.UI.Pages
                 });
                 if (item.NeededToOpen)
                 {
-                    text.Children.Add(new TextBlock
+                    var warning = new TextBlock
                     {
                         Text = Loc.T(LocKeys.Connections.StopNeeded, list.Publisher),
                         Style = caption,
                         TextWrapping = TextWrapping.Wrap,
-                        Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemFillColorCautionBrush"],
-                    });
+                    };
+                    // A missing theme resource must not take the dialog down with it.
+                    if (Application.Current.Resources.TryGetValue("SystemFillColorCautionBrush", out var caution)
+                        && caution is Microsoft.UI.Xaml.Media.Brush cautionBrush)
+                        warning.Foreground = cautionBrush;
+                    text.Children.Add(warning);
                 }
 
                 var box = new CheckBox { Content = text, IsChecked = item.Enabled };

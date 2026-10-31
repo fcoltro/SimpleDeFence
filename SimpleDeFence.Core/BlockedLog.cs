@@ -20,9 +20,10 @@ namespace SimpleDeFence
     /// </summary>
     public sealed class BlockedLog : IEnumerable<FirewallLogEntry>
     {
-        /// <summary>A repeat this long after the last try starts a new entry instead, so a count
-        /// describes one stretch of retrying rather than everything since the service started.</summary>
-        public static readonly TimeSpan MergeWindow = TimeSpan.FromMinutes(10);
+        /// <summary>A repeat this long after the last try starts a new entry instead. Kept short
+        /// because the Blocked list shows only the last few minutes and filters on an entry's
+        /// latest time: a longer window would let a count include tries from before it.</summary>
+        public static readonly TimeSpan MergeWindow = TimeSpan.FromMinutes(1);
 
         private readonly List<FirewallLogEntry> _entries = new();
 
