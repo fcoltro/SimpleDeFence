@@ -156,12 +156,21 @@
       "copyAddresses": "Copiar direcciones",
       "copyPath": "Copiar ruta",
       "openLocation": "Abrir ubicación del archivo",
-      "openLocationMissing": "El archivo y la carpeta del programa ya no existen."
+      "openLocationMissing": "El archivo y la carpeta del programa ya no existen.",
+      "mute": "Silenciar esta app",
+      "unmute": "Dejar de silenciar"
+    },
+    "muted": {
+      "show": "Mostrar {0} silenciadas",
+      "hide": "Ocultar silenciadas"
     },
     "stopTrying": {
       "menu": "Hacer que deje de intentarlo…",
       "title": "Hacer que {0} deje de intentarlo",
       "intro": "Estos elementos inician programas de {0} en segundo plano que no dejan de intentar conectarse. Desmarque los que quiera desactivar. Los que estén en ejecución se cerrarán ahora y no volverán a iniciarse hasta que los vuelva a marcar.",
+      "fromFolder": "{1} no ha superado la comprobación de firma de Windows, así que puede haber sido modificado después de que {0} lo firmara. Analízalo o reinstálalo. Los elementos de abajo proceden de otros programas de su carpeta, firmados por {0}.",
+      "introFolder": "Estos elementos inician en segundo plano programas de la carpeta de {0}, que siguen intentando conectarse. Desmarca los que quieras desactivar. Los que estén en ejecución se cerrarán y no volverán a iniciarse hasta que los marques de nuevo.",
+      "unsignedFolder": "{0} no tiene una firma válida, así que SimpleDeFence no puede saber quién lo creó. Estos elementos aparecen solo porque se ejecutan desde su carpeta, {1}. Revisa cada uno antes de desactivarlo.",
       "needed": "Comprobación de licencia. Es posible que las apps de {0} no se abran sin ella.",
       "kindService": "Servicio",
       "kindTask": "Tarea programada",
@@ -169,7 +178,7 @@
       "apply": "Aplicar",
       "allOn": "Volver a activar todo",
       "none": "Nada de {0} se inicia en segundo plano.",
-      "unsigned": "SimpleDeFence no puede saber quién creó este programa porque no tiene una firma válida. Solo los programas firmados pueden asociarse a sus componentes en segundo plano. Nunca se ofrecen programas del propio Windows.",
+      "unsigned": "SimpleDeFence no puede saber quién creó este programa: no tiene una firma válida y su carpeta la comparten otros programas. Nunca se ofrecen programas del propio Windows.",
       "unreachable": "El servicio no respondió. ¿Está en ejecución?",
       "done": "Listo. {0} desactivados, {1} reactivados.",
       "failed": "No se pudieron aplicar algunos cambios. Consulte el registro del servicio.",

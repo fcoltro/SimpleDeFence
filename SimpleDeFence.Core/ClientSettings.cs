@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
@@ -137,6 +139,41 @@ namespace SimpleDeFence
                 BlockedHistoryMinutes == 0 ? DefaultBlockedHistoryMinutes : BlockedHistoryMinutes,
                 MinBlockedHistoryMinutes,
                 MaxBlockedHistoryMinutes));
+
+        /// <summary>
+        /// Apps muted from the Connections page: still blocked, but left out of the Blocked list
+        /// and of notifications. For a program that retries for ever and has nothing left to
+        /// switch off. Each entry is a MuteKey.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public List<string>? MutedApps { get; set; }
+
+        /// <summary>What a muted app is remembered by: its package, or its full path. Null for a
+        /// row with neither, which cannot be muted - it would hide every unnamed row at once.</summary>
+        public static string? MuteKey(string? path, string? packageId)
+            => !string.IsNullOrEmpty(packageId) ? "pkg:" + packageId
+             : !string.IsNullOrEmpty(path) && Path.IsPathRooted(path) ? "exe:" + path
+             : null;
+
+        public bool IsMuted(string? path, string? packageId)
+            => MuteKey(path, packageId) is string key
+               && MutedApps is { Count: > 0 } muted
+               && muted.Contains(key, StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Mutes or unmutes an app. Returns false when the app has nothing to be
+        /// remembered by. Call Save afterwards.</summary>
+        public bool SetMuted(string? path, string? packageId, bool mute)
+        {
+            if (MuteKey(path, packageId) is not string key)
+                return false;
+
+            var muted = MutedApps ?? new List<string>();
+            muted.RemoveAll(k => string.Equals(k, key, StringComparison.OrdinalIgnoreCase));
+            if (mute)
+                muted.Add(key);
+            MutedApps = muted.Count > 0 ? muted : null;
+            return true;
+        }
 
         private static string FilePath
         {

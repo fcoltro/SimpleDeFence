@@ -2782,15 +2782,28 @@ namespace SimpleDeFence
             try
             {
                 var manager = new BackgroundItemsManager(SignatureOf, WindowsDirectory);
-                var publisher = manager.PublisherOf(args.AppPath);
+                var (publisher, fromFolder) = manager.PublisherNear(args.AppPath);
                 if (publisher.Length == 0)
-                    return args.CreateResponse(string.Empty, Array.Empty<BackgroundItem>());
+                {
+                    // Nobody to go by: fall back to the program's own folder, unless that folder
+                    // is one many programs share. The client never names the folder; it is worked
+                    // out here again for the SET request, from the path alone.
+                    var folder = manager.OwnFolderOf(args.AppPath);
+                    if (folder.Length == 0)
+                        return args.CreateResponse(string.Empty, Array.Empty<BackgroundItem>());
+
+                    if (args.Type == MessageType.SET_BACKGROUND_ITEMS
+                        && !manager.ApplyInFolder(folder, args.Changes ?? Array.Empty<BackgroundItemChange>()))
+                        return TwMessageError.Instance;
+
+                    return args.CreateResponse(string.Empty, manager.ListInFolder(folder)) with { ScopeFolder = folder };
+                }
 
                 if (args.Type == MessageType.SET_BACKGROUND_ITEMS
                     && !manager.Apply(publisher, args.Changes ?? Array.Empty<BackgroundItemChange>()))
                     return TwMessageError.Instance;
 
-                return args.CreateResponse(publisher, manager.List(publisher));
+                return args.CreateResponse(publisher, manager.List(publisher)) with { PublisherFromFolder = fromFolder };
             }
             catch (Exception e)
             {

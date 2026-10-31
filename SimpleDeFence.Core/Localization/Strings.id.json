@@ -156,12 +156,21 @@
       "copyAddresses": "Salin alamat",
       "copyPath": "Salin jalur",
       "openLocation": "Buka lokasi file",
-      "openLocationMissing": "File dan folder program ini sudah tidak ada."
+      "openLocationMissing": "File dan folder program ini sudah tidak ada.",
+      "mute": "Bisukan aplikasi ini",
+      "unmute": "Batalkan bisu"
+    },
+    "muted": {
+      "show": "Tampilkan {0} yang dibisukan",
+      "hide": "Sembunyikan yang dibisukan"
     },
     "stopTrying": {
       "menu": "Hentikan percobaannya…",
       "title": "Hentikan {0} mencoba terhubung",
       "intro": "Item ini menjalankan program {0} di latar belakang yang terus mencoba terhubung. Hapus centang yang ingin dimatikan. Yang sedang berjalan akan ditutup sekarang dan tidak akan mulai lagi sampai Anda mencentangnya kembali.",
+      "fromFolder": "{1} gagal dalam pemeriksaan tanda tangan Windows, jadi mungkin telah diubah setelah {0} menandatanganinya. Pindai atau instal ulang. Item di bawah berasal dari program lain di foldernya yang ditandatangani oleh {0}.",
+      "introFolder": "Item ini menjalankan program dari folder {0} di latar belakang, dan program tersebut terus mencoba terhubung. Hapus centang item yang ingin dimatikan. Yang sedang berjalan akan ditutup dan tidak akan berjalan lagi sampai Anda mencentangnya kembali.",
+      "unsignedFolder": "{0} tidak memiliki tanda tangan yang valid, jadi SimpleDeFence tidak dapat mengetahui pembuatnya. Item ini ditemukan hanya karena berjalan dari foldernya, {1}. Periksa masing-masing sebelum mematikannya.",
       "needed": "Pemeriksaan lisensi. Aplikasi {0} mungkin tidak bisa dibuka tanpanya.",
       "kindService": "Layanan",
       "kindTask": "Tugas terjadwal",
@@ -169,7 +178,7 @@
       "apply": "Terapkan",
       "allOn": "Nyalakan semua lagi",
       "none": "Tidak ada program {0} yang berjalan di latar belakang.",
-      "unsigned": "SimpleDeFence tidak dapat mengetahui pembuat program ini karena tidak memiliki tanda tangan yang valid. Hanya program bertanda tangan yang dapat dihubungkan ke bagian latar belakangnya. Program milik Windows sendiri tidak pernah ditawarkan.",
+      "unsigned": "SimpleDeFence tidak dapat mengetahui pembuat program ini karena tidak memiliki tanda tangan yang valid, dan foldernya dipakai bersama program lain. Program milik Windows sendiri tidak pernah ditawarkan.",
       "unreachable": "Layanan tidak menjawab. Apakah sedang berjalan?",
       "done": "Selesai. {0} dimatikan, {1} dinyalakan kembali.",
       "failed": "Beberapa perubahan tidak dapat dilakukan. Detailnya ada di log layanan.",

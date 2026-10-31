@@ -48,17 +48,124 @@ namespace SimpleDeFence
             return BackgroundItemRules.MayQuiet(publisher) ? publisher : string.Empty;
         }
 
+        /// <summary>
+        /// Like PublisherOf, but when the program's own signature fails - it was changed after it
+        /// was signed, or never signed - the publisher is read from the signed programs and
+        /// libraries in the same folder (see BackgroundItemRules.PublisherFromNeighbours).
+        /// FromFolder tells the dialog to say so. Every item is still checked against that
+        /// publisher's signature one by one, so nothing unsigned is ever switched off this way.
+        /// </summary>
+        internal (string Publisher, bool FromFolder) PublisherNear(string path)
+        {
+            var own = PublisherOf(path);
+            if (own.Length > 0)
+                return (own, false);
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                return (string.Empty, false);
+
+            // A Microsoft-signed program is refused outright, not looked around: its folder may
+            // well hold someone else's files, but its items are never offered.
+            var (valid, subject) = SignatureOf(path);
+            if (valid && !string.IsNullOrEmpty(subject))
+                return (string.Empty, false);
+
+            var folder = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(folder) || BackgroundItemRules.IsInWindowsFolder(path, WindowsDirectory))
+                return (string.Empty, false);
+
+            var publisher = BackgroundItemRules.PublisherFromNeighbours(NeighbourPublishers(folder!, path));
+            return publisher.Length > 0 ? (publisher, true) : (string.Empty, false);
+        }
+
+        /// <summary>The publishers of up to NeighbourLimit other programs and libraries in the
+        /// folder, smallest first: checking a signature hashes the whole file, and the answer has
+        /// to arrive well inside the pipe's 20-second wait.</summary>
+        private List<string?> NeighbourPublishers(string folder, string except)
+        {
+            const int NeighbourLimit = 12;
+            const long MaxSize = 64L * 1024 * 1024;
+
+            List<FileInfo> files = new();
+            try
+            {
+                files = new DirectoryInfo(folder).EnumerateFiles()
+                    .Where(f => f.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase)
+                             || f.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))
+                    .Where(f => f.Length <= MaxSize
+                             && !string.Equals(f.FullName, except, StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(f => f.Length)
+                    .Take(NeighbourLimit)
+                    .ToList();
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+            {
+                // Unreadable folder: no neighbours, so no publisher.
+            }
+
+            var publishers = new List<string?>(files.Count);
+            foreach (var f in files)
+            {
+                var (valid, subject) = SignatureOf(f.FullName);
+                publishers.Add(valid && !string.IsNullOrEmpty(subject) ? PublisherTrust.DisplayName(subject!) : null);
+            }
+            return publishers;
+        }
+
+        /// <summary>
+        /// The folder "Stop it trying" may fall back to for a program with no publisher: its own,
+        /// or empty when that is a place many programs share (see BackgroundItemRules.FolderTooBroad),
+        /// inside the Windows folder, or when the program is signed by a publisher whose items are
+        /// never offered.
+        /// </summary>
+        internal string OwnFolderOf(string path)
+        {
+            if (string.IsNullOrEmpty(path) || !File.Exists(path)
+                || BackgroundItemRules.IsInWindowsFolder(path, WindowsDirectory))
+                return string.Empty;
+
+            var (valid, subject) = SignatureOf(path);
+            if (valid && !string.IsNullOrEmpty(subject))
+                return string.Empty;
+
+            var folder = Path.GetDirectoryName(path) ?? string.Empty;
+            var usersRoot = Path.GetDirectoryName(Environment.GetEnvironmentVariable("PUBLIC") ?? string.Empty) ?? string.Empty;
+            var shared = new[]
+            {
+                WindowsDirectory,
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                Path.GetTempPath(),
+            };
+            return BackgroundItemRules.FolderTooBroad(folder, shared, usersRoot) ? string.Empty : folder;
+        }
+
+        /// <summary>The items whose program is validly signed by this publisher.</summary>
         internal BackgroundItem[] List(string publisher)
+            => BackgroundItemRules.MayQuiet(publisher)
+                ? ListMatching(path => FromPublisher(path, publisher))
+                : Array.Empty<BackgroundItem>();
+
+        /// <summary>
+        /// The items whose program runs from this folder or below it, for a blocked program with
+        /// no publisher to go by. Weaker than a signature, so the dialog says so; the folder must
+        /// pass BackgroundItemRules.FolderTooBroad first, and Windows' own and Microsoft-signed
+        /// programs are still never offered.
+        /// </summary>
+        internal BackgroundItem[] ListInFolder(string folder)
+            => ListMatching(path => InFolder(path, folder));
+
+        private BackgroundItem[] ListMatching(Func<string, bool> belongs)
         {
             var items = new List<BackgroundItem>();
-            if (!BackgroundItemRules.MayQuiet(publisher))
-                return items.ToArray();
 
-            try { items.AddRange(Services(publisher)); }
+            try { items.AddRange(Services(belongs)); }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_SERVICE); }
-            try { items.AddRange(Tasks(publisher)); }
+            try { items.AddRange(Tasks(belongs)); }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_SERVICE); }
-            try { items.AddRange(StartupEntries(publisher)); }
+            try { items.AddRange(StartupEntries(belongs)); }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_SERVICE); }
 
             // Only what we switched off - and is still off - can be put back by "Switch all back
@@ -82,8 +189,14 @@ namespace SimpleDeFence
         /// switched off. Returns false if any change failed; the others still went through.
         /// </summary>
         internal bool Apply(string publisher, IEnumerable<BackgroundItemChange> changes)
+            => Apply(List(publisher), changes);
+
+        /// <summary>Apply, for the items ListInFolder finds.</summary>
+        internal bool ApplyInFolder(string folder, IEnumerable<BackgroundItemChange> changes)
+            => Apply(ListInFolder(folder), changes);
+
+        private bool Apply(BackgroundItem[] current, IEnumerable<BackgroundItemChange> changes)
         {
-            var current = List(publisher);
             bool ok = true;
             var stopPaths = new List<string>();
 
@@ -123,7 +236,7 @@ namespace SimpleDeFence
 
         // ----------------------------------------------------------------- services
 
-        private List<BackgroundItem> Services(string publisher)
+        private List<BackgroundItem> Services(Func<string, bool> belongs)
         {
             var items = new List<BackgroundItem>();
             using var servicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services");
@@ -139,7 +252,7 @@ namespace SimpleDeFence
                             imagePath = key?.GetValue("ImagePath") as string ?? string.Empty;
 
                         var path = BackgroundItemRules.ExecutableOf(imagePath, Environment.ExpandEnvironmentVariables);
-                        if (!FromPublisher(path, publisher))
+                        if (!belongs(path))
                             continue;
 
                         items.Add(new BackgroundItem
@@ -247,15 +360,15 @@ namespace SimpleDeFence
 
         // ----------------------------------------------------------------- scheduled tasks
 
-        private IEnumerable<BackgroundItem> Tasks(string publisher)
+        private IEnumerable<BackgroundItem> Tasks(Func<string, bool> belongs)
         {
             var items = new List<BackgroundItem>();
             dynamic svc = TaskScheduler.ConnectedService();
-            WalkTasks(svc.GetFolder(@"\"), publisher, items);
+            WalkTasks(svc.GetFolder(@"\"), belongs, items);
             return items;
         }
 
-        private void WalkTasks(dynamic folder, string publisher, List<BackgroundItem> items)
+        private void WalkTasks(dynamic folder, Func<string, bool> belongs, List<BackgroundItem> items)
         {
             // Windows' own tasks live under \Microsoft and are never offered; skipping the folder
             // also skips most of the work.
@@ -284,7 +397,7 @@ namespace SimpleDeFence
                         break;
                     }
 
-                    if (path is null || !FromPublisher(path, publisher))
+                    if (path is null || !belongs(path))
                         continue;
 
                     items.Add(new BackgroundItem
@@ -303,7 +416,7 @@ namespace SimpleDeFence
             dynamic folders = folder.GetFolders(0);
             int folderCount = folders.Count;
             for (int f = 1; f <= folderCount; ++f)
-                WalkTasks(folders[f], publisher, items);
+                WalkTasks(folders[f], belongs, items);
         }
 
         private static void SetTask(string taskPath, bool enable)
@@ -344,7 +457,7 @@ namespace SimpleDeFence
             }
         }
 
-        private List<BackgroundItem> StartupEntries(string publisher)
+        private List<BackgroundItem> StartupEntries(Func<string, bool> belongs)
         {
             var items = new List<BackgroundItem>();
             foreach (var loc in RunLocations())
@@ -359,7 +472,7 @@ namespace SimpleDeFence
                     foreach (var valueName in run.GetValueNames())
                     {
                         var path = BackgroundItemRules.ExecutableOf(run.GetValue(valueName) as string, Environment.ExpandEnvironmentVariables);
-                        if (!FromPublisher(path, publisher))
+                        if (!belongs(path))
                             continue;
 
                         items.Add(new BackgroundItem
@@ -408,6 +521,21 @@ namespace SimpleDeFence
             return valid
                 && !string.IsNullOrEmpty(subject)
                 && BackgroundItemRules.SamePublisher(PublisherTrust.DisplayName(subject!), publisher);
+        }
+
+        private bool InFolder(string path, string folder)
+        {
+            if (string.IsNullOrEmpty(path)
+                || BackgroundItemRules.IsInWindowsFolder(path, WindowsDirectory)
+                || !BackgroundItemRules.IsUnder(path, folder)
+                || !File.Exists(path))
+                return false;
+
+            // Anything validly signed by a publisher whose items are never offered - Microsoft -
+            // stays out, wherever it was installed.
+            var (valid, subject) = SignatureOf(path);
+            return !(valid && !string.IsNullOrEmpty(subject)
+                     && !BackgroundItemRules.MayQuiet(PublisherTrust.DisplayName(subject!)));
         }
 
         private static void CloseRunning(List<string> paths)

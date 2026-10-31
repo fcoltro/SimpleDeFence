@@ -384,6 +384,15 @@ namespace SimpleDeFence
         public BackgroundItem[] Items { get; }
         public BackgroundItemChange[] Changes { get; }
 
+        /// <summary>The program's own signature failed, so Publisher was read from the signed
+        /// programs in its folder instead. The dialog warns about it.</summary>
+        public bool PublisherFromFolder { get; init; }
+
+        /// <summary>Set, with Publisher empty, when no publisher could be told at all: the items
+        /// are the ones that run from this folder, the program's own. The dialog warns that this
+        /// is weaker than a signature.</summary>
+        public string ScopeFolder { get; init; } = string.Empty;
+
         [JsonConstructor]
         public TwMessageBackgroundItems(MessageType type, string appPath, string publisher, BackgroundItem[] items, BackgroundItemChange[] changes) :
             base(type)

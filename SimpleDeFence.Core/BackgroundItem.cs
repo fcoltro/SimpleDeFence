@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleDeFence
 {
@@ -136,13 +137,87 @@ namespace SimpleDeFence
             return value;
         }
 
+        /// <summary>
+        /// The publisher behind a program whose own signature fails, read from the other programs
+        /// in its folder: the name at least two of them are validly signed with, and more of them
+        /// than any other name. A single signed file proves little, since suites bundle libraries
+        /// signed by other companies, and a tie names no one. Empty when no name qualifies.
+        /// Publishers whose items are never offered (see MayQuiet) do not count.
+        /// </summary>
+        public static string PublisherFromNeighbours(IEnumerable<string?> neighbourPublishers)
+        {
+            var counts = neighbourPublishers
+                .Where(MayQuiet)
+                .GroupBy(p => p!, StringComparer.OrdinalIgnoreCase)
+                .Select(g => (Name: g.Key, Count: g.Count()))
+                .OrderByDescending(g => g.Count)
+                .ToList();
+            if (counts.Count == 0 || counts[0].Count < 2)
+                return string.Empty;
+            if (counts.Count > 1 && counts[1].Count == counts[0].Count)
+                return string.Empty;
+            return counts[0].Name;
+        }
+
         /// <summary>A program inside the Windows folder is a part of Windows, whoever signed it.</summary>
         public static bool IsInWindowsFolder(string path, string windowsDirectory)
+            => IsUnder(path, windowsDirectory);
+
+        /// <summary>Whether path is inside folder, at any depth.</summary>
+        public static bool IsUnder(string path, string folder)
         {
-            if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(windowsDirectory))
+            if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(folder))
                 return false;
-            var windows = windowsDirectory.TrimEnd('\\', '/') + System.IO.Path.DirectorySeparatorChar;
-            return path.StartsWith(windows, StringComparison.OrdinalIgnoreCase);
+            var prefix = folder.TrimEnd('\\', '/') + System.IO.Path.DirectorySeparatorChar;
+            return path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static readonly string[] BroadInProfile = { "Desktop", "Documents", "Downloads", "Music", "Pictures", "Videos", "AppData" };
+        private static readonly string[] BroadInAppData = { @"AppData\Local", @"AppData\LocalLow", @"AppData\Roaming", @"AppData\Local\Programs", @"AppData\Local\Temp" };
+
+        /// <summary>
+        /// Whether a folder is too wide to stand for one program in "Stop it trying": a drive's
+        /// root, one of the shared folders (Program Files, ProgramData, the Windows folder...) or
+        /// anything above them, a user's profile, or a well-known folder inside it like Downloads.
+        /// An unsigned program in such a place would otherwise take every other program there
+        /// with it.
+        /// </summary>
+        public static bool FolderTooBroad(string? folder, IEnumerable<string> sharedFolders, string usersRoot)
+        {
+            if (string.IsNullOrWhiteSpace(folder))
+                return true;
+            var f = folder!.TrimEnd('\\', '/');
+            if (f.Length <= 3)   // "C:" or "C:\"
+                return true;
+
+            foreach (var shared in sharedFolders)
+            {
+                if (string.IsNullOrEmpty(shared))
+                    continue;
+                var s = shared.TrimEnd('\\', '/');
+                if (string.Equals(f, s, StringComparison.OrdinalIgnoreCase) || IsUnder(s, f))
+                    return true;
+            }
+
+            if (!string.IsNullOrEmpty(usersRoot))
+            {
+                var users = usersRoot.TrimEnd('\\', '/');
+                if (string.Equals(f, users, StringComparison.OrdinalIgnoreCase) || IsUnder(users, f))
+                    return true;
+                if (IsUnder(f, users))
+                {
+                    // Users\<name>\...: the profile itself and its well-known folders are too wide.
+                    var parts = f.Substring(users.Length + 1).Split('\\', '/');
+                    if (parts.Length == 1)
+                        return true;
+                    var inProfile = string.Join("\\", parts, 1, parts.Length - 1);
+                    if (parts.Length == 2 && BroadInProfile.Contains(parts[1], StringComparer.OrdinalIgnoreCase))
+                        return true;
+                    if (BroadInAppData.Contains(inProfile, StringComparer.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+            return false;
         }
     }
 }

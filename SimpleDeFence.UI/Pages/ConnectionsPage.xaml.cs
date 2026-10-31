@@ -101,6 +101,9 @@ namespace SimpleDeFence.UI.Pages
         public string? AppPath { get; init; }
         public string? PackageId { get; init; }
 
+        /// <summary>Muted from the right-click menu; only listed while "Show muted" is on.</summary>
+        public bool IsMuted { get; init; }
+
         /// <summary>The key this row's attempts were grouped under, carried rather than recomputed.
         /// Recomputing it from this object would not be safe: AppName here is substituted with
         /// "Unknown" when the log had no name, so a key derived from it could differ from the one
@@ -401,9 +404,15 @@ namespace SimpleDeFence.UI.Pages
         /// </summary>
         private readonly Dictionary<string, DateTime> _allowedAt = new();
 
+        /// <summary>Whether muted apps are shown in the Blocked list for now, so they can be
+        /// unmuted. Not remembered: the list goes back to hiding them next time.</summary>
+        private bool _showMuted;
+
         private void RebuildBlocked(IEnumerable<BlockedRow> rows)
         {
             _blocked.Clear();
+            var settings = ClientSettings.Load();
+            int mutedCount = 0;
 
             var groups = rows
                 .Where(r => !SuppressedByAllow(r))
@@ -411,6 +420,15 @@ namespace SimpleDeFence.UI.Pages
 
             foreach (var group in groups)
             {
+                var first = group.First();
+                bool muted = settings.IsMuted(first.AppPath, first.PackageId);
+                if (muted)
+                {
+                    ++mutedCount;
+                    if (!_showMuted)
+                        continue;
+                }
+
                 // Newest first, so both the row's timestamp and the dialog lead with what just
                 // happened rather than whatever the log happened to hand us first.
                 var ordered = group.OrderByDescending(r => r.Timestamp).ToList();
@@ -457,6 +475,7 @@ namespace SimpleDeFence.UI.Pages
                     When = newest.Timestamp.ToString("HH:mm:ss"),
                     AppPath = newest.AppPath,
                     PackageId = newest.PackageId,
+                    IsMuted = muted,
                     Attempts = listed,
                     Addresses = addresses,
                     TruncationNote = ordered.Count > listed.Count
@@ -467,6 +486,31 @@ namespace SimpleDeFence.UI.Pages
                 item.ShowAllRequested += async (_, _) => await ShowDetailsAsync(DetailsOf(item), lookUpNow: false);
                 _blocked.Add(item);
             }
+
+            if (mutedCount == 0)
+                _showMuted = false;
+            MutedToggle.Visibility = mutedCount > 0 ? Visibility.Visible : Visibility.Collapsed;
+            MutedToggle.Content = _showMuted
+                ? Loc.T(LocKeys.Connections.MutedHide)
+                : Loc.T(LocKeys.Connections.MutedShow, mutedCount);
+        }
+
+        private void MutedToggle_Click(object sender, RoutedEventArgs e)
+        {
+            _showMuted = !_showMuted;
+            ApplyFilter();
+        }
+
+        /// <summary>"Mute this app": still blocked, but out of the Blocked list and notifications.
+        /// For a program that retries for ever and has nothing left to switch off.</summary>
+        private void SetMuted(BlockedListItem item, bool mute)
+        {
+            var settings = ClientSettings.Load();
+            if (!settings.SetMuted(item.AppPath, item.PackageId, mute))
+                return;
+            settings.Save();
+            App.NotifyActivitySettingsChanged(settings);
+            ApplyFilter();
         }
 
         private async Task AllowAsync(BlockedListItem item)
@@ -1120,6 +1164,13 @@ namespace SimpleDeFence.UI.Pages
                 Add(LocKeys.Connections.Allow, "", async () => await AllowAsync(blocked));
             if (details.AppPath is { Length: > 0 } stopPath)
                 Add(LocKeys.Connections.StopMenu, "", async () => await StopTryingAsync(details.AppName, stopPath));
+            if (details.Blocked is { } mutable && ClientSettings.MuteKey(mutable.AppPath, mutable.PackageId) is not null)
+            {
+                if (mutable.IsMuted)
+                    Add(LocKeys.Connections.MenuUnmute, "\uE767", () => SetMuted(mutable, false));
+                else
+                    Add(LocKeys.Connections.MenuMute, "\uE74F", () => SetMuted(mutable, true));
+            }
 
             menu.Items.Add(new MenuFlyoutSeparator());
             Add(LocKeys.Connections.MenuFilterApp, "", () => FilterBox.Text = details.AppName);
