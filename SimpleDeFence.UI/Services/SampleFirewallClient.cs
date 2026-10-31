@@ -371,7 +371,7 @@ namespace SimpleDeFence.UI.Services
             {
                 var change = changes.FirstOrDefault(c => c.Kind == _sampleBackground[i].Kind && c.Id == _sampleBackground[i].Id);
                 if (change is not null)
-                    _sampleBackground[i] = _sampleBackground[i] with { Enabled = change.Enable };
+                    _sampleBackground[i] = _sampleBackground[i] with { Enabled = change.Enable, SwitchedOffHere = !change.Enable };
             }
             var reply = TwMessageBackgroundItems.CreateSetRequest(appPath, changes).CreateResponse("Adobe Inc.", _sampleBackground.ToArray());
             return Task.FromResult((MessageType.SET_BACKGROUND_ITEMS, (TwMessageBackgroundItems?)reply));

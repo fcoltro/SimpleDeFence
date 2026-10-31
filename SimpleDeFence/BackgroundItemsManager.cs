@@ -61,6 +61,15 @@ namespace SimpleDeFence
             try { items.AddRange(StartupEntries(publisher)); }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_SERVICE); }
 
+            // Only what we switched off - and is still off - can be put back by "Switch all back
+            // on". Something its own installer or the user had switched off stays as they left it.
+            var state = LoadState();
+            for (int i = 0; i < items.Count; ++i)
+            {
+                if (!items[i].Enabled && state.ContainsKey(StateKey(items[i].Kind, items[i].Id)))
+                    items[i] = items[i] with { SwitchedOffHere = true };
+            }
+
             return items
                 .OrderBy(i => i.Kind)
                 .ThenBy(i => i.Name, StringComparer.CurrentCultureIgnoreCase)
@@ -151,15 +160,18 @@ namespace SimpleDeFence
 
         private static void SetService(string name, bool enable)
         {
-            var saved = LoadSavedStartTypes();
+            var state = LoadState();
+            var key = StateKey(BackgroundItemKind.Service, name);
             using var scm = new ServiceControlManager();
 
             if (enable)
             {
-                var mode = saved.TryGetValue(name, out var previous) ? previous : ServiceStartMode.Manual;
+                var mode = state.TryGetValue(key, out var previous) && Enum.TryParse<ServiceStartMode>(previous, out var parsed)
+                    ? parsed
+                    : ServiceStartMode.Manual;
                 scm.SetStartupMode(name, mode);
-                saved.Remove(name);
-                SaveStartTypes(saved);
+                state.Remove(key);
+                SaveState(state);
 
                 if (mode == ServiceStartMode.Automatic)
                 {
@@ -171,10 +183,10 @@ namespace SimpleDeFence
             {
                 using (var sc = new ServiceController(name))
                 {
-                    if (!saved.ContainsKey(name))
+                    if (!state.ContainsKey(key))
                     {
-                        saved[name] = sc.StartType;
-                        SaveStartTypes(saved);
+                        state[key] = sc.StartType.ToString();
+                        SaveState(state);
                     }
                     scm.SetStartupMode(name, ServiceStartMode.Disabled);
 
@@ -188,29 +200,49 @@ namespace SimpleDeFence
             }
         }
 
-        /// <summary>The start type each service had before we disabled it, one "name=type" per
-        /// line. Kept out of the configuration so a reset of the configuration cannot lose it.</summary>
-        private static Dictionary<string, ServiceStartMode> LoadSavedStartTypes()
+        /// <summary>Records that we switched a task or startup entry off, or forgets it when it is
+        /// switched back on - so "Switch all back on" only undoes what SimpleDeFence did.</summary>
+        private static void RememberSwitchedOff(BackgroundItemKind kind, string id, bool off)
         {
-            var result = new Dictionary<string, ServiceStartMode>(StringComparer.OrdinalIgnoreCase);
+            var state = LoadState();
+            var key = StateKey(kind, id);
+            if (off)
+                state[key] = "Off";
+            else if (!state.Remove(key))
+                return;
+            SaveState(state);
+        }
+
+        private static string StateKey(BackgroundItemKind kind, string id) => $"{kind}|{id}";
+
+        /// <summary>
+        /// What SimpleDeFence switched off, one "Kind|Id=value" per line: for a service, the start
+        /// type it had before; for anything else, "Off". Kept out of the configuration so a reset
+        /// of the configuration cannot lose it, and in the service's own data directory, which
+        /// only SYSTEM and Administrators can write.
+        /// </summary>
+        private static Dictionary<string, string> LoadState()
+        {
+            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             try
             {
                 if (!File.Exists(StateFilePath))
                     return result;
                 foreach (var line in File.ReadAllLines(StateFilePath))
                 {
+                    // The value never holds '=', an Id may (a startup entry's value name).
                     int eq = line.LastIndexOf('=');
-                    if (eq > 0 && Enum.TryParse<ServiceStartMode>(line.Substring(eq + 1), out var mode))
-                        result[line.Substring(0, eq)] = mode;
+                    if (eq > 0)
+                        result[line.Substring(0, eq)] = line.Substring(eq + 1);
                 }
             }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_SERVICE); }
             return result;
         }
 
-        private static void SaveStartTypes(Dictionary<string, ServiceStartMode> saved)
+        private static void SaveState(Dictionary<string, string> state)
         {
-            File.WriteAllLines(StateFilePath, saved.Select(kv => $"{kv.Key}={kv.Value}"));
+            File.WriteAllLines(StateFilePath, state.Select(kv => $"{kv.Key}={kv.Value}"));
         }
 
         // ----------------------------------------------------------------- scheduled tasks
@@ -279,6 +311,7 @@ namespace SimpleDeFence
             dynamic svc = TaskScheduler.ConnectedService();
             dynamic task = svc.GetFolder(@"\").GetTask(taskPath);
             task.Enabled = enable;
+            RememberSwitchedOff(BackgroundItemKind.ScheduledTask, taskPath, !enable);
             if (!enable)
             {
                 try { task.Stop(0); }
@@ -356,6 +389,7 @@ namespace SimpleDeFence
                 var valueName = id.Substring(prefix.Length);
                 using var approved = loc.Root.CreateSubKey(loc.ApprovedKey);
                 approved.SetValue(valueName, BackgroundItemRules.StartupApprovedValue(enable, DateTime.UtcNow), RegistryValueKind.Binary);
+                RememberSwitchedOff(BackgroundItemKind.Startup, id, !enable);
                 return;
             }
             throw new ArgumentException($"Unknown startup entry \"{id}\".");

@@ -32,6 +32,10 @@ namespace SimpleDeFence
 
         /// <summary>A licence checker the publisher's apps may refuse to open without.</summary>
         public bool NeededToOpen { get; init; }
+
+        /// <summary>Switched off by "Stop it trying", so "Switch all back on" may restore it.
+        /// Things that were already off before SimpleDeFence touched them stay off.</summary>
+        public bool SwitchedOffHere { get; init; }
     }
 
     /// <summary>One change asked for from the "Stop it trying" dialog.</summary>

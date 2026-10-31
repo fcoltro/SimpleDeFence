@@ -130,7 +130,7 @@ namespace SimpleDeFence.UI.Pages
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
                 DefaultButton = ContentDialogButton.Primary,
             };
-            if (list.Items.Any(i => !i.Enabled))
+            if (list.Items.Any(i => i.SwitchedOffHere))
                 dialog.SecondaryButtonText = Loc.T(LocKeys.Connections.StopAllOn);
 
             ContentDialogResult result;
@@ -151,7 +151,7 @@ namespace SimpleDeFence.UI.Pages
                     .Select(b => new BackgroundItemChange { Kind = b.Item.Kind, Id = b.Item.Id, Enable = b.Box.IsChecked == true })
                     .ToArray(),
                 ContentDialogResult.Secondary => list.Items
-                    .Where(i => !i.Enabled)
+                    .Where(i => i.SwitchedOffHere)
                     .Select(i => new BackgroundItemChange { Kind = i.Kind, Id = i.Id, Enable = true })
                     .ToArray(),
                 _ => null,
