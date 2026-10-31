@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SimpleDeFence - a free firewall for Windows that blocks every app you have not allowed</title>
+  <meta name="description" content="SimpleDeFence is a free, open-source firewall for Windows 10 and 11. It blocks every program you have not allowed, installs no kernel driver and collects no data." />
+  <meta property="og:title" content="SimpleDeFence" />
+  <meta property="og:description" content="A free, lightweight Windows firewall that blocks every program you have not allowed." />
+  <meta property="og:image" content="https://fcoltro.github.io/SimpleDeFence/assets/connections-light.png" />
+  <link rel="icon" href="assets/simpledefence.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#"><img src="assets/simpledefence.png" alt="" width="28" height="28" /> SimpleDeFence</a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#download">Download</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#code-signing-policy">Code signing</a>
+      <a href="https://github.com/fcoltro/SimpleDeFence">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <img class="logo" src="assets/simpledefence.png" alt="SimpleDeFence logo" width="112" height="112" />
+      <h1>A firewall that blocks every app you have not allowed</h1>
+      <p class="lead">SimpleDeFence is free and open source. It sits in the notification area, stops
+        unknown programs from reaching the network, and lets you allow the ones you trust with one click.
+        No kernel driver, no account, no data collected.</p>
+      <p class="actions">
+        <a class="button primary" href="https://github.com/fcoltro/SimpleDeFence/releases/latest">Download for Windows</a>
+        <a class="button" href="https://github.com/fcoltro/SimpleDeFence">View the source</a>
+      </p>
+      <p class="small">Windows 10 (2004 or newer) and Windows 11, 64-bit. GPLv3.</p>
+    </section>
+
+    <figure class="shot">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="assets/connections-dark.png" />
+        <img src="assets/connections-light.png" alt="The Connections screen: blocked attempts with a one-click Allow, alongside current connections and listening ports" width="820" />
+      </picture>
+      <figcaption>The Connections screen: what was blocked, what is connected, what is listening. One click allows anything in the list.</figcaption>
+    </figure>
+
+    <section id="features">
+      <h2>What it does</h2>
+      <div class="grid">
+        <article><h3>Blocked by default</h3><p>Normal mode allows only the programs you chose. Block all, Allow outgoing, Learning and Disabled are one click away in the tray.</p></article>
+        <article><h3>Known apps built in</h3><p>A database of common programs lets you allow them without hunting for executables by hand.</p></article>
+        <article><h3>Live connections</h3><p>See what is connected, listening and blocked. Right-click a row to allow the app, copy its address or open its folder.</p></article>
+        <article><h3>Stop it trying</h3><p>Blocked suites like Adobe Creative Cloud or Autodesk retry for ever. Switch off their background services, tasks and startup entries in one dialog.</p></article>
+        <article><h3>Temporary rules</h3><p>Allow or block an app for 5 minutes up to 24 hours, or until the next restart. The rule removes itself.</p></article>
+        <article><h3>Trusted publishers</h3><p>Allow every program signed by one vendor, so apps keep working through updates. Only signatures Windows verifies count.</p></article>
+        <article><h3>Public network lockdown</h3><p>On café or hotel Wi-Fi, sharing, discovery and remote access are switched off, and come back on your home network.</p></article>
+        <article><h3>Password lock</h3><p>Lock the settings so nothing running as you can change them without the password.</p></article>
+        <article><h3>Blocklists</h3><p>Hosts-file blocklists and your own list of blocked addresses that no program can reach.</p></article>
+        <article><h3>Sixteen languages</h3><p>Including Arabic and Farsi with right-to-left layout.</p></article>
+      </div>
+    </section>
+
+    <section id="download">
+      <h2>Download</h2>
+      <p>Get the installer from the <a href="https://github.com/fcoltro/SimpleDeFence/releases/latest">latest release on GitHub</a> and run it.
+        It is a single self-contained MSI of about 55 MB: no .NET runtime to install first and no kernel driver.
+        It asks for administrator rights, because programming the Windows Filtering Platform needs them.</p>
+      <p>Updates are offered inside the app and checked against a SHA-256 published in the repository
+        before anything runs. Each release also lists its checksums in <code>SHA256SUMS.txt</code>.</p>
+      <p>You can also install it with winget once it is listed: <code>winget install fcoltro.SimpleDeFence</code>.</p>
+      <p class="note">Free code signing for Windows releases is provided by <a href="https://about.signpath.io">SignPath.io</a>,
+        certificate by <a href="https://signpath.org">SignPath Foundation</a>. See the <a href="#code-signing-policy">code signing policy</a>.</p>
+    </section>
+
+    <section id="privacy">
+      <h2>Privacy</h2>
+      <p>SimpleDeFence collects no personal data and has no telemetry. It has no account and sends nothing about you or your computer anywhere.</p>
+      <p>It goes online only for these:</p>
+      <ul>
+        <li><strong>The update check</strong>: it reads <code>update.json</code> from this project on GitHub, and downloads new app, database or hosts-file updates from GitHub when you accept them. It can be switched off in Settings.</li>
+        <li><strong>"Look up addresses"</strong>, only when you click it: the addresses shown go to your DNS server and to <a href="https://rdap.org">rdap.org</a> to find their names and owners.</li>
+      </ul>
+      <p>Connection logs, if you switch them on, stay on your computer. GitHub hosts this website and the downloads; see <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a> for what it records.</p>
+    </section>
+
+    <section id="code-signing-policy">
+      <h2>Code signing policy</h2>
+      <p>Free code signing provided by <a href="https://about.signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</p>
+      <table>
+        <tr><th>Committers and reviewers</th><td><a href="https://github.com/fcoltro">fcoltro</a></td></tr>
+        <tr><th>Approvers</th><td><a href="https://github.com/fcoltro">fcoltro</a></td></tr>
+      </table>
+      <p>Only the installer built from this repository by the Release workflow on GitHub Actions is signed,
+        and each signing request is approved by hand. Nothing built on a personal computer is signed.
+        Signed releases start with the first version after the SignPath application is approved.</p>
+      <p>The privacy policy is the <a href="#privacy">Privacy</a> section above.</p>
+    </section>
+
+    <section id="support">
+      <h2>Support the project</h2>
+      <p>SimpleDeFence is free and stays free. If it is useful to you:
+        <a href="https://ko-fi.com/fcoltro">Ko-fi</a>, <a href="https://github.com/sponsors/fcoltro">GitHub Sponsors</a> or
+        <a href="https://buymeacoffee.com/fcoltro">Buy Me a Coffee</a>. Bug reports from real installs help just as much:
+        <a href="https://github.com/fcoltro/SimpleDeFence/issues">open an issue</a> or ask in
+        <a href="https://github.com/fcoltro/SimpleDeFence/discussions">Discussions</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>SimpleDeFence is GPLv3 and built on <a href="https://github.com/pylorak/TinyWall">TinyWall</a> as its original code base.
+      <a href="https://github.com/fcoltro/SimpleDeFence/blob/main/docs/FAQ.md">FAQ</a> ·
+      <a href="https://github.com/fcoltro/SimpleDeFence/blob/main/SECURITY.md">Security</a> ·
+      <a href="https://github.com/fcoltro/SimpleDeFence/blob/main/LICENSE.txt">Licence</a></p>
+  </footer>
+</body>
+</html>

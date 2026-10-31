@@ -1357,13 +1357,38 @@ namespace SimpleDeFence.UI.Pages
 
             var confirmTitle = Loc.T(LocKeys.Rules.CleanUpTitle);
             var confirmBody = Loc.T(LocKeys.Rules.CleanUpConfirmBody, ids.Count);
+
+            // The programs themselves, not only how many: a rule is easy to lose and tedious to
+            // rebuild, so the user should see which ones are going before they agree.
+            var missingPaths = profile.AppExceptions
+                .Where(ex => ids.Contains(ex.Id) && ex.Subject is ExecutableSubject)
+                .Select(ex => ((ExecutableSubject)ex.Subject).ExecutablePath)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(path => path, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
+            var confirmList = new StackPanel { Spacing = 2 };
+            foreach (var path in missingPaths)
+            {
+                confirmList.Children.Add(new TextBlock
+                {
+                    Text = path,
+                    FontSize = 12,
+                    Opacity = 0.8,
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                    IsTextSelectionEnabled = true,
+                });
+            }
+            var confirmContent = new StackPanel { Spacing = 8, MaxWidth = 560 };
+            confirmContent.Children.Add(new TextBlock { Text = confirmBody, TextWrapping = TextWrapping.Wrap });
+            confirmContent.Children.Add(new ScrollViewer { Content = confirmList, MaxHeight = 240, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
+
             var confirm = new ContentDialog
             {
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
                 RequestedTheme = App.UiElementTheme,
                 Title = confirmTitle,
-                Content = confirmBody,
+                Content = confirmContent,
                 PrimaryButtonText = Loc.T(LocKeys.Rules.Remove),
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
                 DefaultButton = ContentDialogButton.Close,

@@ -23,6 +23,7 @@
         GET_PROCESS_PATH,
         READ_FW_LOG,
         IS_LOCKED,
+        BACKGROUND_ITEMS,
 
         // Unprivileged write commands (>1023)
         UNLOCK = 1024,
@@ -39,6 +40,9 @@
 
         // Service-to-client messages
         DATABASE_UPDATED,
+
+        // Privileged write, added after DATABASE_UPDATED so no existing number moves
+        SET_BACKGROUND_ITEMS,
 
         // Service-to-service only (>4095)
         ADD_TEMPORARY_EXCEPTION = 4096,

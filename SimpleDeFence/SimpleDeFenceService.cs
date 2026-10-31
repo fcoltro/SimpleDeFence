@@ -60,8 +60,11 @@ namespace SimpleDeFence
         /// blocked entries needed: on an ordinary network the inbound broadcast and multicast
         /// traffic that EventMatchAnyKeywords asks for arrives constantly, and it was evicting the
         /// outbound application blocks the user opened the screen to find.
+        ///
+        /// Repeats are merged as well - see BlockedLog. A blocked app retrying in a loop used to
+        /// take every slot by itself within seconds.
         /// </summary>
-        private readonly CircularBuffer<FirewallLogEntry> FirewallLogEntries = new(500);
+        private readonly BlockedLog FirewallLogEntries = new(500);
         private readonly FileLocker FileLocker = new();
         private readonly HostsFileManager HostsFileManager = new();
         private DateTime LastControllerCommandTime = DateTime.Now;
@@ -1705,7 +1708,7 @@ namespace SimpleDeFence
                     exs.RemoveAt(i);
                     config_changed = true;
                 }
-                else if (((int)exs[i].Timer > 0) && (exs[i].CreationDate.AddMinutes((double)exs[i].Timer) <= DateTime.Now))
+                else if (AppExceptionTimers.ExpiresAt(exs[i]) is DateTime expires && expires.ToUniversalTime() <= DateTime.UtcNow)
                 {
                     exs.RemoveAt(i);
                     config_changed = true;
@@ -1751,7 +1754,6 @@ namespace SimpleDeFence
             // is the worst possible lie to tell.
             var previousMode = VisibleState.Mode;
             var previousStartupMode = ActiveConfig.Service.StartupMode;
-            var previousChangeset = GlobalInstances.ServerChangeset;
 
             VisibleState.Mode = newMode;
 
@@ -1784,7 +1786,11 @@ namespace SimpleDeFence
 
                 VisibleState.Mode = previousMode;
                 ActiveConfig.Service.StartupMode = previousStartupMode;
-                GlobalInstances.ServerChangeset = previousChangeset;
+
+                // A fresh changeset, not the previous one: CommitLearnedRules above may already
+                // have added the rules Learning collected, and those stay. Handing back the old
+                // changeset told open windows nothing had changed, so they never showed them.
+                GlobalInstances.ServerChangeset = Guid.NewGuid();
 
                 // Only worth rewriting if we changed it: on the common path save_needed
                 // is false and the file on disk still describes the mode WFP is running.
@@ -1864,7 +1870,7 @@ namespace SimpleDeFence
                         // limit sets it again. Bounded to a day: the GUI offers up to an hour, and
                         // a larger value from anywhere else is not a time limit anyone meant.
                         VisibleState.LearningEndsAt = (newMode == FirewallMode.Learning) && (args.LearningMinutes > 0)
-                            ? DateTime.Now.AddMinutes(Math.Min(args.LearningMinutes, 24 * 60))
+                            ? DateTime.UtcNow.AddMinutes(Math.Min(args.LearningMinutes, 24 * 60))
                             : null;
 
                         return args.CreateResponse(VisibleState.Mode);
@@ -2123,7 +2129,7 @@ namespace SimpleDeFence
                         // next tick, with the limit still set and the mode unchanged.
                         if ((VisibleState.Mode == FirewallMode.Learning)
                             && (VisibleState.LearningEndsAt is DateTime learningEnds)
-                            && (learningEnds <= DateTime.Now))
+                            && (learningEnds.ToUniversalTime() <= DateTime.UtcNow))
                         {
                             Utils.Log("Learning mode's time limit ran out; switching back to Normal.", Utils.LOG_ID_SERVICE);
                             if (TrySwitchMode(FirewallMode.Normal))
@@ -2532,6 +2538,10 @@ namespace SimpleDeFence
         /// Whether a file's signature verifies, and who signed it, remembered per path until the
         /// file changes. Verifying means hashing the whole file, and the process snapshot names
         /// the same few dozen programs at every 30-minute reload.
+        ///
+        /// Only remembered for files a standard user cannot change. Anyone who can write a file
+        /// can also put its old timestamp back, so for a program in a user's own folders the
+        /// timestamp proves nothing and the signature is checked again every time.
         /// </summary>
         private (bool Valid, string? Subject) SignatureOf(string path)
         {
@@ -2539,9 +2549,10 @@ namespace SimpleDeFence
             try { lastWrite = File.GetLastWriteTimeUtc(path); }
             catch { return (false, null); }
 
+            bool cacheable = SimpleDeFenceDoctor.OnlyAdminsCanChange(path);
             lock (SignatureCache)
             {
-                if (SignatureCache.TryGetValue(path, out var cached) && cached.LastWriteUtc == lastWrite)
+                if (cacheable && SignatureCache.TryGetValue(path, out var cached) && cached.LastWriteUtc == lastWrite)
                     return (cached.Valid, cached.Subject);
             }
 
@@ -2549,12 +2560,15 @@ namespace SimpleDeFence
             bool valid = exe.CertValid;
             string? subject = valid ? exe.CertSubject : null;
 
-            lock (SignatureCache)
+            if (cacheable)
             {
-                // A long-running service sees many paths come and go; this is a cache, not a record.
-                if (SignatureCache.Count > 4096)
-                    SignatureCache.Clear();
-                SignatureCache[path] = (lastWrite, valid, subject);
+                lock (SignatureCache)
+                {
+                    // A long-running service sees many paths come and go; this is a cache, not a record.
+                    if (SignatureCache.Count > 4096)
+                        SignatureCache.Clear();
+                    SignatureCache[path] = (lastWrite, valid, subject);
+                }
             }
             return (valid, subject);
         }
@@ -2604,7 +2618,7 @@ namespace SimpleDeFence
             {
                 lock (FirewallLogEntries)
                 {
-                    FirewallLogEntries.Enqueue(entry);
+                    FirewallLogEntries.Add(entry);
                 }
             }
         }
@@ -2671,9 +2685,11 @@ namespace SimpleDeFence
                 // Notify that we need to be unlocked first
                 return TwMessageLocked.Instance;
             }
-            if (((int)reqMsg.Type > 4095))
+            if (((int)reqMsg.Type > 4095)
+                || reqMsg.Type is MessageType.MINUTE_TIMER or MessageType.REENUMERATE_ADDRESSES or MessageType.DATABASE_UPDATED)
             {
-                // We cannot receive this from the client
+                // We cannot receive this from the client. The three named here sit below 4096 for
+                // historical reasons, but only the service's own timer and watchers send them.
                 return TwMessageError.Instance;
             }
             else
@@ -2686,12 +2702,42 @@ namespace SimpleDeFence
                 if ((int)reqMsg.Type >= (int)MessageType.UNLOCK)
                     LastControllerCommandTime = DateTime.Now;
 
+                // Answered here, on the pipe's thread, not by the worker: the first listing checks
+                // the signature of every candidate program, which can take seconds, and the worker
+                // is what installs the rules for programs as they start. Nothing here touches the
+                // firewall's state, and SignatureOf is safe to call from any thread.
+                if (reqMsg is TwMessageBackgroundItems backgroundItems)
+                    return ProcessBackgroundItems(backgroundItems);
+
                 // Process and wait for response
                 var req = new TwRequest(reqMsg);
                 Q.Add(req);
 
                 // Send response back to pipe
                 return req.Response;
+            }
+        }
+
+        /// <summary>BACKGROUND_ITEMS and SET_BACKGROUND_ITEMS, for "Stop it trying".</summary>
+        private TwMessage ProcessBackgroundItems(TwMessageBackgroundItems args)
+        {
+            try
+            {
+                var manager = new BackgroundItemsManager(SignatureOf, WindowsDirectory);
+                var publisher = manager.PublisherOf(args.AppPath);
+                if (publisher.Length == 0)
+                    return args.CreateResponse(string.Empty, Array.Empty<BackgroundItem>());
+
+                if (args.Type == MessageType.SET_BACKGROUND_ITEMS
+                    && !manager.Apply(publisher, args.Changes ?? Array.Empty<BackgroundItemChange>()))
+                    return TwMessageError.Instance;
+
+                return args.CreateResponse(publisher, manager.List(publisher));
+            }
+            catch (Exception e)
+            {
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                return TwMessageError.Instance;
             }
         }
 

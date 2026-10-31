@@ -158,6 +158,23 @@
       "openLocation": "Open file location",
       "openLocationMissing": "The program's file and folder are no longer there."
     },
+    "stopTrying": {
+      "menu": "Stop it trying…",
+      "title": "Stop {0} from trying",
+      "intro": "These start programs from {0} in the background, and they keep trying to connect. Untick the ones you want switched off. Any of them that are running now are closed, and they won't start again until you tick them back.",
+      "needed": "Licence check. {0} apps may not open without it.",
+      "kindService": "Service",
+      "kindTask": "Scheduled task",
+      "kindStartup": "Starts with Windows",
+      "apply": "Apply",
+      "allOn": "Switch all back on",
+      "none": "Nothing from {0} starts in the background.",
+      "unsigned": "SimpleDeFence can't tell who made this program, because it has no valid signature. Only signed programs can be traced to their background parts. Windows' own programs are never offered.",
+      "unreachable": "The service did not answer. Is it running?",
+      "done": "Done. {0} switched off, {1} switched back on.",
+      "failed": "Some changes could not be made. The service log has the details.",
+      "locked": "Unlock the configuration first."
+    },
     "details": {
       "addresses": "Addresses",
       "lookUpNote": "Finds each address's name, owner and the country where its network is registered. Nothing is sent until you click: the addresses then go to your DNS server and to rdap.org.",

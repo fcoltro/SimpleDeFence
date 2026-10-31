@@ -158,6 +158,23 @@
       "openLocation": "Buka lokasi file",
       "openLocationMissing": "File dan folder program ini sudah tidak ada."
     },
+    "stopTrying": {
+      "menu": "Hentikan percobaannya…",
+      "title": "Hentikan {0} mencoba terhubung",
+      "intro": "Item ini menjalankan program {0} di latar belakang yang terus mencoba terhubung. Hapus centang yang ingin dimatikan. Yang sedang berjalan akan ditutup sekarang dan tidak akan mulai lagi sampai Anda mencentangnya kembali.",
+      "needed": "Pemeriksaan lisensi. Aplikasi {0} mungkin tidak bisa dibuka tanpanya.",
+      "kindService": "Layanan",
+      "kindTask": "Tugas terjadwal",
+      "kindStartup": "Mulai bersama Windows",
+      "apply": "Terapkan",
+      "allOn": "Nyalakan semua lagi",
+      "none": "Tidak ada program {0} yang berjalan di latar belakang.",
+      "unsigned": "SimpleDeFence tidak dapat mengetahui pembuat program ini karena tidak memiliki tanda tangan yang valid. Hanya program bertanda tangan yang dapat dihubungkan ke bagian latar belakangnya. Program milik Windows sendiri tidak pernah ditawarkan.",
+      "unreachable": "Layanan tidak menjawab. Apakah sedang berjalan?",
+      "done": "Selesai. {0} dimatikan, {1} dinyalakan kembali.",
+      "failed": "Beberapa perubahan tidak dapat dilakukan. Detailnya ada di log layanan.",
+      "locked": "Buka kunci konfigurasi terlebih dahulu."
+    },
     "details": {
       "addresses": "Alamat",
       "lookUpNote": "Mencari nama setiap alamat, pemiliknya, dan negara tempat jaringannya terdaftar. Tidak ada yang dikirim sebelum Anda mengklik: setelah itu alamat dikirim ke server DNS Anda dan ke rdap.org.",

@@ -188,7 +188,7 @@ namespace SimpleDeFence.UI.ViewModels
         {
             var description = FirewallModes.DescriptionFor(mode);
             if (mode == FirewallMode.Learning && _client.State?.LearningEndsAt is System.DateTime ends)
-                return Loc.T(LocKeys.Mode.LearningEndsAt, description, ends.ToString("t"));
+                return Loc.T(LocKeys.Mode.LearningEndsAt, description, ends.ToLocalTime().ToString("t"));
 
             return description;
         }

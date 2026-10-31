@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using SimpleDeFence.DatabaseClasses;
 
@@ -75,7 +76,7 @@ namespace SimpleDeFence.UI.Services
 
             State.Mode = mode;
             State.LearningEndsAt = (mode == FirewallMode.Learning) && (learningMinutes > 0)
-                ? DateTime.Now.AddMinutes(learningMinutes)
+                ? DateTime.UtcNow.AddMinutes(learningMinutes)
                 : null;
             Changed?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(MessageType.MODE_SWITCH);
@@ -346,6 +347,34 @@ namespace SimpleDeFence.UI.Services
                 new() { ProcessId = 4242, Name = "tracker", Path = @"C:\Users\sample\AppData\Local\Telemetry\tracker.exe" },
             };
             return Task.FromResult(list);
+        }
+
+        private readonly List<BackgroundItem> _sampleBackground = new()
+        {
+            new() { Kind = BackgroundItemKind.Service, Id = "AGSService", Name = "Adobe Genuine Software Integrity Service", Path = @"C:\Program Files (x86)\Common Files\Adobe\AdobeGCClient\AGSService.exe", Enabled = true },
+            new() { Kind = BackgroundItemKind.Service, Id = "AdobeUpdateService", Name = "AdobeUpdateService", Path = @"C:\Program Files (x86)\Common Files\Adobe\Adobe Desktop Common\ElevationManager\AdobeUpdateService.exe", Enabled = true },
+            new() { Kind = BackgroundItemKind.ScheduledTask, Id = @"\AdobeGCInvoker-1.0", Name = "AdobeGCInvoker-1.0", Path = @"C:\Program Files (x86)\Common Files\Adobe\AdobeGCClient\AdobeGCClient.exe", Enabled = true },
+            new() { Kind = BackgroundItemKind.Startup, Id = @"HKLM\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run|AdobeAAMUpdater-1.0", Name = "Adobe Creative Cloud", Path = @"C:\Program Files\Adobe\Adobe Creative Cloud\ACC\Creative Cloud.exe", Enabled = true },
+            new() { Kind = BackgroundItemKind.Startup, Id = @"HKLM\Software\Microsoft\Windows\CurrentVersion\Run|AdobeIPCBroker", Name = "AdobeIPCBroker", Path = @"C:\Program Files (x86)\Common Files\Adobe\OOBE\PDApp\IPC\AdobeIPCBroker.exe", Enabled = true, NeededToOpen = true },
+        };
+
+        public Task<TwMessageBackgroundItems?> GetBackgroundItemsAsync(string appPath)
+            => Task.FromResult<TwMessageBackgroundItems?>(
+                TwMessageBackgroundItems.CreateListRequest(appPath).CreateResponse("Adobe Inc.", _sampleBackground.ToArray()));
+
+        public Task<(MessageType Result, TwMessageBackgroundItems? Items)> SetBackgroundItemsAsync(string appPath, BackgroundItemChange[] changes)
+        {
+            if (_locked)
+                return Task.FromResult((MessageType.RESPONSE_LOCKED, (TwMessageBackgroundItems?)null));
+
+            for (int i = 0; i < _sampleBackground.Count; ++i)
+            {
+                var change = changes.FirstOrDefault(c => c.Kind == _sampleBackground[i].Kind && c.Id == _sampleBackground[i].Id);
+                if (change is not null)
+                    _sampleBackground[i] = _sampleBackground[i] with { Enabled = change.Enable, SwitchedOffHere = !change.Enable };
+            }
+            var reply = TwMessageBackgroundItems.CreateSetRequest(appPath, changes).CreateResponse("Adobe Inc.", _sampleBackground.ToArray());
+            return Task.FromResult((MessageType.SET_BACKGROUND_ITEMS, (TwMessageBackgroundItems?)reply));
         }
 
         public Task<IReadOnlyList<WindowListEntry>> GetTopLevelWindowsAsync()

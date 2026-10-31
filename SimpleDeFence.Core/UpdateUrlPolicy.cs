@@ -14,10 +14,15 @@ namespace SimpleDeFence
     /// </summary>
     public static class UpdateUrlPolicy
     {
-        // Release assets live on github.com; the database and hosts modules may be served
-        // straight from the repository through raw.githubusercontent.com.
-        private static readonly string[] AllowedHosts = { "github.com", "raw.githubusercontent.com" };
-        private const string AllowedPathPrefix = "/fcoltro/SimpleDeFence/";
+        // Release assets live on github.com, under releases/download only: the rest of the
+        // project's github.com space includes issue attachments, which anyone can upload. The
+        // database and hosts modules may be served straight from the repository through
+        // raw.githubusercontent.com, which serves nothing but the repository's own files.
+        private static readonly (string Host, string PathPrefix)[] Allowed =
+        {
+            ("github.com", "/fcoltro/SimpleDeFence/releases/download/"),
+            ("raw.githubusercontent.com", "/fcoltro/SimpleDeFence/"),
+        };
 
         public static bool IsAllowed(string? url)
         {
@@ -26,11 +31,16 @@ namespace SimpleDeFence
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
                 return false;
 
+            // Escaped dots and slashes could climb out of the prefix once the server decodes them.
+            if (url.Contains("%2e", StringComparison.OrdinalIgnoreCase) || url.Contains("%2f", StringComparison.OrdinalIgnoreCase)
+                || url.Contains("%5c", StringComparison.OrdinalIgnoreCase) || url.Contains(".."))
+                return false;
+
             return uri.Scheme == Uri.UriSchemeHttps
                 && uri.IsDefaultPort
                 && string.IsNullOrEmpty(uri.UserInfo)
-                && Array.Exists(AllowedHosts, h => string.Equals(uri.Host, h, StringComparison.OrdinalIgnoreCase))
-                && uri.AbsolutePath.StartsWith(AllowedPathPrefix, StringComparison.OrdinalIgnoreCase);
+                && Array.Exists(Allowed, a => string.Equals(uri.Host, a.Host, StringComparison.OrdinalIgnoreCase)
+                    && uri.AbsolutePath.StartsWith(a.PathPrefix, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

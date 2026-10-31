@@ -1,5 +1,6 @@
 ﻿using SimpleDeFence;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace SimpleDeFence.Tests
@@ -144,6 +145,90 @@ namespace SimpleDeFence.Tests
             var result = ConnectionActivity.RecentBlocked(entries, now, TimeSpan.FromMinutes(5));
 
             Assert.Empty(result);
+        }
+
+        [Fact]
+        public void RecentBlocked_merges_retries_that_differ_only_in_local_port_and_adds_up_counts()
+        {
+            // Windows hands an outgoing connection a fresh local port on every try, so a blocked
+            // app retrying in a loop must still come out as one row.
+            var now = DateTime.Now;
+            var entries = new[]
+            {
+                Entry(EventLogEvent.BLOCKED_CONNECTION, now.AddMinutes(-2)) with { LocalPort = 50001, Count = 40 },
+                Entry(EventLogEvent.BLOCKED_CONNECTION, now.AddMinutes(-1)) with { LocalPort = 50002 },
+            };
+
+            var result = ConnectionActivity.RecentBlocked(entries, now, TimeSpan.FromMinutes(5));
+
+            Assert.Single(result);
+            Assert.Equal(41, result[0].Count);
+            Assert.Equal(now.AddMinutes(-1), result[0].Timestamp);
+        }
+
+        [Fact]
+        public void SameAttempt_compares_the_local_port_for_incoming_attempts()
+        {
+            var now = DateTime.Now;
+            var a = Entry(EventLogEvent.BLOCKED, now) with { Direction = RuleDirection.In, LocalPort = 445, RemotePort = 60001 };
+
+            Assert.True(ConnectionActivity.SameAttempt(a, a with { RemotePort = 60002 }));
+            Assert.False(ConnectionActivity.SameAttempt(a, a with { LocalPort = 3389 }));
+        }
+
+        [Fact]
+        public void BlockedLog_merges_a_repeat_into_one_entry_and_moves_it_to_the_newest_end()
+        {
+            var now = DateTime.Now;
+            var log = new BlockedLog(10);
+            log.Add(Entry(EventLogEvent.BLOCKED, now.AddSeconds(-30), remoteIp: "1.1.1.1") with { LocalPort = 50001 });
+            log.Add(Entry(EventLogEvent.BLOCKED, now.AddSeconds(-20), remoteIp: "2.2.2.2"));
+            log.Add(Entry(EventLogEvent.BLOCKED, now, remoteIp: "1.1.1.1") with { LocalPort = 50002 });
+
+            var entries = log.ToArray();
+            Assert.Equal(2, entries.Length);
+            Assert.Equal("2.2.2.2", entries[0].RemoteIp);
+            Assert.Equal("1.1.1.1", entries[1].RemoteIp);
+            Assert.Equal(2, entries[1].Count);
+            Assert.Equal(now, entries[1].Timestamp);
+        }
+
+        [Fact]
+        public void BlockedLog_does_not_let_one_noisy_app_evict_the_others()
+        {
+            var now = DateTime.Now;
+            var log = new BlockedLog(3);
+            log.Add(Entry(EventLogEvent.BLOCKED, now, remoteIp: "9.9.9.9", pid: 7));
+            for (int i = 0; i < 1000; ++i)
+                log.Add(Entry(EventLogEvent.BLOCKED, now.AddMilliseconds(i), remoteIp: "1.1.1.1") with { LocalPort = 50000 + i });
+
+            Assert.Equal(2, log.Count);
+            Assert.Contains(log, e => e.ProcessId == 7);
+            Assert.Contains(log, e => e.RemoteIp == "1.1.1.1" && e.Count == 1000);
+        }
+
+        [Fact]
+        public void BlockedLog_starts_a_new_entry_after_a_long_quiet_gap()
+        {
+            var now = DateTime.Now;
+            var log = new BlockedLog(10);
+            log.Add(Entry(EventLogEvent.BLOCKED, now - BlockedLog.MergeWindow - TimeSpan.FromMinutes(1)));
+            log.Add(Entry(EventLogEvent.BLOCKED, now));
+
+            Assert.Equal(2, log.Count);
+            Assert.All(log, e => Assert.Equal(1, e.Count));
+        }
+
+        [Fact]
+        public void BlockedLog_evicts_the_oldest_entry_when_full()
+        {
+            var now = DateTime.Now;
+            var log = new BlockedLog(2);
+            log.Add(Entry(EventLogEvent.BLOCKED, now, remotePort: 1));
+            log.Add(Entry(EventLogEvent.BLOCKED, now, remotePort: 2));
+            log.Add(Entry(EventLogEvent.BLOCKED, now, remotePort: 3));
+
+            Assert.Equal(new[] { 2, 3 }, log.Select(e => e.RemotePort).ToArray());
         }
 
         [Fact]
