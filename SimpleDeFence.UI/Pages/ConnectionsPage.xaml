@@ -443,6 +443,10 @@
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon FontSize="16" Glyph="&#xE733;"/>
                             <TextBlock x:Name="BlockedHeaderText" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                            <!-- Muted apps are left out of the list; this brings them back into
+                                 view, where their right-click menu offers Unmute. -->
+                            <HyperlinkButton x:Name="MutedToggle" Visibility="Collapsed" Padding="6,2"
+                                             VerticalAlignment="Center" Click="MutedToggle_Click"/>
                         </StackPanel>
                     </Expander.Header>
                     <StackPanel>

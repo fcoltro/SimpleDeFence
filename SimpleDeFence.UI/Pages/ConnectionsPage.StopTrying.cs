@@ -36,18 +36,20 @@ namespace SimpleDeFence.UI.Pages
                     ShowNotice(InfoBarSeverity.Warning, appName, Loc.T(LocKeys.Connections.StopUnreachable));
                     return;
                 }
-                if (list.Publisher.Length == 0)
+                if (list.Publisher.Length == 0 && list.ScopeFolder.Length == 0)
                 {
                     ShowNotice(InfoBarSeverity.Informational, appName, Loc.T(LocKeys.Connections.StopUnsigned));
                     return;
                 }
+                // Who the items belong to: the publisher, or - found by folder - the program itself.
+                var who = list.Publisher.Length > 0 ? list.Publisher : appName;
                 if (list.Items.Length == 0)
                 {
-                    ShowNotice(InfoBarSeverity.Informational, appName, Loc.T(LocKeys.Connections.StopNone, list.Publisher));
+                    ShowNotice(InfoBarSeverity.Informational, appName, Loc.T(LocKeys.Connections.StopNone, who));
                     return;
                 }
 
-                var changes = await AskStopTryingAsync(list);
+                var changes = await AskStopTryingAsync(list, appName);
                 if (changes is null || changes.Length == 0)
                     return;
 
@@ -56,14 +58,14 @@ namespace SimpleDeFence.UI.Pages
                 {
                     int off = changes.Count(c => !c.Enable);
                     int on = changes.Length - off;
-                    ShowNotice(InfoBarSeverity.Success, list.Publisher, Loc.T(LocKeys.Connections.StopDone, off, on));
+                    ShowNotice(InfoBarSeverity.Success, who, Loc.T(LocKeys.Connections.StopDone, off, on));
                 }
                 else
                 {
                     var body = result == MessageType.RESPONSE_LOCKED
                         ? Loc.T(LocKeys.Connections.StopLocked)
                         : Loc.T(LocKeys.Connections.StopFailed);
-                    ShowNotice(InfoBarSeverity.Warning, list.Publisher, body);
+                    ShowNotice(InfoBarSeverity.Warning, who, body);
                 }
             }
             finally
@@ -74,15 +76,43 @@ namespace SimpleDeFence.UI.Pages
 
         /// <summary>The dialog itself. Returns the changes to make, or null when cancelled. A tick
         /// means "keep it running", so the list opens showing things as they are now.</summary>
-        private async Task<BackgroundItemChange[]?> AskStopTryingAsync(TwMessageBackgroundItems list)
+        private async Task<BackgroundItemChange[]?> AskStopTryingAsync(TwMessageBackgroundItems list, string appName)
         {
             var caption = (Style)Application.Current.Resources["CaptionTextBlockStyle"];
+            bool byFolder = list.Publisher.Length == 0;
+            var who = byFolder ? appName : list.Publisher;
             var panel = new StackPanel { Spacing = 8, MinWidth = 380, MaxWidth = 560 };
             panel.Children.Add(new TextBlock
             {
-                Text = Loc.T(LocKeys.Connections.StopIntro, list.Publisher),
+                Text = byFolder
+                    ? Loc.T(LocKeys.Connections.StopIntroFolder, appName)
+                    : Loc.T(LocKeys.Connections.StopIntro, list.Publisher),
                 TextWrapping = TextWrapping.Wrap,
             });
+
+            // The program's own signature failed and the publisher came from its folder instead:
+            // say so, because a changed program is worth a scan whatever happens to its helpers.
+            if (list.PublisherFromFolder)
+            {
+                panel.Children.Add(new InfoBar
+                {
+                    Severity = InfoBarSeverity.Warning,
+                    IsOpen = true,
+                    IsClosable = false,
+                    Message = Loc.T(LocKeys.Connections.StopFromFolder, list.Publisher, appName),
+                });
+            }
+            else if (byFolder)
+            {
+                // No signature anywhere: these were matched on folder alone, which is weaker.
+                panel.Children.Add(new InfoBar
+                {
+                    Severity = InfoBarSeverity.Warning,
+                    IsOpen = true,
+                    IsClosable = false,
+                    Message = Loc.T(LocKeys.Connections.StopUnsignedFolder, appName, list.ScopeFolder),
+                });
+            }
 
             var boxes = new List<(BackgroundItem Item, CheckBox Box)>();
             var rows = new StackPanel { Spacing = 4 };
@@ -101,7 +131,7 @@ namespace SimpleDeFence.UI.Pages
                 {
                     var warning = new TextBlock
                     {
-                        Text = Loc.T(LocKeys.Connections.StopNeeded, list.Publisher),
+                        Text = Loc.T(LocKeys.Connections.StopNeeded, who),
                         Style = caption,
                         TextWrapping = TextWrapping.Wrap,
                     };
@@ -124,7 +154,7 @@ namespace SimpleDeFence.UI.Pages
                 XamlRoot = Content.XamlRoot,
                 FlowDirection = App.UiFlowDirection,
                 RequestedTheme = App.UiElementTheme,
-                Title = Loc.T(LocKeys.Connections.StopTitle, list.Publisher),
+                Title = Loc.T(LocKeys.Connections.StopTitle, who),
                 Content = panel,
                 PrimaryButtonText = Loc.T(LocKeys.Connections.StopApply),
                 CloseButtonText = Loc.T(LocKeys.Common.Cancel),
@@ -140,7 +170,7 @@ namespace SimpleDeFence.UI.Pages
             }
             catch (InvalidOperationException)
             {
-                ShowNotice(InfoBarSeverity.Informational, list.Publisher, Loc.T(LocKeys.Common.AnotherDialogOpenDetail));
+                ShowNotice(InfoBarSeverity.Informational, who, Loc.T(LocKeys.Common.AnotherDialogOpenDetail));
                 return null;
             }
 

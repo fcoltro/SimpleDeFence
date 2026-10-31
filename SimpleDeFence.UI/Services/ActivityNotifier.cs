@@ -122,7 +122,8 @@ namespace SimpleDeFence.UI.Services
         }
 
         private ActivityAlerts.Sighting? Sight(string? path, string? packageId, string name)
-            => ActivityAlerts.KeyFor(path, packageId, _windowsDirectory) is string key
+            => !_settings.IsMuted(path, packageId)
+               && ActivityAlerts.KeyFor(path, packageId, _windowsDirectory) is string key
                 ? new ActivityAlerts.Sighting(key, name)
                 : null;
 

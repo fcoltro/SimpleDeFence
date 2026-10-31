@@ -156,12 +156,21 @@
       "copyAddresses": "Copier les adresses",
       "copyPath": "Copier le chemin",
       "openLocation": "Ouvrir l'emplacement du fichier",
-      "openLocationMissing": "Le fichier et le dossier du programme n'existent plus."
+      "openLocationMissing": "Le fichier et le dossier du programme n'existent plus.",
+      "mute": "Masquer cette app",
+      "unmute": "Ne plus masquer"
+    },
+    "muted": {
+      "show": "Afficher {0} masquées",
+      "hide": "Cacher les masquées"
     },
     "stopTrying": {
       "menu": "L'empêcher de réessayer…",
       "title": "Empêcher {0} de réessayer",
       "intro": "Ces éléments lancent en arrière-plan des programmes de {0} qui essaient sans cesse de se connecter. Décochez ceux que vous voulez désactiver. Ceux qui tournent maintenant sont fermés et ne redémarreront pas tant que vous ne les aurez pas recochés.",
+      "fromFolder": "{1} n'a pas passé la vérification de signature de Windows : il a peut-être été modifié depuis que {0} l'a signé. Analysez-le ou réinstallez-le. Les éléments ci-dessous proviennent d'autres programmes de son dossier, signés par {0}.",
+      "introFolder": "Ces éléments lancent en arrière-plan des programmes du dossier de {0}, qui essaient sans cesse de se connecter. Décochez ceux que vous voulez désactiver. Ceux qui tournent actuellement sont fermés et ne redémarreront pas tant que vous ne les aurez pas recochés.",
+      "unsignedFolder": "{0} n'a pas de signature valide, SimpleDeFence ne peut donc pas savoir qui l'a créé. Ces éléments ont été trouvés uniquement parce qu'ils s'exécutent depuis son dossier, {1}. Vérifiez chacun avant de le désactiver.",
       "needed": "Vérification de licence. Les apps {0} risquent de ne pas s'ouvrir sans elle.",
       "kindService": "Service",
       "kindTask": "Tâche planifiée",
@@ -169,7 +178,7 @@
       "apply": "Appliquer",
       "allOn": "Tout réactiver",
       "none": "Rien de {0} ne démarre en arrière-plan.",
-      "unsigned": "SimpleDeFence ne peut pas savoir qui a créé ce programme, car il n'a pas de signature valide. Seuls les programmes signés peuvent être reliés à leurs composants en arrière-plan. Les programmes de Windows lui-même ne sont jamais proposés.",
+      "unsigned": "SimpleDeFence ne peut pas savoir qui a créé ce programme : il n'a pas de signature valide et son dossier est partagé avec d'autres programmes. Les programmes de Windows lui-même ne sont jamais proposés.",
       "unreachable": "Le service n'a pas répondu. Est-il en cours d'exécution ?",
       "done": "Terminé. {0} désactivé(s), {1} réactivé(s).",
       "failed": "Certaines modifications n'ont pas pu être appliquées. Le journal du service contient les détails.",

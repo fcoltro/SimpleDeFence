@@ -156,12 +156,21 @@
       "copyAddresses": "Copiar endereços",
       "copyPath": "Copiar caminho",
       "openLocation": "Abrir local do arquivo",
-      "openLocationMissing": "O arquivo e a pasta do programa não existem mais."
+      "openLocationMissing": "O arquivo e a pasta do programa não existem mais.",
+      "mute": "Silenciar este app",
+      "unmute": "Deixar de silenciar"
+    },
+    "muted": {
+      "show": "Mostrar {0} silenciados",
+      "hide": "Ocultar silenciados"
     },
     "stopTrying": {
       "menu": "Fazer parar de tentar…",
       "title": "Fazer {0} parar de tentar",
       "intro": "Estes itens iniciam programas da {0} em segundo plano que ficam tentando se conectar. Desmarque os que quer desligar. Os que estiverem em execução serão fechados agora e só voltarão a iniciar quando você marcá-los de novo.",
+      "fromFolder": "{1} não passou na verificação de assinatura do Windows, então pode ter sido alterado depois que {0} o assinou. Verifique-o com o antivírus ou reinstale-o. Os itens abaixo vêm de outros programas da pasta dele, assinados por {0}.",
+      "introFolder": "Estes itens iniciam em segundo plano programas da pasta de {0}, que continuam tentando se conectar. Desmarque os que deseja desligar. Os que estiverem em execução serão fechados e não iniciarão de novo até que você os marque outra vez.",
+      "unsignedFolder": "{0} não tem uma assinatura válida, então o SimpleDeFence não consegue saber quem o fez. Estes itens foram encontrados só porque rodam da pasta dele, {1}. Confira cada um antes de desligá-lo.",
       "needed": "Verificação de licença. Os apps da {0} podem não abrir sem ela.",
       "kindService": "Serviço",
       "kindTask": "Tarefa agendada",
@@ -169,7 +178,7 @@
       "apply": "Aplicar",
       "allOn": "Religar tudo",
       "none": "Nada da {0} inicia em segundo plano.",
-      "unsigned": "O SimpleDeFence não consegue saber quem fez este programa, porque ele não tem uma assinatura válida. Só programas assinados podem ser ligados às suas partes em segundo plano. Programas do próprio Windows nunca são oferecidos.",
+      "unsigned": "O SimpleDeFence não consegue saber quem fez este programa: ele não tem uma assinatura válida e a pasta dele é compartilhada com outros programas. Programas do próprio Windows nunca são oferecidos.",
       "unreachable": "O serviço não respondeu. Ele está em execução?",
       "done": "Pronto. {0} desligados, {1} religados.",
       "failed": "Algumas alterações não puderam ser feitas. O log do serviço tem os detalhes.",

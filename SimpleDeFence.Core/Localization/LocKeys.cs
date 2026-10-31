@@ -170,11 +170,18 @@
             public const string MenuCopyPath = "connections.menu.copyPath";
             public const string MenuOpenLocation = "connections.menu.openLocation";
             public const string OpenLocationMissing = "connections.menu.openLocationMissing";
+            public const string MenuMute = "connections.menu.mute";
+            public const string MenuUnmute = "connections.menu.unmute";
+            public const string MutedShow = "connections.muted.show";
+            public const string MutedHide = "connections.muted.hide";
 
             // "Stop it trying": switch off a blocked app's background parts
             public const string StopMenu = "connections.stopTrying.menu";
             public const string StopTitle = "connections.stopTrying.title";
             public const string StopIntro = "connections.stopTrying.intro";
+            public const string StopFromFolder = "connections.stopTrying.fromFolder";
+            public const string StopIntroFolder = "connections.stopTrying.introFolder";
+            public const string StopUnsignedFolder = "connections.stopTrying.unsignedFolder";
             public const string StopNeeded = "connections.stopTrying.needed";
             public const string StopKindService = "connections.stopTrying.kindService";
             public const string StopKindTask = "connections.stopTrying.kindTask";

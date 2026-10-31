@@ -156,12 +156,21 @@
       "copyAddresses": "Copia indirizzi",
       "copyPath": "Copia percorso",
       "openLocation": "Apri percorso file",
-      "openLocationMissing": "Il file e la cartella del programma non esistono più."
+      "openLocationMissing": "Il file e la cartella del programma non esistono più.",
+      "mute": "Silenzia questa app",
+      "unmute": "Riattiva"
+    },
+    "muted": {
+      "show": "Mostra {0} silenziate",
+      "hide": "Nascondi silenziate"
     },
     "stopTrying": {
       "menu": "Fallo smettere di provare…",
       "title": "Fai smettere {0} di provare",
       "intro": "Questi elementi avviano in background programmi di {0} che continuano a tentare di connettersi. Togli la spunta a quelli da disattivare. Quelli in esecuzione vengono chiusi subito e non ripartiranno finché non rimetti la spunta.",
+      "fromFolder": "{1} non ha superato il controllo della firma di Windows, quindi potrebbe essere stato modificato dopo la firma di {0}. Analizzalo o reinstallalo. Gli elementi qui sotto provengono da altri programmi nella sua cartella, firmati da {0}.",
+      "introFolder": "Questi elementi avviano in background programmi dalla cartella di {0}, che continuano a tentare di connettersi. Togli la spunta a quelli da disattivare. Quelli in esecuzione vengono chiusi e non ripartiranno finché non rimetti la spunta.",
+      "unsignedFolder": "{0} non ha una firma valida, quindi SimpleDeFence non può sapere chi l'ha creato. Questi elementi sono stati trovati solo perché vengono eseguiti dalla sua cartella, {1}. Controllali uno per uno prima di disattivarli.",
       "needed": "Controllo della licenza. Le app di {0} potrebbero non aprirsi senza.",
       "kindService": "Servizio",
       "kindTask": "Attività pianificata",
@@ -169,7 +178,7 @@
       "apply": "Applica",
       "allOn": "Riattiva tutto",
       "none": "Nessun programma di {0} si avvia in background.",
-      "unsigned": "SimpleDeFence non può sapere chi ha creato questo programma, perché non ha una firma valida. Solo i programmi firmati possono essere ricondotti ai loro componenti in background. I programmi di Windows non vengono mai proposti.",
+      "unsigned": "SimpleDeFence non può sapere chi ha creato questo programma: non ha una firma valida e la sua cartella è condivisa con altri programmi. I programmi di Windows non vengono mai proposti.",
       "unreachable": "Il servizio non ha risposto. È in esecuzione?",
       "done": "Fatto. {0} disattivati, {1} riattivati.",
       "failed": "Alcune modifiche non sono state applicate. I dettagli sono nel registro del servizio.",

@@ -78,7 +78,11 @@ Code signing for Windows releases is provided free of charge by the SignPath Fou
   in the background. Right-click one and SimpleDeFence lists every service, scheduled task and
   startup entry signed by the same company. Untick what you don't want and it stops and won't
   start again. Licence checkers are marked, Windows' own parts are never listed, and one button
-  switches everything back on.
+  switches everything back on. If the program's own signature fails (for example it was changed
+  after it was signed), the publisher is read from the signed programs in its folder; for an
+  unsigned program, the items that run from its own folder are offered, with a warning.
+- **Mute this app**: an app you never want to allow, which keeps retrying, can be muted from its
+  right-click menu. It stays blocked, but drops out of the Blocked list and notifications.
 - **Clean up**: one button on the Rules page removes the rules for programs that are no longer
   installed.
 - **Password protection** — the running configuration can be locked so it cannot be changed
