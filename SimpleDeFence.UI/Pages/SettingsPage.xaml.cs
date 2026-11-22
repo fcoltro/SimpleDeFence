@@ -3,6 +3,7 @@ using System.Reflection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SimpleDeFence.Localization;
+using SimpleDeFence.UI.Services;
 using System;
 using System.IO;
 using System.Collections.Generic;
