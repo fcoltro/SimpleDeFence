@@ -252,7 +252,8 @@
       "matches": "Derzeit passende Programme: {0}",
       "matchesMany": "Derzeit passende Programme: mehr als {0}",
       "matchesNone": "Derzeit passt kein Programm. Die Regel gilt trotzdem für später hinzugefügte Programme.",
-      "invalid": "Geben Sie einen vollständigen Ordnerpfad ein, z. B. C:\\Tools. Ein ganzes Laufwerk ist nicht möglich."
+      "invalid": "Geben Sie einen vollständigen Ordnerpfad ein, z. B. C:\\Tools. Ein ganzes Laufwerk ist nicht möglich.",
+      "writable": "Jeder, der diesen PC nutzt, kann Programme in diesen Ordner legen. Eine Zulassen-Regel hier würde also jedes hinzugefügte Programm durchlassen, auch Schadsoftware. Ein Ordner unter „Programme“ ist sicherer."
     },
     "pickUwpTitle": "UWP-App auswählen",
     "pickProcessTitle": "Laufenden Prozess auswählen",

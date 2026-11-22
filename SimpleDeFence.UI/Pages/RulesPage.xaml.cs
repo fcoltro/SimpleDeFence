@@ -845,7 +845,7 @@ namespace SimpleDeFence.UI.Pages
             var patternBox = new TextBox
             {
                 Header = Loc.T(LocKeys.Rules.FolderPattern),
-                PlaceholderText = @"C:\Tools\**",
+                PlaceholderText = @"C:\Program Files\MyApp\**",
                 MinWidth = 380,
             };
             var browse = new Button
@@ -900,10 +900,17 @@ namespace SimpleDeFence.UI.Pages
 
             // How many programs match, counted off the UI thread (a deep folder takes a moment)
             // and only for the newest text: a slower count for an older text is dropped.
+            // Waits for typing to pause, and cancels the previous count: every key press used to
+            // start a full scan of its own, so typing C:\Windows ran several at once.
             int version = 0;
+            System.Threading.CancellationTokenSource? previewCancel = null;
             async void UpdatePreview()
             {
                 int mine = ++version;
+                previewCancel?.Cancel();
+                previewCancel?.Dispose();
+                previewCancel = null;
+
                 var pattern = PathPattern.Normalize(patternBox.Text);
                 dialog.IsPrimaryButtonEnabled = pattern is not null;
                 if (pattern is null)
@@ -914,22 +921,37 @@ namespace SimpleDeFence.UI.Pages
 
                 const int previewLimit = 500;
                 status.Text = Loc.T(LocKeys.Common.Loading);
+                await Task.Delay(300);
+                if (mine != version)
+                    return;
+
+                var cts = previewCancel = new System.Threading.CancellationTokenSource();
+                bool allow = action.SelectedIndex != 1;
                 List<string> matches;
+                bool writable;
                 try
                 {
-                    matches = await Task.Run(() => PathPattern.EnumerateMatches(pattern, previewLimit));
+                    (matches, writable) = await Task.Run(() => (
+                        PathPattern.EnumerateMatches(pattern, previewLimit, cts.Token),
+                        allow && PathPattern.StandardUsersCanWrite(pattern)));
                 }
                 catch
                 {
                     matches = new List<string>();
+                    writable = false;
                 }
                 if (mine != version)
                     return;
 
-                status.Text = matches.Count == 0 ? Loc.T(LocKeys.Rules.FolderMatchesNone)
+                var count = matches.Count == 0 ? Loc.T(LocKeys.Rules.FolderMatchesNone)
                     : matches.Count >= previewLimit ? Loc.T(LocKeys.Rules.FolderMatchesMany, previewLimit)
                     : Loc.T(LocKeys.Rules.FolderMatches, matches.Count);
+
+                // A warning, not a refusal: it may be exactly what the user means, but they should
+                // know that anything put there gets through.
+                status.Text = writable ? count + "\n\n" + Loc.T(LocKeys.Rules.FolderWritable) : count;
             }
+            action.SelectionChanged += (_, _) => UpdatePreview();
             patternBox.TextChanged += (_, _) => UpdatePreview();
 
             browse.Click += async (_, _) =>

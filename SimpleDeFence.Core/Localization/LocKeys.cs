@@ -251,6 +251,7 @@
             public const string FolderMatchesMany = "rules.folderDialog.matchesMany";
             public const string FolderMatchesNone = "rules.folderDialog.matchesNone";
             public const string FolderInvalid = "rules.folderDialog.invalid";
+            public const string FolderWritable = "rules.folderDialog.writable";
             public const string PickUwpTitle = "rules.pickUwpTitle";
             public const string PickProcessTitle = "rules.pickProcessTitle";
             public const string PickWindowTitle = "rules.pickWindowTitle";

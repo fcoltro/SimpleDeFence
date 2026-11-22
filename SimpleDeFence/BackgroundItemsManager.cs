@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
+using System.Threading;
 using Microsoft.Win32;
 using SimpleDeFence.Windows.Services;
 
@@ -22,26 +23,37 @@ namespace SimpleDeFence
     {
         private static readonly string StateFilePath = Path.Combine(Utils.AppDataPath, "background-items.txt");
 
-        /// <summary>Switches back on every item "Stop it trying" switched off. Items that cannot
-        /// be switched on (uninstalled since) are logged and dropped; the file goes once it is
-        /// empty. Never throws.</summary>
+        private static int s_restoring;
+
+        /// <summary>True while something is still waiting to be switched back on.</summary>
+        internal static bool HasPending => File.Exists(StateFilePath);
+
+        /// <summary>
+        /// Switches back on every item "Stop it trying" switched off. Never throws, and does
+        /// nothing if another call is already at it.
+        ///
+        /// An item that cannot be switched on yet stays in the file and is tried again later (the
+        /// service retries every ten minutes while the file exists). This runs at boot, before
+        /// anyone signs in: a user's own startup entries live in their registry hive, which is
+        /// not loaded until they sign in, and Task Scheduler may not be up yet either. Dropping
+        /// those on the first failure turned them off for good. Only an item that is really gone
+        /// (its service or task was uninstalled, or its user account deleted) is dropped.
+        /// </summary>
         internal static void RestoreAll()
         {
+            if (Interlocked.Exchange(ref s_restoring, 1) == 1)
+                return;
             try
             {
                 var state = LoadState();
-                if (state.Count == 0)
-                {
-                    if (File.Exists(StateFilePath))
-                        File.Delete(StateFilePath);
-                    return;
-                }
-
                 foreach (var key in state.Keys.ToList())
                 {
                     int bar = key.IndexOf('|');
                     if (bar <= 0 || !Enum.TryParse<BackgroundItemKind>(key.Substring(0, bar), out var kind))
+                    {
+                        Forget(key);
                         continue;
+                    }
                     var id = key.Substring(bar + 1);
                     try
                     {
@@ -53,21 +65,66 @@ namespace SimpleDeFence
                         }
                         Utils.Log($"Stop it trying was removed: switched {kind} \"{id}\" back on.", Utils.LOG_ID_SERVICE);
                     }
-                    catch (Exception e)
+                    catch (Exception e) when (IsGone(kind, id, e))
                     {
-                        Utils.Log($"Stop it trying was removed: could not switch {kind} \"{id}\" back on ({e.Message}); dropping it.", Utils.LOG_ID_SERVICE);
+                        Utils.Log($"Stop it trying was removed: {kind} \"{id}\" no longer exists; dropping it.", Utils.LOG_ID_SERVICE);
+                        Forget(key);
+                    }
+                    catch (Exception)
+                    {
+                        // Not yet: the user is not signed in, or Task Scheduler is not up. Left in
+                        // the file for the next try.
                     }
                 }
 
-                // Whatever is left could not be restored (gone since); keeping it would only retry
-                // the same failure at every start.
-                if (File.Exists(StateFilePath))
+                if (File.Exists(StateFilePath) && LoadState().Count == 0)
                     File.Delete(StateFilePath);
             }
             catch (Exception e)
             {
                 Utils.LogException(e, Utils.LOG_ID_SERVICE);
             }
+            finally
+            {
+                Volatile.Write(ref s_restoring, 0);
+            }
+        }
+
+        private const int ERROR_SERVICE_DOES_NOT_EXIST = 1060;
+        private const int HR_FILE_NOT_FOUND = unchecked((int)0x80070002);
+        private const int HR_PATH_NOT_FOUND = unchecked((int)0x80070003);
+
+        /// <summary>Whether a failure to switch an item back on means it no longer exists, rather
+        /// than that it cannot be reached yet.</summary>
+        private static bool IsGone(BackgroundItemKind kind, string id, Exception e)
+        {
+            switch (kind)
+            {
+                case BackgroundItemKind.Service:
+                    return e is System.ComponentModel.Win32Exception w && w.NativeErrorCode == ERROR_SERVICE_DOES_NOT_EXIST;
+                case BackgroundItemKind.ScheduledTask:
+                    return e is System.Runtime.InteropServices.COMException c && (c.HResult == HR_FILE_NOT_FOUND || c.HResult == HR_PATH_NOT_FOUND);
+                case BackgroundItemKind.Startup:
+                    // "HKU\<sid>\...": gone only when that account has no profile on this PC any
+                    // more. A profile that exists but is not loaded just means nobody signed in.
+                    if (!id.StartsWith(@"HKU\", StringComparison.OrdinalIgnoreCase))
+                        return false;
+                    var rest = id.Substring(4);
+                    int slash = rest.IndexOf('\\');
+                    var sid = slash > 0 ? rest.Substring(0, slash) : rest;
+                    using (var profiles = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList"))
+                    using (var profile = profiles?.OpenSubKey(sid))
+                        return profiles is not null && profile is null;
+                default:
+                    return true;
+            }
+        }
+
+        private static void Forget(string key)
+        {
+            var state = LoadState();
+            if (state.Remove(key))
+                SaveState(state);
         }
 
         private static void SetService(string name, bool enable)

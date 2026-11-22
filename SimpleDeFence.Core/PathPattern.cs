@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using System.Text.RegularExpressions;
 
 namespace SimpleDeFence
@@ -197,11 +200,74 @@ namespace SimpleDeFence
         }
 
         /// <summary>
+        /// How specific a pattern is: the number of characters in it that are not wildcards, once
+        /// its variables are expanded. When several folder rules match the same program the most
+        /// specific one decides, so "Block C:\Tools\bad\**" wins over "Allow C:\Tools\**"
+        /// whichever was added first.
+        /// </summary>
+        public static int Specificity(string pattern)
+        {
+            int n = 0;
+            foreach (var c in Expand(pattern ?? string.Empty))
+            {
+                if (c != '*' && c != '?')
+                    ++n;
+            }
+            return n;
+        }
+
+        /// <summary>
+        /// Folder rules in the order the service tries them: most specific pattern first (see
+        /// <see cref="Specificity"/>), and a block before an allow of the same specificity. The
+        /// first one whose pattern matches a program decides for it. Rules that are not folder
+        /// rules are left out.
+        /// </summary>
+        public static List<FirewallExceptionV3> InPrecedenceOrder(IEnumerable<FirewallExceptionV3> rules)
+        {
+            var folderRules = new List<FirewallExceptionV3>();
+            foreach (var r in rules)
+            {
+                if (r.Subject is PathPatternSubject)
+                    folderRules.Add(r);
+            }
+
+            // List.Sort is not stable; OrderBy is, so equal rules keep the order they were added in.
+            return System.Linq.Enumerable.ToList(
+                System.Linq.Enumerable.ThenBy(
+                    System.Linq.Enumerable.OrderByDescending(folderRules, r => Specificity(((PathPatternSubject)r.Subject).Pattern)),
+                    r => r.Policy is HardBlockPolicy ? 0 : 1));
+        }
+
+        /// <summary>
+        /// How many folders below <see cref="BaseDirectory"/> a match can be, or -1 for any depth
+        /// (the pattern has a **). "C:\Program Files\*\app.exe" only ever matches one folder
+        /// down, so there is no reason to walk the rest of Program Files to find it.
+        /// </summary>
+        public static int MaxDepthBelowBase(string pattern)
+        {
+            pattern = Expand(pattern);
+            if (pattern.Contains("**", StringComparison.Ordinal))
+                return -1;
+            var baseDir = BaseDirectory(pattern);
+            if (baseDir is null)
+                return -1;
+            var rest = pattern.Substring(Math.Min(baseDir.TrimEnd('\\').Length, pattern.Length)).TrimStart('\\');
+            int separators = 0;
+            foreach (var c in rest)
+            {
+                if (c == '\\')
+                    ++separators;
+            }
+            return separators;
+        }
+
+        /// <summary>
         /// The programs (.exe files) on disk that match <paramref name="pattern"/>, at most
         /// <paramref name="limit"/> of them. Folders that cannot be read are skipped, and so are
-        /// junctions and symbolic links, so a link back up the tree cannot loop.
+        /// junctions and symbolic links, so a link back up the tree cannot loop. Only goes as deep
+        /// as the pattern can match (see <see cref="MaxDepthBelowBase"/>).
         /// </summary>
-        public static List<string> EnumerateMatches(string pattern, int limit = MaxExpandedFiles)
+        public static List<string> EnumerateMatches(string pattern, int limit = MaxExpandedFiles, CancellationToken cancel = default)
         {
             var results = new List<string>();
             pattern = Expand(pattern);
@@ -215,15 +281,21 @@ namespace SimpleDeFence
                     return results;
 
                 var regex = ToRegex(pattern);
+                int depth = MaxDepthBelowBase(pattern);
                 var options = new EnumerationOptions
                 {
-                    RecurseSubdirectories = true,
+                    RecurseSubdirectories = depth != 0,
                     IgnoreInaccessible = true,
                     AttributesToSkip = FileAttributes.ReparsePoint,
                     MatchCasing = MatchCasing.CaseInsensitive,
                 };
+                if (depth > 0)
+                    options.MaxRecursionDepth = depth;
+
                 foreach (var file in Directory.EnumerateFiles(baseDir, "*.exe", options))
                 {
+                    if (cancel.IsCancellationRequested)
+                        break;
                     if (!regex.IsMatch(file))
                         continue;
                     results.Add(file);
@@ -238,5 +310,62 @@ namespace SimpleDeFence
 
             return results;
         }
+
+        private static readonly SecurityIdentifier TrustedInstallerSid = new("S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464");
+
+        /// <summary>
+        /// Whether someone other than SYSTEM, Administrators or TrustedInstaller can add or replace
+        /// programs in the pattern's folder: it is owned by someone else, or grants someone else
+        /// the right to create, write or delete in it. A folder that does not exist yet is judged
+        /// by the nearest one above it, since whoever can create it can fill it. An Allow rule on
+        /// such a folder lets through anything a standard user (or malware running as one) copies
+        /// there, under any name. False when the permissions cannot be read.
+        /// </summary>
+        public static bool StandardUsersCanWrite(string pattern)
+        {
+            try
+            {
+                var baseDir = BaseDirectory(Expand(pattern));
+                if (baseDir is null)
+                    return false;
+
+                var dir = new DirectoryInfo(baseDir);
+                while (dir is not null && !dir.Exists)
+                    dir = dir.Parent;
+                if (dir is null)
+                    return false;
+
+                var acl = dir.GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
+                if (acl.GetOwner(typeof(SecurityIdentifier)) is not SecurityIdentifier owner || !IsAdminLike(owner))
+                    return true;
+
+                const FileSystemRights Dangerous = FileSystemRights.WriteData | FileSystemRights.AppendData
+                    | FileSystemRights.Delete | FileSystemRights.DeleteSubdirectoriesAndFiles
+                    | FileSystemRights.ChangePermissions | FileSystemRights.TakeOwnership;
+
+                foreach (FileSystemAccessRule rule in acl.GetAccessRules(true, true, typeof(SecurityIdentifier)))
+                {
+                    if (rule.AccessControlType != AccessControlType.Allow || (rule.FileSystemRights & Dangerous) == 0)
+                        continue;
+                    // Applies only to what is inside, not to this folder itself.
+                    if ((rule.PropagationFlags & PropagationFlags.InheritOnly) != 0)
+                        continue;
+                    if (rule.IdentityReference is SecurityIdentifier sid
+                        && (IsAdminLike(sid) || sid.IsWellKnown(WellKnownSidType.CreatorOwnerSid)))
+                        continue;
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private static bool IsAdminLike(SecurityIdentifier sid)
+            => sid.IsWellKnown(WellKnownSidType.LocalSystemSid)
+                || sid.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)
+                || sid.Equals(TrustedInstallerSid);
     }
 }

@@ -252,7 +252,8 @@
       "matches": "Program yang cocok saat ini: {0}",
       "matchesMany": "Program yang cocok saat ini: lebih dari {0}",
       "matchesNone": "Belum ada program yang cocok. Aturan tetap berlaku untuk program yang ditambahkan nanti.",
-      "invalid": "Masukkan jalur folder lengkap, misalnya C:\\Tools. Seluruh drive tidak dapat digunakan."
+      "invalid": "Masukkan jalur folder lengkap, misalnya C:\\Tools. Seluruh drive tidak dapat digunakan.",
+      "writable": "Siapa pun yang memakai PC ini dapat menaruh program di folder ini, jadi aturan Izinkan di sini akan meloloskan program apa pun yang ditambahkan, termasuk malware. Folder di bawah Program Files lebih aman."
     },
     "pickUwpTitle": "Pilih aplikasi UWP",
     "pickProcessTitle": "Pilih proses yang berjalan",

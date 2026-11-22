@@ -129,5 +129,65 @@ namespace SimpleDeFence.Tests
             Assert.Throws<NotImplementedException>(() =>
                 new RuleDef(Guid.NewGuid(), "x", new PathPatternSubject(@"C:\Tools\**"), RuleAction.Allow, RuleDirection.Out, Protocol.Any, 0));
         }
+
+        [Theory]
+        [InlineData(@"C:\Tools\**", -1)]
+        [InlineData(@"C:\Tools\**\app.exe", -1)]
+        [InlineData(@"C:\Tools\*.exe", 0)]
+        [InlineData(@"C:\Tools\*\app.exe", 1)]
+        [InlineData(@"C:\Tools\*\bin\*.exe", 2)]
+        [InlineData(@"C:\Tools\sub\app?.exe", 0)]
+        public void MaxDepthBelowBase_only_goes_as_deep_as_a_match_can_be(string pattern, int expected)
+            => Assert.Equal(expected, PathPattern.MaxDepthBelowBase(pattern));
+
+        [Fact]
+        public void EnumerateMatches_finds_programs_only_at_the_depth_the_pattern_allows()
+        {
+            var root = Path.Combine(Path.GetTempPath(), "sdf-pattern-" + Guid.NewGuid().ToString("N"));
+            try
+            {
+                Directory.CreateDirectory(Path.Combine(root, "a", "deep"));
+                File.WriteAllText(Path.Combine(root, "a", "app.exe"), "");
+                File.WriteAllText(Path.Combine(root, "a", "deep", "app.exe"), "");
+
+                var oneDown = PathPattern.EnumerateMatches(root + @"\*\app.exe");
+                Assert.Single(oneDown);
+                Assert.EndsWith(@"a\app.exe", oneDown[0], StringComparison.OrdinalIgnoreCase);
+
+                Assert.Equal(2, PathPattern.EnumerateMatches(root + @"\**").Count);
+            }
+            finally
+            {
+                try { Directory.Delete(root, true); } catch { }
+            }
+        }
+
+        [Fact]
+        public void The_most_specific_folder_rule_comes_first_whatever_order_they_were_added_in()
+        {
+            var broadAllow = new FirewallExceptionV3(new PathPatternSubject(@"C:\Tools\**"), new UnrestrictedPolicy());
+            var narrowBlock = new FirewallExceptionV3(new PathPatternSubject(@"C:\Tools\bad\**"), new HardBlockPolicy());
+            var exe = new FirewallExceptionV3(new ExecutableSubject(@"C:\x.exe"), new UnrestrictedPolicy());
+
+            var ordered = PathPattern.InPrecedenceOrder(new[] { broadAllow, exe, narrowBlock });
+            Assert.Equal(new[] { narrowBlock, broadAllow }, ordered);
+        }
+
+        [Fact]
+        public void A_block_wins_over_an_allow_for_the_same_folder()
+        {
+            var allow = new FirewallExceptionV3(new PathPatternSubject(@"C:\Tools\**"), new UnrestrictedPolicy());
+            var block = new FirewallExceptionV3(new PathPatternSubject(@"C:\Tools\**"), new HardBlockPolicy());
+
+            Assert.Same(block, PathPattern.InPrecedenceOrder(new[] { allow, block })[0]);
+        }
+
+        [Fact]
+        public void A_folder_anyone_can_write_to_is_flagged_and_Windows_is_not()
+        {
+            // %TEMP% belongs to the user running the tests, not to Administrators.
+            Assert.True(PathPattern.StandardUsersCanWrite(Path.Combine(Path.GetTempPath(), "nothing-here") + @"\**"));
+            Assert.False(PathPattern.StandardUsersCanWrite(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + @"\System32\**"));
+        }
     }
 }

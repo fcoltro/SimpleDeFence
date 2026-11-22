@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Linq;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -96,6 +97,15 @@ namespace SimpleDeFence
         // stays valid outside it.
         private List<(Regex Pattern, FirewallExceptionV3 Rule)> FolderRules = new();
         private readonly HashSet<string> FolderAllowedExes = new(StringComparer.OrdinalIgnoreCase);   // Executables already covered by a folder rule
+
+        // What each folder rule's pattern matched on disk at its last scan. Scans run in the
+        // background (see FolderScanFor), never during a rule rebuild: a rebuild happens on every
+        // save, network change and screen on/off, holds InheritanceGuard and runs on the only
+        // worker thread, and walking a big folder there kept the whole service waiting. Has its
+        // own lock.
+        private readonly Dictionary<string, (DateTime ScannedUtc, List<string> Files)> FolderScanCache = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> FolderScansRunning = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly TimeSpan FolderScanMaxAge = TimeSpan.FromMinutes(30);
         private readonly Dictionary<string, (DateTime LastWriteUtc, bool Valid, string? Subject)> SignatureCache = new(StringComparer.OrdinalIgnoreCase);
         private readonly string WindowsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
         private readonly ThreadThrottler FirewallThreadThrottler = new(Thread.CurrentThread, ThreadPriority.Highest, false);
@@ -198,18 +208,31 @@ namespace SimpleDeFence
                 // program itself says more about it than a rule for the folder it sits in.
                 var folderRules = new List<(Regex Pattern, FirewallExceptionV3 Rule)>();
 
+                // Most specific first, and a block before an allow for the same folder, so the
+                // first match is the one that decides (see FolderRuleFor).
+                foreach (var ex in PathPattern.InPrecedenceOrder(UserExceptions))
+                {
+                    var folder = (PathPatternSubject)ex.Subject;
+
+                    // Checked again here, not only by the dialog that adds the rule: a pattern from
+                    // an imported or hand-edited configuration such as "**" or "C:\**" would
+                    // otherwise match every program on the machine.
+                    var pattern = PathPattern.Normalize(folder.Pattern);
+                    if (pattern is null)
+                    {
+                        Utils.Log($"Skipping folder rule with an unusable pattern: {folder.Pattern}", Utils.LOG_ID_SERVICE);
+                        continue;
+                    }
+
+                    try { folderRules.Add((PathPattern.ToRegex(pattern), ex)); }
+                    catch (ArgumentException) { Utils.Log($"Skipping folder rule with an unusable pattern: {folder.Pattern}", Utils.LOG_ID_SERVICE); }
+                }
+
                 // Convert exceptions to rules
                 foreach (FirewallExceptionV3 ex in UserExceptions)
                 {
-                    if (ex.Subject is PathPatternSubject folder)
-                    {
-                        if (!string.IsNullOrEmpty(folder.Pattern))
-                        {
-                            try { folderRules.Add((PathPattern.ToRegex(folder.Pattern), ex)); }
-                            catch (ArgumentException) { Utils.Log($"Skipping folder rule with an unusable pattern: {folder.Pattern}", Utils.LOG_ID_SERVICE); }
-                        }
+                    if (ex.Subject is PathPatternSubject)
                         continue;
-                    }
 
                     if (ex.Subject is ExecutableSubject exe)
                     {
@@ -232,13 +255,19 @@ namespace SimpleDeFence
                 {
                     timer.NewSubTask("Folder rule processing");
 
-                    // The programs on disk now, so they work from their very first connection,
-                    // plus the ones already running (a running program may sit past the
-                    // expansion limit). Programs that appear later are picked up by
-                    // ProcessStartWatcher_EventArrived.
+                    // The programs on disk as of the last background scan, so they work from their
+                    // very first connection, plus the ones already running (a running program may
+                    // be newer than the scan, or sit past the expansion limit). Programs that
+                    // appear later are picked up by ProcessStartWatcher_EventArrived.
                     var candidates = new List<string>();
+                    var patterns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                     foreach (var (_, rule) in folderRules)
-                        candidates.AddRange(PathPattern.EnumerateMatches(((PathPatternSubject)rule.Subject).Pattern));
+                    {
+                        var pattern = PathPattern.Normalize(((PathPatternSubject)rule.Subject).Pattern)!;
+                        if (patterns.Add(pattern))
+                            candidates.AddRange(FolderScanFor(pattern));
+                    }
+                    ForgetFolderScansExcept(patterns);
                     foreach (var p in ProcessManager.CreateToolhelp32SnapshotExtended())
                     {
                         if (!string.IsNullOrEmpty(p.ImagePath))
@@ -280,8 +309,10 @@ namespace SimpleDeFence
                         if (string.IsNullOrEmpty(procPath))
                             continue;
 
-                        // Skip if we have a user-defined rule for this path
-                        if (UserSubjectExes.Contains(procPath))
+                        // Skip if we have a user-defined rule for this path, or a folder rule
+                        // covers it: the same order ProcessStartWatcher_EventArrived uses, so a
+                        // program gets the same rules whether it started before or after a reload.
+                        if (UserSubjectExes.Contains(procPath) || FolderAllowedExes.Contains(procPath))
                             continue;
 
                         // Start walking up the process tree
@@ -367,6 +398,9 @@ namespace SimpleDeFence
                 TrustedPublishers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 FolderRules = new();
             }
+
+            if (FolderRules.Count == 0)
+                ForgetFolderScansExcept(new HashSet<string>());
 
             PrepareRulesForInstall(rules);
             return rules;
@@ -2229,6 +2263,12 @@ namespace SimpleDeFence
                         // soon enough to show it, and keeps Task Scheduler out of every tick.
                         if (++MinutesSinceTelemetryCheck >= 10)
                         {
+                            // Same pace for what "Stop it trying" switched off and could not be
+                            // switched back on yet (a user's startup entries wait for them to
+                            // sign in). Off this thread: it talks to Task Scheduler and the SCM.
+                            if (BackgroundItemsManager.HasPending)
+                                Task.Run(BackgroundItemsManager.RestoreAll);
+
                             var before = VisibleState.Telemetry;
                             RefreshTelemetryStatus();
 
@@ -2499,6 +2539,7 @@ namespace SimpleDeFence
             using var WfpEvent = WfpEngine.SubscribeNetEvent(WfpNetEventCallback);
 
             // "Stop it trying" is gone: switch back on what it switched off, off the start-up path.
+            // Whatever cannot be reached yet is retried from MINUTE_TIMER.
             Task.Run(BackgroundItemsManager.RestoreAll);
 
             ProcessStartWatcher.EventArrived += ProcessStartWatcher_EventArrived;
@@ -2652,8 +2693,71 @@ namespace SimpleDeFence
         }
 
         /// <summary>
+        /// The programs a folder rule's pattern matched at its last scan, without touching the
+        /// disk. When there is no scan yet, or it is older than FolderScanMaxAge, a new one starts
+        /// in the background; if it finds something different it queues a rule reload, which
+        /// comes back here and finds the fresh result. Until then the process-start watcher still
+        /// covers every matching program the moment it starts.
+        /// </summary>
+        private List<string> FolderScanFor(string pattern)
+        {
+            lock (FolderScanCache)
+            {
+                bool have = FolderScanCache.TryGetValue(pattern, out var entry);
+                if ((!have || (DateTime.UtcNow - entry.ScannedUtc > FolderScanMaxAge)) && FolderScansRunning.Add(pattern))
+                {
+                    var previous = have ? entry.Files : null;
+                    Task.Run(() => ScanFolderRule(pattern, previous));
+                }
+                return have ? entry.Files : new List<string>();
+            }
+        }
+
+        private void ScanFolderRule(string pattern, List<string>? previous)
+        {
+            List<string> files;
+            try
+            {
+                files = PathPattern.EnumerateMatches(pattern);
+            }
+            catch (Exception e)
+            {
+                Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                files = previous ?? new List<string>();
+            }
+
+            bool changed = (previous is null)
+                ? files.Count != 0
+                : !files.SequenceEqual(previous, StringComparer.OrdinalIgnoreCase);
+
+            lock (FolderScanCache)
+            {
+                FolderScanCache[pattern] = (DateTime.UtcNow, files);
+                FolderScansRunning.Remove(pattern);
+            }
+
+            if (changed)
+            {
+                // From a pool thread, so waiting for room in the bounded queue is fine here.
+                try { Q.Add(new TwRequest(TwMessageSimple.CreateRequest(MessageType.RELOAD_WFP_FILTERS))); }
+                catch (InvalidOperationException) { /* The service is stopping. */ }
+            }
+        }
+
+        /// <summary>Drops the scans of folder rules that no longer exist.</summary>
+        private void ForgetFolderScansExcept(HashSet<string> patterns)
+        {
+            lock (FolderScanCache)
+            {
+                foreach (var key in FolderScanCache.Keys.Where(k => !patterns.Contains(k)).ToList())
+                    FolderScanCache.Remove(key);
+            }
+        }
+
+        /// <summary>
         /// The rule the first matching folder rule gives a program, as an ordinary rule for that
-        /// one program, or null when no folder rule matches. The copy keeps the folder rule's Id,
+        /// one program, or null when no folder rule matches. The list is in PathPattern.
+        /// InPrecedenceOrder, so the first match is the most specific rule, a block winning a tie. The copy keeps the folder rule's Id,
         /// so what it blocks or allows is attributed to the folder rule.
         /// </summary>
         private static FirewallExceptionV3? FolderRuleFor(string path, List<(Regex Pattern, FirewallExceptionV3 Rule)> folderRules)

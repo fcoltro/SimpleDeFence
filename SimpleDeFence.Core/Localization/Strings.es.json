@@ -252,7 +252,8 @@
       "matches": "Programas que coinciden ahora: {0}",
       "matchesMany": "Programas que coinciden ahora: más de {0}",
       "matchesNone": "Ningún programa coincide ahora. La regla seguirá cubriendo los programas que se añadan después.",
-      "invalid": "Escriba una ruta de carpeta completa, como C:\\Tools. No se puede usar una unidad entera."
+      "invalid": "Escriba una ruta de carpeta completa, como C:\\Tools. No se puede usar una unidad entera.",
+      "writable": "Cualquiera que use este PC puede poner programas en esta carpeta, así que una regla Permitir aquí dejaría pasar cualquier programa que añadan, incluido malware. Una carpeta dentro de Archivos de programa es más segura."
     },
     "pickUwpTitle": "Elige una aplicación UWP",
     "pickProcessTitle": "Elige un proceso en ejecución",

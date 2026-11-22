@@ -252,7 +252,8 @@
       "matches": "Programmes correspondants actuellement : {0}",
       "matchesMany": "Programmes correspondants actuellement : plus de {0}",
       "matchesNone": "Aucun programme ne correspond pour l’instant. La règle couvrira quand même les programmes ajoutés plus tard.",
-      "invalid": "Saisissez un chemin de dossier complet, par exemple C:\\Tools. Un lecteur entier n’est pas accepté."
+      "invalid": "Saisissez un chemin de dossier complet, par exemple C:\\Tools. Un lecteur entier n’est pas accepté.",
+      "writable": "Toute personne utilisant ce PC peut placer des programmes dans ce dossier : une règle Autoriser ici laisserait passer tout programme ajouté, y compris un logiciel malveillant. Un dossier sous Program Files est plus sûr."
     },
     "pickUwpTitle": "Choisissez une application UWP",
     "pickProcessTitle": "Choisissez un processus en cours",

@@ -252,7 +252,8 @@
       "matches": "Şu anda eşleşen programlar: {0}",
       "matchesMany": "Şu anda eşleşen programlar: {0} üzerinde",
       "matchesNone": "Şu anda eşleşen program yok. Kural sonradan eklenen programlar için yine de geçerli olur.",
-      "invalid": "C:\\Tools gibi tam bir klasör yolu girin. Bütün bir sürücü kullanılamaz."
+      "invalid": "C:\\Tools gibi tam bir klasör yolu girin. Bütün bir sürücü kullanılamaz.",
+      "writable": "Bu bilgisayarı kullanan herkes bu klasöre program koyabilir; buradaki bir İzin ver kuralı, kötü amaçlı yazılım dahil eklenen her programı geçirir. Program Files altındaki bir klasör daha güvenlidir."
     },
     "pickUwpTitle": "Bir UWP uygulaması seçin",
     "pickProcessTitle": "Çalışan bir işlem seçin",

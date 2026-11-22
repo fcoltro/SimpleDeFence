@@ -252,7 +252,8 @@
       "matches": "Programs that match right now: {0}",
       "matchesMany": "Programs that match right now: more than {0}",
       "matchesNone": "No programs match right now. The rule still covers programs added later.",
-      "invalid": "Enter a full folder path, such as C:\\Tools. A whole drive cannot be used."
+      "invalid": "Enter a full folder path, such as C:\\Tools. A whole drive cannot be used.",
+      "writable": "Anyone who uses this PC can put programs in this folder, so an Allow rule here would let any program they add through, malware included. A folder under Program Files is safer."
     },
     "pickUwpTitle": "Choose a UWP app",
     "pickProcessTitle": "Choose a running process",
