@@ -26,9 +26,12 @@ namespace SimpleDeFence.UI.Pages
         /// no longer exists on disk - typically because the app was uninstalled after the rule was
         /// created. ServiceSubject derives from ExecutableSubject and is covered by the same check;
         /// GlobalSubject (no path) and AppContainerSubject (a UWP package, not a loose file) have no
-        /// simple existence check and are never flagged.</summary>
-        public bool IsMissing => Row.Exception?.Subject is ExecutableSubject exe
-            && !System.IO.File.Exists(exe.ExecutablePath);
+        /// simple existence check and are never flagged.
+        ///
+        /// Worked out once per refresh, off the UI thread (see RulesPage.RefreshAsync), and handed
+        /// in here. It used to be a File.Exists call made by the binding itself, three times per
+        /// row on every redraw - on the UI thread, where a sleeping drive froze the window.</summary>
+        public bool IsMissing { get; init; }
 
         /// <summary>Paired with MissingNameVisibility below: the row template shows one of two
         /// overlapping TextBlocks rather than switching a single TextBlock's Foreground from C#.
@@ -44,9 +47,13 @@ namespace SimpleDeFence.UI.Pages
         /// row colour.</summary>
         // global:: is required - inside SimpleDeFence.UI.Pages a bare "Windows" binds to
         // SimpleDeFence.Windows, not the platform namespace.
-        public global::Microsoft.UI.Xaml.Media.Brush RowBackground => IsBlocked
-            ? new global::Microsoft.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(0x40, 0xE8, 0x11, 0x23))
-            : new global::Microsoft.UI.Xaml.Media.SolidColorBrush(global::Microsoft.UI.Colors.Transparent);
+        public global::Microsoft.UI.Xaml.Media.Brush RowBackground => IsBlocked ? s_blockedBrush : s_clearBrush;
+
+        // One pair for every row, rather than two new brushes per row per redraw.
+        private static readonly global::Microsoft.UI.Xaml.Media.Brush s_blockedBrush =
+            new global::Microsoft.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(0x40, 0xE8, 0x11, 0x23));
+        private static readonly global::Microsoft.UI.Xaml.Media.Brush s_clearBrush =
+            new global::Microsoft.UI.Xaml.Media.SolidColorBrush(global::Microsoft.UI.Colors.Transparent);
     }
 
     /// <summary>One special-exception row with its toggle.</summary>
@@ -54,10 +61,22 @@ namespace SimpleDeFence.UI.Pages
     {
         public RuleRow Row { get; init; } = null!;
         public string Name => Row.Name;
+        /// <summary>
+        /// Only a real change raises ToggleRequested. The TwoWay x:Bind also writes back when the
+        /// list hands the switch its starting value - a new row's switch starts Off and is set On
+        /// for every special rule that is enabled - and that echo used to be taken as the user
+        /// turning the rule on: it committed, the commit refreshed the page, the refresh built new
+        /// rows, and their switches echoed again. The Rules page reloaded itself without end, which
+        /// cleared the selection every time and left Remove and Clean up unusable.
+        /// </summary>
         public bool IsOn
         {
             get => Row.Enabled;
-            set => ToggleRequested?.Invoke(this, value);
+            set
+            {
+                if (value != Row.Enabled)
+                    ToggleRequested?.Invoke(this, value);
+            }
         }
 
         public event EventHandler<bool>? ToggleRequested;
@@ -236,6 +255,8 @@ namespace SimpleDeFence.UI.Pages
         private IReadOnlyList<string> _publisherSubjects = Array.Empty<string>();
         private readonly List<CustomRuleEditor> _customEditors = new();
         private IReadOnlyList<RuleRow> _rows = Array.Empty<RuleRow>();
+        private HashSet<Guid> _missingIds = new();
+        private int _coverageVersion;
         private bool _busy;
         private bool _committing;
 
@@ -299,7 +320,11 @@ namespace SimpleDeFence.UI.Pages
                     Notice.IsOpen = false;
                     _publisherSubjects = App.Firewall.Config.ActiveProfile.TrustedPublishers.ToList();
                     var db = await App.Firewall.GetAppDatabaseAsync();
-                    _rows = RuleListBuilder.Build(App.Firewall.Config.ActiveProfile, db ?? new AppDatabase());
+                    var profile = App.Firewall.Config.ActiveProfile;
+                    _rows = RuleListBuilder.Build(profile, db ?? new AppDatabase());
+                    // Off the UI thread: a path on a slow or sleeping drive can take a while to
+                    // answer. Same test Clean up uses, so the red rows are exactly what it removes.
+                    _missingIds = (await Task.Run(() => RuleEdit.MissingExecutableRules(profile, System.IO.File.Exists, System.IO.Directory.Exists))).ToHashSet();
                 }
             }
             catch (Exception ex)
@@ -322,9 +347,27 @@ namespace SimpleDeFence.UI.Pages
             var term = FilterBox.Text?.Trim() ?? string.Empty;
             var filtered = RuleListBuilder.Filter(_rows, term);
 
+            // Rebuilding the list drops the selection, so remember it by rule Id and put it back:
+            // a refresh (the Refresh button, or the one after any commit) must not undo what the
+            // user had ticked.
+            var selectedIds = AppsList.SelectedItems.Cast<RuleListItem>()
+                .Select(i => i.Row.Exception?.Id)
+                .Where(id => id is not null)
+                .Select(id => id!.Value)
+                .ToHashSet();
+
             _apps.Clear();
             foreach (var row in filtered.Where(r => r.Group == RuleGroup.Applications))
-                _apps.Add(new RuleListItem { Row = row });
+                _apps.Add(new RuleListItem { Row = row, IsMissing = row.Exception is { } e && _missingIds.Contains(e.Id) });
+
+            if (selectedIds.Count != 0)
+            {
+                foreach (var item in _apps)
+                {
+                    if (item.Row.Exception is { } ex && selectedIds.Contains(ex.Id))
+                        AppsList.SelectedItems.Add(item);
+                }
+            }
 
             RebuildSpecial(_specialRecommended, filtered, RuleGroup.SpecialRecommended);
             RebuildSpecial(_specialOptional, filtered, RuleGroup.SpecialOptional);
@@ -445,6 +488,7 @@ namespace SimpleDeFence.UI.Pages
             DetailKind.Text = row.Kind;
             DetailSubjectDetail.Text = row.Detail;
             DetailSubjectDetail.Visibility = string.IsNullOrEmpty(row.Detail) ? Visibility.Collapsed : Visibility.Visible;
+            ShowFolderCoverage(row.Exception?.Subject as PathPatternSubject);
 
             var policy = row.Exception!.Policy;
             // Not policy.PolicyType == PolicyType.RuleList: that enum is a hand-maintained,
@@ -512,6 +556,38 @@ namespace SimpleDeFence.UI.Pages
 
             UpdateTcpUdpFieldsEnabled();
             UpdateApplyButtonEnabled();
+        }
+
+        /// <summary>
+        /// For a folder rule, which programs it covers right now, listed under its pattern. Counted
+        /// off the UI thread, and dropped if the selection moved on before the count finished.
+        /// </summary>
+        private async void ShowFolderCoverage(PathPatternSubject? folder)
+        {
+            int mine = ++_coverageVersion;
+            if (folder is null || string.IsNullOrEmpty(folder.Pattern))
+            {
+                DetailCoverage.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            const int listLimit = 30, countLimit = 500;
+            DetailCoverage.Text = Loc.T(LocKeys.Common.Loading);
+            DetailCoverage.Visibility = Visibility.Visible;
+
+            List<string> matches;
+            try { matches = await Task.Run(() => PathPattern.EnumerateMatches(folder.Pattern, countLimit)); }
+            catch { matches = new List<string>(); }
+            if (mine != _coverageVersion)
+                return;
+
+            var header = matches.Count == 0 ? Loc.T(LocKeys.Rules.FolderMatchesNone)
+                : matches.Count >= countLimit ? Loc.T(LocKeys.Rules.FolderMatchesMany, countLimit)
+                : Loc.T(LocKeys.Rules.FolderMatches, matches.Count);
+            var lines = matches.Take(listLimit).Select(System.IO.Path.GetFileName);
+            DetailCoverage.Text = matches.Count == 0
+                ? header
+                : header + "\n" + string.Join("\n", lines) + (matches.Count > listLimit ? "\n..." : string.Empty);
         }
 
         /// <summary>True for exactly the ExceptionPolicy subclasses SeedDetailPane/
@@ -734,11 +810,16 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
-        /// <summary>Same safe shape as AddPickExecutable_Click. Recursively collects every
-        /// .exe/.dll under the picked folder and adds each as an exception using the app
-        /// database's default recommendation - deliberately no per-file prompt, matching WinForms'
-        /// SettingsForm.btnAppAddFolder_Click, since a folder can match dozens of files (e.g. a game
-        /// install directory).</summary>
+        /// <summary>
+        /// Adds a folder rule: one rule for every program whose path matches a pattern, in the
+        /// style of Fort Firewall's wildcard paths (C:\Tools\**, C:\Games\*\game.exe). It used
+        /// to add one rule per .exe and .dll found under the folder at that moment, which missed
+        /// every program added later and flooded the list. Now it is a single row the user can
+        /// edit or remove like any other, and the service applies it to whatever matches.
+        ///
+        /// The path can be typed or pasted as well as browsed to, so the rule can still be added
+        /// on a machine where the folder picker refuses to open in an elevated window.
+        /// </summary>
         private async void AddPickFolder_Click(object sender, RoutedEventArgs e)
         {
             if (_addBusy)
@@ -748,61 +829,7 @@ namespace SimpleDeFence.UI.Pages
             UpdateAddButtonEnabled();
             try
             {
-                var picker = new global::Windows.Storage.Pickers.FolderPicker();
-                picker.FileTypeFilter.Add("*");
-
-                if (App.MainWindow is null)
-                    return;
-
-                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-                global::Windows.Storage.StorageFolder? folder;
-                try
-                {
-                    folder = await picker.PickSingleFolderAsync();
-                }
-                catch (Exception ex)
-                {
-                    await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), ex.Message);
-                    return;
-                }
-
-                if (folder is null)
-                    return; // Cancelled.
-
-                var files = new List<string>();
-                CollectExeAndDllFiles(folder.Path, files);
-                if (files.Count == 0)
-                    return;
-
-                var db = await App.Firewall.GetAppDatabaseAsync();
-                var toAdd = new List<FirewallExceptionV3>();
-                foreach (var file in files)
-                {
-                    try
-                    {
-                        toAdd.AddRange((db ?? new AppDatabase()).GetExceptionsForApp(new ExecutableSubject(file), out _));
-                    }
-                    catch { } // Matches WinForms' own per-file catch-and-skip in btnAppAddFolder_Click.
-                }
-
-                if (toAdd.Count == 0)
-                    return;
-
-                var resp = await CommitAsync(profile => profile.AddExceptions(toAdd));
-                if (resp == MessageType.PUT_SETTINGS)
-                {
-                    await ShowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle),
-                        Loc.T(LocKeys.Connections.AllowSuccessBody, folder.Name));
-                    await RefreshAsync();
-                }
-                else
-                {
-                    await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), FailureDetail(resp,
-                        LocKeys.Connections.AllowFailedLockedDetail, LocKeys.Connections.AllowFailedStaleDetail,
-                        LocKeys.Connections.AllowFailedGenericDetail));
-                }
+                await AddFolderRuleAsync();
             }
             finally
             {
@@ -811,23 +838,166 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
-        /// <summary>Pure file-system recursion, ported unchanged from WinForms'
-        /// SettingsForm.CollectExeAndDllFiles - it never had a WinForms dependency, only a WinForms
-        /// home.</summary>
-        private static void CollectExeAndDllFiles(string path, List<string> results)
+        private async Task AddFolderRuleAsync()
         {
+            var title = Loc.T(LocKeys.Rules.FolderTitle);
+
+            var patternBox = new TextBox
+            {
+                Header = Loc.T(LocKeys.Rules.FolderPattern),
+                PlaceholderText = @"C:\Tools\**",
+                MinWidth = 380,
+            };
+            var browse = new Button
+            {
+                Content = Loc.T(LocKeys.Rules.FolderBrowse),
+                VerticalAlignment = VerticalAlignment.Bottom,
+            };
+            var patternRow = new Grid { ColumnSpacing = 8 };
+            patternRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            patternRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            patternRow.Children.Add(patternBox);
+            Grid.SetColumn(browse, 1);
+            patternRow.Children.Add(browse);
+
+            var action = new ComboBox
+            {
+                Header = Loc.T(LocKeys.Rules.FolderAction),
+                MinWidth = 200,
+            };
+            action.Items.Add(Loc.T(LocKeys.Policy.Unrestricted));
+            action.Items.Add(Loc.T(LocKeys.Policy.Blocked));
+            action.SelectedIndex = 0;
+
+            var status = new TextBlock { TextWrapping = TextWrapping.Wrap, Opacity = 0.8 };
+
+            var content = new StackPanel { Spacing = 12, MaxWidth = 560 };
+            content.Children.Add(new TextBlock { Text = Loc.T(LocKeys.Rules.FolderIntro), TextWrapping = TextWrapping.Wrap });
+            content.Children.Add(patternRow);
+            content.Children.Add(new TextBlock
+            {
+                Text = Loc.T(LocKeys.Rules.FolderHelp),
+                TextWrapping = TextWrapping.Wrap,
+                FontSize = 12,
+                Opacity = 0.7,
+                IsTextSelectionEnabled = true,
+            });
+            content.Children.Add(action);
+            content.Children.Add(status);
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
+                Title = title,
+                Content = content,
+                PrimaryButtonText = Loc.T(LocKeys.Rules.Add),
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                DefaultButton = ContentDialogButton.Primary,
+                IsPrimaryButtonEnabled = false,
+            };
+
+            // How many programs match, counted off the UI thread (a deep folder takes a moment)
+            // and only for the newest text: a slower count for an older text is dropped.
+            int version = 0;
+            async void UpdatePreview()
+            {
+                int mine = ++version;
+                var pattern = PathPattern.Normalize(patternBox.Text);
+                dialog.IsPrimaryButtonEnabled = pattern is not null;
+                if (pattern is null)
+                {
+                    status.Text = string.IsNullOrWhiteSpace(patternBox.Text) ? string.Empty : Loc.T(LocKeys.Rules.FolderInvalid);
+                    return;
+                }
+
+                const int previewLimit = 500;
+                status.Text = Loc.T(LocKeys.Common.Loading);
+                List<string> matches;
+                try
+                {
+                    matches = await Task.Run(() => PathPattern.EnumerateMatches(pattern, previewLimit));
+                }
+                catch
+                {
+                    matches = new List<string>();
+                }
+                if (mine != version)
+                    return;
+
+                status.Text = matches.Count == 0 ? Loc.T(LocKeys.Rules.FolderMatchesNone)
+                    : matches.Count >= previewLimit ? Loc.T(LocKeys.Rules.FolderMatchesMany, previewLimit)
+                    : Loc.T(LocKeys.Rules.FolderMatches, matches.Count);
+            }
+            patternBox.TextChanged += (_, _) => UpdatePreview();
+
+            browse.Click += async (_, _) =>
+            {
+                var picked = await PickFolderPathAsync();
+                if (!string.IsNullOrEmpty(picked))
+                    patternBox.Text = picked.TrimEnd('\\') + @"\**";
+            };
+
+            if (await TryShowDialogAsync(dialog, title, Loc.T(LocKeys.Common.AnotherDialogOpenDetail)) != ContentDialogResult.Primary)
+                return;
+
+            var normalized = PathPattern.Normalize(patternBox.Text);
+            if (normalized is null)
+                return;
+
+            ExceptionPolicy policy = action.SelectedIndex == 1 ? new HardBlockPolicy() : new UnrestrictedPolicy();
+            var rule = new FirewallExceptionV3(new PathPatternSubject(normalized), policy);
+
+            var resp = await CommitAsync(profile => profile.AddExceptions(new List<FirewallExceptionV3> { rule }));
+            if (resp == MessageType.PUT_SETTINGS)
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle),
+                    Loc.T(LocKeys.Connections.AllowSuccessBody, normalized));
+                await RefreshAsync();
+            }
+            else
+            {
+                await ShowResultAsync(Loc.T(LocKeys.Connections.AllowFailedTitle), FailureDetail(resp,
+                    LocKeys.Connections.AllowFailedLockedDetail, LocKeys.Connections.AllowFailedStaleDetail,
+                    LocKeys.Connections.AllowFailedGenericDetail));
+            }
+        }
+
+        /// <summary>
+        /// A folder chosen in the system picker, or null. The Windows App SDK picker comes first;
+        /// the older WinRT one is the fallback, because which of the two will open from an
+        /// elevated window has differed between Windows App SDK releases. If neither opens, the
+        /// user can still type the path into the dialog, so a failure here is not an error.
+        /// </summary>
+        private static async Task<string?> PickFolderPathAsync()
+        {
+            if (App.MainWindow is null)
+                return null;
+
             try
             {
-                results.AddRange(System.IO.Directory.GetFiles(path, "*.exe", System.IO.SearchOption.TopDirectoryOnly));
-                results.AddRange(System.IO.Directory.GetFiles(path, "*.dll", System.IO.SearchOption.TopDirectoryOnly));
-
-                foreach (string dir in System.IO.Directory.GetDirectories(path))
-                    CollectExeAndDllFiles(dir, results);
+                var picker = new Microsoft.Windows.Storage.Pickers.FolderPicker(App.MainWindow.AppWindow.Id);
+                var result = await picker.PickSingleFolderAsync();
+                return result?.Path;
             }
-            catch
+            catch (Exception)
             {
-                // Matches WinForms' own behavior: an inaccessible subdirectory is skipped, not fatal
-                // to the whole scan.
+                // Fall through to the older picker.
+            }
+
+            try
+            {
+                var picker = new global::Windows.Storage.Pickers.FolderPicker();
+                picker.FileTypeFilter.Add("*");
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+                var folder = await picker.PickSingleFolderAsync();
+                return folder?.Path;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 

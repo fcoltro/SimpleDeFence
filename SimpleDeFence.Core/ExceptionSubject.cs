@@ -20,6 +20,7 @@ namespace SimpleDeFence
                 SubjectType.AppContainer => (ExceptionSubject?)JsonSerializer.Deserialize<AppContainerSubject>(ref reader, SourceGenerationContext.Default.AppContainerSubject),
                 SubjectType.Executable => (ExceptionSubject?)JsonSerializer.Deserialize<ExecutableSubject>(ref reader, SourceGenerationContext.Default.ExecutableSubject),
                 SubjectType.Service => (ExceptionSubject?)JsonSerializer.Deserialize<ServiceSubject>(ref reader, SourceGenerationContext.Default.ServiceSubject),
+                SubjectType.PathPattern => (ExceptionSubject?)JsonSerializer.Deserialize<PathPatternSubject>(ref reader, SourceGenerationContext.Default.PathPatternSubject),
                 _ => throw new JsonException($"Tried to deserialize unsupported type with discriminator {(SubjectType)discriminator}."),
             };
             return ret;
@@ -37,6 +38,8 @@ namespace SimpleDeFence
                     JsonSerializer.Serialize<ServiceSubject>(writer, typedVal, SourceGenerationContext.Default.ServiceSubject); break;
                 case ExecutableSubject typedVal:
                     JsonSerializer.Serialize<ExecutableSubject>(writer, typedVal, SourceGenerationContext.Default.ExecutableSubject); break;
+                case PathPatternSubject typedVal:
+                    JsonSerializer.Serialize<PathPatternSubject>(writer, typedVal, SourceGenerationContext.Default.PathPatternSubject); break;
                 default:
                     throw new JsonException($"Tried to serialize unsupported type {value.GetType()}.");
             }
@@ -49,7 +52,11 @@ namespace SimpleDeFence
         Global,
         Executable,
         Service,
-        AppContainer
+        AppContainer,
+
+        /// <summary>A folder rule: every program whose path matches a wildcard pattern. Added
+        /// last so the numbers already saved in configurations keep their meaning.</summary>
+        PathPattern
     }
 
     // -----------------------------------------------------------------------
@@ -475,4 +482,53 @@ namespace SimpleDeFence
     }
 
     // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// A folder rule: applies to every program whose full path matches <see cref="Pattern"/> (see
+    /// <see cref="PathPattern"/> for the syntax). It never becomes a filter by itself - the service
+    /// expands it into one executable rule per matching program - so RuleDef.SetSubject refuses it
+    /// rather than quietly treating it as "every program".
+    /// </summary>
+    [DataContract(Namespace = "SimpleDeFence")]
+    public class PathPatternSubject : ExceptionSubject
+    {
+        public override SubjectType SubjectType => SubjectType.PathPattern;
+
+        [DataMember(EmitDefaultValue = false)]
+        public string Pattern { get; private set; }
+
+        [JsonConstructor]
+        public PathPatternSubject(string pattern)
+        {
+            this.Pattern = pattern;
+        }
+
+        /// <summary>The folder the pattern starts from, for display.</summary>
+        [JsonIgnore]
+        public string DisplayName
+        {
+            get
+            {
+                var dir = PathPattern.BaseDirectory(PathPattern.Expand(Pattern ?? string.Empty));
+                if (string.IsNullOrEmpty(dir))
+                    return Pattern ?? string.Empty;
+                var name = System.IO.Path.GetFileName(dir.TrimEnd('\\'));
+                return string.IsNullOrEmpty(name) ? dir : name;
+            }
+        }
+
+        public override bool Equals(ExceptionSubject other)
+        {
+            if (other is PathPatternSubject o)
+                return string.Equals(Pattern, o.Pattern, StringComparison.OrdinalIgnoreCase);
+            return false;
+        }
+
+        public override int GetHashCode()
+            => Pattern is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(Pattern);
+
+        public override string ToString() => Pattern ?? string.Empty;
+    }
 }

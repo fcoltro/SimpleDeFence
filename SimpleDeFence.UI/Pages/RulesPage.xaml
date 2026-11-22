@@ -9,6 +9,12 @@
         <!-- Shared by DetailPane and MultiSelectHint, which swap in the same grid cell. See the
              comment at their declaration. -->
         <x:Double x:Key="RulesDetailPaneWidth">360</x:Double>
+        <!-- The rule list's height cap, shared with the detail pane's MinHeight so the two line up.
+             A ListView only draws the rows in view when its height is bounded; inside the page's
+             own ScrollViewer it is given unlimited height and builds every row up front, which is
+             what made a long rule list slow to open and to redraw. Capped, it scrolls inside
+             itself and builds rows as they come into view. -->
+        <x:Double x:Key="RulesListMaxHeight">560</x:Double>
     </Page.Resources>
 
     <Grid Padding="28" RowSpacing="14">
@@ -83,6 +89,7 @@
                             <TextBlock x:Name="AppsEmpty" Style="{StaticResource BodyTextBlockStyle}"
                                        Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
                             <ListView x:Name="AppsList" SelectionMode="Multiple"
+                                      MaxHeight="{StaticResource RulesListMaxHeight}"
                                       SelectionChanged="AppsList_SelectionChanged">
                                 <ListView.ItemTemplate>
                                     <DataTemplate x:DataType="local:RuleListItem">
@@ -165,7 +172,7 @@
                              case the user actually hits, is now completely still: those differ only
                              by how far the subject path wraps. -->
                         <Border x:Name="DetailPane" Grid.Column="1" Visibility="Collapsed"
-                                Width="{StaticResource RulesDetailPaneWidth}" MinHeight="560"
+                                Width="{StaticResource RulesDetailPaneWidth}" MinHeight="{StaticResource RulesListMaxHeight}"
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
                                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 CornerRadius="4" Padding="16" VerticalAlignment="Top">
@@ -176,6 +183,9 @@
                                     <TextBlock x:Name="DetailName" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
                                     <TextBlock x:Name="DetailKind" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
                                     <TextBlock x:Name="DetailSubjectDetail" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextWrapping="Wrap"/>
+                                    <!-- Folder rules only: the programs the pattern covers right now (ShowFolderCoverage). -->
+                                    <TextBlock x:Name="DetailCoverage" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"
+                                               TextWrapping="Wrap" Visibility="Collapsed" Margin="0,6,0,0" IsTextSelectionEnabled="True"/>
                                 </StackPanel>
 
                                 <TextBlock x:Name="DetailReadOnlyNote" Text="{loc:Loc Key=rules.detail.customRulesReadOnly}"

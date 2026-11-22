@@ -164,26 +164,6 @@
       "show": "Mostra {0} silenziate",
       "hide": "Nascondi silenziate"
     },
-    "stopTrying": {
-      "menu": "Fallo smettere di provare…",
-      "title": "Fai smettere {0} di provare",
-      "intro": "Questi elementi avviano in background programmi di {0} che continuano a tentare di connettersi. Togli la spunta a quelli da disattivare. Quelli in esecuzione vengono chiusi subito e non ripartiranno finché non rimetti la spunta.",
-      "fromFolder": "{1} non ha superato il controllo della firma di Windows, quindi potrebbe essere stato modificato dopo la firma di {0}. Analizzalo o reinstallalo. Gli elementi qui sotto provengono da altri programmi nella sua cartella, firmati da {0}.",
-      "introFolder": "Questi elementi avviano in background programmi dalla cartella di {0}, che continuano a tentare di connettersi. Togli la spunta a quelli da disattivare. Quelli in esecuzione vengono chiusi e non ripartiranno finché non rimetti la spunta.",
-      "unsignedFolder": "{0} non ha una firma valida, quindi SimpleDeFence non può sapere chi l'ha creato. Questi elementi sono stati trovati solo perché vengono eseguiti dalla sua cartella, {1}. Controllali uno per uno prima di disattivarli.",
-      "needed": "Controllo della licenza. Le app di {0} potrebbero non aprirsi senza.",
-      "kindService": "Servizio",
-      "kindTask": "Attività pianificata",
-      "kindStartup": "Si avvia con Windows",
-      "apply": "Applica",
-      "allOn": "Riattiva tutto",
-      "none": "Nessun programma di {0} si avvia in background.",
-      "unsigned": "SimpleDeFence non può sapere chi ha creato questo programma: non ha una firma valida e la sua cartella è condivisa con altri programmi. I programmi di Windows non vengono mai proposti.",
-      "unreachable": "Il servizio non ha risposto. È in esecuzione?",
-      "done": "Fatto. {0} disattivati, {1} riattivati.",
-      "failed": "Alcune modifiche non sono state applicate. I dettagli sono nel registro del servizio.",
-      "locked": "Sblocca prima la configurazione."
-    },
     "details": {
       "addresses": "Indirizzi",
       "lookUpNote": "Trova il nome di ogni indirizzo, il proprietario e il paese in cui è registrata la sua rete. Non viene inviato nulla finché non fai clic: allora gli indirizzi vanno al tuo server DNS e a rdap.org.",
@@ -201,7 +181,8 @@
     "service": "Servizio",
     "uwpPackage": "Pacchetto UWP",
     "global": "Globale",
-    "allApplications": "Tutte le applicazioni"
+    "allApplications": "Tutte le applicazioni",
+    "folder": "Regola cartella"
   },
   "policy": {
     "blocked": "Bloccato",
@@ -261,6 +242,18 @@
     "addPickWindow": "Finestra...",
     "addPickUwp": "App UWP...",
     "addPickFolder": "Scegli cartella...",
+    "folderDialog": {
+      "title": "Aggiungi una regola cartella",
+      "intro": "La regola vale per ogni programma il cui percorso corrisponde, compresi quelli aggiunti alla cartella in seguito.",
+      "pattern": "Cartella o modello",
+      "browse": "Sfoglia...",
+      "help": "* corrisponde a qualsiasi nome in una cartella, ** a qualsiasi numero di cartelle, ? a un carattere. Esempi: C:\\Tools\\**  oppure  C:\\Games\\*\\game.exe",
+      "action": "Regola",
+      "matches": "Programmi che corrispondono ora: {0}",
+      "matchesMany": "Programmi che corrispondono ora: più di {0}",
+      "matchesNone": "Nessun programma corrisponde ora. La regola coprirà comunque i programmi aggiunti in seguito.",
+      "invalid": "Inserisci un percorso di cartella completo, ad esempio C:\\Tools. Non è possibile usare un'intera unità."
+    },
     "pickUwpTitle": "Scegli un'app UWP",
     "pickProcessTitle": "Scegli un processo in esecuzione",
     "pickWindowTitle": "Scegli una finestra",

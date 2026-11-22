@@ -164,26 +164,6 @@
       "show": "显示 {0} 个已静音",
       "hide": "隐藏已静音"
     },
-    "stopTrying": {
-      "menu": "让它停止尝试…",
-      "title": "让 {0} 停止尝试",
-      "intro": "这些项目会在后台启动 {0} 的程序，它们会不断尝试连接。取消勾选要关闭的项目。正在运行的会立即关闭，在你重新勾选之前不会再启动。",
-      "fromFolder": "{1} 未通过 Windows 签名检查，可能在 {0} 签名后被修改过。请扫描或重新安装它。下面的项目来自同一文件夹中由 {0} 签名的其他程序。",
-      "introFolder": "这些项目会在后台启动 {0} 所在文件夹中的程序，它们会不断尝试连接。取消勾选要关闭的项目。正在运行的会被关闭，在重新勾选之前不会再启动。",
-      "unsignedFolder": "{0} 没有有效签名，SimpleDeFence 无法判断其发布者。找到这些项目只是因为它们从其所在文件夹 {1} 运行。关闭前请逐一确认。",
-      "needed": "许可证检查。没有它，{0} 的应用可能无法打开。",
-      "kindService": "服务",
-      "kindTask": "计划任务",
-      "kindStartup": "随 Windows 启动",
-      "apply": "应用",
-      "allOn": "全部重新打开",
-      "none": "{0} 没有在后台启动的项目。",
-      "unsigned": "此程序没有有效签名，且其所在文件夹与其他程序共用，SimpleDeFence 无法判断它的发布者。Windows 自身的程序永远不会列出。",
-      "unreachable": "服务没有响应。它在运行吗？",
-      "done": "完成。已关闭 {0} 项，重新打开 {1} 项。",
-      "failed": "部分更改无法完成。详细信息见服务日志。",
-      "locked": "请先解锁配置。"
-    },
     "details": {
       "addresses": "地址",
       "lookUpNote": "查找每个地址的名称、所有者以及其网络的注册国家/地区。点击之前不会发送任何内容；点击后，这些地址会发送到你的 DNS 服务器和 rdap.org。",
@@ -201,7 +181,8 @@
     "service": "服务",
     "uwpPackage": "UWP 程序包",
     "global": "全局",
-    "allApplications": "所有应用程序"
+    "allApplications": "所有应用程序",
+    "folder": "文件夹规则"
   },
   "policy": {
     "blocked": "已阻止",
@@ -261,6 +242,18 @@
     "addPickWindow": "窗口...",
     "addPickUwp": "UWP 应用...",
     "addPickFolder": "选择文件夹...",
+    "folderDialog": {
+      "title": "添加文件夹规则",
+      "intro": "规则适用于路径匹配的所有程序，包括之后添加到该文件夹的程序。",
+      "pattern": "文件夹或模式",
+      "browse": "浏览...",
+      "help": "* 匹配单个文件夹内的任意名称，** 匹配任意层级的文件夹，? 匹配一个字符。示例：C:\\Tools\\**  或  C:\\Games\\*\\game.exe",
+      "action": "规则",
+      "matches": "当前匹配的程序：{0}",
+      "matchesMany": "当前匹配的程序：超过 {0} 个",
+      "matchesNone": "当前没有匹配的程序。规则仍会覆盖之后添加的程序。",
+      "invalid": "请输入完整的文件夹路径，例如 C:\\Tools。不能使用整个驱动器。"
+    },
     "pickUwpTitle": "选择一个 UWP 应用",
     "pickProcessTitle": "选择一个正在运行的进程",
     "pickWindowTitle": "选择一个窗口",
