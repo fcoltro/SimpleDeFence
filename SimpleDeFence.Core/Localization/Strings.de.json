@@ -75,7 +75,7 @@
       "minutes30": "Nach 30 Minuten",
       "hour1": "Nach 1 Stunde"
     },
-    "learningEndsAt": "{0} Um {1} wird wieder auf Normal umgeschaltet.",
+    "learningEndsAt": "{0} Um {1} wird wieder auf den vorherigen Modus umgeschaltet.",
     "learningEnded": {
       "title": "Der Lernmodus ist beendet",
       "body": "Es wurden {0} Regeln hinzugefügt. Prüfen Sie, ob jede zu einem Programm gehört, dem Sie vertrauen.",

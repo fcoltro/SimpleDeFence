@@ -75,7 +75,7 @@
       "minutes30": "30 dakika sonra",
       "hour1": "1 saat sonra"
     },
-    "learningEndsAt": "{0} Saat {1} itibarıyla Normal moda döner.",
+    "learningEndsAt": "{0} Saat {1} itibarıyla önceki moda döner.",
     "learningEnded": {
       "title": "Öğrenme modu sona erdi",
       "body": "{0} kural eklendi. Her birinin güvendiğiniz bir programa ait olduğunu kontrol edin.",

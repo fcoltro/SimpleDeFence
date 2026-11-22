@@ -75,7 +75,7 @@
       "minutes30": "Depois de 30 minutos",
       "hour1": "Depois de 1 hora"
     },
-    "learningEndsAt": "{0} Volta para Normal às {1}.",
+    "learningEndsAt": "{0} Volta ao modo anterior às {1}.",
     "learningEnded": {
       "title": "O modo de aprendizado terminou",
       "body": "Foram adicionadas {0} regras. Confira se cada uma é de um programa confiável.",

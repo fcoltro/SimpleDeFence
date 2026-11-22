@@ -69,6 +69,7 @@ namespace SimpleDeFence
         private readonly HostsFileManager HostsFileManager = new();
         private readonly TelemetryMitigationHost Telemetry = new();
         private int MinutesSinceTelemetryCheck;
+        private FirewallMode ModeBeforeLearning = FirewallMode.Normal;
         private DateTime LastControllerCommandTime = DateTime.Now;
         private DateTime LastRuleReloadTime = DateTime.Now;
 
@@ -1886,8 +1887,15 @@ namespace SimpleDeFence
                             return TwMessageError.Instance;
                         }
 
+                        var modeBefore = VisibleState.Mode;
                         if (!TrySwitchMode(newMode))
                             return TwMessageError.Instance;
+
+                        // Where Learning's time limit goes back to: wherever the user came from,
+                        // not always Normal - someone in Block all who tries Learning for ten
+                        // minutes expects Block all back.
+                        if (newMode == FirewallMode.Learning && modeBefore != FirewallMode.Learning)
+                            ModeBeforeLearning = modeBefore;
 
                         // Set after the switch so a failed one leaves the old limit in place along
                         // with the old mode. Any switch clears it; only one into Learning with a
@@ -2155,8 +2163,11 @@ namespace SimpleDeFence
                             && (VisibleState.LearningEndsAt is DateTime learningEnds)
                             && (learningEnds.ToUniversalTime() <= DateTime.UtcNow))
                         {
-                            Utils.Log("Learning mode's time limit ran out; switching back to Normal.", Utils.LOG_ID_SERVICE);
-                            if (TrySwitchMode(FirewallMode.Normal))
+                            var back = (FirewallModes.IsOperatingMode(ModeBeforeLearning) && ModeBeforeLearning != FirewallMode.Learning)
+                                ? ModeBeforeLearning
+                                : FirewallMode.Normal;
+                            Utils.Log($"Learning mode's time limit ran out; switching back to {back}.", Utils.LOG_ID_SERVICE);
+                            if (TrySwitchMode(back))
                                 VisibleState.LearningEndsAt = null;
                         }
 

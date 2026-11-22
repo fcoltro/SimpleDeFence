@@ -18,6 +18,10 @@ namespace SimpleDeFence
         internal bool updatenow = false;
         internal bool startup = false;
 
+        /// <summary>/uninstall /upgrade: the installer is replacing this version with a newer one,
+        /// not removing SimpleDeFence. See SimpleDeFenceDoctor.Uninstall.</summary>
+        internal bool upgrade = false;
+
         internal StartUpMode ProgramMode = StartUpMode.Invalid;
     }
 }

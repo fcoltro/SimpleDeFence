@@ -75,7 +75,7 @@
       "minutes30": "30 分钟后",
       "hour1": "1 小时后"
     },
-    "learningEndsAt": "{0} 将于 {1} 切换回正常模式。",
+    "learningEndsAt": "{0} 将于 {1} 切换回之前的模式。",
     "learningEnded": {
       "title": "学习模式已结束",
       "body": "已添加 {0} 条规则。请确认每条规则都属于你信任的程序。",

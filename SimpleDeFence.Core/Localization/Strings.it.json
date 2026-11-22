@@ -75,7 +75,7 @@
       "minutes30": "Dopo 30 minuti",
       "hour1": "Dopo 1 ora"
     },
-    "learningEndsAt": "{0} Torna a Normale alle {1}.",
+    "learningEndsAt": "{0} Torna alla modalità precedente alle {1}.",
     "learningEnded": {
       "title": "La modalità di apprendimento è terminata",
       "body": "Sono state aggiunte {0} regole. Verifica che ognuna riguardi un programma di cui ti fidi.",

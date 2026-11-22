@@ -75,7 +75,7 @@
       "minutes30": "Setelah 30 menit",
       "hour1": "Setelah 1 jam"
     },
-    "learningEndsAt": "{0} Kembali ke Normal pukul {1}.",
+    "learningEndsAt": "{0} Kembali ke mode sebelumnya pukul {1}.",
     "learningEnded": {
       "title": "Mode belajar telah berakhir",
       "body": "{0} aturan ditambahkan. Pastikan masing-masing untuk program yang Anda percayai.",
