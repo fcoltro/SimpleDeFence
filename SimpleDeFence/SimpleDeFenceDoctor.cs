@@ -327,6 +327,10 @@ namespace SimpleDeFence
             }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_INSTALLER); }
 
+            // Whatever "Stop it trying" (1.1.0) switched off and the service has not been able to
+            // switch back on yet. After this nothing would ever try again.
+            BackgroundItemsManager.RestoreAll();
+
             try
             {
                 using var scm = new ServiceControlManager();
