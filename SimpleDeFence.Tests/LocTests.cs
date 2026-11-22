@@ -107,7 +107,7 @@ namespace SimpleDeFence.Tests
         {
             Loc.SetCulture("en");
 
-            Assert.Equal("6 exceptions in profile \"Default\"",
+            Assert.Equal("6 rules in profile \"Default\"",
                 Loc.T(LocKeys.Applications.Summary, 6, "Default"));
         }
 
