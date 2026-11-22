@@ -55,7 +55,8 @@
                  centres inside something whose width is exactly the visible area, and Stretch keeps
                  it min(viewport, MaxWidth) no matter which cards happen to be realized. -->
             <Grid Width="{x:Bind SettingsScroller.ViewportWidth, Mode=OneWay}">
-                <StackPanel Spacing="12" MaxWidth="1100" HorizontalAlignment="Stretch">
+                <!-- Bottom margin: room below the last About row, so it is never flush with the edge. -->
+                <StackPanel Spacing="12" MaxWidth="1100" HorizontalAlignment="Stretch" Margin="0,0,0,24">
 
                 <controls:SettingsExpander Header="{loc:Loc Key=settings.section.general}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
