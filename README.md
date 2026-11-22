@@ -74,9 +74,15 @@ Code signing for Windows releases is provided free of charge by the SignPath Fou
 - **Address lookup**: "Show all" lists the addresses an app tried to reach, and one click shows
   each one's name, owner and the country where its network is registered. Nothing is sent until
   you click; then only those addresses go to your DNS server and to [rdap.org](https://rdap.org).
-- **Folder rules**: allow or block every program in a folder with one rule, using wildcards in
-  the style of Fort Firewall: `C:\Tools\**` (everything below), `C:\Games\*\game.exe` (one
-  folder level), `%ProgramFiles%\Vendor\**`. Programs added to the folder later are covered too.
+- **Folder rules**: allow or block every program in one or more folders with one named rule,
+  using wildcards in the style of Fort Firewall: `C:\Tools\**` (everything below),
+  `C:\Games\*\game.exe` (one folder level), `%ProgramFiles%\Vendor\**`. Programs added to the
+  folder later are covered too. The window shows how many programs match as you type, and warns
+  when normal users can write to the folder. A rule for a single program always wins over a folder
+  rule, and the most specific folder rule wins over a broader one.
+- **Data used per app**: the Connections page lists how much each app has sent and received since
+  the service started, and its current speed. It is counted on your PC from Windows' own network
+  events, the same source Resource Monitor uses, and is never sent anywhere.
 - **Mute this app**: an app you never want to allow, which keeps retrying, can be muted from its
   right-click menu. It stays blocked, but drops out of the Blocked list and notifications.
 - **Clean up**: one button on the Rules page removes the rules for programs that are no longer
@@ -90,8 +96,8 @@ Code signing for Windows releases is provided free of charge by the SignPath Fou
   components are left out, and both can be switched off in Settings.
 - **Temporary rules**: allow (or block) an app for 5 minutes up to 24 hours, or until the next
   restart, and the rule removes itself.
-- **Learning with a time limit**: Learning mode can switch itself back to Normal after 10, 30 or
-  60 minutes, and the window then points you to the rules it added.
+- **Learning with a time limit**: Learning mode can switch itself back to the mode you were in
+  after 10, 30 or 60 minutes, and the window then points you to the rules it added.
 - **Custom rules**: beyond the presets, an app's rule can be a list of allow and block rules by
   direction, protocol, remote address (IP, network, LocalSubnet, DNS) and port.
 - **Trusted publishers**: allow every program signed by one vendor, so an app keeps working
