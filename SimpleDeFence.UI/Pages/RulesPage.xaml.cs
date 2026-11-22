@@ -620,7 +620,7 @@ namespace SimpleDeFence.UI.Pages
             UpdateAddButtonEnabled();
             try
             {
-                global::Windows.Storage.StorageFile? file;
+                string? file;
                 try
                 {
                     file = await PickExecutableFileAsync();
@@ -637,10 +637,11 @@ namespace SimpleDeFence.UI.Pages
                 if (file is null)
                     return; // Cancelled (or no MainWindow yet) - not an error, no dialog, no notice.
 
-                if (ClientSettings.Load().AskForExceptionDetails && !await ConfirmQuickAddAsync(Content.XamlRoot, file.Name))
+                var name = System.IO.Path.GetFileName(file);
+                if (ClientSettings.Load().AskForExceptionDetails && !await ConfirmQuickAddAsync(Content.XamlRoot, name))
                     return;
 
-                await CommitAddAsync(new ExecutableSubject(file.Path), file.Name);
+                await CommitAddAsync(new ExecutableSubject(file), name);
             }
             finally
             {
@@ -663,19 +664,9 @@ namespace SimpleDeFence.UI.Pages
         /// exception - the page's own Click handler shows an InfoBar-backed result dialog, the
         /// tray/hotkey path already has QuickAddAsync's own outer try/catch - so this method lets
         /// that exception propagate rather than swallowing it.</summary>
-        private static async Task<global::Windows.Storage.StorageFile?> PickExecutableFileAsync()
-        {
-            if (App.MainWindow is null)
-                return null;
-
-            var picker = new global::Windows.Storage.Pickers.FileOpenPicker();
-            picker.FileTypeFilter.Add(".exe");
-
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            return await picker.PickSingleFileAsync();
-        }
+        /// <remarks>Goes through FilePickers: the old WinRT picker cannot open from the elevated
+        /// window this app runs in, and failed every time with 0x80004005.</remarks>
+        private static Task<string?> PickExecutableFileAsync() => FilePickers.OpenFileAsync(".exe");
 
         /// <summary>Same safe shape as AddPickExecutable_Click above.</summary>
         private async void AddPickUwp_Click(object sender, RoutedEventArgs e)
@@ -1215,7 +1206,7 @@ namespace SimpleDeFence.UI.Pages
         private static async Task<(ExceptionSubject Subject, string DisplayName)?> QuickPickExecutableAsync(XamlRoot xamlRoot)
         {
             var file = await PickExecutableFileAsync();
-            return file is null ? null : (new ExecutableSubject(file.Path), file.Name);
+            return file is null ? null : (new ExecutableSubject(file), System.IO.Path.GetFileName(file));
         }
 
         /// <summary>Quick-add's running-process picker - the same list, filter and row shape
