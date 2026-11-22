@@ -214,6 +214,7 @@
             public const string UwpPackage = "subject.uwpPackage";
             public const string Global = "subject.global";
             public const string AllApplications = "subject.allApplications";
+            public const string Folder = "subject.folder";
         }
 
         public static class Rules
@@ -258,6 +259,16 @@
             public const string AddPickWindow = "rules.addPickWindow";
             public const string AddPickUwp = "rules.addPickUwp";
             public const string AddPickFolder = "rules.addPickFolder";
+            public const string FolderTitle = "rules.folderDialog.title";
+            public const string FolderIntro = "rules.folderDialog.intro";
+            public const string FolderPattern = "rules.folderDialog.pattern";
+            public const string FolderBrowse = "rules.folderDialog.browse";
+            public const string FolderHelp = "rules.folderDialog.help";
+            public const string FolderAction = "rules.folderDialog.action";
+            public const string FolderMatches = "rules.folderDialog.matches";
+            public const string FolderMatchesMany = "rules.folderDialog.matchesMany";
+            public const string FolderMatchesNone = "rules.folderDialog.matchesNone";
+            public const string FolderInvalid = "rules.folderDialog.invalid";
             public const string PickUwpTitle = "rules.pickUwpTitle";
             public const string PickProcessTitle = "rules.pickProcessTitle";
             public const string PickWindowTitle = "rules.pickWindowTitle";

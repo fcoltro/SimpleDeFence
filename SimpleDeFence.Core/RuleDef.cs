@@ -103,6 +103,9 @@ namespace SimpleDeFence
                         this.ServiceName = null;
                         this.AppContainerSid = null;
                         break;
+                    // PathPatternSubject lands here on purpose. A folder rule has no single program
+                    // to filter on; with no Application set the rule would cover every program, so
+                    // it must be expanded (SimpleDeFenceService) and never set as a subject.
                     default:
                         throw new NotImplementedException();
                 }

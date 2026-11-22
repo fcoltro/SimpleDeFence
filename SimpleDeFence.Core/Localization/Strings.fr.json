@@ -201,7 +201,8 @@
     "service": "Service",
     "uwpPackage": "Paquet UWP",
     "global": "Global",
-    "allApplications": "Toutes les applications"
+    "allApplications": "Toutes les applications",
+    "folder": "Règle de dossier"
   },
   "policy": {
     "blocked": "Bloqué",
@@ -261,6 +262,18 @@
     "addPickWindow": "Fenêtre...",
     "addPickUwp": "Application UWP...",
     "addPickFolder": "Choisir un dossier...",
+    "folderDialog": {
+      "title": "Ajouter une règle de dossier",
+      "intro": "La règle s’applique à tout programme dont le chemin correspond, y compris ceux ajoutés plus tard au dossier.",
+      "pattern": "Dossier ou modèle",
+      "browse": "Parcourir...",
+      "help": "* correspond à n’importe quel nom dans un dossier, ** à un nombre quelconque de dossiers, ? à un caractère. Exemples : C:\\Tools\\**  ou  C:\\Games\\*\\game.exe",
+      "action": "Règle",
+      "matches": "Programmes correspondants actuellement : {0}",
+      "matchesMany": "Programmes correspondants actuellement : plus de {0}",
+      "matchesNone": "Aucun programme ne correspond pour l’instant. La règle couvrira quand même les programmes ajoutés plus tard.",
+      "invalid": "Saisissez un chemin de dossier complet, par exemple C:\\Tools. Un lecteur entier n’est pas accepté."
+    },
     "pickUwpTitle": "Choisissez une application UWP",
     "pickProcessTitle": "Choisissez un processus en cours",
     "pickWindowTitle": "Choisissez une fenêtre",

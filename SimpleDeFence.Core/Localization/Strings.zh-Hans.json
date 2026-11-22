@@ -201,7 +201,8 @@
     "service": "服务",
     "uwpPackage": "UWP 程序包",
     "global": "全局",
-    "allApplications": "所有应用程序"
+    "allApplications": "所有应用程序",
+    "folder": "文件夹规则"
   },
   "policy": {
     "blocked": "已阻止",
@@ -261,6 +262,18 @@
     "addPickWindow": "窗口...",
     "addPickUwp": "UWP 应用...",
     "addPickFolder": "选择文件夹...",
+    "folderDialog": {
+      "title": "添加文件夹规则",
+      "intro": "规则适用于路径匹配的所有程序，包括之后添加到该文件夹的程序。",
+      "pattern": "文件夹或模式",
+      "browse": "浏览...",
+      "help": "* 匹配单个文件夹内的任意名称，** 匹配任意层级的文件夹，? 匹配一个字符。示例：C:\\Tools\\**  或  C:\\Games\\*\\game.exe",
+      "action": "规则",
+      "matches": "当前匹配的程序：{0}",
+      "matchesMany": "当前匹配的程序：超过 {0} 个",
+      "matchesNone": "当前没有匹配的程序。规则仍会覆盖之后添加的程序。",
+      "invalid": "请输入完整的文件夹路径，例如 C:\\Tools。不能使用整个驱动器。"
+    },
     "pickUwpTitle": "选择一个 UWP 应用",
     "pickProcessTitle": "选择一个正在运行的进程",
     "pickWindowTitle": "选择一个窗口",

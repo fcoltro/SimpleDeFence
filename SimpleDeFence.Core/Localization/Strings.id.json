@@ -201,7 +201,8 @@
     "service": "Layanan",
     "uwpPackage": "Paket UWP",
     "global": "Global",
-    "allApplications": "Semua aplikasi"
+    "allApplications": "Semua aplikasi",
+    "folder": "Aturan folder"
   },
   "policy": {
     "blocked": "Diblokir",
@@ -261,6 +262,18 @@
     "addPickWindow": "Jendela...",
     "addPickUwp": "Aplikasi UWP...",
     "addPickFolder": "Pilih folder...",
+    "folderDialog": {
+      "title": "Tambah aturan folder",
+      "intro": "Aturan berlaku untuk setiap program yang jalurnya cocok, termasuk program yang ditambahkan ke folder nanti.",
+      "pattern": "Folder atau pola",
+      "browse": "Telusuri...",
+      "help": "* cocok dengan nama apa pun dalam satu folder, ** dengan sejumlah folder, ? dengan satu karakter. Contoh: C:\\Tools\\**  atau  C:\\Games\\*\\game.exe",
+      "action": "Aturan",
+      "matches": "Program yang cocok saat ini: {0}",
+      "matchesMany": "Program yang cocok saat ini: lebih dari {0}",
+      "matchesNone": "Belum ada program yang cocok. Aturan tetap berlaku untuk program yang ditambahkan nanti.",
+      "invalid": "Masukkan jalur folder lengkap, misalnya C:\\Tools. Seluruh drive tidak dapat digunakan."
+    },
     "pickUwpTitle": "Pilih aplikasi UWP",
     "pickProcessTitle": "Pilih proses yang berjalan",
     "pickWindowTitle": "Pilih jendela",

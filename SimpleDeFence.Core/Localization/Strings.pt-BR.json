@@ -201,7 +201,8 @@
     "service": "Serviço",
     "uwpPackage": "Pacote UWP",
     "global": "Global",
-    "allApplications": "Todos os aplicativos"
+    "allApplications": "Todos os aplicativos",
+    "folder": "Regra de pasta"
   },
   "policy": {
     "blocked": "Bloqueado",
@@ -261,6 +262,18 @@
     "addPickWindow": "Janela...",
     "addPickUwp": "Aplicativo UWP...",
     "addPickFolder": "Escolher pasta...",
+    "folderDialog": {
+      "title": "Adicionar regra de pasta",
+      "intro": "A regra vale para todo programa cujo caminho corresponda, inclusive os adicionados à pasta depois.",
+      "pattern": "Pasta ou padrão",
+      "browse": "Procurar...",
+      "help": "* corresponde a qualquer nome dentro de uma pasta, ** a qualquer número de pastas, ? a um caractere. Exemplos: C:\\Tools\\**  ou  C:\\Games\\*\\game.exe",
+      "action": "Regra",
+      "matches": "Programas que correspondem agora: {0}",
+      "matchesMany": "Programas que correspondem agora: mais de {0}",
+      "matchesNone": "Nenhum programa corresponde agora. A regra ainda cobre programas adicionados depois.",
+      "invalid": "Digite um caminho de pasta completo, como C:\\Tools. Uma unidade inteira não pode ser usada."
+    },
     "pickUwpTitle": "Escolher um aplicativo UWP",
     "pickProcessTitle": "Escolher um processo em execução",
     "pickWindowTitle": "Escolher uma janela",

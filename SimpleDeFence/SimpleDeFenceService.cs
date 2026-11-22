@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Management;
@@ -89,6 +90,12 @@ namespace SimpleDeFence
         // outside InheritanceGuard so a process start does not hold up a rule rebuild.
         private HashSet<string> TrustedPublishers = new(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> PublisherAllowedExes = new(StringComparer.OrdinalIgnoreCase);   // Executables already allowed through a trusted publisher
+
+        // Context for folder rules (PathPatternSubject). Guarded by InheritanceGuard like the
+        // above. FolderRules is replaced, never changed in place, so a copy taken under the lock
+        // stays valid outside it.
+        private List<(Regex Pattern, FirewallExceptionV3 Rule)> FolderRules = new();
+        private readonly HashSet<string> FolderAllowedExes = new(StringComparer.OrdinalIgnoreCase);   // Executables already covered by a folder rule
         private readonly Dictionary<string, (DateTime LastWriteUtc, bool Valid, string? Subject)> SignatureCache = new(StringComparer.OrdinalIgnoreCase);
         private readonly string WindowsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
         private readonly ThreadThrottler FirewallThreadThrottler = new(Thread.CurrentThread, ThreadPriority.Highest, false);
@@ -186,9 +193,24 @@ namespace SimpleDeFence
                         UserExceptions.AddRange(CollectExceptionsForAppByName(appName));
                 }
 
+                // Folder rules have no single program to filter on. They are set aside here and
+                // expanded below, once every rule for a named program is known: a rule for the
+                // program itself says more about it than a rule for the folder it sits in.
+                var folderRules = new List<(Regex Pattern, FirewallExceptionV3 Rule)>();
+
                 // Convert exceptions to rules
                 foreach (FirewallExceptionV3 ex in UserExceptions)
                 {
+                    if (ex.Subject is PathPatternSubject folder)
+                    {
+                        if (!string.IsNullOrEmpty(folder.Pattern))
+                        {
+                            try { folderRules.Add((PathPattern.ToRegex(folder.Pattern), ex)); }
+                            catch (ArgumentException) { Utils.Log($"Skipping folder rule with an unusable pattern: {folder.Pattern}", Utils.LOG_ID_SERVICE); }
+                        }
+                        continue;
+                    }
+
                     if (ex.Subject is ExecutableSubject exe)
                     {
                         string exePath = exe.ExecutablePath;
@@ -203,6 +225,36 @@ namespace SimpleDeFence
                     }
 
                     GetRulesForException(ex, rules, rawSocketExceptions, (ulong)FilterWeights.UserPermit, (ulong)FilterWeights.UserBlock);
+                }
+
+                FolderRules = folderRules;
+                if (folderRules.Count != 0)
+                {
+                    timer.NewSubTask("Folder rule processing");
+
+                    // The programs on disk now, so they work from their very first connection,
+                    // plus the ones already running (a running program may sit past the
+                    // expansion limit). Programs that appear later are picked up by
+                    // ProcessStartWatcher_EventArrived.
+                    var candidates = new List<string>();
+                    foreach (var (_, rule) in folderRules)
+                        candidates.AddRange(PathPattern.EnumerateMatches(((PathPatternSubject)rule.Subject).Pattern));
+                    foreach (var p in ProcessManager.CreateToolhelp32SnapshotExtended())
+                    {
+                        if (!string.IsNullOrEmpty(p.ImagePath))
+                            candidates.Add(p.ImagePath);
+                    }
+
+                    foreach (var path in candidates)
+                    {
+                        if (UserSubjectExes.Contains(path) || FolderAllowedExes.Contains(path))
+                            continue;
+                        if (FolderRuleFor(path, folderRules) is FirewallExceptionV3 folderEx)
+                        {
+                            GetRulesForException(folderEx, rules, rawSocketExceptions, (ulong)FilterWeights.UserPermit, (ulong)FilterWeights.UserBlock);
+                            FolderAllowedExes.Add(path);
+                        }
+                    }
                 }
 
                 if (ChildInheritance.Count != 0)
@@ -299,7 +351,7 @@ namespace SimpleDeFence
 
                         // A rule of the user's own, or one inherited from a parent, says more about
                         // this program than its publisher does.
-                        if (UserSubjectExes.Contains(procPath) || ChildInheritedSubjectExes.ContainsKey(procPath))
+                        if (UserSubjectExes.Contains(procPath) || FolderAllowedExes.Contains(procPath) || ChildInheritedSubjectExes.ContainsKey(procPath))
                             continue;
 
                         if (PublisherRuleFor(procPath, TrustedPublishers) is FirewallExceptionV3 ex)
@@ -313,6 +365,7 @@ namespace SimpleDeFence
             else
             {
                 TrustedPublishers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                FolderRules = new();
             }
 
             PrepareRulesForInstall(rules);
@@ -441,11 +494,12 @@ namespace SimpleDeFence
                 ChildInheritance.Clear();
                 ChildInheritedSubjectExes.Clear();
                 PublisherAllowedExes.Clear();
+                FolderAllowedExes.Clear();
                 rules.AddRange(AssembleActiveRules(rawSocketExceptions));
 
                 try
                 {
-                    if ((ChildInheritance.Count > 0) || (TrustedPublishers.Count > 0))
+                    if ((ChildInheritance.Count > 0) || (TrustedPublishers.Count > 0) || (FolderRules.Count > 0))
                         ProcessStartWatcher.Start();
                     else
                         ProcessStartWatcher.Stop();
@@ -1070,6 +1124,11 @@ namespace SimpleDeFence
 
         private static void GetRulesForException(FirewallExceptionV3 ex, List<RuleDef> results, List<RuleDef> rawSocketExceptions, ulong permitWeight, ulong blockWeight)
         {
+            // A folder rule names no single program, and a filter without one covers every
+            // program. It only ever reaches WFP expanded (see FolderRuleFor), so refuse it here.
+            if (ex.Subject is PathPatternSubject)
+                return;
+
             if (ex.Id == Guid.Empty)
             {
                 // Do not let the service crash if a rule cannot be constructed 
@@ -2500,18 +2559,28 @@ namespace SimpleDeFence
                     if (UserSubjectExes.Contains(path))
                         return;
 
+                    // A folder rule covers it: the user named its folder, which says more about it
+                    // than its parent or its publisher.
+                    if (FolderAllowedExes.Contains(path))
+                        return;
+                    if (FolderRules.Count != 0 && FolderRuleFor(path, FolderRules) is FirewallExceptionV3 folderEx)
+                    {
+                        FolderAllowedExes.Add(path);
+                        newExceptions = new List<FirewallExceptionV3> { folderEx };
+                    }
+
                     // Taken here, under the lock, and checked after it: see the publisher block
                     // below. Not when the program is already allowed by its publisher, or by
                     // inheritance from an earlier start.
-                    if (TrustedPublishers.Count != 0 && !PublisherAllowedExes.Contains(path) && !ChildInheritedSubjectExes.ContainsKey(path))
+                    if (newExceptions is null && TrustedPublishers.Count != 0 && !PublisherAllowedExes.Contains(path) && !ChildInheritedSubjectExes.ContainsKey(path))
                         trustedPublishers = TrustedPublishers;
 
                     // This list will hold parents that we already checked for a process.
                     // Used to avoid infinite loop when parent-PID info is unreliable.
                     var pidsChecked = new HashSet<uint>();
 
-                    // Start walking up the process tree
-                    for (var parentPid = pid; ;)
+                    // Start walking up the process tree, unless a folder rule already covers it
+                    for (var parentPid = pid; newExceptions is null;)
                     {
                         if (!ProcessManager.GetParentProcess(parentPid, ref parentPid))
                             // We reached the top of the process tree (with non-existent parent)
@@ -2577,6 +2646,21 @@ namespace SimpleDeFence
             {
                 e.NewEvent.Dispose();
             }
+        }
+
+        /// <summary>
+        /// The rule the first matching folder rule gives a program, as an ordinary rule for that
+        /// one program, or null when no folder rule matches. The copy keeps the folder rule's Id,
+        /// so what it blocks or allows is attributed to the folder rule.
+        /// </summary>
+        private static FirewallExceptionV3? FolderRuleFor(string path, List<(Regex Pattern, FirewallExceptionV3 Rule)> folderRules)
+        {
+            foreach (var (pattern, rule) in folderRules)
+            {
+                if (pattern.IsMatch(path))
+                    return new FirewallExceptionV3(new ExecutableSubject(path), rule.Policy) { Id = rule.Id };
+            }
+            return null;
         }
 
         /// <summary>

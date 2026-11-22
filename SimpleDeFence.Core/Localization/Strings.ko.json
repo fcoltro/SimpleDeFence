@@ -201,7 +201,8 @@
     "service": "서비스",
     "uwpPackage": "UWP 패키지",
     "global": "전역",
-    "allApplications": "모든 응용 프로그램"
+    "allApplications": "모든 응용 프로그램",
+    "folder": "폴더 규칙"
   },
   "policy": {
     "blocked": "차단됨",
@@ -261,6 +262,18 @@
     "addPickWindow": "창...",
     "addPickUwp": "UWP 앱...",
     "addPickFolder": "폴더 선택...",
+    "folderDialog": {
+      "title": "폴더 규칙 추가",
+      "intro": "경로가 일치하는 모든 프로그램에 규칙이 적용되며, 나중에 폴더에 추가된 프로그램도 포함됩니다.",
+      "pattern": "폴더 또는 패턴",
+      "browse": "찾아보기...",
+      "help": "*는 한 폴더 안의 모든 이름, **는 여러 단계의 폴더, ?는 한 글자와 일치합니다. 예: C:\\Tools\\**  또는  C:\\Games\\*\\game.exe",
+      "action": "규칙",
+      "matches": "현재 일치하는 프로그램: {0}",
+      "matchesMany": "현재 일치하는 프로그램: {0}개 초과",
+      "matchesNone": "현재 일치하는 프로그램이 없습니다. 나중에 추가되는 프로그램에는 규칙이 적용됩니다.",
+      "invalid": "C:\\Tools처럼 전체 폴더 경로를 입력하세요. 드라이브 전체는 사용할 수 없습니다."
+    },
     "pickUwpTitle": "UWP 앱 선택",
     "pickProcessTitle": "실행 중인 프로세스 선택",
     "pickWindowTitle": "창 선택",

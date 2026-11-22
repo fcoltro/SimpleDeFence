@@ -201,7 +201,8 @@
     "service": "Service",
     "uwpPackage": "UWP Package",
     "global": "Global",
-    "allApplications": "All applications"
+    "allApplications": "All applications",
+    "folder": "Folder rule"
   },
   "policy": {
     "blocked": "Blocked",
@@ -261,6 +262,18 @@
     "addPickWindow": "Window...",
     "addPickUwp": "UWP app...",
     "addPickFolder": "Pick folder...",
+    "folderDialog": {
+      "title": "Add a folder rule",
+      "intro": "The rule applies to every program whose path matches, including programs added to the folder later.",
+      "pattern": "Folder or pattern",
+      "browse": "Browse...",
+      "help": "* matches any name inside one folder, ** matches any number of folders, ? matches one character. Examples: C:\\Tools\\**  or  C:\\Games\\*\\game.exe",
+      "action": "Rule",
+      "matches": "Programs that match right now: {0}",
+      "matchesMany": "Programs that match right now: more than {0}",
+      "matchesNone": "No programs match right now. The rule still covers programs added later.",
+      "invalid": "Enter a full folder path, such as C:\\Tools. A whole drive cannot be used."
+    },
     "pickUwpTitle": "Choose a UWP app",
     "pickProcessTitle": "Choose a running process",
     "pickWindowTitle": "Choose a window",

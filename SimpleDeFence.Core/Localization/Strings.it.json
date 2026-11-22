@@ -201,7 +201,8 @@
     "service": "Servizio",
     "uwpPackage": "Pacchetto UWP",
     "global": "Globale",
-    "allApplications": "Tutte le applicazioni"
+    "allApplications": "Tutte le applicazioni",
+    "folder": "Regola cartella"
   },
   "policy": {
     "blocked": "Bloccato",
@@ -261,6 +262,18 @@
     "addPickWindow": "Finestra...",
     "addPickUwp": "App UWP...",
     "addPickFolder": "Scegli cartella...",
+    "folderDialog": {
+      "title": "Aggiungi una regola cartella",
+      "intro": "La regola vale per ogni programma il cui percorso corrisponde, compresi quelli aggiunti alla cartella in seguito.",
+      "pattern": "Cartella o modello",
+      "browse": "Sfoglia...",
+      "help": "* corrisponde a qualsiasi nome in una cartella, ** a qualsiasi numero di cartelle, ? a un carattere. Esempi: C:\\Tools\\**  oppure  C:\\Games\\*\\game.exe",
+      "action": "Regola",
+      "matches": "Programmi che corrispondono ora: {0}",
+      "matchesMany": "Programmi che corrispondono ora: più di {0}",
+      "matchesNone": "Nessun programma corrisponde ora. La regola coprirà comunque i programmi aggiunti in seguito.",
+      "invalid": "Inserisci un percorso di cartella completo, ad esempio C:\\Tools. Non è possibile usare un'intera unità."
+    },
     "pickUwpTitle": "Scegli un'app UWP",
     "pickProcessTitle": "Scegli un processo in esecuzione",
     "pickWindowTitle": "Scegli una finestra",

@@ -201,7 +201,8 @@
     "service": "Dienst",
     "uwpPackage": "UWP-Paket",
     "global": "Global",
-    "allApplications": "Alle Anwendungen"
+    "allApplications": "Alle Anwendungen",
+    "folder": "Ordnerregel"
   },
   "policy": {
     "blocked": "Blockiert",
@@ -261,6 +262,18 @@
     "addPickWindow": "Fenster...",
     "addPickUwp": "UWP-App...",
     "addPickFolder": "Ordner wählen...",
+    "folderDialog": {
+      "title": "Ordnerregel hinzufügen",
+      "intro": "Die Regel gilt für jedes Programm, dessen Pfad passt, auch für Programme, die später in den Ordner kommen.",
+      "pattern": "Ordner oder Muster",
+      "browse": "Durchsuchen...",
+      "help": "* steht für einen beliebigen Namen innerhalb eines Ordners, ** für beliebig viele Ordner, ? für ein Zeichen. Beispiele: C:\\Tools\\**  oder  C:\\Games\\*\\game.exe",
+      "action": "Regel",
+      "matches": "Derzeit passende Programme: {0}",
+      "matchesMany": "Derzeit passende Programme: mehr als {0}",
+      "matchesNone": "Derzeit passt kein Programm. Die Regel gilt trotzdem für später hinzugefügte Programme.",
+      "invalid": "Geben Sie einen vollständigen Ordnerpfad ein, z. B. C:\\Tools. Ein ganzes Laufwerk ist nicht möglich."
+    },
     "pickUwpTitle": "UWP-App auswählen",
     "pickProcessTitle": "Laufenden Prozess auswählen",
     "pickWindowTitle": "Fenster auswählen",

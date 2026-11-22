@@ -201,7 +201,8 @@
     "service": "Hizmet",
     "uwpPackage": "UWP paketi",
     "global": "Genel",
-    "allApplications": "Tüm uygulamalar"
+    "allApplications": "Tüm uygulamalar",
+    "folder": "Klasör kuralı"
   },
   "policy": {
     "blocked": "Engellendi",
@@ -261,6 +262,18 @@
     "addPickWindow": "Pencere...",
     "addPickUwp": "UWP uygulaması...",
     "addPickFolder": "Klasör seç...",
+    "folderDialog": {
+      "title": "Klasör kuralı ekle",
+      "intro": "Kural, yolu eşleşen her programa uygulanır; klasöre sonradan eklenen programlar da dahil.",
+      "pattern": "Klasör veya desen",
+      "browse": "Gözat...",
+      "help": "* bir klasör içindeki herhangi bir adla, ** herhangi sayıda klasörle, ? tek bir karakterle eşleşir. Örnekler: C:\\Tools\\**  veya  C:\\Games\\*\\game.exe",
+      "action": "Kural",
+      "matches": "Şu anda eşleşen programlar: {0}",
+      "matchesMany": "Şu anda eşleşen programlar: {0} üzerinde",
+      "matchesNone": "Şu anda eşleşen program yok. Kural sonradan eklenen programlar için yine de geçerli olur.",
+      "invalid": "C:\\Tools gibi tam bir klasör yolu girin. Bütün bir sürücü kullanılamaz."
+    },
     "pickUwpTitle": "Bir UWP uygulaması seçin",
     "pickProcessTitle": "Çalışan bir işlem seçin",
     "pickWindowTitle": "Bir pencere seçin",

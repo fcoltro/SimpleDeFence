@@ -46,6 +46,7 @@ namespace SimpleDeFence
     [JsonSerializable(typeof(AppContainerSubject))]
     [JsonSerializable(typeof(ExecutableSubject))]
     [JsonSerializable(typeof(ServiceSubject))]
+    [JsonSerializable(typeof(PathPatternSubject))]
     [JsonSerializable(typeof(HardBlockPolicy))]
     [JsonSerializable(typeof(UnrestrictedPolicy))]
     [JsonSerializable(typeof(TcpUdpPolicy))]
@@ -331,6 +332,7 @@ namespace SimpleDeFence
             typeof(ExecutableSubject),
             typeof(ServiceSubject),
             typeof(AppContainerSubject),
+            typeof(PathPatternSubject),
 
             typeof(ExceptionPolicy),
             typeof(HardBlockPolicy),
