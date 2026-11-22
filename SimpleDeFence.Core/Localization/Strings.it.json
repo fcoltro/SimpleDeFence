@@ -87,9 +87,9 @@
   "applications": {
     "title": "Applicazioni",
     "filterPlaceholder": "Filtra per nome o percorso",
-    "summary": "{0} eccezioni nel profilo \"{1}\"",
-    "summaryOne": "1 eccezione nel profilo \"{0}\"",
-    "empty": "Non ci sono ancora eccezioni per le applicazioni."
+    "summary": "{0} regole nel profilo \"{1}\"",
+    "summaryOne": "1 regola nel profilo \"{0}\"",
+    "empty": "Non ci sono ancora regole per le applicazioni."
   },
   "connections": {
     "title": "Connessioni",
@@ -100,7 +100,9 @@
       "unavailable": "L'uso dei dati non è disponibile. Il servizio del firewall non è raggiungibile, oppure Windows non gli ha permesso di contare il traffico.",
       "sent": "Inviati",
       "received": "Ricevuti",
-      "rate": "Velocità dall'ultimo aggiornamento"
+      "rate": "Velocità dall'ultimo aggiornamento",
+      "appHeading": "App",
+      "rateHeading": "Velocità"
     },
     "section": {
       "blocked": "Bloccate",
@@ -123,15 +125,15 @@
       "body": "Scegli come {0} può usare la rete."
     },
     "allowSuccess": {
-      "title": "Eccezione aggiunta",
+      "title": "Regola aggiunta",
       "body": "Ora {0} può connettersi."
     },
     "allowFailed": {
-      "title": "Impossibile aggiungere l'eccezione",
-      "lockedDetail": "Sblocca la configurazione prima di aggiungere un'eccezione.",
-      "staleDetail": "La configurazione è appena cambiata altrove; l'eccezione non è stata aggiunta. Riprova.",
-      "genericDetail": "Il servizio ha restituito {0}. L'eccezione non è stata aggiunta.",
-      "unidentified": "Non è stato possibile identificare l'applicazione (né percorso né pacchetto), quindi non è stata aggiunta alcuna eccezione."
+      "title": "Impossibile aggiungere la regola",
+      "lockedDetail": "Sblocca la configurazione prima di aggiungere una regola.",
+      "staleDetail": "La configurazione è appena cambiata altrove; la regola non è stata aggiunta. Riprova.",
+      "genericDetail": "Il servizio ha restituito {0}. La regola non è stata aggiunta.",
+      "unidentified": "Non è stato possibile identificare l'applicazione (né percorso né pacchetto), quindi non è stata aggiunta alcuna regola."
     },
     "gatherFailed": {
       "title": "Impossibile leggere i dati sulle connessioni"
@@ -208,7 +210,7 @@
     "allPorts": "tutte"
   },
   "rules": {
-    "specialKind": "Eccezione speciale",
+    "specialKind": "Regola speciale",
     "specialPolicy": "Predefinita",
     "title": "Regole",
     "section": {
@@ -218,32 +220,32 @@
     },
     "filterPlaceholder": "Filtra per nome o percorso",
     "empty": {
-      "applications": "Non ci sono ancora eccezioni per le applicazioni.",
-      "special": "Nessuna eccezione speciale disponibile.",
+      "applications": "Non ci sono ancora regole per le applicazioni.",
+      "special": "Nessuna regola speciale disponibile.",
       "filtered": "Niente corrisponde al filtro attuale.",
       "publishers": "Nessun editore attendibile."
     },
     "appMissing": "Il file di questa applicazione non esiste più sul disco: potrebbe essere stata disinstallata.",
     "remove": "Rimuovi",
     "removeConfirm": {
-      "title": "Rimuovere le eccezioni?",
-      "body": "Rimuovere {0} eccezioni? Le applicazioni interessate torneranno a essere bloccate."
+      "title": "Rimuovere le regole?",
+      "body": "Rimuovere le regole selezionate ({0})? I programmi che consentivano verranno di nuovo bloccati e quelli che bloccavano seguiranno la modalità del firewall."
     },
     "removeSuccess": {
-      "title": "Eccezioni rimosse",
-      "body": "{0} eccezioni sono state rimosse."
+      "title": "Regole rimosse",
+      "body": "Regole rimosse: {0}."
     },
     "removeFailed": {
-      "title": "Impossibile rimuovere le eccezioni",
-      "lockedDetail": "Sblocca la configurazione prima di rimuovere le eccezioni.",
-      "staleDetail": "La configurazione è appena cambiata altrove; le eccezioni non sono state rimosse. Riprova.",
-      "genericDetail": "Il servizio ha restituito {0}. Le eccezioni non sono state rimosse."
+      "title": "Impossibile rimuovere le regole",
+      "lockedDetail": "Sblocca la configurazione prima di rimuovere le regole.",
+      "staleDetail": "La configurazione è appena cambiata altrove; le regole non sono state rimosse. Riprova.",
+      "genericDetail": "Il servizio ha restituito {0}. Le regole non sono state rimosse."
     },
     "specialToggleFailed": {
-      "title": "Impossibile modificare l'eccezione speciale",
-      "lockedDetail": "Sblocca la configurazione prima di modificare questa eccezione.",
-      "staleDetail": "La configurazione è appena cambiata altrove; l'eccezione non è stata modificata. Riprova.",
-      "genericDetail": "Il servizio ha restituito {0}. L'eccezione non è stata modificata."
+      "title": "Impossibile modificare la regola speciale",
+      "lockedDetail": "Sblocca la configurazione prima di modificare questa regola.",
+      "staleDetail": "La configurazione è appena cambiata altrove; la regola non è stata modificata. Riprova.",
+      "genericDetail": "Il servizio ha restituito {0}. La regola non è stata modificata."
     },
     "add": "Aggiungi",
     "addPickExecutable": "File eseguibile...",
@@ -263,7 +265,9 @@
       "matchesMany": "Programmi che corrispondono ora: più di {0}",
       "matchesNone": "Nessun programma corrisponde ora. La regola coprirà comunque i programmi aggiunti in seguito.",
       "invalid": "Inserisci un percorso di cartella completo, ad esempio C:\\Tools. Non è possibile usare un'intera unità.",
-      "writable": "Chiunque usi questo PC può mettere programmi in questa cartella, quindi una regola Consenti qui lascerebbe passare qualsiasi programma aggiunto, malware compreso. Una cartella in Programmi è più sicura."
+      "writable": "Chiunque usi questo PC può mettere programmi in questa cartella, quindi una regola Consenti qui lascerebbe passare qualsiasi programma aggiunto, malware compreso. Una cartella in Programmi è più sicura.",
+      "addedAllowed": "{0} è stata aggiunta. I programmi che copre ora possono connettersi.",
+      "addedBlocked": "{0} è stata aggiunta. I programmi che copre ora sono bloccati."
     },
     "pickUwpTitle": "Scegli un'app UWP",
     "pickProcessTitle": "Scegli un processo in esecuzione",
@@ -289,7 +293,9 @@
         "staleDetail": "La configurazione è appena cambiata altrove; il criterio non è stato modificato. Riprova.",
         "genericDetail": "Il servizio ha restituito {0}. Il criterio non è stato modificato."
       },
-      "policyCustom": "Regole personalizzate"
+      "policyCustom": "Regole personalizzate",
+      "invalidPorts": "{0}: \"{1}\" non è un elenco di porte. Usa numeri e intervalli separati da virgole, come 80, 443, 8000-8100, oppure * per tutte le porte.",
+      "portsHint": "Vuoto per nessuna, * per tutte, oppure 80, 443, 8000-8100"
     },
     "multiSelectHint": "{0} regole selezionate. Rimuovi le elimina tutte; seleziona una sola regola per modificarla.",
     "publishersKind": "Editori attendibili",
@@ -322,7 +328,7 @@
     "cleanUpTooltip": "Rimuovi le regole dei programmi non più installati",
     "cleanUpDialog": {
       "title": "Pulisci le regole",
-      "confirmBody": "{0} regola/e riguardano programmi non più presenti su questo PC. Rimuoverle?",
+      "confirmBody": "Regole per programmi che non sono più su questo PC: {0}. Rimuoverle?",
       "nothing": "Tutte le regole riguardano programmi ancora presenti su questo PC."
     }
   },
@@ -360,8 +366,8 @@
       "languageAuto": "Usa impostazione di sistema",
       "languageRestartTitle": "Riavvia per completare il cambio di lingua",
       "languageRestartDetail": "Parte del testo sullo schermo mantiene la lingua precedente fino al riavvio di SimpleDeFence.",
-      "askForExceptionDetails": "Chiedi i dettagli quando aggiungi una singola eccezione",
-      "askForExceptionDetailsDescription": "Mostra una conferma modificabile prima di aggiungere un'eccezione tramite le scorciatoie di aggiunta rapida dell'area di notifica. Le aggiunte in blocco (ad esempio un'intera cartella) non chiedono mai.",
+      "askForExceptionDetails": "Chiedi i dettagli quando aggiungi una singola regola",
+      "askForExceptionDetailsDescription": "Chiedi conferma prima di consentire un programma da Aggiungi o dalle scorciatoie dell'area di notifica. Le regole per cartella non chiedono mai.",
       "enableHotkeys": "Attiva le scorciatoie da tastiera globali",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W consentono all'istante un eseguibile, un processo o una finestra da qualsiasi punto. Ctrl+Alt+B passa a Blocca tutto e torna a Normale.",
       "autoRefreshInterval": "Intervallo di aggiornamento automatico",
@@ -369,7 +375,8 @@
       "notifyBlocked": "Avvisami quando un'app viene bloccata",
       "notifyBlockedDescription": "Una volta per app in ogni sessione, in modalità Normale. I componenti di Windows sono esclusi.",
       "notifyListening": "Avvisami quando un'app inizia ad accettare connessioni in entrata",
-      "notifyListeningDescription": "Una volta per app in ogni sessione. I componenti di Windows sono esclusi."
+      "notifyListeningDescription": "Una volta per app in ogni sessione. I componenti di Windows sono esclusi.",
+      "languageRestartNow": "Riavvia ora"
     },
     "protection": {
       "allowLocalSubnet": "Consenti la rete locale",
@@ -389,7 +396,9 @@
       "addressesDescription": "Nessun programma può connettersi da o verso questi indirizzi IP e reti, qualunque cosa dicano le sue regole. Uno per riga; le righe che iniziano con # vengono ignorate.",
       "addressesPlaceholder": "Ad esempio 203.0.113.7 o 198.51.100.0/24",
       "addressesSave": "Salva indirizzi",
-      "addressesInvalid": "«{0}» non è un indirizzo IP né una rete. Non è stato salvato nulla."
+      "addressesInvalid": "«{0}» non è un indirizzo IP né una rete. Non è stato salvato nulla.",
+      "hostsDescription": "Impedisce le connessioni a siti dannosi noti tramite il file hosts di Windows.",
+      "portsDescription": "Blocca le porte di rete usate spesso dal malware."
     },
     "privacy": {
       "telemetry": "Riduci la telemetria di Windows",
@@ -444,18 +453,30 @@
       "unlockFailed": {
         "title": "Impossibile sbloccare la configurazione",
         "detail": "La password non è stata accettata."
-      }
+      },
+      "removeConfirm": {
+        "title": "Rimuovere la password?",
+        "body": "Chiunque possa accedere a questo PC potrà modificare le regole e le impostazioni di SimpleDeFence."
+      },
+      "passwordHeader": "Password",
+      "lockHeader": "Blocca la configurazione"
     },
     "updates": {
       "autoCheck": "Controlla automaticamente gli aggiornamenti",
       "autoCheckDescription": "SimpleDeFence controlla periodicamente la presenza di nuove versioni.",
-      "checkNow": "Controlla ora gli aggiornamenti",
+      "checkNow": "Controlla ora",
       "checkingTitle": "Controllo degli aggiornamenti...",
       "checkFailedTitle": "Controllo degli aggiornamenti non riuscito",
       "noneAvailable": "Stai usando la versione più recente.",
       "available": "La versione {0} è disponibile. Scaricarla e installarla ora?",
       "downloading": "Download dell'aggiornamento...",
-      "verificationFailed": "Il file scaricato non corrispondeva al checksum pubblicato per questa versione, quindi non è stato eseguito. Non è stato installato nulla."
+      "verificationFailed": "Il file scaricato non corrispondeva al checksum pubblicato per questa versione, quindi non è stato eseguito. Non è stato installato nulla.",
+      "manualCheckHeader": "Cerca aggiornamenti",
+      "manualCheckDescription": "Controlla se è disponibile una versione più recente di SimpleDeFence.",
+      "upToDateTitle": "Nessun aggiornamento disponibile",
+      "availableTitle": "Aggiornamento disponibile",
+      "install": "Scarica e installa",
+      "notNow": "Non ora"
     },
     "maintenance": {
       "import": "Importa configurazione...",
@@ -479,7 +500,9 @@
       },
       "exportFailed": {
         "title": "Impossibile esportare la configurazione"
-      }
+      },
+      "backupHeader": "Backup o ripristino",
+      "backupDescription": "Salva tutte le regole e le impostazioni in un file, o caricale da un file."
     },
     "about": {
       "version": "Versione {0}",
@@ -536,7 +559,7 @@
       "failedTitle": "Password errata"
     },
     "quickAdd": {
-      "confirmTitle": "Aggiungere l'eccezione?",
+      "confirmTitle": "Aggiungere la regola?",
       "confirmBody": "Consentire a \"{0}\" di attraversare il firewall?",
       "confirmAdd": "Aggiungi"
     },
@@ -545,7 +568,7 @@
     },
     "stillRunning": {
       "title": "SimpleDeFence è ancora in esecuzione",
-      "body": "Chiudere la finestra non arresta il firewall. Usa Esci in questo menu per arrestarlo."
+      "body": "Chiudere la finestra non ferma il firewall. Esci chiude solo questa app; il firewall continua a proteggere il PC."
     }
   },
   "duration": {

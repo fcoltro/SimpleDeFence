@@ -65,7 +65,7 @@
     },
     "learningConfirm": {
       "title": "Start automatic learning?",
-      "body": "In automatic learning mode SimpleDeFence allows all traffic and remembers which applications used the network, then adds exceptions for them when you leave the mode. Rules cannot be learned for Special Exceptions.\n\nOnly use this on a system you are confident is free of malware.",
+      "body": "In automatic learning mode SimpleDeFence allows all traffic and remembers which applications used the network, then adds rules for them when you leave the mode. Special rules cannot be learned.\n\nOnly use this on a system you are confident is free of malware.",
       "confirm": "Enter learning mode"
     },
     "learningDuration": {
@@ -87,9 +87,9 @@
   "applications": {
     "title": "Applications",
     "filterPlaceholder": "Filter by name or path",
-    "summary": "{0} exceptions in profile \"{1}\"",
-    "summaryOne": "1 exception in profile \"{0}\"",
-    "empty": "No application exceptions yet."
+    "summary": "{0} rules in profile \"{1}\"",
+    "summaryOne": "1 rule in profile \"{0}\"",
+    "empty": "No application rules yet."
   },
   "connections": {
     "title": "Connections",
@@ -100,7 +100,9 @@
       "unavailable": "Data use is not available. The firewall service could not be reached, or Windows did not let it count traffic.",
       "sent": "Sent",
       "received": "Received",
-      "rate": "Speed since the last refresh"
+      "rate": "Speed since the last refresh",
+      "appHeading": "App",
+      "rateHeading": "Speed"
     },
     "section": {
       "blocked": "Blocked",
@@ -123,15 +125,15 @@
       "body": "Choose how {0} may use the network."
     },
     "allowSuccess": {
-      "title": "Exception added",
+      "title": "Rule added",
       "body": "{0} can now connect."
     },
     "allowFailed": {
-      "title": "Could not add the exception",
-      "lockedDetail": "Unlock the configuration before adding an exception.",
-      "staleDetail": "The configuration changed elsewhere just now; the exception was not added. Please try again.",
-      "genericDetail": "The service returned {0}. The exception was not added.",
-      "unidentified": "The application could not be identified (no path or package), so no exception was added."
+      "title": "Could not add the rule",
+      "lockedDetail": "Unlock the configuration before adding a rule.",
+      "staleDetail": "The configuration changed elsewhere just now; the rule was not added. Please try again.",
+      "genericDetail": "The service returned {0}. The rule was not added.",
+      "unidentified": "The application could not be identified (no path or package), so no rule was added."
     },
     "gatherFailed": {
       "title": "Could not read connection data"
@@ -208,7 +210,7 @@
     "allPorts": "all"
   },
   "rules": {
-    "specialKind": "Special exception",
+    "specialKind": "Special rules",
     "specialPolicy": "Predefined",
     "title": "Rules",
     "section": {
@@ -218,32 +220,32 @@
     },
     "filterPlaceholder": "Filter by name or path",
     "empty": {
-      "applications": "No application exceptions yet.",
-      "special": "No special exceptions available.",
+      "applications": "No application rules yet.",
+      "special": "No special rules available.",
       "filtered": "Nothing matches the current filter.",
       "publishers": "No trusted publishers."
     },
     "appMissing": "This application's file no longer exists on disk - it may have been uninstalled.",
     "remove": "Remove",
     "removeConfirm": {
-      "title": "Remove exceptions?",
-      "body": "Remove {0} exception(s)? The affected applications will be blocked again."
+      "title": "Remove rules?",
+      "body": "Remove the selected rules ({0})? Programs they allowed will be blocked again, and programs they blocked will follow the firewall mode."
     },
     "removeSuccess": {
-      "title": "Exceptions removed",
-      "body": "{0} exception(s) were removed."
+      "title": "Rules removed",
+      "body": "Rules removed: {0}."
     },
     "removeFailed": {
-      "title": "Could not remove the exceptions",
-      "lockedDetail": "Unlock the configuration before removing exceptions.",
-      "staleDetail": "The configuration changed elsewhere just now; the exceptions were not removed. Please try again.",
-      "genericDetail": "The service returned {0}. The exceptions were not removed."
+      "title": "Could not remove the rules",
+      "lockedDetail": "Unlock the configuration before removing rules.",
+      "staleDetail": "The configuration changed elsewhere just now; the rules were not removed. Please try again.",
+      "genericDetail": "The service returned {0}. The rules were not removed."
     },
     "specialToggleFailed": {
-      "title": "Could not change the special exception",
-      "lockedDetail": "Unlock the configuration before changing this exception.",
-      "staleDetail": "The configuration changed elsewhere just now; the exception was not changed. Please try again.",
-      "genericDetail": "The service returned {0}. The exception was not changed."
+      "title": "Could not change the special rule",
+      "lockedDetail": "Unlock the configuration before changing this rule.",
+      "staleDetail": "The configuration changed elsewhere just now; the rule was not changed. Please try again.",
+      "genericDetail": "The service returned {0}. The rule was not changed."
     },
     "add": "Add",
     "addPickExecutable": "Executable file...",
@@ -263,7 +265,9 @@
       "matchesMany": "Programs that match right now: more than {0}",
       "matchesNone": "No programs match right now. The rule still covers programs added later.",
       "invalid": "Enter a full folder path, such as C:\\Tools. A whole drive cannot be used.",
-      "writable": "Anyone who uses this PC can put programs in this folder, so an Allow rule here would let any program they add through, malware included. A folder under Program Files is safer."
+      "writable": "Anyone who uses this PC can put programs in this folder, so an Allow rule here would let any program they add through, malware included. A folder under Program Files is safer.",
+      "addedAllowed": "{0} was added. Programs it covers can now connect.",
+      "addedBlocked": "{0} was added. Programs it covers are now blocked."
     },
     "pickUwpTitle": "Choose a UWP app",
     "pickProcessTitle": "Choose a running process",
@@ -282,14 +286,16 @@
       "lanOnly": "LAN only",
       "apply": "Apply",
       "customRulesReadOnly": "This kind of rule can't be edited here.",
-      "applySuccess": "Policy updated.",
+      "applySuccess": "Rule updated.",
       "applyFailed": {
-        "title": "Could not update the policy",
+        "title": "Could not update the rule",
         "lockedDetail": "Unlock the configuration before changing this rule.",
-        "staleDetail": "The configuration changed elsewhere just now; the policy was not changed. Please try again.",
-        "genericDetail": "The service returned {0}. The policy was not changed."
+        "staleDetail": "The configuration changed elsewhere just now; the rule was not changed. Please try again.",
+        "genericDetail": "The service returned {0}. The rule was not changed."
       },
-      "policyCustom": "Custom rules"
+      "policyCustom": "Custom rules",
+      "invalidPorts": "{0}: \"{1}\" is not a list of ports. Use numbers and ranges separated by commas, such as 80, 443, 8000-8100, or * for every port.",
+      "portsHint": "Empty for none, * for all, or 80, 443, 8000-8100"
     },
     "multiSelectHint": "{0} rules selected. Remove deletes all of them; select a single rule to edit it.",
     "publishersKind": "Trusted publishers",
@@ -322,7 +328,7 @@
     "cleanUpTooltip": "Remove the rules for programs that are no longer installed",
     "cleanUpDialog": {
       "title": "Clean up rules",
-      "confirmBody": "{0} rule(s) are for programs that are no longer on this PC. Remove them?",
+      "confirmBody": "Rules for programs that are no longer on this PC: {0}. Remove them?",
       "nothing": "Every rule is for a program that is still on this PC."
     }
   },
@@ -360,16 +366,17 @@
       "languageAuto": "Use system setting",
       "languageRestartTitle": "Restart to finish switching language",
       "languageRestartDetail": "Some of the text on screen keeps the previous language until SimpleDeFence is restarted.",
-      "askForExceptionDetails": "Ask for details when adding a single exception",
-      "askForExceptionDetailsDescription": "Show an editable confirmation before adding one exception via the tray's quick-add shortcuts. Bulk adds (e.g. a whole folder) never prompt.",
+      "askForExceptionDetails": "Ask before adding a single rule",
+      "askForExceptionDetailsDescription": "Show a confirmation before allowing one program from Add or from the tray's quick-add shortcuts. Folder rules never ask.",
       "enableHotkeys": "Enable global keyboard shortcuts",
-      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly whitelist an executable, process, or window from anywhere. Ctrl+Alt+B switches to Block all, and back to Normal.",
+      "enableHotkeysDescription": "Ctrl+Alt+E/P/W instantly allow an executable, process, or window from anywhere. Ctrl+Alt+B switches to Block all, and back to Normal.",
       "autoRefreshInterval": "Auto-refresh interval",
       "autoRefreshIntervalDescription": "How often the Connections page re-checks while its Auto-refresh switch is on. Nothing pushes changes to it, so this is a polling interval; lower is fresher and costs more.",
       "notifyBlocked": "Tell me when an app is blocked",
       "notifyBlockedDescription": "Once per app each session, in Normal mode. Windows components are left out.",
       "notifyListening": "Tell me when an app starts accepting incoming connections",
-      "notifyListeningDescription": "Once per app each session. Windows components are left out."
+      "notifyListeningDescription": "Once per app each session. Windows components are left out.",
+      "languageRestartNow": "Restart now"
     },
     "protection": {
       "allowLocalSubnet": "Allow local network",
@@ -389,7 +396,9 @@
       "addressesDescription": "No program can connect to or from these IP addresses and networks, whatever its rules say. One per line; lines starting with # are ignored.",
       "addressesPlaceholder": "For example 203.0.113.7 or 198.51.100.0/24",
       "addressesSave": "Save addresses",
-      "addressesInvalid": "\"{0}\" is not an IP address or network. Nothing was saved."
+      "addressesInvalid": "\"{0}\" is not an IP address or network. Nothing was saved.",
+      "hostsDescription": "Stops connections to known malicious websites, using the Windows hosts file.",
+      "portsDescription": "Blocks network ports that malware commonly uses."
     },
     "privacy": {
       "telemetry": "Reduce Windows telemetry",
@@ -444,18 +453,30 @@
       "unlockFailed": {
         "title": "Could not unlock the configuration",
         "detail": "The password was not accepted."
-      }
+      },
+      "removeConfirm": {
+        "title": "Remove the password?",
+        "body": "Anyone who can sign in to this PC will be able to change SimpleDeFence's rules and settings."
+      },
+      "passwordHeader": "Password",
+      "lockHeader": "Lock the configuration"
     },
     "updates": {
       "autoCheck": "Automatically check for updates",
       "autoCheckDescription": "SimpleDeFence periodically checks for new versions.",
-      "checkNow": "Check for updates now",
+      "checkNow": "Check now",
       "checkingTitle": "Checking for updates...",
       "checkFailedTitle": "Update check failed",
       "noneAvailable": "You're running the latest version.",
       "available": "Version {0} is available. Download and install it now?",
       "downloading": "Downloading update...",
-      "verificationFailed": "The download did not match the checksum published for this release, so it was not run. Nothing has been installed."
+      "verificationFailed": "The download did not match the checksum published for this release, so it was not run. Nothing has been installed.",
+      "manualCheckHeader": "Check for updates",
+      "manualCheckDescription": "See whether a newer version of SimpleDeFence is available.",
+      "upToDateTitle": "No update available",
+      "availableTitle": "Update available",
+      "install": "Download and install",
+      "notNow": "Not now"
     },
     "maintenance": {
       "import": "Import configuration...",
@@ -479,7 +500,9 @@
       },
       "exportFailed": {
         "title": "Could not export the configuration"
-      }
+      },
+      "backupHeader": "Back up or restore",
+      "backupDescription": "Save every rule and setting to a file, or load them from one."
     },
     "about": {
       "version": "Version {0}",
@@ -514,20 +537,20 @@
   "tray": {
     "mode": {
       "normal": "Normal",
-      "blockAll": "Block All",
-      "allowOutgoing": "Allow Outgoing",
+      "blockAll": "Block all",
+      "allowOutgoing": "Allow outgoing",
       "disabled": "Disabled",
       "learning": "Learning"
     },
     "manage": "Manage...",
     "connections": "Connections...",
     "lock": "Lock",
-    "elevate": "Run as Administrator",
-    "allowLocalSubnet": "Allow Local Subnet",
-    "enableHostsBlocklist": "Enable Hosts Blocklist",
-    "whitelistByExecutable": "Whitelist executable...",
-    "whitelistByProcess": "Whitelist running process...",
-    "whitelistByWindow": "Whitelist by window...",
+    "elevate": "Run as administrator",
+    "allowLocalSubnet": "Allow local subnet",
+    "enableHostsBlocklist": "Enable hosts blocklist",
+    "whitelistByExecutable": "Allow executable...",
+    "whitelistByProcess": "Allow running process...",
+    "whitelistByWindow": "Allow by window...",
     "quit": "Quit",
     "unlock": {
       "title": "Unlock SimpleDeFence",
@@ -536,7 +559,7 @@
       "failedTitle": "Incorrect password"
     },
     "quickAdd": {
-      "confirmTitle": "Add exception?",
+      "confirmTitle": "Add rule?",
       "confirmBody": "Allow \"{0}\" through the firewall?",
       "confirmAdd": "Add"
     },
@@ -545,7 +568,7 @@
     },
     "stillRunning": {
       "title": "SimpleDeFence is still running",
-      "body": "Closing the window does not stop the firewall. Use Quit in this menu to stop it."
+      "body": "Closing the window does not stop the firewall. Quit only closes this app; the firewall keeps protecting this PC."
     }
   },
   "duration": {

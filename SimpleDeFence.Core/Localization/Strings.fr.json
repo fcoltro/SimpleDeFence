@@ -87,9 +87,9 @@
   "applications": {
     "title": "Applications",
     "filterPlaceholder": "Filtrer par nom ou chemin",
-    "summary": "{0} exceptions dans le profil « {1} »",
-    "summaryOne": "1 exception dans le profil « {0} »",
-    "empty": "Aucune exception d'application pour l'instant."
+    "summary": "{0} règles dans le profil « {1} »",
+    "summaryOne": "1 règle dans le profil « {0} »",
+    "empty": "Aucune règle d'application pour l'instant."
   },
   "connections": {
     "title": "Connexions",
@@ -100,7 +100,9 @@
       "unavailable": "L'utilisation des données n'est pas disponible. Le service du pare-feu est injoignable, ou Windows ne l'a pas autorisé à compter le trafic.",
       "sent": "Envoyées",
       "received": "Reçues",
-      "rate": "Débit depuis la dernière actualisation"
+      "rate": "Débit depuis la dernière actualisation",
+      "appHeading": "Application",
+      "rateHeading": "Débit"
     },
     "section": {
       "blocked": "Bloquées",
@@ -123,15 +125,15 @@
       "body": "Choisissez comment {0} peut utiliser le réseau."
     },
     "allowSuccess": {
-      "title": "Exception ajoutée",
+      "title": "Règle ajoutée",
       "body": "{0} peut désormais se connecter."
     },
     "allowFailed": {
-      "title": "Impossible d'ajouter l'exception",
-      "lockedDetail": "Déverrouillez la configuration avant d'ajouter une exception.",
-      "staleDetail": "La configuration vient d'être modifiée ailleurs ; l'exception n'a pas été ajoutée. Veuillez réessayer.",
-      "genericDetail": "Le service a renvoyé {0}. L'exception n'a pas été ajoutée.",
-      "unidentified": "L'application n'a pas pu être identifiée (ni chemin ni paquet), aucune exception n'a donc été ajoutée."
+      "title": "Impossible d'ajouter la règle",
+      "lockedDetail": "Déverrouillez la configuration avant d'ajouter une règle.",
+      "staleDetail": "La configuration vient d'être modifiée ailleurs ; la règle n'a pas été ajoutée. Veuillez réessayer.",
+      "genericDetail": "Le service a renvoyé {0}. La règle n'a pas été ajoutée.",
+      "unidentified": "L'application n'a pas pu être identifiée (ni chemin ni paquet), aucune règle n'a donc été ajoutée."
     },
     "gatherFailed": {
       "title": "Impossible de lire les données de connexion"
@@ -208,7 +210,7 @@
     "allPorts": "tous"
   },
   "rules": {
-    "specialKind": "Exception spéciale",
+    "specialKind": "Règle spéciale",
     "specialPolicy": "Prédéfinie",
     "title": "Règles",
     "section": {
@@ -218,32 +220,32 @@
     },
     "filterPlaceholder": "Filtrer par nom ou chemin",
     "empty": {
-      "applications": "Aucune exception d'application pour l'instant.",
-      "special": "Aucune exception spéciale disponible.",
+      "applications": "Aucune règle d'application pour l'instant.",
+      "special": "Aucune règle spéciale disponible.",
       "filtered": "Rien ne correspond au filtre actuel.",
       "publishers": "Aucun éditeur approuvé."
     },
     "appMissing": "Le fichier de cette application n'existe plus sur le disque - elle a peut-être été désinstallée.",
     "remove": "Supprimer",
     "removeConfirm": {
-      "title": "Supprimer les exceptions ?",
-      "body": "Supprimer {0} exception(s) ? Les applications concernées seront de nouveau bloquées."
+      "title": "Supprimer les règles ?",
+      "body": "Supprimer les règles sélectionnées ({0}) ? Les programmes qu'elles autorisaient seront de nouveau bloqués, et ceux qu'elles bloquaient suivront le mode du pare-feu."
     },
     "removeSuccess": {
-      "title": "Exceptions supprimées",
-      "body": "{0} exception(s) ont été supprimées."
+      "title": "Règles supprimées",
+      "body": "Règles supprimées : {0}."
     },
     "removeFailed": {
-      "title": "Impossible de supprimer les exceptions",
-      "lockedDetail": "Déverrouillez la configuration avant de supprimer des exceptions.",
-      "staleDetail": "La configuration vient d'être modifiée ailleurs ; les exceptions n'ont pas été supprimées. Veuillez réessayer.",
-      "genericDetail": "Le service a renvoyé {0}. Les exceptions n'ont pas été supprimées."
+      "title": "Impossible de supprimer les règles",
+      "lockedDetail": "Déverrouillez la configuration avant de supprimer des règles.",
+      "staleDetail": "La configuration vient d'être modifiée ailleurs ; les règles n'ont pas été supprimées. Veuillez réessayer.",
+      "genericDetail": "Le service a renvoyé {0}. Les règles n'ont pas été supprimées."
     },
     "specialToggleFailed": {
-      "title": "Impossible de modifier l'exception spéciale",
-      "lockedDetail": "Déverrouillez la configuration avant de modifier cette exception.",
-      "staleDetail": "La configuration vient d'être modifiée ailleurs ; l'exception n'a pas été modifiée. Veuillez réessayer.",
-      "genericDetail": "Le service a renvoyé {0}. L'exception n'a pas été modifiée."
+      "title": "Impossible de modifier la règle spéciale",
+      "lockedDetail": "Déverrouillez la configuration avant de modifier cette règle.",
+      "staleDetail": "La configuration vient d'être modifiée ailleurs ; la règle n'a pas été modifiée. Veuillez réessayer.",
+      "genericDetail": "Le service a renvoyé {0}. La règle n'a pas été modifiée."
     },
     "add": "Ajouter",
     "addPickExecutable": "Fichier exécutable...",
@@ -263,7 +265,9 @@
       "matchesMany": "Programmes correspondants actuellement : plus de {0}",
       "matchesNone": "Aucun programme ne correspond pour l’instant. La règle couvrira quand même les programmes ajoutés plus tard.",
       "invalid": "Saisissez un chemin de dossier complet, par exemple C:\\Tools. Un lecteur entier n’est pas accepté.",
-      "writable": "Toute personne utilisant ce PC peut placer des programmes dans ce dossier : une règle Autoriser ici laisserait passer tout programme ajouté, y compris un logiciel malveillant. Un dossier sous Program Files est plus sûr."
+      "writable": "Toute personne utilisant ce PC peut placer des programmes dans ce dossier : une règle Autoriser ici laisserait passer tout programme ajouté, y compris un logiciel malveillant. Un dossier sous Program Files est plus sûr.",
+      "addedAllowed": "{0} a été ajoutée. Les programmes concernés peuvent maintenant se connecter.",
+      "addedBlocked": "{0} a été ajoutée. Les programmes concernés sont maintenant bloqués."
     },
     "pickUwpTitle": "Choisissez une application UWP",
     "pickProcessTitle": "Choisissez un processus en cours",
@@ -289,7 +293,9 @@
         "staleDetail": "La configuration vient d'être modifiée ailleurs ; la stratégie n'a pas été modifiée. Veuillez réessayer.",
         "genericDetail": "Le service a renvoyé {0}. La stratégie n'a pas été modifiée."
       },
-      "policyCustom": "Règles personnalisées"
+      "policyCustom": "Règles personnalisées",
+      "invalidPorts": "{0} : « {1} » n'est pas une liste de ports. Utilisez des nombres et des plages séparés par des virgules, comme 80, 443, 8000-8100, ou * pour tous les ports.",
+      "portsHint": "Vide pour aucun, * pour tous, ou 80, 443, 8000-8100"
     },
     "multiSelectHint": "{0} règles sélectionnées. Supprimer les efface toutes ; sélectionnez une seule règle pour la modifier.",
     "publishersKind": "Éditeurs approuvés",
@@ -322,7 +328,7 @@
     "cleanUpTooltip": "Supprimer les règles des programmes qui ne sont plus installés",
     "cleanUpDialog": {
       "title": "Nettoyer les règles",
-      "confirmBody": "{0} règle(s) concernent des programmes qui ne sont plus sur ce PC. Les supprimer ?",
+      "confirmBody": "Règles de programmes qui ne sont plus sur ce PC : {0}. Les supprimer ?",
       "nothing": "Toutes les règles concernent des programmes encore présents sur ce PC."
     }
   },
@@ -360,8 +366,8 @@
       "languageAuto": "Utiliser le paramètre système",
       "languageRestartTitle": "Redémarrez pour terminer le changement de langue",
       "languageRestartDetail": "Une partie du texte à l'écran conserve la langue précédente jusqu'au redémarrage de SimpleDeFence.",
-      "askForExceptionDetails": "Demander des détails lors de l'ajout d'une seule exception",
-      "askForExceptionDetailsDescription": "Affiche une confirmation modifiable avant d'ajouter une exception via les raccourcis rapides de la zone de notification. Les ajouts groupés (un dossier entier, par exemple) ne demandent jamais.",
+      "askForExceptionDetails": "Demander des détails lors de l'ajout d'une seule règle",
+      "askForExceptionDetailsDescription": "Demander une confirmation avant d'autoriser un programme depuis Ajouter ou les raccourcis de la zone de notification. Les règles de dossier ne demandent jamais.",
       "enableHotkeys": "Activer les raccourcis clavier globaux",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W autorisent instantanément un exécutable, un processus ou une fenêtre depuis n'importe où. Ctrl+Alt+B passe en mode Tout bloquer, puis revient en mode Normal.",
       "autoRefreshInterval": "Intervalle d'actualisation automatique",
@@ -369,7 +375,8 @@
       "notifyBlocked": "Me prévenir quand une application est bloquée",
       "notifyBlockedDescription": "Une fois par application et par session, en mode Normal. Les composants de Windows sont exclus.",
       "notifyListening": "Me prévenir quand une application commence à accepter des connexions entrantes",
-      "notifyListeningDescription": "Une fois par application et par session. Les composants de Windows sont exclus."
+      "notifyListeningDescription": "Une fois par application et par session. Les composants de Windows sont exclus.",
+      "languageRestartNow": "Redémarrer maintenant"
     },
     "protection": {
       "allowLocalSubnet": "Autoriser le réseau local",
@@ -389,7 +396,9 @@
       "addressesDescription": "Aucun programme ne peut se connecter à ces adresses IP et réseaux, ni en recevoir de connexion, quelles que soient ses règles. Une par ligne ; les lignes commençant par # sont ignorées.",
       "addressesPlaceholder": "Par exemple 203.0.113.7 ou 198.51.100.0/24",
       "addressesSave": "Enregistrer les adresses",
-      "addressesInvalid": "« {0} » n’est ni une adresse IP ni un réseau. Rien n’a été enregistré."
+      "addressesInvalid": "« {0} » n’est ni une adresse IP ni un réseau. Rien n’a été enregistré.",
+      "hostsDescription": "Empêche les connexions vers des sites malveillants connus grâce au fichier hosts de Windows.",
+      "portsDescription": "Bloque les ports réseau souvent utilisés par les logiciels malveillants."
     },
     "privacy": {
       "telemetry": "Réduire la télémétrie de Windows",
@@ -444,18 +453,30 @@
       "unlockFailed": {
         "title": "Impossible de déverrouiller la configuration",
         "detail": "Le mot de passe n'a pas été accepté."
-      }
+      },
+      "removeConfirm": {
+        "title": "Supprimer le mot de passe ?",
+        "body": "Toute personne pouvant se connecter à ce PC pourra modifier les règles et les paramètres de SimpleDeFence."
+      },
+      "passwordHeader": "Mot de passe",
+      "lockHeader": "Verrouiller la configuration"
     },
     "updates": {
       "autoCheck": "Rechercher les mises à jour automatiquement",
       "autoCheckDescription": "SimpleDeFence recherche régulièrement de nouvelles versions.",
-      "checkNow": "Rechercher les mises à jour maintenant",
+      "checkNow": "Rechercher",
       "checkingTitle": "Recherche de mises à jour...",
       "checkFailedTitle": "La recherche de mises à jour a échoué",
       "noneAvailable": "Vous utilisez la dernière version.",
       "available": "La version {0} est disponible. La télécharger et l'installer maintenant ?",
       "downloading": "Téléchargement de la mise à jour...",
-      "verificationFailed": "Le téléchargement ne correspondait pas à la somme de contrôle publiée pour cette version : il n'a donc pas été exécuté. Rien n'a été installé."
+      "verificationFailed": "Le téléchargement ne correspondait pas à la somme de contrôle publiée pour cette version : il n'a donc pas été exécuté. Rien n'a été installé.",
+      "manualCheckHeader": "Rechercher des mises à jour",
+      "manualCheckDescription": "Vérifier si une version plus récente de SimpleDeFence est disponible.",
+      "upToDateTitle": "Aucune mise à jour disponible",
+      "availableTitle": "Mise à jour disponible",
+      "install": "Télécharger et installer",
+      "notNow": "Pas maintenant"
     },
     "maintenance": {
       "import": "Importer la configuration...",
@@ -479,7 +500,9 @@
       },
       "exportFailed": {
         "title": "Impossible d'exporter la configuration"
-      }
+      },
+      "backupHeader": "Sauvegarder ou restaurer",
+      "backupDescription": "Enregistrer toutes les règles et tous les paramètres dans un fichier, ou les charger depuis un fichier."
     },
     "about": {
       "version": "Version {0}",
@@ -536,7 +559,7 @@
       "failedTitle": "Mot de passe incorrect"
     },
     "quickAdd": {
-      "confirmTitle": "Ajouter l'exception ?",
+      "confirmTitle": "Ajouter la règle ?",
       "confirmBody": "Autoriser « {0} » à traverser le pare-feu ?",
       "confirmAdd": "Ajouter"
     },
@@ -545,7 +568,7 @@
     },
     "stillRunning": {
       "title": "SimpleDeFence est toujours en cours d'exécution",
-      "body": "Fermer la fenêtre n'arrête pas le pare-feu. Utilisez Quitter dans ce menu pour l'arrêter."
+      "body": "Fermer la fenêtre n'arrête pas le pare-feu. Quitter ferme seulement cette application ; le pare-feu continue de protéger ce PC."
     }
   },
   "duration": {

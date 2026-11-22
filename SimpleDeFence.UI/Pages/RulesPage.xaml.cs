@@ -260,6 +260,18 @@ namespace SimpleDeFence.UI.Pages
         private bool _busy;
         private bool _committing;
 
+        /// <summary>A refresh was asked for while one was running; run another when it ends, so a
+        /// commit's own refresh is never silently skipped and the list left showing the old row.</summary>
+        private bool _refreshPending;
+
+        /// <summary>True while ApplyFilter rebuilds the list. Rebuilding clears and refills it,
+        /// which fires SelectionChanged once per row; the editor is updated once at the end.</summary>
+        private bool _rebuildingList;
+
+        /// <summary>The rule the editor was last filled from. Selecting that same rule again (which
+        /// every rebuild does) keeps what the user has typed instead of filling it afresh.</summary>
+        private Guid? _seededId;
+
         /// <summary>Guards the Add split button's four pickers for the part _committing does not
         /// cover: the picker dialog is up but no commit has started yet (CommitAsync only flips
         /// _committing once a picker actually has something to commit). Prevents a rapid
@@ -301,8 +313,21 @@ namespace SimpleDeFence.UI.Pages
         private async Task RefreshAsync()
         {
             if (_busy)
+            {
+                _refreshPending = true;
                 return;
+            }
 
+            do
+            {
+                _refreshPending = false;
+                await RefreshOnceAsync();
+            }
+            while (_refreshPending);
+        }
+
+        private async Task RefreshOnceAsync()
+        {
             SetBusy(true);
             try
             {
@@ -356,18 +381,27 @@ namespace SimpleDeFence.UI.Pages
                 .Select(id => id!.Value)
                 .ToHashSet();
 
-            _apps.Clear();
-            foreach (var row in filtered.Where(r => r.Group == RuleGroup.Applications))
-                _apps.Add(new RuleListItem { Row = row, IsMissing = row.Exception is { } e && _missingIds.Contains(e.Id) });
-
-            if (selectedIds.Count != 0)
+            _rebuildingList = true;
+            try
             {
-                foreach (var item in _apps)
+                _apps.Clear();
+                foreach (var row in filtered.Where(r => r.Group == RuleGroup.Applications))
+                    _apps.Add(new RuleListItem { Row = row, IsMissing = row.Exception is { } e && _missingIds.Contains(e.Id) });
+
+                if (selectedIds.Count != 0)
                 {
-                    if (item.Row.Exception is { } ex && selectedIds.Contains(ex.Id))
-                        AppsList.SelectedItems.Add(item);
+                    foreach (var item in _apps)
+                    {
+                        if (item.Row.Exception is { } ex && selectedIds.Contains(ex.Id))
+                            AppsList.SelectedItems.Add(item);
+                    }
                 }
             }
+            finally
+            {
+                _rebuildingList = false;
+            }
+            UpdateDetailPane();
 
             RebuildSpecial(_specialRecommended, filtered, RuleGroup.SpecialRecommended);
             RebuildSpecial(_specialOptional, filtered, RuleGroup.SpecialOptional);
@@ -435,6 +469,8 @@ namespace SimpleDeFence.UI.Pages
 
         private void AppsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (_rebuildingList)
+                return;
             UpdateRemoveButton();
             UpdateDetailPane();
         }
@@ -459,6 +495,7 @@ namespace SimpleDeFence.UI.Pages
             if (selected.Count != 1)
             {
                 _selectedDetailItem = null;
+                _seededId = null;
                 DetailPane.Visibility = Visibility.Collapsed;
 
                 // Only for a real multi-selection, not for zero: with nothing checked there is no
@@ -478,6 +515,18 @@ namespace SimpleDeFence.UI.Pages
             MultiSelectHint.Visibility = Visibility.Collapsed;
             _selectedDetailItem = selected[0];
             DetailPane.Visibility = Visibility.Visible;
+
+            // The same rule as before - the list was only rebuilt (a filter keystroke, a refresh, a
+            // switch flipped elsewhere on the page). Filling the editor again here threw away
+            // whatever the user had typed into it and not applied yet.
+            var id = _selectedDetailItem.Row.Exception?.Id;
+            if (id is not null && id == _seededId)
+            {
+                UpdateApplyButtonEnabled();
+                return;
+            }
+
+            _seededId = id;
             SeedDetailPane(_selectedDetailItem);
         }
 
@@ -984,7 +1033,16 @@ namespace SimpleDeFence.UI.Pages
                     nameBox.Text = System.IO.Path.GetFileName(picked.TrimEnd('\\'));
             };
 
-            if (await TryShowDialogAsync(dialog, title, Loc.T(LocKeys.Common.AnotherDialogOpenDetail)) != ContentDialogResult.Primary)
+            var result = await TryShowDialogAsync(dialog, title, Loc.T(LocKeys.Common.AnotherDialogOpenDetail));
+
+            // The match count may still be walking the disk. Nobody will see it now, so stop it -
+            // it used to carry on for up to 500 matches after the dialog had closed.
+            ++version;
+            previewCancel?.Cancel();
+            previewCancel?.Dispose();
+            previewCancel = null;
+
+            if (result != ContentDialogResult.Primary)
                 return;
 
             var (normalized, invalid) = ParseFolderLines(patternBox.Text);
@@ -998,8 +1056,11 @@ namespace SimpleDeFence.UI.Pages
             var resp = await CommitAsync(profile => profile.AddExceptions(new List<FirewallExceptionV3> { rule }));
             if (resp == MessageType.PUT_SETTINGS)
             {
+                // Not the Allow wording: a folder rule can just as well block, and "can now
+                // connect" was reported for those too.
                 await ShowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle),
-                    Loc.T(LocKeys.Connections.AllowSuccessBody, subject.DisplayName));
+                    Loc.T(policy is HardBlockPolicy ? LocKeys.Rules.FolderAddedBlocked : LocKeys.Rules.FolderAddedAllowed,
+                        subject.DisplayName));
                 await RefreshAsync();
             }
             else
@@ -1712,9 +1773,15 @@ namespace SimpleDeFence.UI.Pages
             }
             else
             {
+                if (BuildPolicyFromEditor(out var portsError) is not ExceptionPolicy preset)
+                {
+                    await ShowResultAsync(Loc.T(LocKeys.Rules.DetailApplyFailedTitle), portsError ?? string.Empty);
+                    return;
+                }
+
                 try
                 {
-                    edited = RuleEdit.ApplyPreset(original, BuildPolicyFromEditor());
+                    edited = RuleEdit.ApplyPreset(original, preset);
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -1754,8 +1821,9 @@ namespace SimpleDeFence.UI.Pages
         /// exclusive radios above, and exactly one of the five is always checked once a row has been
         /// seeded (SeedDetailPane always sets one). Not called with Custom checked:
         /// ApplyButton_Click builds that one from the rule editors, which can refuse.</summary>
-        private ExceptionPolicy BuildPolicyFromEditor()
+        private ExceptionPolicy? BuildPolicyFromEditor(out string? error)
         {
+            error = null;
             if (PresetBlocked.IsChecked == true)
                 return new HardBlockPolicy();
 
@@ -1765,20 +1833,50 @@ namespace SimpleDeFence.UI.Pages
             if (PresetUnrestrictedLan.IsChecked == true)
                 return new UnrestrictedPolicy { LocalNetworkOnly = true };
 
+            // Checked here, before anything is sent. These boxes used to be saved as typed, and the
+            // service, which parses them only while it installs filters, refused the whole rule
+            // over one bad entry ("80;443", "https"): the app lost its access and the window
+            // reported an incomplete rule set with nothing pointing back at this box.
+            if (!TryPresetPorts(TcpOutBox, LocKeys.Rules.DetailTcpOut, out var tcpOut, ref error)
+                || !TryPresetPorts(UdpOutBox, LocKeys.Rules.DetailUdpOut, out var udpOut, ref error)
+                || !TryPresetPorts(TcpInBox, LocKeys.Rules.DetailTcpIn, out var tcpIn, ref error)
+                || !TryPresetPorts(UdpInBox, LocKeys.Rules.DetailUdpIn, out var udpIn, ref error))
+                return null;
+
             return new TcpUdpPolicy
             {
-                AllowedRemoteTcpConnectPorts = NormalizePorts(TcpOutBox.Text),
-                AllowedRemoteUdpConnectPorts = NormalizePorts(UdpOutBox.Text),
-                AllowedLocalTcpListenerPorts = NormalizePorts(TcpInBox.Text),
-                AllowedLocalUdpListenerPorts = NormalizePorts(UdpInBox.Text),
+                AllowedRemoteTcpConnectPorts = tcpOut,
+                AllowedRemoteUdpConnectPorts = udpOut,
+                AllowedLocalTcpListenerPorts = tcpIn,
+                AllowedLocalUdpListenerPorts = udpIn,
                 LocalNetworkOnly = LanOnlyCheck.IsChecked == true,
             };
         }
 
-        private static string? NormalizePorts(string text)
+        /// <summary>One TCP/UDP preset box: empty means none, "*" (or "any") means every port,
+        /// anything else must be ports and ranges. Unlike the custom-rule fields, empty and "*" are
+        /// different here - the preset stores "*" for all and nothing for none.</summary>
+        private static bool TryPresetPorts(TextBox box, string labelKey, out string? ports, ref string? error)
         {
-            var trimmed = text?.Trim();
-            return string.IsNullOrEmpty(trimmed) ? null : trimmed;
+            ports = null;
+            var text = box.Text?.Trim() ?? string.Empty;
+            if (text.Length == 0)
+                return true;
+
+            if (text == "*" || text.Equals("any", StringComparison.OrdinalIgnoreCase))
+            {
+                ports = "*";
+                return true;
+            }
+
+            if (CustomRuleText.TryNormalizePorts(text, out var normalized) && normalized is not null)
+            {
+                ports = normalized;
+                return true;
+            }
+
+            error = Loc.T(LocKeys.Rules.DetailInvalidPorts, Loc.T(labelKey), text);
+            return false;
         }
 
         private async Task ToggleSpecialAsync(SpecialListItem item, bool enabled)

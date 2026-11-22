@@ -30,6 +30,9 @@ namespace SimpleDeFence.UI.Pages
 
         private ClientSettings _clientSettings = new();
 
+        /// <summary>The blocked-address box holds text the user has not saved yet.</summary>
+        private bool _blockedAddressesDirty;
+
         public SettingsPage()
         {
             InitializeComponent();
@@ -76,17 +79,35 @@ namespace SimpleDeFence.UI.Pages
             }
         }
 
+        /// <summary>A refresh was asked for while one was running; run another when it ends, so the
+        /// refresh after a commit is not skipped and the page left showing the old values.</summary>
+        private bool _refreshPending;
+
         private async Task RefreshAsync()
         {
             if (_busy)
+            {
+                _refreshPending = true;
                 return;
+            }
 
+            do
+            {
+                _refreshPending = false;
+                await RefreshOnceAsync();
+            }
+            while (_refreshPending);
+        }
+
+        private async Task RefreshOnceAsync()
+        {
             SetBusy(true);
             try
             {
                 await App.Firewall.RefreshAsync();
 
-                if (!App.Firewall.Connected || App.Firewall.Config is null)
+                bool connected = App.Firewall.Connected && App.Firewall.Config is not null;
+                if (!connected)
                 {
                     ShowNotice(InfoBarSeverity.Error, Loc.T(LocKeys.Status.NotConnected),
                         App.Firewall.LastError ?? string.Empty);
@@ -94,16 +115,28 @@ namespace SimpleDeFence.UI.Pages
                 else
                 {
                     Notice.IsOpen = false;
-                    _seeding = true;
-                    try
-                    {
-                        SeedControls();
-                    }
-                    finally
-                    {
-                        _seeding = false;
-                    }
                 }
+
+                // The settings that live on this PC are loaded whether or not the service answered.
+                // They used to be loaded only together with the service's, so with the service
+                // unreachable the page kept a blank ClientSettings - and changing any local option
+                // then saved that blank over the user's file: muted apps, log setup and language
+                // all gone.
+                _seeding = true;
+                try
+                {
+                    SeedLocalControls();
+                    if (connected)
+                        SeedServerControls();
+                }
+                finally
+                {
+                    _seeding = false;
+                }
+
+                // What the service owns cannot be changed without it. Left enabled, every switch
+                // showed Off and each flip ended in an error.
+                SetServerSectionsEnabled(connected);
             }
             catch (Exception ex)
             {
@@ -116,6 +149,26 @@ namespace SimpleDeFence.UI.Pages
         }
 
         private void SeedControls()
+        {
+            SeedLocalControls();
+            SeedServerControls();
+        }
+
+        /// <summary>The service-owned sections, and the one service-owned switch outside them.</summary>
+        private void SetServerSectionsEnabled(bool enabled)
+        {
+            ProtectionSection.IsEnabled = enabled;
+            BlocklistsSection.IsEnabled = enabled;
+            PrivacySection.IsEnabled = enabled;
+            SecuritySection.IsEnabled = enabled;
+            MaintenanceSection.IsEnabled = enabled;
+            AutoUpdateCheckToggle.IsEnabled = enabled;
+        }
+
+        /// <summary>Settings kept on this PC (ClientSettings), read fresh from disk each time so a
+        /// change made elsewhere - a mute on the Connections page - is not overwritten later by
+        /// an old copy held here.</summary>
+        private void SeedLocalControls()
         {
             _clientSettings = ClientSettings.Load();
             ThemeCombo.SelectedIndex = _clientSettings.UiTheme switch
@@ -158,9 +211,15 @@ namespace SimpleDeFence.UI.Pages
             // A log that silently stopped writing is worse than no log, so the last write failure
             // is surfaced here rather than only living on the service.
             var logError = App.ConnectionLogError;
-            if (_clientSettings.ConnectionLogEnabled && logError is not null)
+            if (_clientSettings.ConnectionLogEnabled && logError is not null && !Notice.IsOpen)
                 ShowNotice(InfoBarSeverity.Warning, Loc.T(LocKeys.Settings.LoggingWriteFailedTitle), logError);
 
+            // From the app itself, so About is right even with the service unreachable.
+            SeedVersion();
+        }
+
+        private void SeedServerControls()
+        {
             var config = App.Firewall.Config!;
             AllowLocalSubnetToggle.IsOn = config.ActiveProfile.AllowLocalSubnet;
             DisplayOffBlockToggle.IsOn = config.ActiveProfile.DisplayOffBlock;
@@ -175,7 +234,10 @@ namespace SimpleDeFence.UI.Pages
             EnableBlocklistsToggle.IsOn = config.Blocklists.EnableBlocklists;
             EnableHostsBlocklistToggle.IsOn = config.Blocklists.EnableHostsBlocklist;
             EnablePortBlocklistToggle.IsOn = config.Blocklists.EnablePortBlocklist;
-            BlockedAddressesBox.Text = string.Join("\r", config.Blocklists.BlockedAddresses);
+            // Not while the user has typed changes they have not saved yet: every switch on this
+            // page reseeds after its commit, and that used to wipe a half-entered list.
+            if (!_blockedAddressesDirty)
+                BlockedAddressesBox.Text = string.Join("\r", config.Blocklists.BlockedAddresses);
             UpdateBlocklistSubTogglesEnabled();
 
             LockHostsFileToggle.IsOn = config.LockHostsFile;
@@ -195,7 +257,10 @@ namespace SimpleDeFence.UI.Pages
             UpdateControlsEnabled();
 
             AutoUpdateCheckToggle.IsOn = config.AutoUpdateCheck;
+        }
 
+        private void SeedVersion()
+        {
             // GetEntryAssembly, not GetExecutingAssembly. Executing is SimpleDeFence.UI, whose own
             // <Version> is 1.0.0 and has nothing to do with the product - About reported 1.0.0 for a
             // 0.1.0 build. Entry is SimpleDeFence.exe, which is what the installer and Add/Remove
@@ -335,9 +400,12 @@ namespace SimpleDeFence.UI.Pages
             // Said out loud rather than left for the user to notice: most of what is on screen was
             // resolved at InitializeComponent and will not change until the app is started again,
             // so a picker that appeared to do nothing would read as a broken setting.
+            var restart = new Button { Content = Loc.T(LocKeys.Settings.GeneralLanguageRestartNow) };
+            restart.Click += (_, _) => App.Tray?.Restart();
             ShowNotice(InfoBarSeverity.Informational,
                 Loc.T(LocKeys.Settings.GeneralLanguageRestartTitle),
-                Loc.T(LocKeys.Settings.GeneralLanguageRestartDetail));
+                Loc.T(LocKeys.Settings.GeneralLanguageRestartDetail),
+                restart);
         }
 
         private void AskForExceptionDetailsToggle_Toggled(object sender, RoutedEventArgs e)
@@ -576,7 +644,21 @@ namespace SimpleDeFence.UI.Pages
                     entries.Add(normalized);
             }
 
-            await CommitToggleAsync(config => config.Blocklists.BlockedAddresses = entries);
+            // Cleared first so the reseed after the commit shows the list as saved. On a failure
+            // the user's text is put back, still marked unsaved, rather than lost.
+            var typed = BlockedAddressesBox.Text;
+            _blockedAddressesDirty = false;
+            if (await CommitToggleAsync(config => config.Blocklists.BlockedAddresses = entries) != MessageType.PUT_SETTINGS)
+            {
+                BlockedAddressesBox.Text = typed;
+                _blockedAddressesDirty = true;
+            }
+        }
+
+        private void BlockedAddressesBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!_seeding)
+                _blockedAddressesDirty = true;
         }
 
         private void LockHostsFileToggle_Toggled(object sender, RoutedEventArgs e)
@@ -737,7 +819,7 @@ namespace SimpleDeFence.UI.Pages
         /// and later Updates/Security's Lock-hosts-file): commits, then refreshes either way so
         /// every toggle's visual state reconciles back to the server's truth - the same pattern
         /// RulesPage.ToggleSpecialAsync uses for the identical reason.</summary>
-        private async Task CommitToggleAsync(Action<ServerConfiguration> mutate)
+        private async Task<MessageType> CommitToggleAsync(Action<ServerConfiguration> mutate)
         {
             // Serializes with other toggles: each Toggled handler's own _committing check happens
             // before the DispatcherQueue.TryEnqueue hop, so two toggles flipped within the same
@@ -747,7 +829,7 @@ namespace SimpleDeFence.UI.Pages
             if (_committing)
             {
                 RevertDroppedToggle();
-                return;
+                return MessageType.COM_ERROR;
             }
 
             var resp = await CommitAsync(mutate);
@@ -764,6 +846,7 @@ namespace SimpleDeFence.UI.Pages
                     LocKeys.Settings.CommitFailedLockedDetail, LocKeys.Settings.CommitFailedStaleDetail,
                     LocKeys.Settings.CommitFailedGenericDetail));
             }
+            return resp;
         }
 
         /// <summary>A toggle flipped while another commit was in flight is refused, but the switch
@@ -814,6 +897,24 @@ namespace SimpleDeFence.UI.Pages
         private async void RemovePasswordButton_Click(object sender, RoutedEventArgs e)
         {
             if (_committing) return;
+
+            // One click used to take away the only thing that keeps other people who use this PC
+            // out of the firewall's settings.
+            var title = Loc.T(LocKeys.Settings.SecurityRemoveConfirmTitle);
+            var body = Loc.T(LocKeys.Settings.SecurityRemoveConfirmBody);
+            var confirm = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                FlowDirection = App.UiFlowDirection,
+                RequestedTheme = App.UiElementTheme,
+                Title = title,
+                Content = body,
+                PrimaryButtonText = Loc.T(LocKeys.Settings.SecurityRemovePassword),
+                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                DefaultButton = ContentDialogButton.Close,
+            };
+            if (await TryShowDialogAsync(confirm, title, body) != ContentDialogResult.Primary)
+                return;
             await SetPasswordAsync(string.Empty, Loc.T(LocKeys.Settings.SecurityPasswordRemovedBody));
         }
 
@@ -1186,8 +1287,11 @@ namespace SimpleDeFence.UI.Pages
                 Loc.T(LocKeys.Settings.LocalSaveFailedDetail, error.Message));
         }
 
-        private void ShowNotice(InfoBarSeverity severity, string title, string message)
+        private void ShowNotice(InfoBarSeverity severity, string title, string message,
+            Microsoft.UI.Xaml.Controls.Primitives.ButtonBase? action = null)
         {
+            // Every notice replaces the last one whole, its button included.
+            Notice.ActionButton = action;
             Notice.Severity = severity;
             Notice.Title = title;
             Notice.Message = message;

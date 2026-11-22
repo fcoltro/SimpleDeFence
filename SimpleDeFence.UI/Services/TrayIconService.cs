@@ -468,6 +468,30 @@ namespace SimpleDeFence.UI.Services
             Microsoft.UI.Xaml.Application.Current.Exit();
         }
 
+        /// <summary>Starts a new copy of the app and closes this one, for a change (the language)
+        /// that most of the window only picks up at startup. Same start-then-exit order as
+        /// ElevateSelfAsync, without asking for elevation: this copy already has what it has.</summary>
+        internal void Restart()
+        {
+            var path = SimpleDeFence.Windows.ProcessManager.ExecutablePath;
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path)
+                {
+                    WorkingDirectory = System.IO.Path.GetDirectoryName(path),
+                    UseShellExecute = true,
+                })?.Dispose();
+            }
+            catch (Exception)
+            {
+                // Could not start the new copy: keep this one rather than leave no window at all.
+                return;
+            }
+
+            Dispose();
+            Microsoft.UI.Xaml.Application.Current.Exit();
+        }
+
         private static async Task ToggleAllowLocalSubnetAsync(bool value)
             => await App.Firewall.CommitConfigChangesAsync(c => c.ActiveProfile.AllowLocalSubnet = value);
 

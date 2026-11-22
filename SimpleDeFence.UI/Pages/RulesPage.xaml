@@ -25,6 +25,36 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- The editor sits beside the list only when there is room for both. Beside it at the
+             900px minimum window, the list was left about 250px for rows that need well over 330,
+             and every name and kind was cut short. Below the threshold the editor goes under the
+             list at full width instead. 1250 is the list's own need (about 600px) plus the
+             editor's 376 plus the pane and the page padding. -->
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="EditorBeside">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1250"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="EditorBelow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="DetailPane.(Grid.Row)" Value="1"/>
+                        <Setter Target="DetailPane.(Grid.Column)" Value="0"/>
+                        <Setter Target="DetailPane.Width" Value="Auto"/>
+                        <Setter Target="DetailPane.MinHeight" Value="0"/>
+                        <Setter Target="MultiSelectHint.(Grid.Row)" Value="1"/>
+                        <Setter Target="MultiSelectHint.(Grid.Column)" Value="0"/>
+                        <Setter Target="MultiSelectHint.Width" Value="Auto"/>
+                        <Setter Target="AppsGrid.ColumnSpacing" Value="0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <TextBlock Grid.Row="0" Text="{loc:Loc Key=rules.title}" Style="{StaticResource TitleTextBlockStyle}"/>
 
         <InfoBar Grid.Row="1" x:Name="Notice" IsOpen="False" IsClosable="True"/>
@@ -72,7 +102,7 @@
                     <Expander.Header>
                         <TextBlock x:Name="AppsHeader" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     </Expander.Header>
-                    <Grid ColumnSpacing="16">
+                    <Grid x:Name="AppsGrid" ColumnSpacing="16" RowSpacing="16">
                         <!-- Auto, not "*" with a MinWidth: a "*" column keeps its full share of the
                              width even when its only child is Collapsed, so the detail pane - which
                              is Collapsed until a rule is selected (UpdateDetailPane) - was holding a
@@ -84,11 +114,15 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
                         <StackPanel Grid.Column="0">
                             <TextBlock x:Name="AppsEmpty" Style="{StaticResource BodyTextBlockStyle}"
                                        Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
-                            <ListView x:Name="AppsList" SelectionMode="Multiple"
+                            <ListView x:Name="AppsList" SelectionMode="Extended"
                                       MaxHeight="{StaticResource RulesListMaxHeight}"
                                       SelectionChanged="AppsList_SelectionChanged">
                                 <ListView.ItemTemplate>
@@ -203,13 +237,13 @@
 
                                     <StackPanel x:Name="TcpUdpFields" Spacing="6" Margin="26,0,0,0">
                                         <TextBlock Text="{loc:Loc Key=rules.detail.tcpOut}" Style="{StaticResource CaptionTextBlockStyle}"/>
-                                        <TextBox x:Name="TcpOutBox"/>
+                                        <TextBox x:Name="TcpOutBox" PlaceholderText="{loc:Loc Key=rules.detail.portsHint}"/>
                                         <TextBlock Text="{loc:Loc Key=rules.detail.udpOut}" Style="{StaticResource CaptionTextBlockStyle}"/>
-                                        <TextBox x:Name="UdpOutBox"/>
+                                        <TextBox x:Name="UdpOutBox" PlaceholderText="{loc:Loc Key=rules.detail.portsHint}"/>
                                         <TextBlock Text="{loc:Loc Key=rules.detail.tcpIn}" Style="{StaticResource CaptionTextBlockStyle}"/>
-                                        <TextBox x:Name="TcpInBox"/>
+                                        <TextBox x:Name="TcpInBox" PlaceholderText="{loc:Loc Key=rules.detail.portsHint}"/>
                                         <TextBlock Text="{loc:Loc Key=rules.detail.udpIn}" Style="{StaticResource CaptionTextBlockStyle}"/>
-                                        <TextBox x:Name="UdpInBox"/>
+                                        <TextBox x:Name="UdpInBox" PlaceholderText="{loc:Loc Key=rules.detail.portsHint}"/>
                                         <CheckBox x:Name="LanOnlyCheck" Content="{loc:Loc Key=rules.detail.lanOnly}"/>
                                     </StackPanel>
 
@@ -249,7 +283,8 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="{x:Bind Name}" VerticalAlignment="Center" TextWrapping="NoWrap"/>
-                                        <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsOn, Mode=TwoWay}" OnContent="" OffContent=""/>
+                                        <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsOn, Mode=TwoWay}" OnContent="" OffContent=""
+                                                      AutomationProperties.Name="{x:Bind Name}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -264,7 +299,8 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="{x:Bind Name}" VerticalAlignment="Center" TextWrapping="NoWrap"/>
-                                        <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsOn, Mode=TwoWay}" OnContent="" OffContent=""/>
+                                        <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsOn, Mode=TwoWay}" OnContent="" OffContent=""
+                                                      AutomationProperties.Name="{x:Bind Name}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>

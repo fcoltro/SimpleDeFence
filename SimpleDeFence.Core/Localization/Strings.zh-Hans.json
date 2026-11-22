@@ -87,9 +87,9 @@
   "applications": {
     "title": "应用程序",
     "filterPlaceholder": "按名称或路径筛选",
-    "summary": "配置文件“{1}”中有 {0} 个例外",
-    "summaryOne": "配置文件“{0}”中有 1 个例外",
-    "empty": "尚无应用程序例外。"
+    "summary": "配置文件“{1}”中有 {0} 个规则",
+    "summaryOne": "配置文件“{0}”中有 1 个规则",
+    "empty": "尚无应用程序规则。"
   },
   "connections": {
     "title": "连接",
@@ -100,7 +100,9 @@
       "unavailable": "无法获取数据用量。无法连接防火墙服务，或 Windows 不允许其统计流量。",
       "sent": "已发送",
       "received": "已接收",
-      "rate": "自上次刷新以来的速度"
+      "rate": "自上次刷新以来的速度",
+      "appHeading": "应用",
+      "rateHeading": "速度"
     },
     "section": {
       "blocked": "已阻止",
@@ -123,15 +125,15 @@
       "body": "选择 {0} 可以如何使用网络。"
     },
     "allowSuccess": {
-      "title": "已添加例外",
+      "title": "已添加规则",
       "body": "{0} 现在可以连接了。"
     },
     "allowFailed": {
-      "title": "无法添加例外",
-      "lockedDetail": "添加例外前请先解锁配置。",
-      "staleDetail": "配置刚刚在别处发生了更改；例外未被添加。请重试。",
-      "genericDetail": "服务返回 {0}。例外未被添加。",
-      "unidentified": "无法识别该应用程序（没有路径或程序包），因此未添加任何例外。"
+      "title": "无法添加规则",
+      "lockedDetail": "添加规则前请先解锁配置。",
+      "staleDetail": "配置刚刚在别处发生了更改；规则未被添加。请重试。",
+      "genericDetail": "服务返回 {0}。规则未被添加。",
+      "unidentified": "无法识别该应用程序（没有路径或程序包），因此未添加任何规则。"
     },
     "gatherFailed": {
       "title": "无法读取连接数据"
@@ -208,7 +210,7 @@
     "allPorts": "全部"
   },
   "rules": {
-    "specialKind": "特殊例外",
+    "specialKind": "特殊规则",
     "specialPolicy": "预定义",
     "title": "规则",
     "section": {
@@ -218,32 +220,32 @@
     },
     "filterPlaceholder": "按名称或路径筛选",
     "empty": {
-      "applications": "尚无应用程序例外。",
-      "special": "没有可用的特殊例外。",
+      "applications": "尚无应用程序规则。",
+      "special": "没有可用的特殊规则。",
       "filtered": "没有符合当前筛选条件的内容。",
       "publishers": "没有受信任的发布者。"
     },
     "appMissing": "此应用程序的文件已不在磁盘上，可能已被卸载。",
     "remove": "移除",
     "removeConfirm": {
-      "title": "移除例外？",
-      "body": "移除 {0} 个例外？受影响的应用程序将再次被阻止。"
+      "title": "移除规则？",
+      "body": "移除所选规则（{0} 条）？它们允许的程序将再次被阻止，它们阻止的程序将遵循防火墙模式。"
     },
     "removeSuccess": {
-      "title": "例外已移除",
-      "body": "已移除 {0} 个例外。"
+      "title": "规则已移除",
+      "body": "已移除规则：{0} 条。"
     },
     "removeFailed": {
-      "title": "无法移除例外",
-      "lockedDetail": "移除例外前请先解锁配置。",
-      "staleDetail": "配置刚刚在别处发生了更改；例外未被移除。请重试。",
-      "genericDetail": "服务返回 {0}。例外未被移除。"
+      "title": "无法移除规则",
+      "lockedDetail": "移除规则前请先解锁配置。",
+      "staleDetail": "配置刚刚在别处发生了更改；规则未被移除。请重试。",
+      "genericDetail": "服务返回 {0}。规则未被移除。"
     },
     "specialToggleFailed": {
-      "title": "无法更改该特殊例外",
-      "lockedDetail": "更改此例外前请先解锁配置。",
-      "staleDetail": "配置刚刚在别处发生了更改；例外未被更改。请重试。",
-      "genericDetail": "服务返回 {0}。例外未被更改。"
+      "title": "无法更改该特殊规则",
+      "lockedDetail": "更改此规则前请先解锁配置。",
+      "staleDetail": "配置刚刚在别处发生了更改；规则未被更改。请重试。",
+      "genericDetail": "服务返回 {0}。规则未被更改。"
     },
     "add": "添加",
     "addPickExecutable": "可执行文件...",
@@ -263,7 +265,9 @@
       "matchesMany": "当前匹配的程序：超过 {0} 个",
       "matchesNone": "当前没有匹配的程序。规则仍会覆盖之后添加的程序。",
       "invalid": "请输入完整的文件夹路径，例如 C:\\Tools。不能使用整个驱动器。",
-      "writable": "使用这台电脑的任何人都可以把程序放进此文件夹，因此在这里设置“允许”规则会放行他们添加的任何程序，包括恶意软件。Program Files 下的文件夹更安全。"
+      "writable": "使用这台电脑的任何人都可以把程序放进此文件夹，因此在这里设置“允许”规则会放行他们添加的任何程序，包括恶意软件。Program Files 下的文件夹更安全。",
+      "addedAllowed": "已添加 {0}。其涵盖的程序现在可以连接。",
+      "addedBlocked": "已添加 {0}。其涵盖的程序现在已被阻止。"
     },
     "pickUwpTitle": "选择一个 UWP 应用",
     "pickProcessTitle": "选择一个正在运行的进程",
@@ -289,7 +293,9 @@
         "staleDetail": "配置刚刚在别处发生了更改；策略未被更改。请重试。",
         "genericDetail": "服务返回 {0}。策略未被更改。"
       },
-      "policyCustom": "自定义规则"
+      "policyCustom": "自定义规则",
+      "invalidPorts": "{0}：“{1}”不是端口列表。请使用以逗号分隔的数字和范围，例如 80, 443, 8000-8100，或用 * 表示所有端口。",
+      "portsHint": "留空表示无，* 表示全部，或 80, 443, 8000-8100"
     },
     "multiSelectHint": "已选择 {0} 条规则。“移除”会全部删除；选择单条规则才能编辑它。",
     "publishersKind": "受信任的发布者",
@@ -322,7 +328,7 @@
     "cleanUpTooltip": "删除已不再安装的程序的规则",
     "cleanUpDialog": {
       "title": "清理规则",
-      "confirmBody": "有 {0} 条规则对应的程序已不在这台电脑上。要删除吗？",
+      "confirmBody": "已不在此电脑上的程序的规则：{0} 条。要移除吗？",
       "nothing": "所有规则对应的程序都还在这台电脑上。"
     }
   },
@@ -360,8 +366,8 @@
       "languageAuto": "使用系统设置",
       "languageRestartTitle": "重启以完成语言切换",
       "languageRestartDetail": "屏幕上的部分文字会保持之前的语言，直到重新启动 SimpleDeFence。",
-      "askForExceptionDetails": "添加单个例外时询问详细信息",
-      "askForExceptionDetailsDescription": "通过托盘的快速添加快捷方式添加单个例外前，显示一个可编辑的确认框。批量添加（例如整个文件夹）从不询问。",
+      "askForExceptionDetails": "添加单个规则时询问详细信息",
+      "askForExceptionDetailsDescription": "通过“添加”或托盘快捷添加允许单个程序前先确认。文件夹规则从不询问。",
       "enableHotkeys": "启用全局键盘快捷键",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W 可在任何位置立即将可执行文件、进程或窗口加入白名单。Ctrl+Alt+B 切换到“全部阻止”,再按一次回到正常模式。",
       "autoRefreshInterval": "自动刷新间隔",
@@ -369,7 +375,8 @@
       "notifyBlocked": "应用被阻止时通知我",
       "notifyBlockedDescription": "在正常模式下,每个应用每次会话通知一次。不包括 Windows 组件。",
       "notifyListening": "应用开始接受传入连接时通知我",
-      "notifyListeningDescription": "每个应用每次会话通知一次。不包括 Windows 组件。"
+      "notifyListeningDescription": "每个应用每次会话通知一次。不包括 Windows 组件。",
+      "languageRestartNow": "立即重启"
     },
     "protection": {
       "allowLocalSubnet": "允许本地网络",
@@ -389,7 +396,9 @@
       "addressesDescription": "无论规则如何，任何程序都不能与这些 IP 地址和网络建立连接。每行一个；以 # 开头的行会被忽略。",
       "addressesPlaceholder": "例如 203.0.113.7 或 198.51.100.0/24",
       "addressesSave": "保存地址",
-      "addressesInvalid": "“{0}”不是 IP 地址或网络。未保存任何内容。"
+      "addressesInvalid": "“{0}”不是 IP 地址或网络。未保存任何内容。",
+      "hostsDescription": "通过 Windows hosts 文件阻止连接到已知的恶意网站。",
+      "portsDescription": "阻止恶意软件常用的网络端口。"
     },
     "privacy": {
       "telemetry": "减少 Windows 遥测",
@@ -444,18 +453,30 @@
       "unlockFailed": {
         "title": "无法解锁配置",
         "detail": "密码未被接受。"
-      }
+      },
+      "removeConfirm": {
+        "title": "移除密码？",
+        "body": "任何能登录此电脑的人都将能够更改 SimpleDeFence 的规则和设置。"
+      },
+      "passwordHeader": "密码",
+      "lockHeader": "锁定配置"
     },
     "updates": {
       "autoCheck": "自动检查更新",
       "autoCheckDescription": "SimpleDeFence 会定期检查新版本。",
-      "checkNow": "立即检查更新",
+      "checkNow": "立即检查",
       "checkingTitle": "正在检查更新...",
       "checkFailedTitle": "检查更新失败",
       "noneAvailable": "你正在使用最新版本。",
       "available": "版本 {0} 可用。现在下载并安装吗？",
       "downloading": "正在下载更新...",
-      "verificationFailed": "下载的文件与该版本公布的校验和不符，因此没有运行。未安装任何内容。"
+      "verificationFailed": "下载的文件与该版本公布的校验和不符，因此没有运行。未安装任何内容。",
+      "manualCheckHeader": "检查更新",
+      "manualCheckDescription": "查看是否有更新版本的 SimpleDeFence。",
+      "upToDateTitle": "没有可用更新",
+      "availableTitle": "有可用更新",
+      "install": "下载并安装",
+      "notNow": "以后再说"
     },
     "maintenance": {
       "import": "导入配置...",
@@ -479,7 +500,9 @@
       },
       "exportFailed": {
         "title": "无法导出配置"
-      }
+      },
+      "backupHeader": "备份或还原",
+      "backupDescription": "将所有规则和设置保存到文件，或从文件加载。"
     },
     "about": {
       "version": "版本 {0}",
@@ -536,7 +559,7 @@
       "failedTitle": "密码不正确"
     },
     "quickAdd": {
-      "confirmTitle": "添加例外？",
+      "confirmTitle": "添加规则？",
       "confirmBody": "允许“{0}”通过防火墙吗？",
       "confirmAdd": "添加"
     },
@@ -545,7 +568,7 @@
     },
     "stillRunning": {
       "title": "SimpleDeFence 仍在运行",
-      "body": "关闭窗口不会停止防火墙。请使用此菜单中的“退出”来停止它。"
+      "body": "关闭窗口不会停止防火墙。“退出”只关闭此应用，防火墙会继续保护此电脑。"
     }
   },
   "duration": {
