@@ -57,9 +57,9 @@ namespace SimpleDeFence
             return SimpleDeFenceDoctor.EnsureServiceInstalledAndRunning(Utils.LOG_ID_INSTALLER, true) ? 0 : -1;
         }
 
-        private static int UninstallService()
+        private static int UninstallService(bool upgrade)
         {
-            return SimpleDeFenceDoctor.Uninstall();
+            return SimpleDeFenceDoctor.Uninstall(upgrade);
         }
 
         /// <summary>
@@ -116,6 +116,7 @@ namespace SimpleDeFence
             opts.autowhitelist = Utils.StringArrayContains(args, "/autowhitelist");
             opts.updatenow = Utils.StringArrayContains(args, "/updatenow");
             opts.startup = Utils.StringArrayContains(args, "/startup");
+            opts.upgrade = Utils.StringArrayContains(args, "/upgrade");
 
 #if !DEBUG
             // Register an unhandled exception handler - lol
@@ -166,7 +167,7 @@ namespace SimpleDeFence
                 case StartUpMode.Install:
                     return InstallService();
                 case StartUpMode.Uninstall:
-                    return UninstallService();
+                    return UninstallService(opts.upgrade);
                 case StartUpMode.Controller:
                     return StartController(opts);
                 case StartUpMode.DevelTool:

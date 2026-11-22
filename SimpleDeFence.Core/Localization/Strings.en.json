@@ -75,7 +75,7 @@
       "minutes30": "After 30 minutes",
       "hour1": "After 1 hour"
     },
-    "learningEndsAt": "{0} It switches back to Normal at {1}.",
+    "learningEndsAt": "{0} It switches back to the previous mode at {1}.",
     "learningEnded": {
       "title": "Learning mode has ended",
       "body": "It added {0} rules. Check that each one is for a program you trust.",

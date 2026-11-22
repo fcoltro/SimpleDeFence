@@ -114,6 +114,12 @@
     <CustomAction Id='InstallCustom' FileKey='TinyWallEXE' ExeCommand='/install' Return='check' Execute='commit' Impersonate='no' />
     <CustomAction Id='InstallCustomRollback' FileKey='TinyWallEXE' ExeCommand='/uninstall' Return='check' Execute='rollback' Impersonate='no' />
     <CustomAction Id='UninstallCustom' FileKey='TinyWallEXE' ExeCommand='/uninstall' Return='check' Execute='deferred' Impersonate='no' />
+    <!-- The same, when a newer version is replacing this one (UPGRADINGPRODUCTCODE is set). It
+         leaves the firewall's filters, the hosts file and the telemetry settings in place, and
+         stops the service without the password prompt a locked firewall would otherwise need -
+         with no one there to answer it, that refusal rolled the whole update back. It only helps
+         upgrades away from a version that has it: an upgrade runs the old version's package. -->
+    <CustomAction Id='UninstallCustomUpgrade' FileKey='TinyWallEXE' ExeCommand='/uninstall /upgrade' Return='check' Execute='deferred' Impersonate='no' />
     <!-- Undoes UninstallCustom when a removal fails after it ran. Without it a failed uninstall
          restored the program files but left the machine with no service and no WFP filters. -->
     <CustomAction Id='UninstallCustomRollback' FileKey='TinyWallEXE' ExeCommand='/install' Return='ignore' Execute='rollback' Impersonate='no' />
@@ -134,8 +140,9 @@
            InstallCustom - gated on NOT Installed - never put them back: a repair silently left the
            machine with no firewall. A major upgrade still removes the old product through its own
            package, which runs with REMOVE="ALL". -->
-      <Custom Action='UninstallCustomRollback' Before='UninstallCustom'>REMOVE="ALL"</Custom>
-      <Custom Action='UninstallCustom' Before='UnpublishFeatures'>REMOVE="ALL"</Custom>
+      <Custom Action='UninstallCustomRollback' Before='UninstallCustomUpgrade'>REMOVE="ALL"</Custom>
+      <Custom Action='UninstallCustomUpgrade' Before='UninstallCustom'>REMOVE="ALL" AND UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action='UninstallCustom' Before='UnpublishFeatures'>REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
       <Custom Action='InstallCustomRollback' Before='InstallCustom'>NOT Installed</Custom>
       <!-- Also on repair, so a repair re-registers the service and its filters if they went
            missing. /install is EnsureServiceInstalledAndRunning, which leaves a healthy service
