@@ -164,26 +164,6 @@
       "show": "{0} stummgeschaltete anzeigen",
       "hide": "Stummgeschaltete ausblenden"
     },
-    "stopTrying": {
-      "menu": "Versuche stoppen…",
-      "title": "{0} am Verbinden hindern",
-      "intro": "Diese Einträge starten Programme von {0} im Hintergrund, die immer wieder versuchen, eine Verbindung aufzubauen. Entfernen Sie das Häkchen bei allem, was ausgeschaltet werden soll. Laufende Programme werden sofort beendet und starten erst wieder, wenn Sie das Häkchen wieder setzen.",
-      "fromFolder": "{1} hat die Signaturprüfung von Windows nicht bestanden und wurde möglicherweise verändert, seit {0} es signiert hat. Überprüfen Sie es auf Schadsoftware oder installieren Sie es neu. Die Einträge unten stammen von anderen Programmen in seinem Ordner, die von {0} signiert sind.",
-      "introFolder": "Diese Einträge starten Programme aus dem Ordner von {0} im Hintergrund, die immer wieder versuchen, eine Verbindung aufzubauen. Entfernen Sie das Häkchen bei allem, was ausgeschaltet werden soll. Laufende Programme werden sofort beendet und starten erst wieder, wenn Sie das Häkchen wieder setzen.",
-      "unsignedFolder": "{0} hat keine gültige Signatur, daher kann SimpleDeFence nicht erkennen, von wem es stammt. Diese Einträge wurden nur gefunden, weil sie aus seinem Ordner {1} laufen. Prüfen Sie jeden, bevor Sie ihn ausschalten.",
-      "needed": "Lizenzprüfung. Apps von {0} öffnen sich ohne sie möglicherweise nicht.",
-      "kindService": "Dienst",
-      "kindTask": "Geplante Aufgabe",
-      "kindStartup": "Startet mit Windows",
-      "apply": "Übernehmen",
-      "allOn": "Alle wieder einschalten",
-      "none": "Von {0} startet nichts im Hintergrund.",
-      "unsigned": "SimpleDeFence kann nicht erkennen, von wem dieses Programm stammt: Es hat keine gültige Signatur, und sein Ordner wird mit anderen Programmen geteilt. Programme von Windows selbst werden nie angeboten.",
-      "unreachable": "Der Dienst hat nicht geantwortet. Läuft er?",
-      "done": "Fertig. {0} ausgeschaltet, {1} wieder eingeschaltet.",
-      "failed": "Einige Änderungen konnten nicht vorgenommen werden. Details stehen im Dienstprotokoll.",
-      "locked": "Entsperren Sie zuerst die Konfiguration."
-    },
     "details": {
       "addresses": "Adressen",
       "lookUpNote": "Ermittelt zu jeder Adresse den Namen, den Inhaber und das Land, in dem ihr Netz registriert ist. Erst wenn du klickst, wird etwas gesendet: Die Adressen gehen dann an deinen DNS-Server und an rdap.org.",

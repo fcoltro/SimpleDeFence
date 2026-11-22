@@ -1162,8 +1162,6 @@ namespace SimpleDeFence.UI.Pages
                 Add(LocKeys.Connections.MenuLookUp, "", async () => await ShowDetailsAsync(details, lookUpNow: true));
             if (details.Blocked is { } blocked)
                 Add(LocKeys.Connections.Allow, "", async () => await AllowAsync(blocked));
-            if (details.AppPath is { Length: > 0 } stopPath)
-                Add(LocKeys.Connections.StopMenu, "", async () => await StopTryingAsync(details.AppName, stopPath));
             if (details.Blocked is { } mutable && ClientSettings.MuteKey(mutable.AppPath, mutable.PackageId) is not null)
             {
                 if (mutable.IsMuted)

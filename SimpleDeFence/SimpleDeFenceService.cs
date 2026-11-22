@@ -2498,6 +2498,9 @@ namespace SimpleDeFence
             WfpEngine.EventMatchAnyKeywords = InboundEventMatchKeyword.FWPM_NET_EVENT_KEYWORD_INBOUND_BCAST | InboundEventMatchKeyword.FWPM_NET_EVENT_KEYWORD_INBOUND_MCAST;
             using var WfpEvent = WfpEngine.SubscribeNetEvent(WfpNetEventCallback);
 
+            // "Stop it trying" is gone: switch back on what it switched off, off the start-up path.
+            Task.Run(BackgroundItemsManager.RestoreAll);
+
             ProcessStartWatcher.EventArrived += ProcessStartWatcher_EventArrived;
             NetworkInterfaceWatcher.InterfaceChanged += (sender, args) =>
             {
@@ -2844,55 +2847,12 @@ namespace SimpleDeFence
                 if ((int)reqMsg.Type >= (int)MessageType.UNLOCK)
                     LastControllerCommandTime = DateTime.Now;
 
-                // Answered here, on the pipe's thread, not by the worker: the first listing checks
-                // the signature of every candidate program, which can take seconds, and the worker
-                // is what installs the rules for programs as they start. Nothing here touches the
-                // firewall's state, and SignatureOf is safe to call from any thread.
-                if (reqMsg is TwMessageBackgroundItems backgroundItems)
-                    return ProcessBackgroundItems(backgroundItems);
-
                 // Process and wait for response
                 var req = new TwRequest(reqMsg);
                 Q.Add(req);
 
                 // Send response back to pipe
                 return req.Response;
-            }
-        }
-
-        /// <summary>BACKGROUND_ITEMS and SET_BACKGROUND_ITEMS, for "Stop it trying".</summary>
-        private TwMessage ProcessBackgroundItems(TwMessageBackgroundItems args)
-        {
-            try
-            {
-                var manager = new BackgroundItemsManager(SignatureOf, WindowsDirectory);
-                var (publisher, fromFolder) = manager.PublisherNear(args.AppPath);
-                if (publisher.Length == 0)
-                {
-                    // Nobody to go by: fall back to the program's own folder, unless that folder
-                    // is one many programs share. The client never names the folder; it is worked
-                    // out here again for the SET request, from the path alone.
-                    var folder = manager.OwnFolderOf(args.AppPath);
-                    if (folder.Length == 0)
-                        return args.CreateResponse(string.Empty, Array.Empty<BackgroundItem>());
-
-                    if (args.Type == MessageType.SET_BACKGROUND_ITEMS
-                        && !manager.ApplyInFolder(folder, args.Changes ?? Array.Empty<BackgroundItemChange>()))
-                        return TwMessageError.Instance;
-
-                    return args.CreateResponse(string.Empty, manager.ListInFolder(folder)) with { ScopeFolder = folder };
-                }
-
-                if (args.Type == MessageType.SET_BACKGROUND_ITEMS
-                    && !manager.Apply(publisher, args.Changes ?? Array.Empty<BackgroundItemChange>()))
-                    return TwMessageError.Instance;
-
-                return args.CreateResponse(publisher, manager.List(publisher)) with { PublisherFromFolder = fromFolder };
-            }
-            catch (Exception e)
-            {
-                Utils.LogException(e, Utils.LOG_ID_SERVICE);
-                return TwMessageError.Instance;
             }
         }
 
