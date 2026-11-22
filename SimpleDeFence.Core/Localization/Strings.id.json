@@ -87,9 +87,9 @@
   "applications": {
     "title": "Aplikasi",
     "filterPlaceholder": "Saring menurut nama atau jalur",
-    "summary": "{0} pengecualian dalam profil \"{1}\"",
-    "summaryOne": "1 pengecualian dalam profil \"{0}\"",
-    "empty": "Belum ada pengecualian aplikasi."
+    "summary": "{0} aturan dalam profil \"{1}\"",
+    "summaryOne": "1 aturan dalam profil \"{0}\"",
+    "empty": "Belum ada aturan aplikasi."
   },
   "connections": {
     "title": "Koneksi",
@@ -100,7 +100,9 @@
       "unavailable": "Penggunaan data tidak tersedia. Layanan firewall tidak dapat dihubungi, atau Windows tidak mengizinkannya menghitung lalu lintas.",
       "sent": "Terkirim",
       "received": "Diterima",
-      "rate": "Kecepatan sejak penyegaran terakhir"
+      "rate": "Kecepatan sejak penyegaran terakhir",
+      "appHeading": "Aplikasi",
+      "rateHeading": "Kecepatan"
     },
     "section": {
       "blocked": "Diblokir",
@@ -123,15 +125,15 @@
       "body": "Pilih bagaimana {0} boleh menggunakan jaringan."
     },
     "allowSuccess": {
-      "title": "Pengecualian ditambahkan",
+      "title": "Aturan ditambahkan",
       "body": "{0} kini dapat terhubung."
     },
     "allowFailed": {
-      "title": "Tidak dapat menambahkan pengecualian",
-      "lockedDetail": "Buka kunci konfigurasi sebelum menambahkan pengecualian.",
-      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; pengecualian tidak ditambahkan. Silakan coba lagi.",
-      "genericDetail": "Layanan mengembalikan {0}. Pengecualian tidak ditambahkan.",
-      "unidentified": "Aplikasi tidak dapat dikenali (tanpa jalur maupun paket), sehingga tidak ada pengecualian yang ditambahkan."
+      "title": "Tidak dapat menambahkan aturan",
+      "lockedDetail": "Buka kunci konfigurasi sebelum menambahkan aturan.",
+      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; aturan tidak ditambahkan. Silakan coba lagi.",
+      "genericDetail": "Layanan mengembalikan {0}. Aturan tidak ditambahkan.",
+      "unidentified": "Aplikasi tidak dapat dikenali (tanpa jalur maupun paket), sehingga tidak ada aturan yang ditambahkan."
     },
     "gatherFailed": {
       "title": "Tidak dapat membaca data koneksi"
@@ -208,7 +210,7 @@
     "allPorts": "semua"
   },
   "rules": {
-    "specialKind": "Pengecualian khusus",
+    "specialKind": "Aturan khusus",
     "specialPolicy": "Bawaan",
     "title": "Aturan",
     "section": {
@@ -218,32 +220,32 @@
     },
     "filterPlaceholder": "Saring menurut nama atau jalur",
     "empty": {
-      "applications": "Belum ada pengecualian aplikasi.",
-      "special": "Tidak ada pengecualian khusus yang tersedia.",
+      "applications": "Belum ada aturan aplikasi.",
+      "special": "Tidak ada aturan khusus yang tersedia.",
       "filtered": "Tidak ada yang cocok dengan saringan saat ini.",
       "publishers": "Belum ada penerbit tepercaya."
     },
     "appMissing": "File aplikasi ini sudah tidak ada lagi di disk - mungkin telah dihapus instalannya.",
     "remove": "Hapus",
     "removeConfirm": {
-      "title": "Hapus pengecualian?",
-      "body": "Hapus {0} pengecualian? Aplikasi yang terdampak akan diblokir kembali."
+      "title": "Hapus aturan?",
+      "body": "Hapus aturan yang dipilih ({0})? Program yang diizinkan akan diblokir lagi, dan program yang diblokir akan mengikuti mode firewall."
     },
     "removeSuccess": {
-      "title": "Pengecualian dihapus",
-      "body": "{0} pengecualian telah dihapus."
+      "title": "Aturan dihapus",
+      "body": "Aturan dihapus: {0}."
     },
     "removeFailed": {
-      "title": "Tidak dapat menghapus pengecualian",
-      "lockedDetail": "Buka kunci konfigurasi sebelum menghapus pengecualian.",
-      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; pengecualian tidak dihapus. Silakan coba lagi.",
-      "genericDetail": "Layanan mengembalikan {0}. Pengecualian tidak dihapus."
+      "title": "Tidak dapat menghapus aturan",
+      "lockedDetail": "Buka kunci konfigurasi sebelum menghapus aturan.",
+      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; aturan tidak dihapus. Silakan coba lagi.",
+      "genericDetail": "Layanan mengembalikan {0}. Aturan tidak dihapus."
     },
     "specialToggleFailed": {
-      "title": "Tidak dapat mengubah pengecualian khusus",
-      "lockedDetail": "Buka kunci konfigurasi sebelum mengubah pengecualian ini.",
-      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; pengecualian tidak diubah. Silakan coba lagi.",
-      "genericDetail": "Layanan mengembalikan {0}. Pengecualian tidak diubah."
+      "title": "Tidak dapat mengubah aturan khusus",
+      "lockedDetail": "Buka kunci konfigurasi sebelum mengubah aturan ini.",
+      "staleDetail": "Konfigurasi baru saja berubah di tempat lain; aturan tidak diubah. Silakan coba lagi.",
+      "genericDetail": "Layanan mengembalikan {0}. Aturan tidak diubah."
     },
     "add": "Tambah",
     "addPickExecutable": "Berkas eksekusi...",
@@ -263,7 +265,9 @@
       "matchesMany": "Program yang cocok saat ini: lebih dari {0}",
       "matchesNone": "Belum ada program yang cocok. Aturan tetap berlaku untuk program yang ditambahkan nanti.",
       "invalid": "Masukkan jalur folder lengkap, misalnya C:\\Tools. Seluruh drive tidak dapat digunakan.",
-      "writable": "Siapa pun yang memakai PC ini dapat menaruh program di folder ini, jadi aturan Izinkan di sini akan meloloskan program apa pun yang ditambahkan, termasuk malware. Folder di bawah Program Files lebih aman."
+      "writable": "Siapa pun yang memakai PC ini dapat menaruh program di folder ini, jadi aturan Izinkan di sini akan meloloskan program apa pun yang ditambahkan, termasuk malware. Folder di bawah Program Files lebih aman.",
+      "addedAllowed": "{0} ditambahkan. Program yang dicakup sekarang dapat terhubung.",
+      "addedBlocked": "{0} ditambahkan. Program yang dicakup sekarang diblokir."
     },
     "pickUwpTitle": "Pilih aplikasi UWP",
     "pickProcessTitle": "Pilih proses yang berjalan",
@@ -289,7 +293,9 @@
         "staleDetail": "Konfigurasi baru saja berubah di tempat lain; kebijakan tidak diubah. Silakan coba lagi.",
         "genericDetail": "Layanan mengembalikan {0}. Kebijakan tidak diubah."
       },
-      "policyCustom": "Aturan khusus"
+      "policyCustom": "Aturan khusus",
+      "invalidPorts": "{0}: \"{1}\" bukan daftar port. Gunakan angka dan rentang yang dipisahkan koma, seperti 80, 443, 8000-8100, atau * untuk semua port.",
+      "portsHint": "Kosong untuk tidak ada, * untuk semua, atau 80, 443, 8000-8100"
     },
     "multiSelectHint": "{0} aturan dipilih. Hapus akan menghapus semuanya; pilih satu aturan saja untuk menyuntingnya.",
     "publishersKind": "Penerbit tepercaya",
@@ -322,7 +328,7 @@
     "cleanUpTooltip": "Hapus aturan untuk program yang sudah tidak terpasang",
     "cleanUpDialog": {
       "title": "Bersihkan aturan",
-      "confirmBody": "{0} aturan untuk program yang sudah tidak ada di PC ini. Hapus?",
+      "confirmBody": "Aturan untuk program yang sudah tidak ada di PC ini: {0}. Hapus?",
       "nothing": "Semua aturan untuk program yang masih ada di PC ini."
     }
   },
@@ -360,8 +366,8 @@
       "languageAuto": "Gunakan pengaturan sistem",
       "languageRestartTitle": "Mulai ulang untuk menyelesaikan penggantian bahasa",
       "languageRestartDetail": "Sebagian teks di layar tetap menggunakan bahasa sebelumnya hingga SimpleDeFence dimulai ulang.",
-      "askForExceptionDetails": "Tanyakan detail saat menambahkan satu pengecualian",
-      "askForExceptionDetailsDescription": "Menampilkan konfirmasi yang dapat disunting sebelum menambahkan satu pengecualian lewat pintasan tambah-cepat pada baki sistem. Penambahan massal (misalnya satu folder penuh) tidak pernah menanyakan.",
+      "askForExceptionDetails": "Tanyakan detail saat menambahkan satu aturan",
+      "askForExceptionDetailsDescription": "Minta konfirmasi sebelum mengizinkan satu program dari Tambah atau pintasan tambah cepat di baki. Aturan folder tidak pernah bertanya.",
       "enableHotkeys": "Aktifkan pintasan papan tik global",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W langsung mengizinkan sebuah berkas eksekusi, proses, atau jendela dari mana saja. Ctrl+Alt+B beralih ke Blokir semua, lalu kembali ke Normal.",
       "autoRefreshInterval": "Selang penyegaran otomatis",
@@ -369,7 +375,8 @@
       "notifyBlocked": "Beri tahu saya saat aplikasi diblokir",
       "notifyBlockedDescription": "Sekali per aplikasi setiap sesi, dalam mode Normal. Komponen Windows tidak disertakan.",
       "notifyListening": "Beri tahu saya saat aplikasi mulai menerima koneksi masuk",
-      "notifyListeningDescription": "Sekali per aplikasi setiap sesi. Komponen Windows tidak disertakan."
+      "notifyListeningDescription": "Sekali per aplikasi setiap sesi. Komponen Windows tidak disertakan.",
+      "languageRestartNow": "Mulai ulang sekarang"
     },
     "protection": {
       "allowLocalSubnet": "Izinkan jaringan lokal",
@@ -389,7 +396,9 @@
       "addressesDescription": "Tidak ada program yang dapat terhubung ke atau dari alamat IP dan jaringan ini, apa pun aturannya. Satu per baris; baris yang diawali # diabaikan.",
       "addressesPlaceholder": "Misalnya 203.0.113.7 atau 198.51.100.0/24",
       "addressesSave": "Simpan alamat",
-      "addressesInvalid": "\"{0}\" bukan alamat IP atau jaringan. Tidak ada yang disimpan."
+      "addressesInvalid": "\"{0}\" bukan alamat IP atau jaringan. Tidak ada yang disimpan.",
+      "hostsDescription": "Menghentikan koneksi ke situs berbahaya yang dikenal, menggunakan file hosts Windows.",
+      "portsDescription": "Memblokir port jaringan yang sering dipakai malware."
     },
     "privacy": {
       "telemetry": "Kurangi telemetri Windows",
@@ -444,18 +453,30 @@
       "unlockFailed": {
         "title": "Tidak dapat membuka kunci konfigurasi",
         "detail": "Kata sandi tidak diterima."
-      }
+      },
+      "removeConfirm": {
+        "title": "Hapus kata sandi?",
+        "body": "Siapa pun yang dapat masuk ke PC ini akan bisa mengubah aturan dan pengaturan SimpleDeFence."
+      },
+      "passwordHeader": "Kata sandi",
+      "lockHeader": "Kunci konfigurasi"
     },
     "updates": {
       "autoCheck": "Periksa pembaruan secara otomatis",
       "autoCheckDescription": "SimpleDeFence memeriksa versi baru secara berkala.",
-      "checkNow": "Periksa pembaruan sekarang",
+      "checkNow": "Periksa sekarang",
       "checkingTitle": "Memeriksa pembaruan...",
       "checkFailedTitle": "Pemeriksaan pembaruan gagal",
       "noneAvailable": "Anda menjalankan versi terbaru.",
       "available": "Versi {0} tersedia. Unduh dan pasang sekarang?",
       "downloading": "Mengunduh pembaruan...",
-      "verificationFailed": "Unduhan tidak cocok dengan checksum yang diterbitkan untuk rilis ini, sehingga tidak dijalankan. Tidak ada yang dipasang."
+      "verificationFailed": "Unduhan tidak cocok dengan checksum yang diterbitkan untuk rilis ini, sehingga tidak dijalankan. Tidak ada yang dipasang.",
+      "manualCheckHeader": "Periksa pembaruan",
+      "manualCheckDescription": "Lihat apakah ada versi SimpleDeFence yang lebih baru.",
+      "upToDateTitle": "Tidak ada pembaruan",
+      "availableTitle": "Pembaruan tersedia",
+      "install": "Unduh dan pasang",
+      "notNow": "Nanti saja"
     },
     "maintenance": {
       "import": "Impor konfigurasi...",
@@ -479,7 +500,9 @@
       },
       "exportFailed": {
         "title": "Tidak dapat mengekspor konfigurasi"
-      }
+      },
+      "backupHeader": "Cadangkan atau pulihkan",
+      "backupDescription": "Simpan semua aturan dan pengaturan ke file, atau muat dari file."
     },
     "about": {
       "version": "Versi {0}",
@@ -536,7 +559,7 @@
       "failedTitle": "Kata sandi salah"
     },
     "quickAdd": {
-      "confirmTitle": "Tambahkan pengecualian?",
+      "confirmTitle": "Tambahkan aturan?",
       "confirmBody": "Izinkan \"{0}\" melewati firewall?",
       "confirmAdd": "Tambah"
     },
@@ -545,7 +568,7 @@
     },
     "stillRunning": {
       "title": "SimpleDeFence masih berjalan",
-      "body": "Menutup jendela tidak menghentikan firewall. Gunakan Keluar pada menu ini untuk menghentikannya."
+      "body": "Menutup jendela tidak menghentikan firewall. Keluar hanya menutup aplikasi ini; firewall tetap melindungi PC ini."
     }
   },
   "duration": {

@@ -10,23 +10,25 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="{loc:Loc Key=settings.title}" Style="{StaticResource TitleTextBlockStyle}"/>
-
-        <InfoBar Grid.Row="1" x:Name="Notice" IsOpen="False" IsClosable="True"/>
-
-        <Grid Grid.Row="2" ColumnSpacing="12">
+        <!-- Refresh sits beside the title. Settings has no filter or Add, so a toolbar row of its
+             own held nothing but this one button. -->
+        <Grid Grid.Row="0" ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="1" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"/>
-            <ProgressRing Grid.Column="2" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="0" Text="{loc:Loc Key=settings.title}" Style="{StaticResource TitleTextBlockStyle}"
+                       VerticalAlignment="Center"/>
+            <ProgressRing Grid.Column="1" x:Name="Busy" IsActive="False" Width="20" Height="20" VerticalAlignment="Center"/>
+            <Button Grid.Column="2" x:Name="RefreshButton" Content="{loc:Loc Key=common.refresh}" Click="RefreshButton_Click"
+                    VerticalAlignment="Center"/>
         </Grid>
+
+        <InfoBar Grid.Row="1" x:Name="Notice" IsOpen="False" IsClosable="True"/>
 
         <!-- HorizontalScrollMode/BarVisibility disabled: a ScrollViewer measures its content with
              infinite width by default, so any card wider than the viewport (the Maintenance and
@@ -35,7 +37,7 @@
              drift sideways and the About section's cards ran off the right edge with their content
              cut off. Disabling the horizontal axis pins the content to the viewport width, which is
              what MaxWidth below was already assuming. -->
-        <ScrollViewer x:Name="SettingsScroller" Grid.Row="3"
+        <ScrollViewer x:Name="SettingsScroller" Grid.Row="2"
                       HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
             <!-- Wider than the 720 this used to be pinned to, and centred. Rules and Connections
                  stretch to the window, so a narrow column hard against the left edge made Settings
@@ -113,7 +115,7 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
-                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.protection}" IsExpanded="True">
+                <controls:SettingsExpander x:Name="ProtectionSection" Header="{loc:Loc Key=settings.section.protection}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xEA18;"/>
                     </controls:SettingsExpander.HeaderIcon>
@@ -141,7 +143,7 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
-                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.blocklists}" IsExpanded="True">
+                <controls:SettingsExpander x:Name="BlocklistsSection" Header="{loc:Loc Key=settings.section.blocklists}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE71C;"/>
                     </controls:SettingsExpander.HeaderIcon>
@@ -152,12 +154,14 @@
                                           OnContent="{loc:Loc Key=common.on}"
                                           OffContent="{loc:Loc Key=common.off}"/>
                         </controls:SettingsCard>
-                        <controls:SettingsCard Header="{loc:Loc Key=settings.blocklists.hosts}">
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.blocklists.hosts}"
+                                                Description="{loc:Loc Key=settings.blocklists.hostsDescription}">
                             <ToggleSwitch x:Name="EnableHostsBlocklistToggle" Toggled="EnableHostsBlocklistToggle_Toggled"
                                           OnContent="{loc:Loc Key=common.on}"
                                           OffContent="{loc:Loc Key=common.off}"/>
                         </controls:SettingsCard>
-                        <controls:SettingsCard Header="{loc:Loc Key=settings.blocklists.ports}">
+                        <controls:SettingsCard Header="{loc:Loc Key=settings.blocklists.ports}"
+                                                Description="{loc:Loc Key=settings.blocklists.portsDescription}">
                             <ToggleSwitch x:Name="EnablePortBlocklistToggle" Toggled="EnablePortBlocklistToggle_Toggled"
                                           OnContent="{loc:Loc Key=common.on}"
                                           OffContent="{loc:Loc Key=common.off}"/>
@@ -174,7 +178,8 @@
                                     <TextBox x:Name="BlockedAddressesBox" AcceptsReturn="True" TextWrapping="Wrap"
                                              MinHeight="80" MaxHeight="240" HorizontalAlignment="Stretch"
                                              ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                             PlaceholderText="{loc:Loc Key=settings.blocklists.addressesPlaceholder}"/>
+                                             PlaceholderText="{loc:Loc Key=settings.blocklists.addressesPlaceholder}"
+                                             TextChanged="BlockedAddressesBox_TextChanged"/>
                                     <Button x:Name="SaveBlockedAddressesButton" Content="{loc:Loc Key=settings.blocklists.addressesSave}"
                                             HorizontalAlignment="Left" Click="SaveBlockedAddressesButton_Click"/>
                                 </StackPanel>
@@ -183,7 +188,7 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
-                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.privacy}" IsExpanded="True">
+                <controls:SettingsExpander x:Name="PrivacySection" Header="{loc:Loc Key=settings.section.privacy}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE8D7;"/>
                     </controls:SettingsExpander.HeaderIcon>
@@ -200,7 +205,7 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
-                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.security}" IsExpanded="True">
+                <controls:SettingsExpander x:Name="SecuritySection" Header="{loc:Loc Key=settings.section.security}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE72E;"/>
                     </controls:SettingsExpander.HeaderIcon>
@@ -227,7 +232,7 @@
                         <controls:SettingsCard IsClickEnabled="False">
                             <controls:SettingsCard.Header>
                                 <StackPanel Spacing="8" HorizontalAlignment="Left" MinWidth="300" Margin="0,4">
-                                    <TextBlock Text="{loc:Loc Key=settings.security.setPassword}"
+                                    <TextBlock Text="{loc:Loc Key=settings.security.passwordHeader}"
                                                Style="{StaticResource BodyStrongTextBlockStyle}"/>
                                     <TextBlock x:Name="PasswordStatusText" Opacity="0.8"
                                                Style="{StaticResource CaptionTextBlockStyle}"/>
@@ -254,7 +259,7 @@
                         <controls:SettingsCard IsClickEnabled="False">
                             <controls:SettingsCard.Header>
                                 <StackPanel Spacing="8" HorizontalAlignment="Left" MinWidth="300" Margin="0,4">
-                                    <TextBlock Text="{loc:Loc Key=settings.security.lockNow}"
+                                    <TextBlock Text="{loc:Loc Key=settings.security.lockHeader}"
                                                Style="{StaticResource BodyStrongTextBlockStyle}"/>
                                     <TextBlock x:Name="LockStatusText" Opacity="0.8"
                                                Style="{StaticResource CaptionTextBlockStyle}"/>
@@ -282,10 +287,10 @@
                                           OffContent="{loc:Loc Key=common.off}"/>
                         </controls:SettingsCard>
 
-                        <controls:SettingsCard IsClickEnabled="False">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button x:Name="CheckForUpdatesNowButton" Content="{loc:Loc Key=settings.updates.checkNow}" Click="CheckForUpdatesNow_Click"/>
-                            </StackPanel>
+                        <controls:SettingsCard IsClickEnabled="False"
+                                               Header="{loc:Loc Key=settings.updates.manualCheckHeader}"
+                                               Description="{loc:Loc Key=settings.updates.manualCheckDescription}">
+                            <Button x:Name="CheckForUpdatesNowButton" Content="{loc:Loc Key=settings.updates.checkNow}" Click="CheckForUpdatesNow_Click"/>
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
@@ -349,12 +354,14 @@
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 
-                <controls:SettingsExpander Header="{loc:Loc Key=settings.section.maintenance}" IsExpanded="True">
+                <controls:SettingsExpander x:Name="MaintenanceSection" Header="{loc:Loc Key=settings.section.maintenance}" IsExpanded="True">
                     <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xEC7A;"/>
                     </controls:SettingsExpander.HeaderIcon>
                     <controls:SettingsExpander.Items>
-                        <controls:SettingsCard IsClickEnabled="False">
+                        <controls:SettingsCard IsClickEnabled="False"
+                                               Header="{loc:Loc Key=settings.maintenance.backupHeader}"
+                                               Description="{loc:Loc Key=settings.maintenance.backupDescription}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <Button x:Name="ImportButton" Content="{loc:Loc Key=settings.maintenance.import}" Click="ImportButton_Click"/>
                                 <Button x:Name="ExportButton" Content="{loc:Loc Key=settings.maintenance.export}" Click="ExportButton_Click"/>

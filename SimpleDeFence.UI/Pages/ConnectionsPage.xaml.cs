@@ -205,7 +205,15 @@ namespace SimpleDeFence.UI.Pages
             Loaded += ConnectionsPage_Loaded;
             FilterRequested += ApplyRequestedFilter;
             _autoRefreshTimer.Interval = ClientSettings.Load().ConnectionsAutoRefreshInterval;
-            _autoRefreshTimer.Tick += async (_, _) => await RefreshAsync();
+            _autoRefreshTimer.Tick += async (_, _) =>
+            {
+                // Closing the window to the tray hides it without unloading this page, so the timer
+                // kept gathering connections and the firewall log every few seconds for a window
+                // nobody could see. The next tick after the window comes back picks up again.
+                if (App.MainWindow?.AppWindow.IsVisible == false)
+                    return;
+                await RefreshAsync();
+            };
             Unloaded += (_, _) => _autoRefreshTimer.Stop();
         }
 
@@ -366,6 +374,7 @@ namespace SimpleDeFence.UI.Pages
                 term, filtered);
 
             // Same rule for Data used: "nothing used" only about counts we actually got.
+            TrafficHeadings.Visibility = _traffic.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             SetEmptyState(TrafficEmpty, _traffic.Count,
                 _snapshot.TrafficUnavailable ? LocKeys.Connections.TrafficUnavailable : LocKeys.Connections.TrafficEmpty,
                 term, filtered);

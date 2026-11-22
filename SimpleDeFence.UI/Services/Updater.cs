@@ -91,7 +91,7 @@ namespace SimpleDeFence.UI.Services
                 || !Version.TryParse(updateModule.ComponentVersion, out var newVersion)
                 || newVersion <= oldVersion)
             {
-                await ShowMessageAsync(xamlRoot, Loc.T(LocKeys.Settings.UpdatesCheckNow), Loc.T(LocKeys.Settings.UpdatesNoneAvailable));
+                await ShowMessageAsync(xamlRoot, Loc.T(LocKeys.Settings.UpdatesUpToDateTitle), Loc.T(LocKeys.Settings.UpdatesNoneAvailable));
                 return;
             }
 
@@ -100,14 +100,17 @@ namespace SimpleDeFence.UI.Services
                 XamlRoot = xamlRoot,
                 FlowDirection = App.UiFlowDirection,
                 RequestedTheme = App.UiElementTheme,
-                Title = Loc.T(LocKeys.Settings.UpdatesCheckNow),
+                Title = Loc.T(LocKeys.Settings.UpdatesAvailableTitle),
                 // newVersion, not the raw ComponentVersion string: this is the value that was
                 // actually parsed and compared, so the number offered to the user cannot differ
                 // from the one the decision was made on - and it is non-null, which the descriptor
                 // field is not.
                 Content = Loc.T(LocKeys.Settings.UpdatesAvailable, newVersion.ToString()),
-                PrimaryButtonText = Loc.T(LocKeys.Common.Ok),
-                CloseButtonText = Loc.T(LocKeys.Common.Cancel),
+                // Say what each button does: a bare OK/Cancel under a title that was just the
+                // name of the button the user had pressed told them neither.
+                PrimaryButtonText = Loc.T(LocKeys.Settings.UpdatesInstall),
+                CloseButtonText = Loc.T(LocKeys.Settings.UpdatesNotNow),
+                DefaultButton = ContentDialogButton.Primary,
             };
             if (await TryShowDialogAsync(confirm) != ContentDialogResult.Primary)
                 return;

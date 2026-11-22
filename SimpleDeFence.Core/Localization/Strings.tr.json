@@ -87,9 +87,9 @@
   "applications": {
     "title": "Uygulamalar",
     "filterPlaceholder": "Ada veya yola göre süz",
-    "summary": "\"{1}\" profilinde {0} ayrıcalık",
-    "summaryOne": "\"{0}\" profilinde 1 ayrıcalık",
-    "empty": "Henüz uygulama ayrıcalığı yok."
+    "summary": "\"{1}\" profilinde {0} kural",
+    "summaryOne": "\"{0}\" profilinde 1 kural",
+    "empty": "Henüz uygulama kuralı yok."
   },
   "connections": {
     "title": "Bağlantılar",
@@ -100,7 +100,9 @@
       "unavailable": "Veri kullanımı kullanılamıyor. Güvenlik duvarı hizmetine ulaşılamadı veya Windows trafiği saymasına izin vermedi.",
       "sent": "Gönderilen",
       "received": "Alınan",
-      "rate": "Son yenilemeden bu yana hız"
+      "rate": "Son yenilemeden bu yana hız",
+      "appHeading": "Uygulama",
+      "rateHeading": "Hız"
     },
     "section": {
       "blocked": "Engellenen",
@@ -123,15 +125,15 @@
       "body": "{0} uygulamasının ağı nasıl kullanabileceğini seçin."
     },
     "allowSuccess": {
-      "title": "Ayrıcalık eklendi",
+      "title": "Kural eklendi",
       "body": "{0} artık bağlanabilir."
     },
     "allowFailed": {
-      "title": "Ayrıcalık eklenemedi",
-      "lockedDetail": "Ayrıcalık eklemeden önce yapılandırmanın kilidini açın.",
-      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ayrıcalık eklenmedi. Lütfen yeniden deneyin.",
-      "genericDetail": "Hizmet {0} döndürdü. Ayrıcalık eklenmedi.",
-      "unidentified": "Uygulama tanımlanamadı (ne yol ne de paket var), bu yüzden hiçbir ayrıcalık eklenmedi."
+      "title": "Kural eklenemedi",
+      "lockedDetail": "Kural eklemeden önce yapılandırmanın kilidini açın.",
+      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; kural eklenmedi. Lütfen yeniden deneyin.",
+      "genericDetail": "Hizmet {0} döndürdü. Kural eklenmedi.",
+      "unidentified": "Uygulama tanımlanamadı (ne yol ne de paket var), bu yüzden hiçbir kural eklenmedi."
     },
     "gatherFailed": {
       "title": "Bağlantı verileri okunamadı"
@@ -208,7 +210,7 @@
     "allPorts": "tümü"
   },
   "rules": {
-    "specialKind": "Özel ayrıcalık",
+    "specialKind": "Özel kural",
     "specialPolicy": "Önceden tanımlı",
     "title": "Kurallar",
     "section": {
@@ -218,32 +220,32 @@
     },
     "filterPlaceholder": "Ada veya yola göre süz",
     "empty": {
-      "applications": "Henüz uygulama ayrıcalığı yok.",
-      "special": "Kullanılabilir özel ayrıcalık yok.",
+      "applications": "Henüz uygulama kuralı yok.",
+      "special": "Kullanılabilir özel kural yok.",
       "filtered": "Geçerli süzgeçle eşleşen bir şey yok.",
       "publishers": "Güvenilen yayımcı yok."
     },
     "appMissing": "Bu uygulamanın dosyası artık diskte yok - kaldırılmış olabilir.",
     "remove": "Kaldır",
     "removeConfirm": {
-      "title": "Ayrıcalıklar kaldırılsın mı?",
-      "body": "{0} ayrıcalık kaldırılsın mı? Etkilenen uygulamalar yeniden engellenecek."
+      "title": "Kurallar kaldırılsın mı?",
+      "body": "Seçili kurallar kaldırılsın mı ({0})? İzin verdikleri programlar yeniden engellenir, engelledikleri programlar güvenlik duvarı modunu izler."
     },
     "removeSuccess": {
-      "title": "Ayrıcalıklar kaldırıldı",
-      "body": "{0} ayrıcalık kaldırıldı."
+      "title": "Kurallar kaldırıldı",
+      "body": "Kaldırılan kural: {0}."
     },
     "removeFailed": {
-      "title": "Ayrıcalıklar kaldırılamadı",
-      "lockedDetail": "Ayrıcalıkları kaldırmadan önce yapılandırmanın kilidini açın.",
-      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ayrıcalıklar kaldırılmadı. Lütfen yeniden deneyin.",
-      "genericDetail": "Hizmet {0} döndürdü. Ayrıcalıklar kaldırılmadı."
+      "title": "Kurallar kaldırılamadı",
+      "lockedDetail": "Kuralları kaldırmadan önce yapılandırmanın kilidini açın.",
+      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; kurallar kaldırılmadı. Lütfen yeniden deneyin.",
+      "genericDetail": "Hizmet {0} döndürdü. Kurallar kaldırılmadı."
     },
     "specialToggleFailed": {
-      "title": "Özel ayrıcalık değiştirilemedi",
-      "lockedDetail": "Bu ayrıcalığı değiştirmeden önce yapılandırmanın kilidini açın.",
-      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ayrıcalık değiştirilmedi. Lütfen yeniden deneyin.",
-      "genericDetail": "Hizmet {0} döndürdü. Ayrıcalık değiştirilmedi."
+      "title": "Özel kural değiştirilemedi",
+      "lockedDetail": "Bu kuralı değiştirmeden önce yapılandırmanın kilidini açın.",
+      "staleDetail": "Yapılandırma az önce başka bir yerde değişti; kural değiştirilmedi. Lütfen yeniden deneyin.",
+      "genericDetail": "Hizmet {0} döndürdü. Kural değiştirilmedi."
     },
     "add": "Ekle",
     "addPickExecutable": "Çalıştırılabilir dosya...",
@@ -263,7 +265,9 @@
       "matchesMany": "Şu anda eşleşen programlar: {0} üzerinde",
       "matchesNone": "Şu anda eşleşen program yok. Kural sonradan eklenen programlar için yine de geçerli olur.",
       "invalid": "C:\\Tools gibi tam bir klasör yolu girin. Bütün bir sürücü kullanılamaz.",
-      "writable": "Bu bilgisayarı kullanan herkes bu klasöre program koyabilir; buradaki bir İzin ver kuralı, kötü amaçlı yazılım dahil eklenen her programı geçirir. Program Files altındaki bir klasör daha güvenlidir."
+      "writable": "Bu bilgisayarı kullanan herkes bu klasöre program koyabilir; buradaki bir İzin ver kuralı, kötü amaçlı yazılım dahil eklenen her programı geçirir. Program Files altındaki bir klasör daha güvenlidir.",
+      "addedAllowed": "{0} eklendi. Kapsadığı programlar artık bağlanabilir.",
+      "addedBlocked": "{0} eklendi. Kapsadığı programlar artık engelleniyor."
     },
     "pickUwpTitle": "Bir UWP uygulaması seçin",
     "pickProcessTitle": "Çalışan bir işlem seçin",
@@ -289,7 +293,9 @@
         "staleDetail": "Yapılandırma az önce başka bir yerde değişti; ilke değiştirilmedi. Lütfen yeniden deneyin.",
         "genericDetail": "Hizmet {0} döndürdü. İlke değiştirilmedi."
       },
-      "policyCustom": "Özel kurallar"
+      "policyCustom": "Özel kurallar",
+      "invalidPorts": "{0}: \"{1}\" bir bağlantı noktası listesi değil. 80, 443, 8000-8100 gibi virgülle ayrılmış sayılar ve aralıklar ya da tüm bağlantı noktaları için * kullanın.",
+      "portsHint": "Hiçbiri için boş, tümü için *, ya da 80, 443, 8000-8100"
     },
     "multiSelectHint": "{0} kural seçili. Kaldır hepsini siler; düzenlemek için tek bir kural seçin.",
     "publishersKind": "Güvenilen yayımcılar",
@@ -322,7 +328,7 @@
     "cleanUpTooltip": "Artık yüklü olmayan programların kurallarını kaldır",
     "cleanUpDialog": {
       "title": "Kuralları temizle",
-      "confirmBody": "{0} kural artık bu bilgisayarda olmayan programlara ait. Kaldırılsın mı?",
+      "confirmBody": "Artık bu bilgisayarda olmayan programların kuralları: {0}. Kaldırılsın mı?",
       "nothing": "Tüm kurallar hâlâ bu bilgisayarda olan programlara ait."
     }
   },
@@ -360,8 +366,8 @@
       "languageAuto": "Sistem ayarını kullan",
       "languageRestartTitle": "Dil değişikliğini tamamlamak için yeniden başlatın",
       "languageRestartDetail": "Ekrandaki bazı metinler, SimpleDeFence yeniden başlatılana kadar önceki dilde kalır.",
-      "askForExceptionDetails": "Tek bir ayrıcalık eklerken ayrıntıları sor",
-      "askForExceptionDetailsDescription": "Bildirim alanındaki hızlı ekleme kısayollarıyla tek bir ayrıcalık eklemeden önce düzenlenebilir bir onay gösterir. Toplu eklemeler (örneğin bütün bir klasör) hiçbir zaman sormaz.",
+      "askForExceptionDetails": "Tek bir kural eklerken ayrıntıları sor",
+      "askForExceptionDetailsDescription": "Ekle ile veya tepsideki hızlı ekleme kısayollarıyla tek bir programa izin vermeden önce onay iste. Klasör kuralları hiç sormaz.",
       "enableHotkeys": "Genel klavye kısayollarını etkinleştir",
       "enableHotkeysDescription": "Ctrl+Alt+E/P/W her yerden anında bir çalıştırılabilir dosyaya, işleme veya pencereye izin verir. Ctrl+Alt+B Tümünü engelle moduna geçirir ve Normal moda geri döndürür.",
       "autoRefreshInterval": "Otomatik yenileme aralığı",
@@ -369,7 +375,8 @@
       "notifyBlocked": "Bir uygulama engellendiğinde bana bildir",
       "notifyBlockedDescription": "Her oturumda uygulama başına bir kez, Normal modda. Windows bileşenleri dahil edilmez.",
       "notifyListening": "Bir uygulama gelen bağlantıları kabul etmeye başladığında bana bildir",
-      "notifyListeningDescription": "Her oturumda uygulama başına bir kez. Windows bileşenleri dahil edilmez."
+      "notifyListeningDescription": "Her oturumda uygulama başına bir kez. Windows bileşenleri dahil edilmez.",
+      "languageRestartNow": "Şimdi yeniden başlat"
     },
     "protection": {
       "allowLocalSubnet": "Yerel ağa izin ver",
@@ -389,7 +396,9 @@
       "addressesDescription": "Kuralları ne derse desin, hiçbir program bu IP adresleri ve ağlarla bağlantı kuramaz. Her satıra bir tane; # ile başlayan satırlar yok sayılır.",
       "addressesPlaceholder": "Örneğin 203.0.113.7 veya 198.51.100.0/24",
       "addressesSave": "Adresleri kaydet",
-      "addressesInvalid": "\"{0}\" bir IP adresi veya ağ değil. Hiçbir şey kaydedilmedi."
+      "addressesInvalid": "\"{0}\" bir IP adresi veya ağ değil. Hiçbir şey kaydedilmedi.",
+      "hostsDescription": "Windows hosts dosyasını kullanarak bilinen kötü amaçlı sitelere bağlantıyı engeller.",
+      "portsDescription": "Kötü amaçlı yazılımların sık kullandığı ağ bağlantı noktalarını engeller."
     },
     "privacy": {
       "telemetry": "Windows telemetrisini azalt",
@@ -444,18 +453,30 @@
       "unlockFailed": {
         "title": "Yapılandırmanın kilidi açılamadı",
         "detail": "Parola kabul edilmedi."
-      }
+      },
+      "removeConfirm": {
+        "title": "Parola kaldırılsın mı?",
+        "body": "Bu bilgisayarda oturum açabilen herkes SimpleDeFence kurallarını ve ayarlarını değiştirebilir."
+      },
+      "passwordHeader": "Parola",
+      "lockHeader": "Yapılandırmayı kilitle"
     },
     "updates": {
       "autoCheck": "Güncelleştirmeleri otomatik denetle",
       "autoCheckDescription": "SimpleDeFence düzenli aralıklarla yeni sürümleri denetler.",
-      "checkNow": "Güncelleştirmeleri şimdi denetle",
+      "checkNow": "Şimdi denetle",
       "checkingTitle": "Güncelleştirmeler denetleniyor...",
       "checkFailedTitle": "Güncelleştirme denetimi başarısız oldu",
       "noneAvailable": "En son sürümü kullanıyorsunuz.",
       "available": "{0} sürümü kullanılabilir. Şimdi indirilip kurulsun mu?",
       "downloading": "Güncelleştirme indiriliyor...",
-      "verificationFailed": "İndirilen dosya bu sürüm için yayımlanan sağlama toplamıyla eşleşmediğinden çalıştırılmadı. Hiçbir şey kurulmadı."
+      "verificationFailed": "İndirilen dosya bu sürüm için yayımlanan sağlama toplamıyla eşleşmediğinden çalıştırılmadı. Hiçbir şey kurulmadı.",
+      "manualCheckHeader": "Güncellemeleri denetle",
+      "manualCheckDescription": "SimpleDeFence için daha yeni bir sürüm olup olmadığına bakar.",
+      "upToDateTitle": "Güncelleme yok",
+      "availableTitle": "Güncelleme var",
+      "install": "İndir ve yükle",
+      "notNow": "Şimdi değil"
     },
     "maintenance": {
       "import": "Yapılandırmayı içe aktar...",
@@ -479,7 +500,9 @@
       },
       "exportFailed": {
         "title": "Yapılandırma dışa aktarılamadı"
-      }
+      },
+      "backupHeader": "Yedekle veya geri yükle",
+      "backupDescription": "Tüm kuralları ve ayarları bir dosyaya kaydeder ya da bir dosyadan yükler."
     },
     "about": {
       "version": "Sürüm {0}",
@@ -536,7 +559,7 @@
       "failedTitle": "Yanlış parola"
     },
     "quickAdd": {
-      "confirmTitle": "Ayrıcalık eklensin mi?",
+      "confirmTitle": "Kural eklensin mi?",
       "confirmBody": "\"{0}\" güvenlik duvarından geçsin mi?",
       "confirmAdd": "Ekle"
     },
@@ -545,7 +568,7 @@
     },
     "stillRunning": {
       "title": "SimpleDeFence hâlâ çalışıyor",
-      "body": "Pencereyi kapatmak güvenlik duvarını durdurmaz. Durdurmak için bu menüdeki Çık'ı kullanın."
+      "body": "Pencereyi kapatmak güvenlik duvarını durdurmaz. Çık yalnızca bu uygulamayı kapatır; güvenlik duvarı bu bilgisayarı korumaya devam eder."
     }
   },
   "duration": {

@@ -532,6 +532,25 @@
                     <StackPanel>
                         <TextBlock x:Name="TrafficNote" Style="{StaticResource CaptionTextBlockStyle}"
                                    Opacity="0.7" Margin="0,0,0,4" TextWrapping="Wrap" Visibility="Collapsed"/>
+                        <!-- Column headings, on the same grid as TrafficRow so they line up with
+                             the numbers. They used to be tooltips only. -->
+                        <Grid x:Name="TrafficHeadings" Padding="12,4" ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*" MinWidth="120"/>
+                                <ColumnDefinition Width="96"/>
+                                <ColumnDefinition Width="96"/>
+                                <ColumnDefinition Width="96"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="1" Text="{loc:Loc Key=connections.traffic.appHeading}"
+                                       Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="NoWrap"/>
+                            <TextBlock Grid.Column="2" Text="{loc:Loc Key=connections.traffic.sent}" TextAlignment="Right"
+                                       Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="NoWrap"/>
+                            <TextBlock Grid.Column="3" Text="{loc:Loc Key=connections.traffic.received}" TextAlignment="Right"
+                                       Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="NoWrap"/>
+                            <TextBlock Grid.Column="4" Text="{loc:Loc Key=connections.traffic.rateHeading}" TextAlignment="Right"
+                                       Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="NoWrap"/>
+                        </Grid>
                         <TextBlock x:Name="TrafficEmpty" Text="{loc:Loc Key=connections.traffic.empty}"
                                    Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
                         <ListView x:Name="TrafficList" SelectionMode="None"

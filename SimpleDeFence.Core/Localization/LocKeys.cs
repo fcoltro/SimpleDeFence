@@ -139,6 +139,8 @@
             public const string TrafficSent = "connections.traffic.sent";
             public const string TrafficReceived = "connections.traffic.received";
             public const string TrafficRate = "connections.traffic.rate";
+            public const string TrafficAppHeading = "connections.traffic.appHeading";
+            public const string TrafficRateHeading = "connections.traffic.rateHeading";
 
             public const string SectionCount = "connections.section.count";
             public const string EmptyBlocked = "connections.empty.blocked";
@@ -265,6 +267,8 @@
             public const string FolderMatchesNone = "rules.folderDialog.matchesNone";
             public const string FolderInvalid = "rules.folderDialog.invalid";
             public const string FolderWritable = "rules.folderDialog.writable";
+            public const string FolderAddedAllowed = "rules.folderDialog.addedAllowed";
+            public const string FolderAddedBlocked = "rules.folderDialog.addedBlocked";
             public const string PickUwpTitle = "rules.pickUwpTitle";
             public const string PickProcessTitle = "rules.pickProcessTitle";
             public const string PickWindowTitle = "rules.pickWindowTitle";
@@ -310,6 +314,8 @@
             public const string DetailApplyFailedLockedDetail = "rules.detail.applyFailed.lockedDetail";
             public const string DetailApplyFailedStaleDetail = "rules.detail.applyFailed.staleDetail";
             public const string DetailApplyFailedGenericDetail = "rules.detail.applyFailed.genericDetail";
+            public const string DetailInvalidPorts = "rules.detail.invalidPorts";
+            public const string DetailPortsHint = "rules.detail.portsHint";
         }
 
         public static class Settings
@@ -342,6 +348,7 @@
             public const string GeneralLanguageAuto = "settings.general.languageAuto";
             public const string GeneralLanguageRestartTitle = "settings.general.languageRestartTitle";
             public const string GeneralLanguageRestartDetail = "settings.general.languageRestartDetail";
+            public const string GeneralLanguageRestartNow = "settings.general.languageRestartNow";
             public const string GeneralAskForExceptionDetails = "settings.general.askForExceptionDetails";
             public const string GeneralAskForExceptionDetailsDescription = "settings.general.askForExceptionDetailsDescription";
             public const string GeneralEnableHotkeys = "settings.general.enableHotkeys";
@@ -392,6 +399,8 @@
             public const string BlocklistsEnableDescription = "settings.blocklists.enableDescription";
             public const string BlocklistsHosts = "settings.blocklists.hosts";
             public const string BlocklistsPorts = "settings.blocklists.ports";
+            public const string BlocklistsHostsDescription = "settings.blocklists.hostsDescription";
+            public const string BlocklistsPortsDescription = "settings.blocklists.portsDescription";
             public const string BlocklistsAddresses = "settings.blocklists.addresses";
             public const string BlocklistsAddressesDescription = "settings.blocklists.addressesDescription";
             public const string BlocklistsAddressesPlaceholder = "settings.blocklists.addressesPlaceholder";
@@ -408,6 +417,10 @@
             public const string SecurityConfirmPassword = "settings.security.confirmPassword";
             public const string SecuritySetPassword = "settings.security.setPassword";
             public const string SecurityRemovePassword = "settings.security.removePassword";
+            public const string SecurityRemoveConfirmTitle = "settings.security.removeConfirm.title";
+            public const string SecurityRemoveConfirmBody = "settings.security.removeConfirm.body";
+            public const string SecurityPasswordHeader = "settings.security.passwordHeader";
+            public const string SecurityLockHeader = "settings.security.lockHeader";
             public const string SecurityPasswordMismatchTitle = "settings.security.passwordMismatch.title";
             public const string SecurityPasswordMismatchDetail = "settings.security.passwordMismatch.detail";
             public const string SecurityPasswordUpdatedTitle = "settings.security.passwordUpdated.title";
@@ -427,6 +440,12 @@
             public const string UpdatesAutoCheck = "settings.updates.autoCheck";
             public const string UpdatesAutoCheckDescription = "settings.updates.autoCheckDescription";
             public const string UpdatesCheckNow = "settings.updates.checkNow";
+            public const string UpdatesManualCheckHeader = "settings.updates.manualCheckHeader";
+            public const string UpdatesManualCheckDescription = "settings.updates.manualCheckDescription";
+            public const string UpdatesUpToDateTitle = "settings.updates.upToDateTitle";
+            public const string UpdatesAvailableTitle = "settings.updates.availableTitle";
+            public const string UpdatesInstall = "settings.updates.install";
+            public const string UpdatesNotNow = "settings.updates.notNow";
             public const string UpdatesCheckingTitle = "settings.updates.checkingTitle";
             public const string UpdatesCheckFailedTitle = "settings.updates.checkFailedTitle";
             public const string UpdatesNoneAvailable = "settings.updates.noneAvailable";
@@ -436,6 +455,8 @@
 
             public const string MaintenanceImport = "settings.maintenance.import";
             public const string MaintenanceExport = "settings.maintenance.export";
+            public const string MaintenanceBackupHeader = "settings.maintenance.backupHeader";
+            public const string MaintenanceBackupDescription = "settings.maintenance.backupDescription";
             public const string MaintenanceFilePickerName = "settings.maintenance.filePickerName";
             public const string MaintenanceImportConfirmTitle = "settings.maintenance.importConfirm.title";
             public const string MaintenanceImportConfirmBody = "settings.maintenance.importConfirm.body";
