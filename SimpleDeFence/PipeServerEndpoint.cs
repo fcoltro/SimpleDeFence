@@ -112,20 +112,41 @@ namespace SimpleDeFence
             // already taken, rather than quietly joining someone else's pipe as a second instance.
             // If that happens at startup, something is already squatting the name and the only safe
             // thing to do is refuse to serve rather than compete for connections.
-            NamedPipeServerStream pipeServer;
-            try
+            //
+            // Refusing is not the same as giving up, though. The name is only held while the
+            // squatter keeps its handle open (an upgrade, a service restart or a crash leaves a
+            // gap anyone can take), and giving up for good left the service unreachable until it
+            // was restarted. So keep trying: every 2 seconds for the first minute, then every 30.
+            NamedPipeServerStream? pipeServer = null;
+            for (int attempt = 0; pipeServer is null; ++attempt)
             {
-                pipeServer = NamedPipeServerStreamAcl.Create(
-                    m_PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message,
-                    PipeOptions.WriteThrough | PipeOptions.FirstPipeInstance,
-                    2048 * 10, 2048 * 10, ps);
-            }
-            catch (Exception e)
-            {
-                Utils.Log($"Could not create the control pipe '{m_PipeName}'. Another process is already holding that name, "
-                    + "so no client requests will be served. For details see the next log entry.", Utils.LOG_ID_SERVICE);
-                Utils.LogException(e, Utils.LOG_ID_SERVICE);
-                return;
+                try
+                {
+                    pipeServer = NamedPipeServerStreamAcl.Create(
+                        m_PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message,
+                        PipeOptions.WriteThrough | PipeOptions.FirstPipeInstance,
+                        2048 * 10, 2048 * 10, ps);
+                    if (attempt > 0)
+                        Utils.Log($"Created the control pipe '{m_PipeName}' after {attempt} failed attempts; client requests are served again.", Utils.LOG_ID_SERVICE);
+                }
+                catch (Exception e)
+                {
+                    if (attempt == 0)
+                    {
+                        Utils.Log($"Could not create the control pipe '{m_PipeName}'. Another process is already holding that name, "
+                            + "so no client requests can be served until it lets go; retrying. For details see the next log entry.", Utils.LOG_ID_SERVICE);
+                        Utils.LogException(e, Utils.LOG_ID_SERVICE);
+                    }
+
+                    // In short steps, so Dispose (which clears m_Run) is not kept waiting.
+                    var wait = TimeSpan.FromSeconds(attempt < 30 ? 2 : 30);
+                    for (var waited = TimeSpan.Zero; waited < wait; waited += TimeSpan.FromMilliseconds(250))
+                    {
+                        if (!m_Run)
+                            return;
+                        Thread.Sleep(250);
+                    }
+                }
             }
 
             using (pipeServer)

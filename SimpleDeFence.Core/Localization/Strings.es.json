@@ -75,7 +75,7 @@
       "minutes30": "Después de 30 minutos",
       "hour1": "Después de 1 hora"
     },
-    "learningEndsAt": "{0} Vuelve a Normal a las {1}.",
+    "learningEndsAt": "{0} Vuelve al modo anterior a las {1}.",
     "learningEnded": {
       "title": "El modo de aprendizaje ha terminado",
       "body": "Se añadieron {0} reglas. Comprueba que cada una sea de un programa de confianza.",
@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "Conexiones",
+    "traffic": {
+      "section": "Datos usados",
+      "since": "Contados desde {0}, cuando se inició SimpleDeFence. No se cuenta el tráfico que no sale de este equipo.",
+      "empty": "Ninguna aplicación ha usado la red desde que empezó el recuento.",
+      "unavailable": "El uso de datos no está disponible. No se pudo contactar con el servicio del firewall o Windows no le permitió contar el tráfico.",
+      "sent": "Enviados",
+      "received": "Recibidos",
+      "rate": "Velocidad desde la última actualización"
+    },
     "section": {
       "blocked": "Bloqueadas",
       "connected": "Conectadas",
@@ -164,26 +173,6 @@
       "show": "Mostrar {0} silenciadas",
       "hide": "Ocultar silenciadas"
     },
-    "stopTrying": {
-      "menu": "Hacer que deje de intentarlo…",
-      "title": "Hacer que {0} deje de intentarlo",
-      "intro": "Estos elementos inician programas de {0} en segundo plano que no dejan de intentar conectarse. Desmarque los que quiera desactivar. Los que estén en ejecución se cerrarán ahora y no volverán a iniciarse hasta que los vuelva a marcar.",
-      "fromFolder": "{1} no ha superado la comprobación de firma de Windows, así que puede haber sido modificado después de que {0} lo firmara. Analízalo o reinstálalo. Los elementos de abajo proceden de otros programas de su carpeta, firmados por {0}.",
-      "introFolder": "Estos elementos inician en segundo plano programas de la carpeta de {0}, que siguen intentando conectarse. Desmarca los que quieras desactivar. Los que estén en ejecución se cerrarán y no volverán a iniciarse hasta que los marques de nuevo.",
-      "unsignedFolder": "{0} no tiene una firma válida, así que SimpleDeFence no puede saber quién lo creó. Estos elementos aparecen solo porque se ejecutan desde su carpeta, {1}. Revisa cada uno antes de desactivarlo.",
-      "needed": "Comprobación de licencia. Es posible que las apps de {0} no se abran sin ella.",
-      "kindService": "Servicio",
-      "kindTask": "Tarea programada",
-      "kindStartup": "Se inicia con Windows",
-      "apply": "Aplicar",
-      "allOn": "Volver a activar todo",
-      "none": "Nada de {0} se inicia en segundo plano.",
-      "unsigned": "SimpleDeFence no puede saber quién creó este programa: no tiene una firma válida y su carpeta la comparten otros programas. Nunca se ofrecen programas del propio Windows.",
-      "unreachable": "El servicio no respondió. ¿Está en ejecución?",
-      "done": "Listo. {0} desactivados, {1} reactivados.",
-      "failed": "No se pudieron aplicar algunos cambios. Consulte el registro del servicio.",
-      "locked": "Desbloquee primero la configuración."
-    },
     "details": {
       "addresses": "Direcciones",
       "lookUpNote": "Busca el nombre de cada dirección, su propietario y el país donde está registrada su red. No se envía nada hasta que hagas clic: entonces las direcciones van a tu servidor DNS y a rdap.org.",
@@ -201,7 +190,8 @@
     "service": "Servicio",
     "uwpPackage": "Paquete UWP",
     "global": "Global",
-    "allApplications": "Todas las aplicaciones"
+    "allApplications": "Todas las aplicaciones",
+    "folder": "Regla de carpeta"
   },
   "policy": {
     "blocked": "Bloqueado",
@@ -261,6 +251,20 @@
     "addPickWindow": "Ventana...",
     "addPickUwp": "Aplicación UWP...",
     "addPickFolder": "Elegir carpeta...",
+    "folderDialog": {
+      "title": "Añadir una regla de carpeta",
+      "intro": "La regla se aplica a todo programa cuya ruta coincida, incluidos los que se añadan más tarde a la carpeta.",
+      "name": "Nombre de la regla",
+      "pattern": "Carpetas o patrones, uno por línea",
+      "browse": "Examinar...",
+      "help": "* coincide con cualquier nombre dentro de una carpeta, ** con cualquier número de carpetas, ? con un carácter. Ejemplos: C:\\Tools\\**  o  C:\\Games\\*\\game.exe",
+      "action": "Regla",
+      "matches": "Programas que coinciden ahora: {0}",
+      "matchesMany": "Programas que coinciden ahora: más de {0}",
+      "matchesNone": "Ningún programa coincide ahora. La regla seguirá cubriendo los programas que se añadan después.",
+      "invalid": "Escriba una ruta de carpeta completa, como C:\\Tools. No se puede usar una unidad entera.",
+      "writable": "Cualquiera que use este PC puede poner programas en esta carpeta, así que una regla Permitir aquí dejaría pasar cualquier programa que añadan, incluido malware. Una carpeta dentro de Archivos de programa es más segura."
+    },
     "pickUwpTitle": "Elige una aplicación UWP",
     "pickProcessTitle": "Elige un proceso en ejecución",
     "pickWindowTitle": "Elige una ventana",

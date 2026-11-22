@@ -128,6 +128,18 @@
             public const string SectionBlocked = "connections.section.blocked";
             public const string SectionConnected = "connections.section.connected";
             public const string SectionOpen = "connections.section.open";
+
+            /// <summary>The Data used section: bytes per app, counted by the service.</summary>
+            public const string SectionTraffic = "connections.traffic.section";
+            public const string TrafficSince = "connections.traffic.since";
+            public const string TrafficEmpty = "connections.traffic.empty";
+            /// <summary>Shown instead of TrafficEmpty when there are no counts to show, for the
+            /// same reason as BlockedUnavailable.</summary>
+            public const string TrafficUnavailable = "connections.traffic.unavailable";
+            public const string TrafficSent = "connections.traffic.sent";
+            public const string TrafficReceived = "connections.traffic.received";
+            public const string TrafficRate = "connections.traffic.rate";
+
             public const string SectionCount = "connections.section.count";
             public const string EmptyBlocked = "connections.empty.blocked";
             /// <summary>Shown instead of EmptyBlocked when the firewall log could not be read, so
@@ -176,24 +188,6 @@
             public const string MutedHide = "connections.muted.hide";
 
             // "Stop it trying": switch off a blocked app's background parts
-            public const string StopMenu = "connections.stopTrying.menu";
-            public const string StopTitle = "connections.stopTrying.title";
-            public const string StopIntro = "connections.stopTrying.intro";
-            public const string StopFromFolder = "connections.stopTrying.fromFolder";
-            public const string StopIntroFolder = "connections.stopTrying.introFolder";
-            public const string StopUnsignedFolder = "connections.stopTrying.unsignedFolder";
-            public const string StopNeeded = "connections.stopTrying.needed";
-            public const string StopKindService = "connections.stopTrying.kindService";
-            public const string StopKindTask = "connections.stopTrying.kindTask";
-            public const string StopKindStartup = "connections.stopTrying.kindStartup";
-            public const string StopApply = "connections.stopTrying.apply";
-            public const string StopAllOn = "connections.stopTrying.allOn";
-            public const string StopNone = "connections.stopTrying.none";
-            public const string StopUnsigned = "connections.stopTrying.unsigned";
-            public const string StopUnreachable = "connections.stopTrying.unreachable";
-            public const string StopDone = "connections.stopTrying.done";
-            public const string StopFailed = "connections.stopTrying.failed";
-            public const string StopLocked = "connections.stopTrying.locked";
 
             /// <summary>The details dialog behind "Show all", and its on-demand address lookup.</summary>
             public const string DetailsAddresses = "connections.details.addresses";
@@ -214,6 +208,7 @@
             public const string UwpPackage = "subject.uwpPackage";
             public const string Global = "subject.global";
             public const string AllApplications = "subject.allApplications";
+            public const string Folder = "subject.folder";
         }
 
         public static class Rules
@@ -258,6 +253,18 @@
             public const string AddPickWindow = "rules.addPickWindow";
             public const string AddPickUwp = "rules.addPickUwp";
             public const string AddPickFolder = "rules.addPickFolder";
+            public const string FolderTitle = "rules.folderDialog.title";
+            public const string FolderIntro = "rules.folderDialog.intro";
+            public const string FolderName = "rules.folderDialog.name";
+            public const string FolderPattern = "rules.folderDialog.pattern";
+            public const string FolderBrowse = "rules.folderDialog.browse";
+            public const string FolderHelp = "rules.folderDialog.help";
+            public const string FolderAction = "rules.folderDialog.action";
+            public const string FolderMatches = "rules.folderDialog.matches";
+            public const string FolderMatchesMany = "rules.folderDialog.matchesMany";
+            public const string FolderMatchesNone = "rules.folderDialog.matchesNone";
+            public const string FolderInvalid = "rules.folderDialog.invalid";
+            public const string FolderWritable = "rules.folderDialog.writable";
             public const string PickUwpTitle = "rules.pickUwpTitle";
             public const string PickProcessTitle = "rules.pickProcessTitle";
             public const string PickWindowTitle = "rules.pickWindowTitle";

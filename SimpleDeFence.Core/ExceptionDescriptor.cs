@@ -71,6 +71,7 @@ namespace SimpleDeFence
             SubjectType.Service => ((ServiceSubject)subject).ServiceName,
             SubjectType.AppContainer => ((AppContainerSubject)subject).DisplayName,
             SubjectType.Global => Loc.T(LocKeys.Subject.AllApplications),
+            SubjectType.PathPattern => ((PathPatternSubject)subject).DisplayName,
             _ => Loc.T(LocKeys.Common.Unknown),
         };
 
@@ -80,6 +81,7 @@ namespace SimpleDeFence
             SubjectType.Service => Loc.T(LocKeys.Subject.Service),
             SubjectType.AppContainer => Loc.T(LocKeys.Subject.UwpPackage),
             SubjectType.Global => Loc.T(LocKeys.Subject.Global),
+            SubjectType.PathPattern => Loc.T(LocKeys.Subject.Folder),
             _ => Loc.T(LocKeys.Common.Unknown),
         };
 
@@ -88,6 +90,7 @@ namespace SimpleDeFence
             SubjectType.Executable => ((ExecutableSubject)subject).ExecutablePath,
             SubjectType.Service => ((ServiceSubject)subject).ExecutablePath,
             SubjectType.AppContainer => Join((AppContainerSubject)subject),
+            SubjectType.PathPattern => subject.ToString(),
             _ => string.Empty,
         };
 

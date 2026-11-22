@@ -33,6 +33,7 @@ namespace SimpleDeFence
                 MessageType.TELEMETRY_APPLY => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.TELEMETRY_UNDO => (TwMessage?)JsonSerializer.Deserialize<TwMessageSimple>(ref reader, SourceGenerationContext.Default.TwMessageSimple),
                 MessageType.ADD_TEMPORARY_EXCEPTION => (TwMessage?)JsonSerializer.Deserialize<TwMessageAddTempException>(ref reader, SourceGenerationContext.Default.TwMessageAddTempException),
+                MessageType.GET_TRAFFIC => (TwMessage?)JsonSerializer.Deserialize<TwMessageGetTraffic>(ref reader, SourceGenerationContext.Default.TwMessageGetTraffic),
                 _ => throw new JsonException($"Tried to deserialize unsupported type with discriminator {(MessageType)discriminator}."),
             };
             return ret;
@@ -70,6 +71,8 @@ namespace SimpleDeFence
                     JsonSerializer.Serialize<TwMessageBackgroundItems>(writer, typedVal, SourceGenerationContext.Default.TwMessageBackgroundItems); break;
                 case TwMessageAddTempException typedVal:
                     JsonSerializer.Serialize<TwMessageAddTempException>(writer, typedVal, SourceGenerationContext.Default.TwMessageAddTempException); break;
+                case TwMessageGetTraffic typedVal:
+                    JsonSerializer.Serialize<TwMessageGetTraffic>(writer, typedVal, SourceGenerationContext.Default.TwMessageGetTraffic); break;
                 default:
                     throw new JsonException($"Tried to serialize unsupported type {value.GetType()}.");
             };
@@ -411,6 +414,36 @@ namespace SimpleDeFence
 
         public TwMessageBackgroundItems CreateResponse(string publisher, BackgroundItem[] items)
             => new(Type, AppPath, publisher, items, Array.Empty<BackgroundItemChange>());
+    }
+
+    /// <summary>
+    /// GET_TRAFFIC: bytes sent and received per app, for the Connections page's "Data used"
+    /// section. Available is false when the service could not start counting (Windows refused the
+    /// trace session), so an empty list is never read as "nothing used the network".
+    /// </summary>
+    public record TwMessageGetTraffic : TwMessage
+    {
+        public bool Available { get; }
+        public DateTime Since { get; }
+        public AppTraffic[] Apps { get; }
+
+        [JsonConstructor]
+        public TwMessageGetTraffic(bool available, DateTime since, AppTraffic[] apps) :
+            base(MessageType.GET_TRAFFIC)
+        {
+            Available = available;
+            Since = since;
+            Apps = apps ?? Array.Empty<AppTraffic>();
+        }
+
+        public static TwMessageGetTraffic CreateRequest()
+            => new(false, default, Array.Empty<AppTraffic>());
+
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static")]
+#pragma warning restore IDE0079 // Remove unnecessary suppression
+        public TwMessageGetTraffic CreateResponse(bool available, DateTime since, AppTraffic[] apps)
+            => new(available, since, apps);
     }
 
     public record TwMessageAddTempException : TwMessage

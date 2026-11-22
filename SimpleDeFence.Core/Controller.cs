@@ -116,15 +116,10 @@ namespace SimpleDeFence
             return Endpoint.QueueMessage(TwMessageSimple.CreateRequest(MessageType.LOCK)).Response.Type;
         }
 
-        /// <summary>The background items from the publisher of <paramref name="appPath"/>, or null
-        /// when the service did not answer with a list (locked, error, older service).</summary>
-        public TwMessageBackgroundItems? GetBackgroundItems(string appPath)
-            => Endpoint.QueueMessage(TwMessageBackgroundItems.CreateListRequest(appPath)).Response as TwMessageBackgroundItems;
-
-        /// <summary>Applies the changes, then returns the list as it now stands. The reply is
-        /// RESPONSE_LOCKED or RESPONSE_ERROR when nothing was changed.</summary>
-        public TwMessage SetBackgroundItems(string appPath, BackgroundItemChange[] changes)
-            => Endpoint.QueueMessage(TwMessageBackgroundItems.CreateSetRequest(appPath, changes)).Response;
+        /// <summary>Bytes per app since the service started counting, or null when the service did
+        /// not answer with them (locked out, unreachable, or older than this message).</summary>
+        public TwMessageGetTraffic? GetTraffic()
+            => Endpoint.QueueMessage(TwMessageGetTraffic.CreateRequest()).Response as TwMessageGetTraffic;
 
         public string TryGetProcessPath(uint pid)
         {

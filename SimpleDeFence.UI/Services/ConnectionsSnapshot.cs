@@ -35,6 +35,21 @@ namespace SimpleDeFence.UI.Services
         public int Count { get; init; } = 1;
     }
 
+    /// <summary>One row in the Data used section: an app's bytes since the service started
+    /// counting.</summary>
+    internal sealed class TrafficRow
+    {
+        public string AppName { get; init; } = string.Empty;
+        public string AppPath { get; init; } = string.Empty;
+
+        /// <summary>Identifies the row from one refresh to the next, so the page can work out a
+        /// rate from the difference. See TrafficLedger.KeyOf.</summary>
+        public string Key { get; init; } = string.Empty;
+
+        public long Sent { get; init; }
+        public long Received { get; init; }
+    }
+
     /// <summary>One row of the process picker: a running process with its resolved path.</summary>
     internal sealed class ProcessListEntry
     {
@@ -70,5 +85,17 @@ namespace SimpleDeFence.UI.Services
         public bool BlockedUnavailable { get; init; }
         public IReadOnlyList<ConnectionRow> Connected { get; init; } = Array.Empty<ConnectionRow>();
         public IReadOnlyList<ConnectionRow> Open { get; init; } = Array.Empty<ConnectionRow>();
+
+        public IReadOnlyList<TrafficRow> Traffic { get; init; } = Array.Empty<TrafficRow>();
+
+        /// <summary>When the service started counting. Only meaningful while
+        /// <see cref="TrafficUnavailable"/> is false.</summary>
+        public DateTime TrafficSince { get; init; }
+
+        /// <summary>True when there are no counts to show: the service could not be reached, is
+        /// older than the counters, or Windows would not let it count. Same reasoning as
+        /// <see cref="BlockedUnavailable"/>: an empty Data used list must never stand for an
+        /// answer we did not get.</summary>
+        public bool TrafficUnavailable { get; init; } = true;
     }
 }

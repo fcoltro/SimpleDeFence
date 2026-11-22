@@ -127,7 +127,34 @@ namespace SimpleDeFence
             }
         }
 
-        internal static int Uninstall()
+        /// <summary>Stops the service through the Service Control Manager, waiting up to 15 s.
+        /// Logs and carries on if it does not stop.</summary>
+        private static void StopServiceThroughScm()
+        {
+            try
+            {
+                using var sc = new ServiceController(SimpleDeFenceService.SERVICE_NAME);
+                if (sc.Status != ServiceControllerStatus.Stopped)
+                {
+                    sc.Stop();
+                    sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(15));
+                }
+            }
+            catch (Exception e)
+            {
+                Utils.LogException(e, Utils.LOG_ID_INSTALLER);
+            }
+        }
+
+        /// <param name="upgrade">
+        /// True when the installer is only replacing this version with a newer one (Product.wxs
+        /// passes /upgrade when UPGRADINGPRODUCTCODE is set). Then the firewall must stay up and
+        /// nothing may need a person: the filters are left in place for the new service to
+        /// replace, the hosts file and telemetry settings are left alone, and the service is
+        /// stopped through Windows rather than asked over the pipe - which a password lock would
+        /// refuse with no one there to type the password, rolling the whole update back.
+        /// </param>
+        internal static int Uninstall(bool upgrade = false)
         {
             // Everything below that puts something on screen first has to know whether there is a
             // screen. Product.wxs runs UninstallCustom - and InstallCustomRollback - as deferred,
@@ -139,7 +166,9 @@ namespace SimpleDeFence
             // Arriving here without an interactive desktop already implies consent - msiexec only
             // runs the action after an elevated, user-initiated uninstall - so the confirmation is
             // skipped there rather than asked into a void.
-            bool interactive = HasInteractiveDesktop();
+            bool interactive = !upgrade && HasInteractiveDesktop();
+            if (upgrade)
+                Utils.Log("Removing the old version for an upgrade; the firewall's filters stay in place.", Utils.LOG_ID_INSTALLER);
 
             if (interactive)
             {
@@ -174,7 +203,11 @@ namespace SimpleDeFence
             // Stop service
             try
             {
-                if (SimpleDeFenceDoctor.IsServiceRunning(Utils.LOG_ID_INSTALLER, false))
+                if (upgrade)
+                {
+                    StopServiceThroughScm();
+                }
+                else if (SimpleDeFenceDoctor.IsServiceRunning(Utils.LOG_ID_INSTALLER, false))
                 {
                     var twController = new Controller("SimpleDeFenceController");
 
@@ -227,21 +260,7 @@ namespace SimpleDeFence
                     }
 
                     if (!IsServiceStopped())
-                    {
-                        try
-                        {
-                            using var sc = new ServiceController(SimpleDeFenceService.SERVICE_NAME);
-                            if (sc.Status != ServiceControllerStatus.Stopped)
-                            {
-                                sc.Stop();
-                                sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(15));
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Utils.LogException(e, Utils.LOG_ID_INSTALLER);
-                        }
-                    }
+                        StopServiceThroughScm();
 
                     if (!IsServiceStopped())
                     {
@@ -286,6 +305,9 @@ namespace SimpleDeFence
                 }
             }
 
+            // Not on an upgrade: removing them here left the PC with no firewall at all until the
+            // new version had installed. The new service replaces every one of them when it starts.
+            if (!upgrade)
             try
             {
                 // Remove persistent WFP objects
@@ -309,6 +331,21 @@ namespace SimpleDeFence
             }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_INSTALLER); }
 
+            // "Reduce Windows telemetry" switched Windows services and tasks off and set policies.
+            // After a real uninstall nothing would be left to undo that, so undo it now. Not on an
+            // upgrade: the new version keeps it as it is.
+            if (!upgrade)
+            {
+                try
+                {
+                    if (!new TelemetryMitigationHost().Undo())
+                        Utils.Log("Some Windows telemetry settings could not be put back during uninstall; see the service log.", Utils.LOG_ID_INSTALLER);
+                }
+                catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_INSTALLER); }
+            }
+
+            // Not on an upgrade: the new service installs the blocklist again straight away.
+            if (!upgrade)
             try
             {
                 // Put back the user's original hosts file.
@@ -326,6 +363,10 @@ namespace SimpleDeFence
                 }
             }
             catch (Exception e) { Utils.LogException(e, Utils.LOG_ID_INSTALLER); }
+
+            // Whatever "Stop it trying" (1.1.0) switched off and the service has not been able to
+            // switch back on yet. After this nothing would ever try again.
+            BackgroundItemsManager.RestoreAll();
 
             try
             {

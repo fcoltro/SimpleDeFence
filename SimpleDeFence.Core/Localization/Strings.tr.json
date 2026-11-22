@@ -75,7 +75,7 @@
       "minutes30": "30 dakika sonra",
       "hour1": "1 saat sonra"
     },
-    "learningEndsAt": "{0} Saat {1} itibarıyla Normal moda döner.",
+    "learningEndsAt": "{0} Saat {1} itibarıyla önceki moda döner.",
     "learningEnded": {
       "title": "Öğrenme modu sona erdi",
       "body": "{0} kural eklendi. Her birinin güvendiğiniz bir programa ait olduğunu kontrol edin.",
@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "Bağlantılar",
+    "traffic": {
+      "section": "Kullanılan veri",
+      "since": "SimpleDeFence'in başladığı {0} itibarıyla sayılıyor. Bu bilgisayarda kalan trafik sayılmaz.",
+      "empty": "Sayım başladığından beri hiçbir uygulama ağı kullanmadı.",
+      "unavailable": "Veri kullanımı kullanılamıyor. Güvenlik duvarı hizmetine ulaşılamadı veya Windows trafiği saymasına izin vermedi.",
+      "sent": "Gönderilen",
+      "received": "Alınan",
+      "rate": "Son yenilemeden bu yana hız"
+    },
     "section": {
       "blocked": "Engellenen",
       "connected": "Bağlı",
@@ -164,26 +173,6 @@
       "show": "Susturulan {0} uygulamayı göster",
       "hide": "Susturulanları gizle"
     },
-    "stopTrying": {
-      "menu": "Denemesini durdur…",
-      "title": "{0} denemelerini durdur",
-      "intro": "Bunlar {0} programlarını arka planda başlatır ve bu programlar sürekli bağlanmaya çalışır. Kapatmak istediklerinizin işaretini kaldırın. Şu anda çalışanlar hemen kapatılır ve siz yeniden işaretleyene kadar başlamaz.",
-      "fromFolder": "{1}, Windows imza denetiminden geçemedi; {0} imzaladıktan sonra değiştirilmiş olabilir. Taratın veya yeniden yükleyin. Aşağıdaki öğeler, klasöründeki {0} tarafından imzalanmış diğer programlardan geliyor.",
-      "introFolder": "Bunlar {0} klasöründeki programları arka planda başlatır ve bu programlar bağlanmayı denemeye devam eder. Kapatmak istediklerinizin işaretini kaldırın. Şu anda çalışanlar kapatılır ve yeniden işaretleyene kadar başlamaz.",
-      "unsignedFolder": "{0} geçerli bir imzaya sahip değil, bu yüzden SimpleDeFence onu kimin yaptığını bilemiyor. Bu öğeler yalnızca klasöründen ({1}) çalıştıkları için bulundu. Kapatmadan önce her birini kontrol edin.",
-      "needed": "Lisans denetimi. {0} uygulamaları bu olmadan açılmayabilir.",
-      "kindService": "Hizmet",
-      "kindTask": "Zamanlanmış görev",
-      "kindStartup": "Windows ile başlar",
-      "apply": "Uygula",
-      "allOn": "Hepsini yeniden aç",
-      "none": "{0} tarafından arka planda başlayan bir şey yok.",
-      "unsigned": "Bu programın geçerli bir imzası yok ve klasörü başka programlarla paylaşılıyor, bu yüzden SimpleDeFence onu kimin yaptığını bilemiyor. Windows'un kendi programları hiçbir zaman sunulmaz.",
-      "unreachable": "Hizmet yanıt vermedi. Çalışıyor mu?",
-      "done": "Tamam. {0} kapatıldı, {1} yeniden açıldı.",
-      "failed": "Bazı değişiklikler yapılamadı. Ayrıntılar hizmet günlüğünde.",
-      "locked": "Önce yapılandırmanın kilidini açın."
-    },
     "details": {
       "addresses": "Adresler",
       "lookUpNote": "Her adresin adını, sahibini ve ağının kayıtlı olduğu ülkeyi bulur. Siz tıklayana kadar hiçbir şey gönderilmez: tıkladığınızda adresler DNS sunucunuza ve rdap.org'a gider.",
@@ -201,7 +190,8 @@
     "service": "Hizmet",
     "uwpPackage": "UWP paketi",
     "global": "Genel",
-    "allApplications": "Tüm uygulamalar"
+    "allApplications": "Tüm uygulamalar",
+    "folder": "Klasör kuralı"
   },
   "policy": {
     "blocked": "Engellendi",
@@ -261,6 +251,20 @@
     "addPickWindow": "Pencere...",
     "addPickUwp": "UWP uygulaması...",
     "addPickFolder": "Klasör seç...",
+    "folderDialog": {
+      "title": "Klasör kuralı ekle",
+      "intro": "Kural, yolu eşleşen her programa uygulanır; klasöre sonradan eklenen programlar da dahil.",
+      "name": "Kural adı",
+      "pattern": "Klasörler veya desenler, her satıra bir tane",
+      "browse": "Gözat...",
+      "help": "* bir klasör içindeki herhangi bir adla, ** herhangi sayıda klasörle, ? tek bir karakterle eşleşir. Örnekler: C:\\Tools\\**  veya  C:\\Games\\*\\game.exe",
+      "action": "Kural",
+      "matches": "Şu anda eşleşen programlar: {0}",
+      "matchesMany": "Şu anda eşleşen programlar: {0} üzerinde",
+      "matchesNone": "Şu anda eşleşen program yok. Kural sonradan eklenen programlar için yine de geçerli olur.",
+      "invalid": "C:\\Tools gibi tam bir klasör yolu girin. Bütün bir sürücü kullanılamaz.",
+      "writable": "Bu bilgisayarı kullanan herkes bu klasöre program koyabilir; buradaki bir İzin ver kuralı, kötü amaçlı yazılım dahil eklenen her programı geçirir. Program Files altındaki bir klasör daha güvenlidir."
+    },
     "pickUwpTitle": "Bir UWP uygulaması seçin",
     "pickProcessTitle": "Çalışan bir işlem seçin",
     "pickWindowTitle": "Bir pencere seçin",

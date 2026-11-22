@@ -75,7 +75,7 @@
       "minutes30": "Nach 30 Minuten",
       "hour1": "Nach 1 Stunde"
     },
-    "learningEndsAt": "{0} Um {1} wird wieder auf Normal umgeschaltet.",
+    "learningEndsAt": "{0} Um {1} wird wieder auf den vorherigen Modus umgeschaltet.",
     "learningEnded": {
       "title": "Der Lernmodus ist beendet",
       "body": "Es wurden {0} Regeln hinzugefügt. Prüfen Sie, ob jede zu einem Programm gehört, dem Sie vertrauen.",
@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "Verbindungen",
+    "traffic": {
+      "section": "Datenverbrauch",
+      "since": "Gezählt seit {0}, dem Start von SimpleDeFence. Datenverkehr, der auf diesem Computer bleibt, wird nicht gezählt.",
+      "empty": "Seit Beginn der Zählung hat keine App das Netzwerk genutzt.",
+      "unavailable": "Der Datenverbrauch ist nicht verfügbar. Der Firewall-Dienst war nicht erreichbar, oder Windows hat das Zählen nicht erlaubt.",
+      "sent": "Gesendet",
+      "received": "Empfangen",
+      "rate": "Geschwindigkeit seit der letzten Aktualisierung"
+    },
     "section": {
       "blocked": "Blockiert",
       "connected": "Verbunden",
@@ -164,26 +173,6 @@
       "show": "{0} stummgeschaltete anzeigen",
       "hide": "Stummgeschaltete ausblenden"
     },
-    "stopTrying": {
-      "menu": "Versuche stoppen…",
-      "title": "{0} am Verbinden hindern",
-      "intro": "Diese Einträge starten Programme von {0} im Hintergrund, die immer wieder versuchen, eine Verbindung aufzubauen. Entfernen Sie das Häkchen bei allem, was ausgeschaltet werden soll. Laufende Programme werden sofort beendet und starten erst wieder, wenn Sie das Häkchen wieder setzen.",
-      "fromFolder": "{1} hat die Signaturprüfung von Windows nicht bestanden und wurde möglicherweise verändert, seit {0} es signiert hat. Überprüfen Sie es auf Schadsoftware oder installieren Sie es neu. Die Einträge unten stammen von anderen Programmen in seinem Ordner, die von {0} signiert sind.",
-      "introFolder": "Diese Einträge starten Programme aus dem Ordner von {0} im Hintergrund, die immer wieder versuchen, eine Verbindung aufzubauen. Entfernen Sie das Häkchen bei allem, was ausgeschaltet werden soll. Laufende Programme werden sofort beendet und starten erst wieder, wenn Sie das Häkchen wieder setzen.",
-      "unsignedFolder": "{0} hat keine gültige Signatur, daher kann SimpleDeFence nicht erkennen, von wem es stammt. Diese Einträge wurden nur gefunden, weil sie aus seinem Ordner {1} laufen. Prüfen Sie jeden, bevor Sie ihn ausschalten.",
-      "needed": "Lizenzprüfung. Apps von {0} öffnen sich ohne sie möglicherweise nicht.",
-      "kindService": "Dienst",
-      "kindTask": "Geplante Aufgabe",
-      "kindStartup": "Startet mit Windows",
-      "apply": "Übernehmen",
-      "allOn": "Alle wieder einschalten",
-      "none": "Von {0} startet nichts im Hintergrund.",
-      "unsigned": "SimpleDeFence kann nicht erkennen, von wem dieses Programm stammt: Es hat keine gültige Signatur, und sein Ordner wird mit anderen Programmen geteilt. Programme von Windows selbst werden nie angeboten.",
-      "unreachable": "Der Dienst hat nicht geantwortet. Läuft er?",
-      "done": "Fertig. {0} ausgeschaltet, {1} wieder eingeschaltet.",
-      "failed": "Einige Änderungen konnten nicht vorgenommen werden. Details stehen im Dienstprotokoll.",
-      "locked": "Entsperren Sie zuerst die Konfiguration."
-    },
     "details": {
       "addresses": "Adressen",
       "lookUpNote": "Ermittelt zu jeder Adresse den Namen, den Inhaber und das Land, in dem ihr Netz registriert ist. Erst wenn du klickst, wird etwas gesendet: Die Adressen gehen dann an deinen DNS-Server und an rdap.org.",
@@ -201,7 +190,8 @@
     "service": "Dienst",
     "uwpPackage": "UWP-Paket",
     "global": "Global",
-    "allApplications": "Alle Anwendungen"
+    "allApplications": "Alle Anwendungen",
+    "folder": "Ordnerregel"
   },
   "policy": {
     "blocked": "Blockiert",
@@ -261,6 +251,20 @@
     "addPickWindow": "Fenster...",
     "addPickUwp": "UWP-App...",
     "addPickFolder": "Ordner wählen...",
+    "folderDialog": {
+      "title": "Ordnerregel hinzufügen",
+      "intro": "Die Regel gilt für jedes Programm, dessen Pfad passt, auch für Programme, die später in den Ordner kommen.",
+      "name": "Name der Regel",
+      "pattern": "Ordner oder Muster, einer pro Zeile",
+      "browse": "Durchsuchen...",
+      "help": "* steht für einen beliebigen Namen innerhalb eines Ordners, ** für beliebig viele Ordner, ? für ein Zeichen. Beispiele: C:\\Tools\\**  oder  C:\\Games\\*\\game.exe",
+      "action": "Regel",
+      "matches": "Derzeit passende Programme: {0}",
+      "matchesMany": "Derzeit passende Programme: mehr als {0}",
+      "matchesNone": "Derzeit passt kein Programm. Die Regel gilt trotzdem für später hinzugefügte Programme.",
+      "invalid": "Geben Sie einen vollständigen Ordnerpfad ein, z. B. C:\\Tools. Ein ganzes Laufwerk ist nicht möglich.",
+      "writable": "Jeder, der diesen PC nutzt, kann Programme in diesen Ordner legen. Eine Zulassen-Regel hier würde also jedes hinzugefügte Programm durchlassen, auch Schadsoftware. Ein Ordner unter „Programme“ ist sicherer."
+    },
     "pickUwpTitle": "UWP-App auswählen",
     "pickProcessTitle": "Laufenden Prozess auswählen",
     "pickWindowTitle": "Fenster auswählen",
