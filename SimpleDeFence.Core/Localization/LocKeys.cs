@@ -243,6 +243,7 @@
             public const string AddPickFolder = "rules.addPickFolder";
             public const string FolderTitle = "rules.folderDialog.title";
             public const string FolderIntro = "rules.folderDialog.intro";
+            public const string FolderName = "rules.folderDialog.name";
             public const string FolderPattern = "rules.folderDialog.pattern";
             public const string FolderBrowse = "rules.folderDialog.browse";
             public const string FolderHelp = "rules.folderDialog.help";

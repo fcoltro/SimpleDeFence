@@ -245,7 +245,8 @@
     "folderDialog": {
       "title": "Tambah aturan folder",
       "intro": "Aturan berlaku untuk setiap program yang jalurnya cocok, termasuk program yang ditambahkan ke folder nanti.",
-      "pattern": "Folder atau pola",
+      "name": "Nama aturan",
+      "pattern": "Folder atau pola, satu per baris",
       "browse": "Telusuri...",
       "help": "* cocok dengan nama apa pun dalam satu folder, ** dengan sejumlah folder, ? dengan satu karakter. Contoh: C:\\Tools\\**  atau  C:\\Games\\*\\game.exe",
       "action": "Aturan",

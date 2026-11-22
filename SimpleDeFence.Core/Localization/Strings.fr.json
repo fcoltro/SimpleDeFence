@@ -245,7 +245,8 @@
     "folderDialog": {
       "title": "Ajouter une règle de dossier",
       "intro": "La règle s’applique à tout programme dont le chemin correspond, y compris ceux ajoutés plus tard au dossier.",
-      "pattern": "Dossier ou modèle",
+      "name": "Nom de la règle",
+      "pattern": "Dossiers ou modèles, un par ligne",
       "browse": "Parcourir...",
       "help": "* correspond à n’importe quel nom dans un dossier, ** à un nombre quelconque de dossiers, ? à un caractère. Exemples : C:\\Tools\\**  ou  C:\\Games\\*\\game.exe",
       "action": "Règle",

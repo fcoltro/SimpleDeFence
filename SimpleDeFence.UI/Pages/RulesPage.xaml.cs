@@ -565,7 +565,8 @@ namespace SimpleDeFence.UI.Pages
         private async void ShowFolderCoverage(PathPatternSubject? folder)
         {
             int mine = ++_coverageVersion;
-            if (folder is null || string.IsNullOrEmpty(folder.Pattern))
+            var folderPatterns = folder?.UsablePatterns.ToList() ?? new List<string>();
+            if (folderPatterns.Count == 0)
             {
                 DetailCoverage.Visibility = Visibility.Collapsed;
                 return;
@@ -576,7 +577,7 @@ namespace SimpleDeFence.UI.Pages
             DetailCoverage.Visibility = Visibility.Visible;
 
             List<string> matches;
-            try { matches = await Task.Run(() => PathPattern.EnumerateMatches(folder.Pattern, countLimit)); }
+            try { matches = await Task.Run(() => EnumerateAll(folderPatterns, countLimit)); }
             catch { matches = new List<string>(); }
             if (mine != _coverageVersion)
                 return;
@@ -842,16 +843,30 @@ namespace SimpleDeFence.UI.Pages
         {
             var title = Loc.T(LocKeys.Rules.FolderTitle);
 
+            // Like an application group in Fort Firewall: a name, and as many folders or patterns
+            // as the user wants, one per line. A program matching any of them gets the rule.
+            var nameBox = new TextBox
+            {
+                Header = Loc.T(LocKeys.Rules.FolderName),
+                PlaceholderText = "MyApp",
+                MinWidth = 380,
+            };
             var patternBox = new TextBox
             {
                 Header = Loc.T(LocKeys.Rules.FolderPattern),
-                PlaceholderText = @"C:\Program Files\MyApp\**",
+                PlaceholderText = "C:\\Program Files\\MyApp\\**\rC:\\Games\\*\\game.exe",
                 MinWidth = 380,
+                AcceptsReturn = true,
+                TextWrapping = TextWrapping.NoWrap,
+                MinHeight = 110,
+                MaxHeight = 200,
             };
+            ScrollViewer.SetVerticalScrollBarVisibility(patternBox, ScrollBarVisibility.Auto);
             var browse = new Button
             {
                 Content = Loc.T(LocKeys.Rules.FolderBrowse),
-                VerticalAlignment = VerticalAlignment.Bottom,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, 28, 0, 0),
             };
             var patternRow = new Grid { ColumnSpacing = 8 };
             patternRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -873,6 +888,7 @@ namespace SimpleDeFence.UI.Pages
 
             var content = new StackPanel { Spacing = 12, MaxWidth = 560 };
             content.Children.Add(new TextBlock { Text = Loc.T(LocKeys.Rules.FolderIntro), TextWrapping = TextWrapping.Wrap });
+            content.Children.Add(nameBox);
             content.Children.Add(patternRow);
             content.Children.Add(new TextBlock
             {
@@ -911,11 +927,16 @@ namespace SimpleDeFence.UI.Pages
                 previewCancel?.Dispose();
                 previewCancel = null;
 
-                var pattern = PathPattern.Normalize(patternBox.Text);
-                dialog.IsPrimaryButtonEnabled = pattern is not null;
-                if (pattern is null)
+                var (patterns, bad) = ParseFolderLines(patternBox.Text);
+                dialog.IsPrimaryButtonEnabled = patterns.Count != 0 && bad is null;
+                if (bad is not null)
                 {
-                    status.Text = string.IsNullOrWhiteSpace(patternBox.Text) ? string.Empty : Loc.T(LocKeys.Rules.FolderInvalid);
+                    status.Text = Loc.T(LocKeys.Rules.FolderInvalid) + "\n" + bad;
+                    return;
+                }
+                if (patterns.Count == 0)
+                {
+                    status.Text = string.Empty;
                     return;
                 }
 
@@ -932,8 +953,8 @@ namespace SimpleDeFence.UI.Pages
                 try
                 {
                     (matches, writable) = await Task.Run(() => (
-                        PathPattern.EnumerateMatches(pattern, previewLimit, cts.Token),
-                        allow && PathPattern.StandardUsersCanWrite(pattern)));
+                        EnumerateAll(patterns, previewLimit, cts.Token),
+                        allow && patterns.Any(PathPattern.StandardUsersCanWrite)));
                 }
                 catch
                 {
@@ -957,25 +978,32 @@ namespace SimpleDeFence.UI.Pages
             browse.Click += async (_, _) =>
             {
                 var picked = await PickFolderPathAsync();
-                if (!string.IsNullOrEmpty(picked))
-                    patternBox.Text = picked.TrimEnd('\\') + @"\**";
+                if (string.IsNullOrEmpty(picked))
+                    return;
+                // Added as a new line, so several folders can be browsed to one after another.
+                var line = picked.TrimEnd('\\') + @"\**";
+                var text = patternBox.Text.TrimEnd('\r', '\n');
+                patternBox.Text = text.Length == 0 ? line : text + "\r" + line;
+                if (string.IsNullOrWhiteSpace(nameBox.Text))
+                    nameBox.Text = System.IO.Path.GetFileName(picked.TrimEnd('\\'));
             };
 
             if (await TryShowDialogAsync(dialog, title, Loc.T(LocKeys.Common.AnotherDialogOpenDetail)) != ContentDialogResult.Primary)
                 return;
 
-            var normalized = PathPattern.Normalize(patternBox.Text);
-            if (normalized is null)
+            var (normalized, invalid) = ParseFolderLines(patternBox.Text);
+            if (normalized.Count == 0 || invalid is not null)
                 return;
 
             ExceptionPolicy policy = action.SelectedIndex == 1 ? new HardBlockPolicy() : new UnrestrictedPolicy();
-            var rule = new FirewallExceptionV3(new PathPatternSubject(normalized), policy);
+            var subject = new PathPatternSubject(normalized.ToArray(), nameBox.Text);
+            var rule = new FirewallExceptionV3(subject, policy);
 
             var resp = await CommitAsync(profile => profile.AddExceptions(new List<FirewallExceptionV3> { rule }));
             if (resp == MessageType.PUT_SETTINGS)
             {
                 await ShowResultAsync(Loc.T(LocKeys.Connections.AllowSuccessTitle),
-                    Loc.T(LocKeys.Connections.AllowSuccessBody, normalized));
+                    Loc.T(LocKeys.Connections.AllowSuccessBody, subject.DisplayName));
                 await RefreshAsync();
             }
             else
@@ -984,6 +1012,44 @@ namespace SimpleDeFence.UI.Pages
                     LocKeys.Connections.AllowFailedLockedDetail, LocKeys.Connections.AllowFailedStaleDetail,
                     LocKeys.Connections.AllowFailedGenericDetail));
             }
+        }
+
+        /// <summary>
+        /// The folder dialog's lines as stored patterns: blank lines skipped, duplicates dropped.
+        /// Invalid is the first line that is not a usable folder or pattern, or null.
+        /// </summary>
+        private static (List<string> Patterns, string? Invalid) ParseFolderLines(string? text)
+        {
+            var patterns = new List<string>();
+            foreach (var raw in (text ?? string.Empty).Split('\r', '\n'))
+            {
+                if (string.IsNullOrWhiteSpace(raw))
+                    continue;
+                var p = PathPattern.Normalize(raw);
+                if (p is null)
+                    return (patterns, raw.Trim());
+                if (!patterns.Contains(p, StringComparer.OrdinalIgnoreCase))
+                    patterns.Add(p);
+            }
+            return (patterns, null);
+        }
+
+        /// <summary>The programs matching any of the patterns, each once, at most limit.</summary>
+        private static List<string> EnumerateAll(IEnumerable<string> patterns, int limit, System.Threading.CancellationToken cancel = default)
+        {
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var all = new List<string>();
+            foreach (var p in patterns)
+            {
+                if (all.Count >= limit || cancel.IsCancellationRequested)
+                    break;
+                foreach (var m in PathPattern.EnumerateMatches(p, limit - all.Count, cancel))
+                {
+                    if (seen.Add(m))
+                        all.Add(m);
+                }
+            }
+            return all;
         }
 
         /// <summary>

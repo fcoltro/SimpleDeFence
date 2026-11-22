@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Runtime.Serialization;
 using System.Text.Json;
@@ -496,24 +498,50 @@ namespace SimpleDeFence
     {
         public override SubjectType SubjectType => SubjectType.PathPattern;
 
+        /// <summary>The folders and patterns this rule covers. A program matching any of them is
+        /// covered, the way an application group in Fort Firewall lists several paths.</summary>
         [DataMember(EmitDefaultValue = false)]
-        public string Pattern { get; private set; }
+        public string[] Patterns { get; private set; }
+
+        /// <summary>The name the user gave the rule, or null to name it after its first folder.</summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string? Name { get; private set; }
 
         [JsonConstructor]
-        public PathPatternSubject(string pattern)
+        public PathPatternSubject(string[]? patterns, string? name)
         {
-            this.Pattern = pattern;
+            this.Patterns = patterns ?? Array.Empty<string>();
+            this.Name = string.IsNullOrWhiteSpace(name) ? null : name!.Trim();
         }
 
-        /// <summary>The folder the pattern starts from, for display.</summary>
+        public PathPatternSubject(string pattern) : this(new[] { pattern }, null) { }
+
+        /// <summary>The patterns that are not blank.</summary>
+        [JsonIgnore]
+        public IEnumerable<string> UsablePatterns
+        {
+            get
+            {
+                foreach (var p in Patterns ?? Array.Empty<string>())
+                {
+                    if (!string.IsNullOrWhiteSpace(p))
+                        yield return p;
+                }
+            }
+        }
+
+        /// <summary>The rule's name, or the folder its first pattern starts from.</summary>
         [JsonIgnore]
         public string DisplayName
         {
             get
             {
-                var dir = PathPattern.BaseDirectory(PathPattern.Expand(Pattern ?? string.Empty));
+                if (!string.IsNullOrEmpty(Name))
+                    return Name!;
+                var first = UsablePatterns.FirstOrDefault() ?? string.Empty;
+                var dir = PathPattern.BaseDirectory(PathPattern.Expand(first));
                 if (string.IsNullOrEmpty(dir))
-                    return Pattern ?? string.Empty;
+                    return first;
                 var name = System.IO.Path.GetFileName(dir.TrimEnd('\\'));
                 return string.IsNullOrEmpty(name) ? dir : name;
             }
@@ -521,14 +549,22 @@ namespace SimpleDeFence
 
         public override bool Equals(ExceptionSubject other)
         {
-            if (other is PathPatternSubject o)
-                return string.Equals(Pattern, o.Pattern, StringComparison.OrdinalIgnoreCase);
-            return false;
+            if (other is not PathPatternSubject o)
+                return false;
+            var mine = Patterns ?? Array.Empty<string>();
+            var theirs = o.Patterns ?? Array.Empty<string>();
+            return string.Equals(Name, o.Name, StringComparison.OrdinalIgnoreCase)
+                && mine.SequenceEqual(theirs, StringComparer.OrdinalIgnoreCase);
         }
 
         public override int GetHashCode()
-            => Pattern is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(Pattern);
+        {
+            int hash = Name is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(Name);
+            foreach (var p in Patterns ?? Array.Empty<string>())
+                hash = unchecked(hash * 31 + StringComparer.OrdinalIgnoreCase.GetHashCode(p ?? string.Empty));
+            return hash;
+        }
 
-        public override string ToString() => Pattern ?? string.Empty;
+        public override string ToString() => string.Join("; ", UsablePatterns);
     }
 }

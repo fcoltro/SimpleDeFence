@@ -245,7 +245,8 @@
     "folderDialog": {
       "title": "Klasör kuralı ekle",
       "intro": "Kural, yolu eşleşen her programa uygulanır; klasöre sonradan eklenen programlar da dahil.",
-      "pattern": "Klasör veya desen",
+      "name": "Kural adı",
+      "pattern": "Klasörler veya desenler, her satıra bir tane",
       "browse": "Gözat...",
       "help": "* bir klasör içindeki herhangi bir adla, ** herhangi sayıda klasörle, ? tek bir karakterle eşleşir. Örnekler: C:\\Tools\\**  veya  C:\\Games\\*\\game.exe",
       "action": "Kural",

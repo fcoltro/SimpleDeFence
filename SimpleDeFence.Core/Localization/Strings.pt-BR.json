@@ -245,7 +245,8 @@
     "folderDialog": {
       "title": "Adicionar regra de pasta",
       "intro": "A regra vale para todo programa cujo caminho corresponda, inclusive os adicionados à pasta depois.",
-      "pattern": "Pasta ou padrão",
+      "name": "Nome da regra",
+      "pattern": "Pastas ou padrões, um por linha",
       "browse": "Procurar...",
       "help": "* corresponde a qualquer nome dentro de uma pasta, ** a qualquer número de pastas, ? a um caractere. Exemplos: C:\\Tools\\**  ou  C:\\Games\\*\\game.exe",
       "action": "Regra",

@@ -1,6 +1,7 @@
 using SimpleDeFence;
 using System;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace SimpleDeFence.Tests
@@ -109,7 +110,8 @@ namespace SimpleDeFence.Tests
             var back = SerializationHelper.Deserialize(bytes, new FirewallExceptionV3(GlobalSubject.Instance, new HardBlockPolicy()));
 
             var subject = Assert.IsType<PathPatternSubject>(back.Subject);
-            Assert.Equal(@"C:\Tools\**", subject.Pattern);
+            Assert.Equal(new[] { @"C:\Tools\**" }, subject.Patterns);
+            Assert.Null(subject.Name);
             Assert.Equal(ex.Id, back.Id);
             Assert.IsType<UnrestrictedPolicy>(back.Policy);
         }
@@ -170,7 +172,7 @@ namespace SimpleDeFence.Tests
             var exe = new FirewallExceptionV3(new ExecutableSubject(@"C:\x.exe"), new UnrestrictedPolicy());
 
             var ordered = PathPattern.InPrecedenceOrder(new[] { broadAllow, exe, narrowBlock });
-            Assert.Equal(new[] { narrowBlock, broadAllow }, ordered);
+            Assert.Equal(new[] { narrowBlock, broadAllow }, ordered.Select(e => e.Rule));
         }
 
         [Fact]
@@ -179,7 +181,30 @@ namespace SimpleDeFence.Tests
             var allow = new FirewallExceptionV3(new PathPatternSubject(@"C:\Tools\**"), new UnrestrictedPolicy());
             var block = new FirewallExceptionV3(new PathPatternSubject(@"C:\Tools\**"), new HardBlockPolicy());
 
-            Assert.Same(block, PathPattern.InPrecedenceOrder(new[] { allow, block })[0]);
+            Assert.Same(block, PathPattern.InPrecedenceOrder(new[] { allow, block })[0].Rule);
+        }
+
+        [Fact]
+        public void A_named_rule_with_several_folders_gives_one_entry_per_folder()
+        {
+            var group = new FirewallExceptionV3(new PathPatternSubject(new[] { @"C:\Tools\**", @"D:\Games\*\game.exe", " " }, "  My tools "), new UnrestrictedPolicy());
+            var other = new FirewallExceptionV3(new PathPatternSubject(@"C:\Tools\sub\**"), new HardBlockPolicy());
+
+            var ordered = PathPattern.InPrecedenceOrder(new[] { group, other });
+            Assert.Equal(new[] { @"D:\Games\*\game.exe", @"C:\Tools\sub\**", @"C:\Tools\**" }, ordered.Select(e => e.Pattern));
+            Assert.Equal("My tools", ((PathPatternSubject)group.Subject).DisplayName);
+            Assert.Equal(@"C:\Tools\**; D:\Games\*\game.exe", ExceptionDescriptor.Describe(group).Detail);
+        }
+
+        [Fact]
+        public void A_named_rule_survives_a_save_and_load()
+        {
+            var ex = new FirewallExceptionV3(new PathPatternSubject(new[] { @"C:\A\**", @"C:\B\**" }, "Both"), new HardBlockPolicy());
+            var back = SerializationHelper.Deserialize(SerializationHelper.Serialize(ex), new FirewallExceptionV3(GlobalSubject.Instance, new HardBlockPolicy()));
+            var subject = Assert.IsType<PathPatternSubject>(back.Subject);
+            Assert.Equal("Both", subject.Name);
+            Assert.Equal(new[] { @"C:\A\**", @"C:\B\**" }, subject.Patterns);
+            Assert.Equal(ex.Subject, back.Subject);
         }
 
         [Fact]

@@ -245,7 +245,8 @@
     "folderDialog": {
       "title": "Añadir una regla de carpeta",
       "intro": "La regla se aplica a todo programa cuya ruta coincida, incluidos los que se añadan más tarde a la carpeta.",
-      "pattern": "Carpeta o patrón",
+      "name": "Nombre de la regla",
+      "pattern": "Carpetas o patrones, uno por línea",
       "browse": "Examinar...",
       "help": "* coincide con cualquier nombre dentro de una carpeta, ** con cualquier número de carpetas, ? con un carácter. Ejemplos: C:\\Tools\\**  o  C:\\Games\\*\\game.exe",
       "action": "Regla",

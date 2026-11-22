@@ -245,7 +245,8 @@
     "folderDialog": {
       "title": "Add a folder rule",
       "intro": "The rule applies to every program whose path matches, including programs added to the folder later.",
-      "pattern": "Folder or pattern",
+      "name": "Rule name",
+      "pattern": "Folders or patterns, one per line",
       "browse": "Browse...",
       "help": "* matches any name inside one folder, ** matches any number of folders, ? matches one character. Examples: C:\\Tools\\**  or  C:\\Games\\*\\game.exe",
       "action": "Rule",

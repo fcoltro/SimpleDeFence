@@ -207,25 +207,28 @@ namespace SimpleDeFence
                 // expanded below, once every rule for a named program is known: a rule for the
                 // program itself says more about it than a rule for the folder it sits in.
                 var folderRules = new List<(Regex Pattern, FirewallExceptionV3 Rule)>();
+                var folderPatterns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 // Most specific first, and a block before an allow for the same folder, so the
                 // first match is the one that decides (see FolderRuleFor).
-                foreach (var ex in PathPattern.InPrecedenceOrder(UserExceptions))
+                foreach (var (rawPattern, ex) in PathPattern.InPrecedenceOrder(UserExceptions))
                 {
-                    var folder = (PathPatternSubject)ex.Subject;
-
                     // Checked again here, not only by the dialog that adds the rule: a pattern from
                     // an imported or hand-edited configuration such as "**" or "C:\**" would
                     // otherwise match every program on the machine.
-                    var pattern = PathPattern.Normalize(folder.Pattern);
+                    var pattern = PathPattern.Normalize(rawPattern);
                     if (pattern is null)
                     {
-                        Utils.Log($"Skipping folder rule with an unusable pattern: {folder.Pattern}", Utils.LOG_ID_SERVICE);
+                        Utils.Log($"Skipping folder rule pattern that is unusable: {rawPattern}", Utils.LOG_ID_SERVICE);
                         continue;
                     }
 
-                    try { folderRules.Add((PathPattern.ToRegex(pattern), ex)); }
-                    catch (ArgumentException) { Utils.Log($"Skipping folder rule with an unusable pattern: {folder.Pattern}", Utils.LOG_ID_SERVICE); }
+                    try
+                    {
+                        folderRules.Add((PathPattern.ToRegex(pattern), ex));
+                        folderPatterns.Add(pattern);
+                    }
+                    catch (ArgumentException) { Utils.Log($"Skipping folder rule pattern that is unusable: {rawPattern}", Utils.LOG_ID_SERVICE); }
                 }
 
                 // Convert exceptions to rules
@@ -260,14 +263,9 @@ namespace SimpleDeFence
                     // be newer than the scan, or sit past the expansion limit). Programs that
                     // appear later are picked up by ProcessStartWatcher_EventArrived.
                     var candidates = new List<string>();
-                    var patterns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var (_, rule) in folderRules)
-                    {
-                        var pattern = PathPattern.Normalize(((PathPatternSubject)rule.Subject).Pattern)!;
-                        if (patterns.Add(pattern))
-                            candidates.AddRange(FolderScanFor(pattern));
-                    }
-                    ForgetFolderScansExcept(patterns);
+                    foreach (var pattern in folderPatterns)
+                        candidates.AddRange(FolderScanFor(pattern));
+                    ForgetFolderScansExcept(folderPatterns);
                     foreach (var p in ProcessManager.CreateToolhelp32SnapshotExtended())
                     {
                         if (!string.IsNullOrEmpty(p.ImagePath))

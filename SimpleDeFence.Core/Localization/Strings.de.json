@@ -245,7 +245,8 @@
     "folderDialog": {
       "title": "Ordnerregel hinzufügen",
       "intro": "Die Regel gilt für jedes Programm, dessen Pfad passt, auch für Programme, die später in den Ordner kommen.",
-      "pattern": "Ordner oder Muster",
+      "name": "Name der Regel",
+      "pattern": "Ordner oder Muster, einer pro Zeile",
       "browse": "Durchsuchen...",
       "help": "* steht für einen beliebigen Namen innerhalb eines Ordners, ** für beliebig viele Ordner, ? für ein Zeichen. Beispiele: C:\\Tools\\**  oder  C:\\Games\\*\\game.exe",
       "action": "Regel",

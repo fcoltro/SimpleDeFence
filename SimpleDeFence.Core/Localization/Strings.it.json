@@ -245,7 +245,8 @@
     "folderDialog": {
       "title": "Aggiungi una regola cartella",
       "intro": "La regola vale per ogni programma il cui percorso corrisponde, compresi quelli aggiunti alla cartella in seguito.",
-      "pattern": "Cartella o modello",
+      "name": "Nome della regola",
+      "pattern": "Cartelle o modelli, uno per riga",
       "browse": "Sfoglia...",
       "help": "* corrisponde a qualsiasi nome in una cartella, ** a qualsiasi numero di cartelle, ? a un carattere. Esempi: C:\\Tools\\**  oppure  C:\\Games\\*\\game.exe",
       "action": "Regola",

@@ -219,23 +219,27 @@ namespace SimpleDeFence
         /// <summary>
         /// Folder rules in the order the service tries them: most specific pattern first (see
         /// <see cref="Specificity"/>), and a block before an allow of the same specificity. The
-        /// first one whose pattern matches a program decides for it. Rules that are not folder
-        /// rules are left out.
+        /// first one whose pattern matches a program decides for it. A rule with several folders
+        /// gives one entry per folder, each placed by its own specificity. Rules that are not
+        /// folder rules are left out.
         /// </summary>
-        public static List<FirewallExceptionV3> InPrecedenceOrder(IEnumerable<FirewallExceptionV3> rules)
+        public static List<(string Pattern, FirewallExceptionV3 Rule)> InPrecedenceOrder(IEnumerable<FirewallExceptionV3> rules)
         {
-            var folderRules = new List<FirewallExceptionV3>();
+            var entries = new List<(string Pattern, FirewallExceptionV3 Rule)>();
             foreach (var r in rules)
             {
-                if (r.Subject is PathPatternSubject)
-                    folderRules.Add(r);
+                if (r.Subject is PathPatternSubject folder)
+                {
+                    foreach (var p in folder.UsablePatterns)
+                        entries.Add((p, r));
+                }
             }
 
-            // List.Sort is not stable; OrderBy is, so equal rules keep the order they were added in.
+            // List.Sort is not stable; OrderBy is, so equal entries keep the order they were added in.
             return System.Linq.Enumerable.ToList(
                 System.Linq.Enumerable.ThenBy(
-                    System.Linq.Enumerable.OrderByDescending(folderRules, r => Specificity(((PathPatternSubject)r.Subject).Pattern)),
-                    r => r.Policy is HardBlockPolicy ? 0 : 1));
+                    System.Linq.Enumerable.OrderByDescending(entries, e => Specificity(e.Pattern)),
+                    e => e.Rule.Policy is HardBlockPolicy ? 0 : 1));
         }
 
         /// <summary>

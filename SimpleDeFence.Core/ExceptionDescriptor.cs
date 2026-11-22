@@ -90,7 +90,7 @@ namespace SimpleDeFence
             SubjectType.Executable => ((ExecutableSubject)subject).ExecutablePath,
             SubjectType.Service => ((ServiceSubject)subject).ExecutablePath,
             SubjectType.AppContainer => Join((AppContainerSubject)subject),
-            SubjectType.PathPattern => ((PathPatternSubject)subject).Pattern ?? string.Empty,
+            SubjectType.PathPattern => subject.ToString(),
             _ => string.Empty,
         };
 
