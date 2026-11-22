@@ -25,6 +25,9 @@
         IS_LOCKED,
         BACKGROUND_ITEMS,
 
+        // Numbered explicitly so a read command added above cannot move it.
+        GET_TRAFFIC = 37,
+
         // Unprivileged write commands (>1023)
         UNLOCK = 1024,
 

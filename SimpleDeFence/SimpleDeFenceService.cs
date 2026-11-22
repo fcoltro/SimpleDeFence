@@ -74,6 +74,9 @@ namespace SimpleDeFence
 
         // Context needed for learning mode
         private readonly FirewallLogWatcher LogWatcher = new();
+
+        /// <summary>Set once Run has started the traffic trace; read from the pipe's thread.</summary>
+        private volatile TrafficMonitor? Traffic;
         private readonly List<FirewallExceptionV3> LearningNewExceptions = new();
 
         // Context for auto rule inheritance
@@ -2439,6 +2442,11 @@ namespace SimpleDeFence
             WfpEngine.EventMatchAnyKeywords = InboundEventMatchKeyword.FWPM_NET_EVENT_KEYWORD_INBOUND_BCAST | InboundEventMatchKeyword.FWPM_NET_EVENT_KEYWORD_INBOUND_MCAST;
             using var WfpEvent = WfpEngine.SubscribeNetEvent(WfpNetEventCallback);
 
+            // Bytes per app, for the Connections page's "Data used" section. Optional: when Windows
+            // will not start the trace, GET_TRAFFIC says so and nothing else is affected.
+            using var TrafficCounter = new TrafficMonitor();
+            Traffic = TrafficCounter;
+
             ProcessStartWatcher.EventArrived += ProcessStartWatcher_EventArrived;
             NetworkInterfaceWatcher.InterfaceChanged += (sender, args) =>
             {
@@ -2766,6 +2774,11 @@ namespace SimpleDeFence
                 // firewall's state, and SignatureOf is safe to call from any thread.
                 if (reqMsg is TwMessageBackgroundItems backgroundItems)
                     return ProcessBackgroundItems(backgroundItems);
+
+                // Also answered here: the counters are their own, thread-safe, and the page asks
+                // on every refresh.
+                if (reqMsg is TwMessageGetTraffic traffic)
+                    return Traffic?.Answer(traffic) ?? traffic.CreateResponse(false, DateTime.Now, Array.Empty<AppTraffic>());
 
                 // Process and wait for response
                 var req = new TwRequest(reqMsg);

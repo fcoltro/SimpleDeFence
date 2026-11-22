@@ -126,6 +126,11 @@ namespace SimpleDeFence
         public TwMessage SetBackgroundItems(string appPath, BackgroundItemChange[] changes)
             => Endpoint.QueueMessage(TwMessageBackgroundItems.CreateSetRequest(appPath, changes)).Response;
 
+        /// <summary>Bytes per app since the service started counting, or null when the service did
+        /// not answer with them (locked out, unreachable, or older than this message).</summary>
+        public TwMessageGetTraffic? GetTraffic()
+            => Endpoint.QueueMessage(TwMessageGetTraffic.CreateRequest()).Response as TwMessageGetTraffic;
+
         public string TryGetProcessPath(uint pid)
         {
             var resp = Endpoint.QueueMessage(TwMessageGetProcessPath.CreateRequest(pid)).Response;

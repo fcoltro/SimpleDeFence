@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "Conexiones",
+    "traffic": {
+      "section": "Datos usados",
+      "since": "Contados desde {0}, cuando se inició SimpleDeFence. No se cuenta el tráfico que no sale de este equipo.",
+      "empty": "Ninguna aplicación ha usado la red desde que empezó el recuento.",
+      "unavailable": "El uso de datos no está disponible. No se pudo contactar con el servicio del firewall o Windows no le permitió contar el tráfico.",
+      "sent": "Enviados",
+      "received": "Recibidos",
+      "rate": "Velocidad desde la última actualización"
+    },
     "section": {
       "blocked": "Bloqueadas",
       "connected": "Conectadas",

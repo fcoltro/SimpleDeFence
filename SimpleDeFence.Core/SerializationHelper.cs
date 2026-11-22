@@ -42,6 +42,7 @@ namespace SimpleDeFence
     [JsonSerializable(typeof(TwMessageSimple))]
     [JsonSerializable(typeof(TwMessageAddTempException))]
     [JsonSerializable(typeof(TwMessageBackgroundItems))]
+    [JsonSerializable(typeof(TwMessageGetTraffic))]
     [JsonSerializable(typeof(GlobalSubject))]
     [JsonSerializable(typeof(AppContainerSubject))]
     [JsonSerializable(typeof(ExecutableSubject))]

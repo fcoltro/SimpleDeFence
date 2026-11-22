@@ -75,6 +75,23 @@ namespace SimpleDeFence.UI.Pages
         public Visibility RemoteVisibility => IsLocal ? Visibility.Collapsed : Visibility.Visible;
     }
 
+    /// <summary>One app's row in the Data used section.</summary>
+    public sealed class TrafficListItem
+    {
+        public string AppName { get; init; } = string.Empty;
+        public string? TooltipText { get; init; }
+        public string SentText { get; init; } = string.Empty;
+        public string ReceivedText { get; init; } = string.Empty;
+
+        /// <summary>Bytes a second over the last refresh, both directions. Empty when there is no
+        /// earlier refresh close enough to work it out from, or the app was quiet.</summary>
+        public string RateText { get; init; } = string.Empty;
+
+        public string SentLabel => Loc.T(LocKeys.Connections.TrafficSent);
+        public string ReceivedLabel => Loc.T(LocKeys.Connections.TrafficReceived);
+        public string RateLabel => Loc.T(LocKeys.Connections.TrafficRate);
+    }
+
     /// <summary>A single blocked attempt, shown in a group's "Show all" dialog.</summary>
     public sealed class BlockedAttempt
     {
@@ -159,6 +176,12 @@ namespace SimpleDeFence.UI.Pages
         private readonly ObservableCollection<ConnectionListItem> _connected = new();
         private readonly ObservableCollection<ConnectionListItem> _open = new();
         private readonly ObservableCollection<BlockedListItem> _blocked = new();
+        private readonly ObservableCollection<TrafficListItem> _traffic = new();
+
+        /// <summary>Bytes a second per Data used row, from the last two refreshes. Kept apart from
+        /// the snapshot so typing in the filter box does not lose it.</summary>
+        private Dictionary<string, double> _trafficRates = new();
+        private DateTime _snapshotTakenAt;
         // Interval comes from ClientSettings, not a constant: this page polls - nothing pushes
         // connection changes to it - so how stale the list is allowed to get is the user's call.
         // Re-read in ConnectionsPage_Loaded as well as here, because this page is cached
@@ -178,6 +201,7 @@ namespace SimpleDeFence.UI.Pages
             BlockedList.ItemsSource = _blocked;
             ConnectedList.ItemsSource = _connected;
             OpenList.ItemsSource = _open;
+            TrafficList.ItemsSource = _traffic;
             Loaded += ConnectionsPage_Loaded;
             FilterRequested += ApplyRequestedFilter;
             _autoRefreshTimer.Interval = ClientSettings.Load().ConnectionsAutoRefreshInterval;
@@ -268,7 +292,11 @@ namespace SimpleDeFence.UI.Pages
                 else
                     Notice.IsOpen = false;
 
+                var previous = _snapshot;
+                var previousTakenAt = _snapshotTakenAt;
                 _snapshot = await App.Firewall.GetConnectionsAsync();
+                _snapshotTakenAt = DateTime.Now;
+                _trafficRates = TrafficRates(previous, previousTakenAt, _snapshot, _snapshotTakenAt);
             }
             catch (Exception ex)
             {
@@ -315,10 +343,12 @@ namespace SimpleDeFence.UI.Pages
             RebuildConnections(_open, _snapshot.Open.Where(r => Matches(r.AppName)), remote: false);
 
             RebuildBlocked(_snapshot.Blocked.Where(r => Matches(r.AppName)));
+            RebuildTraffic(_snapshot.Traffic.Where(r => Matches(r.AppName)));
 
             SetHeader(BlockedHeaderText, LocKeys.Connections.SectionBlocked, _blocked.Count);
             SetHeader(ConnectedHeaderText, LocKeys.Connections.SectionConnected, _connected.Count);
             SetHeader(OpenHeaderText, LocKeys.Connections.SectionOpen, _open.Count);
+            SetHeader(TrafficHeaderText, LocKeys.Connections.SectionTraffic, _traffic.Count);
 
             // Empty states read reassuringly rather than like a failure - an empty Blocked list is
             // a *good* outcome on a firewall. But a filter hiding every row is not the same thing
@@ -334,6 +364,75 @@ namespace SimpleDeFence.UI.Pages
             SetEmptyState(BlockedEmpty, _blocked.Count,
                 _snapshot.BlockedUnavailable ? LocKeys.Connections.BlockedUnavailable : LocKeys.Connections.EmptyBlocked,
                 term, filtered);
+
+            // Same rule for Data used: "nothing used" only about counts we actually got.
+            SetEmptyState(TrafficEmpty, _traffic.Count,
+                _snapshot.TrafficUnavailable ? LocKeys.Connections.TrafficUnavailable : LocKeys.Connections.TrafficEmpty,
+                term, filtered);
+            if (_snapshot.TrafficUnavailable)
+            {
+                TrafficNote.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                TrafficNote.Text = Loc.T(LocKeys.Connections.TrafficSince, FormatSince(_snapshot.TrafficSince));
+                TrafficNote.Visibility = Visibility.Visible;
+            }
+        }
+
+        /// <summary>The longest gap between two refreshes that still gives a rate worth showing.
+        /// Past it, the number is an average over minutes and reads as "right now" when it is not.</summary>
+        private static readonly TimeSpan MaxRateInterval = TimeSpan.FromSeconds(60);
+
+        /// <summary>Bytes a second for each app that moved any, from two snapshots. Empty when the
+        /// two are too far apart, or the counters restarted in between (the service did).</summary>
+        private static Dictionary<string, double> TrafficRates(
+            ConnectionsSnapshot before, DateTime beforeAt, ConnectionsSnapshot after, DateTime afterAt)
+        {
+            var rates = new Dictionary<string, double>(StringComparer.Ordinal);
+            var seconds = (afterAt - beforeAt).TotalSeconds;
+            if (before.TrafficUnavailable || after.TrafficUnavailable
+                || before.TrafficSince != after.TrafficSince
+                || seconds <= 0 || seconds > MaxRateInterval.TotalSeconds)
+                return rates;
+
+            var earlier = new Dictionary<string, long>(StringComparer.Ordinal);
+            foreach (var row in before.Traffic)
+                earlier[row.Key] = row.Sent + row.Received;
+
+            foreach (var row in after.Traffic)
+            {
+                long delta = row.Sent + row.Received - earlier.GetValueOrDefault(row.Key);
+                if (delta > 0)
+                    rates[row.Key] = delta / seconds;
+            }
+            return rates;
+        }
+
+        /// <summary>A time today, or a date and time for counting that began on an earlier day.</summary>
+        private static string FormatSince(DateTime since)
+            => since.Date == DateTime.Today ? since.ToString("t") : since.ToString("g");
+
+        /// <summary>Most data first. Capped, because the useful part of this list is the top of it
+        /// and a machine that has been up for weeks can have hundreds of apps in it.</summary>
+        private const int MaxTrafficRows = 100;
+
+        private void RebuildTraffic(IEnumerable<TrafficRow> rows)
+        {
+            _traffic.Clear();
+            foreach (var row in rows.OrderByDescending(r => r.Sent + r.Received).Take(MaxTrafficRows))
+            {
+                _traffic.Add(new TrafficListItem
+                {
+                    AppName = string.IsNullOrEmpty(row.AppName) ? Loc.T(LocKeys.Common.Unknown) : row.AppName,
+                    TooltipText = string.IsNullOrEmpty(row.AppPath) ? null : row.AppPath,
+                    SentText = "\u2191 " + TrafficFormat.Bytes(row.Sent),
+                    ReceivedText = "\u2193 " + TrafficFormat.Bytes(row.Received),
+                    RateText = _trafficRates.TryGetValue(row.Key, out var rate)
+                        ? TrafficFormat.Bytes((long)rate) + "/s"
+                        : string.Empty,
+                });
+            }
         }
 
         private static void SetEmptyState(TextBlock target, int count, string emptyKey, string term, string filteredText)

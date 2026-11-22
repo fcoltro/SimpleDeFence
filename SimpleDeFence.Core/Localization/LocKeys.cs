@@ -128,6 +128,18 @@
             public const string SectionBlocked = "connections.section.blocked";
             public const string SectionConnected = "connections.section.connected";
             public const string SectionOpen = "connections.section.open";
+
+            /// <summary>The Data used section: bytes per app, counted by the service.</summary>
+            public const string SectionTraffic = "connections.traffic.section";
+            public const string TrafficSince = "connections.traffic.since";
+            public const string TrafficEmpty = "connections.traffic.empty";
+            /// <summary>Shown instead of TrafficEmpty when there are no counts to show, for the
+            /// same reason as BlockedUnavailable.</summary>
+            public const string TrafficUnavailable = "connections.traffic.unavailable";
+            public const string TrafficSent = "connections.traffic.sent";
+            public const string TrafficReceived = "connections.traffic.received";
+            public const string TrafficRate = "connections.traffic.rate";
+
             public const string SectionCount = "connections.section.count";
             public const string EmptyBlocked = "connections.empty.blocked";
             /// <summary>Shown instead of EmptyBlocked when the firewall log could not be read, so
