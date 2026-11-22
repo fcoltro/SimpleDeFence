@@ -43,6 +43,15 @@ namespace SimpleDeFence.UI.Services
 
         public event EventHandler? Changed;
 
+        /// <summary>How many times anything has tried to save settings. The UI smoke test
+        /// (SmokeTest.cs) checks this stays at zero while nobody touches the window.</summary>
+        public int CommitCount { get; private set; }
+
+        /// <summary>The special rule the sample profile has switched on. One has to be on, so the
+        /// Rules page shows a switch that starts On: that is the switch whose starting value used
+        /// to be saved back as a user toggle, over and over.</summary>
+        internal const string EnabledSpecialRule = "Windows_Update";
+
         public Task RefreshAsync()
         {
             Config ??= BuildConfig();
@@ -330,6 +339,8 @@ namespace SimpleDeFence.UI.Services
 
         public Task<MessageType> CommitConfigChangesAsync(Action<ServerConfiguration> mutate)
         {
+            ++CommitCount;
+
             if (_locked)
                 return Task.FromResult(MessageType.RESPONSE_LOCKED);
 
@@ -438,6 +449,8 @@ namespace SimpleDeFence.UI.Services
             profile.AppExceptions.Add(new FirewallExceptionV3(
                 GlobalSubject.Instance,
                 new TcpUdpPolicy { AllowedLocalUdpListenerPorts = "5353" }));
+
+            profile.SpecialExceptions.Add(EnabledSpecialRule);
 
             var config = new ServerConfiguration();
             config.Profiles.Add(profile);

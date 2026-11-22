@@ -81,6 +81,29 @@ jobs:
         path: ${{ env.PUBLISH_DIR }}
         if-no-files-found: error
 
+    # Starts the published app on sample data, opens the Rules page, leaves it alone for ten
+    # seconds and checks it saved nothing and did not keep rebuilding its lists
+    # (SimpleDeFence.UI/Services/SmokeTest.cs). Catches loops that only happen with real XAML
+    # controls, like the special-rule switches that re-saved themselves on every redraw.
+    # A crash or hang fails the step too.
+    - name: UI smoke test (Rules page)
+      if: matrix.configuration == 'Release'
+      shell: pwsh
+      timeout-minutes: 5
+      run: |
+        $exe = Resolve-Path (Join-Path '${{ env.PUBLISH_DIR }}' 'SimpleDeFence.exe')
+        $out = Join-Path $env:RUNNER_TEMP 'smoke-rules.txt'
+        $p = Start-Process -FilePath $exe -ArgumentList '--smoke-test', 'rules', '--smoke-out', "`"$out`"" -PassThru
+        # Read once so ExitCode is still available after the process ends.
+        $null = $p.Handle
+        if (-not $p.WaitForExit(180000)) {
+          Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+          throw "The app did not finish the smoke test within 3 minutes (hung?)"
+        }
+        if (Test-Path $out) { Get-Content $out } else { Write-Host "No result file was written." }
+        if ($p.ExitCode -ne 0) { throw "UI smoke test failed (exit code $($p.ExitCode))" }
+        if (-not (Test-Path $out)) { throw "UI smoke test exited 0 but wrote no result" }
+
     - name: Get version info
       if: matrix.configuration == 'Release'
       id: version
