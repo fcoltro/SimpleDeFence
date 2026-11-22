@@ -116,6 +116,11 @@ namespace SimpleDeFence
             return Endpoint.QueueMessage(TwMessageSimple.CreateRequest(MessageType.LOCK)).Response.Type;
         }
 
+        /// <summary>Bytes per app since the service started counting, or null when the service did
+        /// not answer with them (locked out, unreachable, or older than this message).</summary>
+        public TwMessageGetTraffic? GetTraffic()
+            => Endpoint.QueueMessage(TwMessageGetTraffic.CreateRequest()).Response as TwMessageGetTraffic;
+
         public string TryGetProcessPath(uint pid)
         {
             var resp = Endpoint.QueueMessage(TwMessageGetProcessPath.CreateRequest(pid)).Response;

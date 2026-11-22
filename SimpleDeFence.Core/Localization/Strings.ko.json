@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "연결",
+    "traffic": {
+      "section": "데이터 사용량",
+      "since": "SimpleDeFence가 시작된 {0}부터 집계합니다. 이 컴퓨터 안에서만 오가는 트래픽은 포함되지 않습니다.",
+      "empty": "집계를 시작한 이후 네트워크를 사용한 앱이 없습니다.",
+      "unavailable": "데이터 사용량을 확인할 수 없습니다. 방화벽 서비스에 연결할 수 없거나 Windows가 트래픽 집계를 허용하지 않았습니다.",
+      "sent": "보냄",
+      "received": "받음",
+      "rate": "마지막 새로 고침 이후 속도"
+    },
     "section": {
       "blocked": "차단됨",
       "connected": "연결됨",

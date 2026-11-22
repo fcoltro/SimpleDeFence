@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "Connections",
+    "traffic": {
+      "section": "Data used",
+      "since": "Counted since {0}, when SimpleDeFence started. Traffic that stays on this computer is not counted.",
+      "empty": "No app has used the network since counting started.",
+      "unavailable": "Data use is not available. The firewall service could not be reached, or Windows did not let it count traffic.",
+      "sent": "Sent",
+      "received": "Received",
+      "rate": "Speed since the last refresh"
+    },
     "section": {
       "blocked": "Blocked",
       "connected": "Connected",

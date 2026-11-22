@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "Verbindungen",
+    "traffic": {
+      "section": "Datenverbrauch",
+      "since": "Gezählt seit {0}, dem Start von SimpleDeFence. Datenverkehr, der auf diesem Computer bleibt, wird nicht gezählt.",
+      "empty": "Seit Beginn der Zählung hat keine App das Netzwerk genutzt.",
+      "unavailable": "Der Datenverbrauch ist nicht verfügbar. Der Firewall-Dienst war nicht erreichbar, oder Windows hat das Zählen nicht erlaubt.",
+      "sent": "Gesendet",
+      "received": "Empfangen",
+      "rate": "Geschwindigkeit seit der letzten Aktualisierung"
+    },
     "section": {
       "blocked": "Blockiert",
       "connected": "Verbunden",

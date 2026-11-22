@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "连接",
+    "traffic": {
+      "section": "数据用量",
+      "since": "自 {0} SimpleDeFence 启动时开始统计。仅在本机内部传输的流量不计入。",
+      "empty": "自开始统计以来，没有应用使用过网络。",
+      "unavailable": "无法获取数据用量。无法连接防火墙服务，或 Windows 不允许其统计流量。",
+      "sent": "已发送",
+      "received": "已接收",
+      "rate": "自上次刷新以来的速度"
+    },
     "section": {
       "blocked": "已阻止",
       "connected": "已连接",

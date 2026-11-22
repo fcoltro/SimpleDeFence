@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "Koneksi",
+    "traffic": {
+      "section": "Data terpakai",
+      "since": "Dihitung sejak {0}, saat SimpleDeFence dimulai. Lalu lintas yang tetap di komputer ini tidak dihitung.",
+      "empty": "Belum ada aplikasi yang memakai jaringan sejak penghitungan dimulai.",
+      "unavailable": "Penggunaan data tidak tersedia. Layanan firewall tidak dapat dihubungi, atau Windows tidak mengizinkannya menghitung lalu lintas.",
+      "sent": "Terkirim",
+      "received": "Diterima",
+      "rate": "Kecepatan sejak penyegaran terakhir"
+    },
     "section": {
       "blocked": "Diblokir",
       "connected": "Terhubung",

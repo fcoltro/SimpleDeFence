@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "Connexions",
+    "traffic": {
+      "section": "Données utilisées",
+      "since": "Comptées depuis {0}, au démarrage de SimpleDeFence. Le trafic qui reste sur cet ordinateur n'est pas compté.",
+      "empty": "Aucune application n'a utilisé le réseau depuis le début du comptage.",
+      "unavailable": "L'utilisation des données n'est pas disponible. Le service du pare-feu est injoignable, ou Windows ne l'a pas autorisé à compter le trafic.",
+      "sent": "Envoyées",
+      "received": "Reçues",
+      "rate": "Débit depuis la dernière actualisation"
+    },
     "section": {
       "blocked": "Bloquées",
       "connected": "Connectées",

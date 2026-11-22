@@ -188,8 +188,39 @@ namespace SimpleDeFence.UI.Services
                     }, "Blocked");
                 }
 
+                // Counted by the service, so only asked for when it could be reached.
+                var traffic = new List<TrafficRow>();
+                var trafficUnavailable = true;
+                var trafficSince = default(DateTime);
+                if (Connected)
+                {
+                    CollectSafely(() =>
+                    {
+                        var reply = _controller.GetTraffic();
+                        if (reply is null || !reply.Available)
+                            return;
+
+                        foreach (var app in reply.Apps)
+                        {
+                            traffic.Add(new TrafficRow
+                            {
+                                AppName = ConnectionActivity.DisplayName(app.Path, null, app.Services),
+                                AppPath = app.Path,
+                                Key = TrafficLedger.KeyOf(app),
+                                Sent = app.Sent,
+                                Received = app.Received,
+                            });
+                        }
+                        trafficSince = reply.Since;
+                        trafficUnavailable = false;
+                    }, "Traffic");
+                }
+
                 return new ConnectionsSnapshot
                 {
+                    Traffic = traffic,
+                    TrafficUnavailable = trafficUnavailable,
+                    TrafficSince = trafficSince,
                     Blocked = blocked,
                     BlockedUnavailable = blockedUnavailable,
                     Connected = connected.OrderBy(r => r.AppName, StringComparer.CurrentCultureIgnoreCase).ToList(),

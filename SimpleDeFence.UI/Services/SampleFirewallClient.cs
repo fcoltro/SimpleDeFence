@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -319,9 +319,47 @@ namespace SimpleDeFence.UI.Services
                 Blocked = BuildSampleBlocked(),
                 Connected = BuildSampleConnected(),
                 Open = BuildSampleOpen(),
+                Traffic = BuildSampleTraffic(),
+                TrafficUnavailable = false,
+                TrafficSince = _trafficSince,
             };
 
             return Task.FromResult(snapshot);
+        }
+
+        private readonly DateTime _trafficSince = DateTime.Now.AddHours(-3);
+
+        /// <summary>Grows on every call, so auto-refresh shows a rate the way it would on a real
+        /// machine.</summary>
+        private IReadOnlyList<TrafficRow> BuildSampleTraffic()
+        {
+            double minutes = (DateTime.Now - _trafficSince).TotalMinutes;
+            TrafficRow Row(string path, string[] services, double sentPerMinute, double receivedPerMinute)
+            {
+                var app = new AppTraffic
+                {
+                    Path = path,
+                    Services = services,
+                    Sent = (long)(sentPerMinute * minutes),
+                    Received = (long)(receivedPerMinute * minutes),
+                };
+                return new TrafficRow
+                {
+                    AppName = ConnectionActivity.DisplayName(app.Path, null, app.Services),
+                    AppPath = app.Path,
+                    Key = TrafficLedger.KeyOf(app),
+                    Sent = app.Sent,
+                    Received = app.Received,
+                };
+            }
+
+            return new[]
+            {
+                Row(@"C:\Program Files\Google\Chrome\Application\chrome.exe", Array.Empty<string>(), 900_000, 21_000_000),
+                Row(@"C:\Windows\System32\svchost.exe", new[] { "DoSvc" }, 40_000, 6_500_000),
+                Row(@"C:\Program Files\Microsoft OneDrive\OneDrive.exe", Array.Empty<string>(), 2_400_000, 150_000),
+                Row("System", Array.Empty<string>(), 3_000, 9_000),
+            };
         }
 
         public Task<MessageType> AllowAsync(ExceptionSubject subject, ExceptionPolicy policy, AppExceptionTimer timer = AppExceptionTimer.Permanent)

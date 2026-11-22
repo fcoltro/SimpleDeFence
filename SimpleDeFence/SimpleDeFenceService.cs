@@ -76,6 +76,9 @@ namespace SimpleDeFence
 
         // Context needed for learning mode
         private readonly FirewallLogWatcher LogWatcher = new();
+
+        /// <summary>Set once Run has started the traffic trace; read from the pipe's thread.</summary>
+        private volatile TrafficMonitor? Traffic;
         private readonly List<FirewallExceptionV3> LearningNewExceptions = new();
 
         // Context for auto rule inheritance
@@ -2540,6 +2543,11 @@ namespace SimpleDeFence
             // Whatever cannot be reached yet is retried from MINUTE_TIMER.
             Task.Run(BackgroundItemsManager.RestoreAll);
 
+            // Bytes per app, for the Connections page's "Data used" section. Optional: when Windows
+            // will not start the trace, GET_TRAFFIC says so and nothing else is affected.
+            using var TrafficCounter = new TrafficMonitor();
+            Traffic = TrafficCounter;
+
             ProcessStartWatcher.EventArrived += ProcessStartWatcher_EventArrived;
             NetworkInterfaceWatcher.InterfaceChanged += (sender, args) =>
             {
@@ -2948,6 +2956,11 @@ namespace SimpleDeFence
                 // firing while either was running.
                 if ((int)reqMsg.Type >= (int)MessageType.UNLOCK)
                     LastControllerCommandTime = DateTime.Now;
+
+                // Also answered here: the counters are their own, thread-safe, and the page asks
+                // on every refresh.
+                if (reqMsg is TwMessageGetTraffic traffic)
+                    return Traffic?.Answer(traffic) ?? traffic.CreateResponse(false, DateTime.Now, Array.Empty<AppTraffic>());
 
                 // Process and wait for response
                 var req = new TwRequest(reqMsg);

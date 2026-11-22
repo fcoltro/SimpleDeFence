@@ -366,6 +366,34 @@
             </Grid>
         </DataTemplate>
 
+        <!-- One template for every width: the row is short enough to fit a narrow window. The
+             number columns are fixed rather than Auto so they line up from row to row; each row
+             is its own Grid, and Auto would size each one to its own text. -->
+        <DataTemplate x:Key="TrafficRow" x:DataType="local:TrafficListItem">
+            <Grid Padding="12,8" ColumnSpacing="12" ToolTipService.ToolTip="{x:Bind TooltipText}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*" MinWidth="120"/>
+                    <ColumnDefinition Width="96"/>
+                    <ColumnDefinition Width="96"/>
+                    <ColumnDefinition Width="96"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="1" Text="{x:Bind AppName}"
+                           Style="{StaticResource BodyStrongTextBlockStyle}"
+                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                <TextBlock Grid.Column="2" Text="{x:Bind SentText}" ToolTipService.ToolTip="{x:Bind SentLabel}"
+                           Style="{StaticResource CaptionTextBlockStyle}" TextAlignment="Right"
+                           VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                <TextBlock Grid.Column="3" Text="{x:Bind ReceivedText}" ToolTipService.ToolTip="{x:Bind ReceivedLabel}"
+                           Style="{StaticResource CaptionTextBlockStyle}" TextAlignment="Right"
+                           VerticalAlignment="Center" Opacity="0.8" TextWrapping="NoWrap"/>
+                <TextBlock Grid.Column="4" Text="{x:Bind RateText}" ToolTipService.ToolTip="{x:Bind RateLabel}"
+                           Style="{StaticResource CaptionTextBlockStyle}" TextAlignment="Right"
+                           VerticalAlignment="Center" TextWrapping="NoWrap"/>
+            </Grid>
+        </DataTemplate>
+
     </Page.Resources>
 
 
@@ -490,6 +518,25 @@
                                   ContextRequested="Row_ContextRequested"
                                   ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
                                   ItemTemplate="{StaticResource OpenRowWide}"/>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Bytes each app has sent and received since the service started counting. -->
+                <Expander x:Name="TrafficExpander" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="16" Glyph="&#xE9D2;"/>
+                            <TextBlock x:Name="TrafficHeaderText" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        </StackPanel>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock x:Name="TrafficNote" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Opacity="0.7" Margin="0,0,0,4" TextWrapping="Wrap" Visibility="Collapsed"/>
+                        <TextBlock x:Name="TrafficEmpty" Text="{loc:Loc Key=connections.traffic.empty}"
+                                   Style="{StaticResource BodyTextBlockStyle}" Opacity="0.7" Margin="0,8" Visibility="Collapsed"/>
+                        <ListView x:Name="TrafficList" SelectionMode="None"
+                                  ItemContainerStyle="{StaticResource ConnectionRowContainerStyle}"
+                                  ItemTemplate="{StaticResource TrafficRow}"/>
                     </StackPanel>
                 </Expander>
             </StackPanel>

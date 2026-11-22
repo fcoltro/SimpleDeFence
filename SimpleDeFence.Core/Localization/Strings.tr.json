@@ -93,6 +93,15 @@
   },
   "connections": {
     "title": "Bağlantılar",
+    "traffic": {
+      "section": "Kullanılan veri",
+      "since": "SimpleDeFence'in başladığı {0} itibarıyla sayılıyor. Bu bilgisayarda kalan trafik sayılmaz.",
+      "empty": "Sayım başladığından beri hiçbir uygulama ağı kullanmadı.",
+      "unavailable": "Veri kullanımı kullanılamıyor. Güvenlik duvarı hizmetine ulaşılamadı veya Windows trafiği saymasına izin vermedi.",
+      "sent": "Gönderilen",
+      "received": "Alınan",
+      "rate": "Son yenilemeden bu yana hız"
+    },
     "section": {
       "blocked": "Engellenen",
       "connected": "Bağlı",

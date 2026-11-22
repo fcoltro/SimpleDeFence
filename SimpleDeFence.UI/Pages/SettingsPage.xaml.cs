@@ -3,6 +3,7 @@ using System.Reflection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SimpleDeFence.Localization;
+using SimpleDeFence.UI.Services;
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -570,18 +571,11 @@ namespace SimpleDeFence.UI.Pages
         {
             if (_committing) return;
 
-            var picker = new global::Windows.Storage.Pickers.FileOpenPicker();
-            picker.FileTypeFilter.Add(".tws");
-
-            if (App.MainWindow is null)
-                return;
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            global::Windows.Storage.StorageFile? file;
+            // FilePickers, not the WinRT picker: that one cannot open from an elevated window.
+            string? file;
             try
             {
-                file = await picker.PickSingleFileAsync();
+                file = await FilePickers.OpenFileAsync(".tws");
             }
             catch (Exception ex)
             {
@@ -595,8 +589,8 @@ namespace SimpleDeFence.UI.Pages
             ConfigExport imported;
             try
             {
-                var buffer = await global::Windows.Storage.FileIO.ReadBufferAsync(file);
-                imported = SerializationHelper.Deserialize(buffer.ToArray(), new ConfigExport());
+                var bytes = await System.IO.File.ReadAllBytesAsync(file);
+                imported = SerializationHelper.Deserialize(bytes, new ConfigExport());
             }
             catch (Exception ex)
             {
@@ -653,7 +647,7 @@ namespace SimpleDeFence.UI.Pages
 
                 await RefreshAsync();
                 await ShowResultAsync(Loc.T(LocKeys.Settings.MaintenanceImportSuccessTitle),
-                    Loc.T(LocKeys.Settings.MaintenanceImportSuccessBody, file.Name));
+                    Loc.T(LocKeys.Settings.MaintenanceImportSuccessBody, System.IO.Path.GetFileName(file)));
             }
             else
             {
@@ -667,19 +661,10 @@ namespace SimpleDeFence.UI.Pages
         {
             if (_committing) return;
 
-            var picker = new global::Windows.Storage.Pickers.FileSavePicker();
-            picker.FileTypeChoices.Add(Loc.T(LocKeys.Settings.MaintenanceFilePickerName), new List<string> { ".tws" });
-            picker.SuggestedFileName = "SimpleDeFence";
-
-            if (App.MainWindow is null)
-                return;
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            global::Windows.Storage.StorageFile? file;
+            string? file;
             try
             {
-                file = await picker.PickSaveFileAsync();
+                file = await FilePickers.SaveFileAsync(Loc.T(LocKeys.Settings.MaintenanceFilePickerName), ".tws", "SimpleDeFence");
             }
             catch (Exception ex)
             {
@@ -698,10 +683,10 @@ namespace SimpleDeFence.UI.Pages
                     Controller = ClientSettings.Load(),
                 };
                 var bytes = SerializationHelper.Serialize(export);
-                await global::Windows.Storage.FileIO.WriteBytesAsync(file, bytes);
+                await System.IO.File.WriteAllBytesAsync(file, bytes);
 
                 await ShowResultAsync(Loc.T(LocKeys.Settings.MaintenanceExportSuccessTitle),
-                    Loc.T(LocKeys.Settings.MaintenanceExportSuccessBody, file.Path));
+                    Loc.T(LocKeys.Settings.MaintenanceExportSuccessBody, file));
             }
             catch (Exception ex)
             {
