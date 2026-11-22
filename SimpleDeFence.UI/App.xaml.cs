@@ -237,7 +237,12 @@ namespace SimpleDeFence.UI
                     | ServiceDegradation.ConfigurationUnreadable
                 : ServiceDegradation.None;
 
-            if (locked || degraded != ServiceDegradation.None || HasSwitch("--sample-data"))
+            // --smoke-test <page> is the UI smoke test CI runs (Services\SmokeTest.cs). It always
+            // runs on sample data: a test that opens pages and waits must never reach the real
+            // service and its rules.
+            var smokeTest = ArgValue("--smoke-test");
+
+            if (locked || degraded != ServiceDegradation.None || HasSwitch("--sample-data") || smokeTest is not null)
                 Firewall = new SampleFirewallClient(locked, degraded);
 
             m_window = new MainWindow();
@@ -257,6 +262,9 @@ namespace SimpleDeFence.UI
 
             // After the tray, which it shows its notifications through.
             _activity = new ActivityNotifier(m_window.DispatcherQueue);
+
+            if (smokeTest is not null && Firewall is SampleFirewallClient sample)
+                SmokeTest.Start(smokeTest, ArgValue("--smoke-out"), sample);
 
             // Closing the main window (title-bar X, Alt+F4) ends the process the same way Quit
             // does - WinUI's default behavior when the last window closes - but unlike Quit, that
