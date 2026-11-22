@@ -35,6 +35,45 @@ namespace SimpleDeFence.UI.Pages
             InitializeComponent();
             NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             Loaded += async (_, _) => await RefreshAsync();
+            Loaded += (_, _) => RealizeAllSettingsRows();
+        }
+
+        /// <summary>The cards inside each section are laid out by an ItemsRepeater, which only builds
+        /// the rows near the visible area and estimates the height of the rest. At the bottom of the
+        /// page the estimate and the real heights disagreed, so the scrollable height kept growing and
+        /// shrinking: the page shook and the last About row could not be scrolled into view. The page
+        /// has only a few dozen rows, so they are all built up front and the height stays put.</summary>
+        private void RealizeAllSettingsRows()
+        {
+            foreach (var expander in Descendants<CommunityToolkit.WinUI.Controls.SettingsExpander>(SettingsScroller))
+            {
+                // A section opened later builds its rows then, so catch those too (once per section).
+                expander.Expanded -= SettingsExpander_Expanded;
+                expander.Expanded += SettingsExpander_Expanded;
+            }
+            foreach (var repeater in Descendants<ItemsRepeater>(SettingsScroller))
+                repeater.VerticalCacheLength = 1000;
+        }
+
+        private void SettingsExpander_Expanded(object? sender, EventArgs e)
+            => DispatcherQueue.TryEnqueue(RealizeAllSettingsRows);
+
+        private static IEnumerable<T> Descendants<T>(DependencyObject root) where T : DependencyObject
+        {
+            var pending = new Stack<DependencyObject>();
+            pending.Push(root);
+            while (pending.Count > 0)
+            {
+                var node = pending.Pop();
+                int count = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(node);
+                for (int i = 0; i < count; i++)
+                {
+                    var child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(node, i);
+                    if (child is T match)
+                        yield return match;
+                    pending.Push(child);
+                }
+            }
         }
 
         private async Task RefreshAsync()
