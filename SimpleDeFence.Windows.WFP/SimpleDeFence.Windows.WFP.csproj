@@ -21,6 +21,6 @@
     <AssemblyTitle>SimpleDeFence.Windows.WFP</AssemblyTitle>
     <Company>Károly Pados</Company>
     <Copyright>Copyright © 2015 Károly Pados</Copyright>
-    <Version>1.2.1</Version>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 </Project>
