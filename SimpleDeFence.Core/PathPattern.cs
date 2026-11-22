@@ -26,6 +26,44 @@ namespace SimpleDeFence
         private static readonly char[] Wildcards = { '*', '?' };
 
         /// <summary>
+        /// The environment variables a pattern may use. Only the machine-wide ones: the service
+        /// that applies the rule runs as SYSTEM, so a per-user variable such as %LOCALAPPDATA%
+        /// would point at SYSTEM's own profile there and at the user's in this window - the rule
+        /// would match one folder and the preview would count another.
+        /// </summary>
+        public static readonly string[] MachineVariables =
+        {
+            "ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "CommonProgramFiles",
+            "CommonProgramFiles(x86)", "ProgramData", "ALLUSERSPROFILE", "PUBLIC",
+            "SystemRoot", "windir", "SystemDrive",
+        };
+
+        /// <summary>
+        /// The pattern with its machine-wide variables (%ProgramFiles% and the like) replaced by
+        /// their values. Any other %name% is left as written, so it simply matches nothing rather
+        /// than meaning something different in the service than on screen.
+        /// </summary>
+        public static string Expand(string pattern)
+        {
+            if (string.IsNullOrEmpty(pattern) || pattern.IndexOf('%') < 0)
+                return pattern;
+
+            return Regex.Replace(pattern, @"%([^%\\]+)%", m =>
+            {
+                var name = m.Groups[1].Value;
+                foreach (var known in MachineVariables)
+                {
+                    if (string.Equals(known, name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var value = Environment.GetEnvironmentVariable(known);
+                        return string.IsNullOrEmpty(value) ? m.Value : value.TrimEnd('\\');
+                    }
+                }
+                return m.Value;
+            });
+        }
+
+        /// <summary>
         /// The pattern as it is stored: trimmed, quotes removed, forward slashes turned into
         /// backslashes, and a plain folder turned into "folder\**". Returns null when the text
         /// cannot be a folder rule - not a full path, or a whole drive (which would allow or block
@@ -52,7 +90,8 @@ namespace SimpleDeFence
             else if (p.EndsWith(@"\", StringComparison.Ordinal))
                 p += "**";
 
-            var baseDir = BaseDirectory(p);
+            // Kept as typed (variables and all); checked as the service will see it.
+            var baseDir = BaseDirectory(Expand(p));
             if (baseDir is null)
                 return null;
 
@@ -110,6 +149,7 @@ namespace SimpleDeFence
         /// <summary>The pattern as a case-insensitive regular expression over whole paths.</summary>
         public static Regex ToRegex(string pattern)
         {
+            pattern = Expand(pattern);
             var sb = new StringBuilder("^");
             for (int i = 0; i < pattern.Length; ++i)
             {
@@ -164,6 +204,7 @@ namespace SimpleDeFence
         public static List<string> EnumerateMatches(string pattern, int limit = MaxExpandedFiles)
         {
             var results = new List<string>();
+            pattern = Expand(pattern);
             var baseDir = BaseDirectory(pattern);
             if (baseDir is null || limit <= 0)
                 return results;

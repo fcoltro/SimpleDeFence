@@ -26,9 +26,12 @@ namespace SimpleDeFence.UI.Pages
         /// no longer exists on disk - typically because the app was uninstalled after the rule was
         /// created. ServiceSubject derives from ExecutableSubject and is covered by the same check;
         /// GlobalSubject (no path) and AppContainerSubject (a UWP package, not a loose file) have no
-        /// simple existence check and are never flagged.</summary>
-        public bool IsMissing => Row.Exception?.Subject is ExecutableSubject exe
-            && !System.IO.File.Exists(exe.ExecutablePath);
+        /// simple existence check and are never flagged.
+        ///
+        /// Worked out once per refresh, off the UI thread (see RulesPage.RefreshAsync), and handed
+        /// in here. It used to be a File.Exists call made by the binding itself, three times per
+        /// row on every redraw - on the UI thread, where a sleeping drive froze the window.</summary>
+        public bool IsMissing { get; init; }
 
         /// <summary>Paired with MissingNameVisibility below: the row template shows one of two
         /// overlapping TextBlocks rather than switching a single TextBlock's Foreground from C#.
@@ -44,9 +47,13 @@ namespace SimpleDeFence.UI.Pages
         /// row colour.</summary>
         // global:: is required - inside SimpleDeFence.UI.Pages a bare "Windows" binds to
         // SimpleDeFence.Windows, not the platform namespace.
-        public global::Microsoft.UI.Xaml.Media.Brush RowBackground => IsBlocked
-            ? new global::Microsoft.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(0x40, 0xE8, 0x11, 0x23))
-            : new global::Microsoft.UI.Xaml.Media.SolidColorBrush(global::Microsoft.UI.Colors.Transparent);
+        public global::Microsoft.UI.Xaml.Media.Brush RowBackground => IsBlocked ? s_blockedBrush : s_clearBrush;
+
+        // One pair for every row, rather than two new brushes per row per redraw.
+        private static readonly global::Microsoft.UI.Xaml.Media.Brush s_blockedBrush =
+            new global::Microsoft.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(0x40, 0xE8, 0x11, 0x23));
+        private static readonly global::Microsoft.UI.Xaml.Media.Brush s_clearBrush =
+            new global::Microsoft.UI.Xaml.Media.SolidColorBrush(global::Microsoft.UI.Colors.Transparent);
     }
 
     /// <summary>One special-exception row with its toggle.</summary>
@@ -248,6 +255,8 @@ namespace SimpleDeFence.UI.Pages
         private IReadOnlyList<string> _publisherSubjects = Array.Empty<string>();
         private readonly List<CustomRuleEditor> _customEditors = new();
         private IReadOnlyList<RuleRow> _rows = Array.Empty<RuleRow>();
+        private HashSet<Guid> _missingIds = new();
+        private int _coverageVersion;
         private bool _busy;
         private bool _committing;
 
@@ -311,7 +320,11 @@ namespace SimpleDeFence.UI.Pages
                     Notice.IsOpen = false;
                     _publisherSubjects = App.Firewall.Config.ActiveProfile.TrustedPublishers.ToList();
                     var db = await App.Firewall.GetAppDatabaseAsync();
-                    _rows = RuleListBuilder.Build(App.Firewall.Config.ActiveProfile, db ?? new AppDatabase());
+                    var profile = App.Firewall.Config.ActiveProfile;
+                    _rows = RuleListBuilder.Build(profile, db ?? new AppDatabase());
+                    // Off the UI thread: a path on a slow or sleeping drive can take a while to
+                    // answer. Same test Clean up uses, so the red rows are exactly what it removes.
+                    _missingIds = (await Task.Run(() => RuleEdit.MissingExecutableRules(profile, System.IO.File.Exists, System.IO.Directory.Exists))).ToHashSet();
                 }
             }
             catch (Exception ex)
@@ -345,7 +358,7 @@ namespace SimpleDeFence.UI.Pages
 
             _apps.Clear();
             foreach (var row in filtered.Where(r => r.Group == RuleGroup.Applications))
-                _apps.Add(new RuleListItem { Row = row });
+                _apps.Add(new RuleListItem { Row = row, IsMissing = row.Exception is { } e && _missingIds.Contains(e.Id) });
 
             if (selectedIds.Count != 0)
             {
@@ -475,6 +488,7 @@ namespace SimpleDeFence.UI.Pages
             DetailKind.Text = row.Kind;
             DetailSubjectDetail.Text = row.Detail;
             DetailSubjectDetail.Visibility = string.IsNullOrEmpty(row.Detail) ? Visibility.Collapsed : Visibility.Visible;
+            ShowFolderCoverage(row.Exception?.Subject as PathPatternSubject);
 
             var policy = row.Exception!.Policy;
             // Not policy.PolicyType == PolicyType.RuleList: that enum is a hand-maintained,
@@ -542,6 +556,38 @@ namespace SimpleDeFence.UI.Pages
 
             UpdateTcpUdpFieldsEnabled();
             UpdateApplyButtonEnabled();
+        }
+
+        /// <summary>
+        /// For a folder rule, which programs it covers right now, listed under its pattern. Counted
+        /// off the UI thread, and dropped if the selection moved on before the count finished.
+        /// </summary>
+        private async void ShowFolderCoverage(PathPatternSubject? folder)
+        {
+            int mine = ++_coverageVersion;
+            if (folder is null || string.IsNullOrEmpty(folder.Pattern))
+            {
+                DetailCoverage.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            const int listLimit = 30, countLimit = 500;
+            DetailCoverage.Text = Loc.T(LocKeys.Common.Loading);
+            DetailCoverage.Visibility = Visibility.Visible;
+
+            List<string> matches;
+            try { matches = await Task.Run(() => PathPattern.EnumerateMatches(folder.Pattern, countLimit)); }
+            catch { matches = new List<string>(); }
+            if (mine != _coverageVersion)
+                return;
+
+            var header = matches.Count == 0 ? Loc.T(LocKeys.Rules.FolderMatchesNone)
+                : matches.Count >= countLimit ? Loc.T(LocKeys.Rules.FolderMatchesMany, countLimit)
+                : Loc.T(LocKeys.Rules.FolderMatches, matches.Count);
+            var lines = matches.Take(listLimit).Select(System.IO.Path.GetFileName);
+            DetailCoverage.Text = matches.Count == 0
+                ? header
+                : header + "\n" + string.Join("\n", lines) + (matches.Count > listLimit ? "\n..." : string.Empty);
         }
 
         /// <summary>True for exactly the ExceptionPolicy subclasses SeedDetailPane/

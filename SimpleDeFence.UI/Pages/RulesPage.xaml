@@ -176,6 +176,9 @@
                                     <TextBlock x:Name="DetailName" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
                                     <TextBlock x:Name="DetailKind" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
                                     <TextBlock x:Name="DetailSubjectDetail" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8" TextWrapping="Wrap"/>
+                                    <!-- Folder rules only: the programs the pattern covers right now (ShowFolderCoverage). -->
+                                    <TextBlock x:Name="DetailCoverage" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"
+                                               TextWrapping="Wrap" Visibility="Collapsed" Margin="0,6,0,0" IsTextSelectionEnabled="True"/>
                                 </StackPanel>
 
                                 <TextBlock x:Name="DetailReadOnlyNote" Text="{loc:Loc Key=rules.detail.customRulesReadOnly}"

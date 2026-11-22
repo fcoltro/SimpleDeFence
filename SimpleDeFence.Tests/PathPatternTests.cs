@@ -85,6 +85,23 @@ namespace SimpleDeFence.Tests
         }
 
         [Fact]
+        public void Machine_wide_variables_are_expanded_and_kept_as_typed()
+        {
+            var programFiles = Environment.GetEnvironmentVariable("ProgramFiles")!.TrimEnd('\\');
+            Assert.Equal(@"%ProgramFiles%\Tools\**", PathPattern.Normalize(@"%ProgramFiles%\Tools"));
+            Assert.Equal(programFiles + @"\Tools\**", PathPattern.Expand(@"%programfiles%\Tools\**"));
+            Assert.True(PathPattern.IsMatch(@"%ProgramFiles%\Tools\**", programFiles + @"\Tools\a.exe"));
+        }
+
+        [Fact]
+        public void Per_user_and_unknown_variables_are_not_expanded()
+        {
+            // The service runs as SYSTEM, so %LOCALAPPDATA% would mean another folder there.
+            Assert.Equal(@"%LOCALAPPDATA%\x\**", PathPattern.Expand(@"%LOCALAPPDATA%\x\**"));
+            Assert.Null(PathPattern.Normalize(@"%LOCALAPPDATA%\x"));
+        }
+
+        [Fact]
         public void Folder_rule_survives_a_save_and_load()
         {
             var ex = new FirewallExceptionV3(new PathPatternSubject(@"C:\Tools\**"), new UnrestrictedPolicy());

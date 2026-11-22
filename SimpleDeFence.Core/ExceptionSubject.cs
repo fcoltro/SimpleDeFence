@@ -511,7 +511,7 @@ namespace SimpleDeFence
         {
             get
             {
-                var dir = PathPattern.BaseDirectory(Pattern ?? string.Empty);
+                var dir = PathPattern.BaseDirectory(PathPattern.Expand(Pattern ?? string.Empty));
                 if (string.IsNullOrEmpty(dir))
                     return Pattern ?? string.Empty;
                 var name = System.IO.Path.GetFileName(dir.TrimEnd('\\'));
