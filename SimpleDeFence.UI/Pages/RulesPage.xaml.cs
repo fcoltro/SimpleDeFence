@@ -836,16 +836,16 @@ namespace SimpleDeFence.UI.Pages
 
             // Like an application group in Fort Firewall: a name, and as many folders or patterns
             // as the user wants, one per line. A program matching any of them gets the rule.
+            // No placeholder text in either box: example paths there looked like text already
+            // typed in, so the greyed-out Add button looked broken. The help line has the examples.
             var nameBox = new TextBox
             {
                 Header = Loc.T(LocKeys.Rules.FolderName),
-                PlaceholderText = "MyApp",
                 MinWidth = 380,
             };
             var patternBox = new TextBox
             {
                 Header = Loc.T(LocKeys.Rules.FolderPattern),
-                PlaceholderText = "C:\\Program Files\\MyApp\\**\rC:\\Games\\*\\game.exe",
                 MinWidth = 380,
                 AcceptsReturn = true,
                 TextWrapping = TextWrapping.NoWrap,
